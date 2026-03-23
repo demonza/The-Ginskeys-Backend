@@ -74,8 +74,6 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3001;
 
-const PORT = process.env.PORT;
-
 if (!PORT) {
   console.error("❌ PORT is not defined");
   process.exit(1);
