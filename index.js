@@ -61,6 +61,9 @@ app.use('/api/tours',        tourRoutes);
 app.use('/api/audit',        auditRoutes);
 
 // ─── HEALTH ───────────────────────────────────────────
+app.get('/', (req, res) => {
+  res.send('Server is alive');
+});
 app.get('/api/health', (req, res) => res.json({ ok: true, ts: new Date() }));
 
 // ─── ERROR HANDLER ────────────────────────────────────
