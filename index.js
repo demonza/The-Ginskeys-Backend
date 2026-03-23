@@ -27,7 +27,8 @@ const ALLOWED_ORIGINS = new Set([
   'http://127.0.0.1:5173',
   'http://localhost:8080',
   'http://127.0.0.1:8080',
-  'null',   // file:// — browser sends literal string "null" as origin
+  'null',
+  'the-ginskeys-backend-production.up.railway.app'// file:// — browser sends literal string "null" as origin
 ]);
 
 const corsOptions = {
