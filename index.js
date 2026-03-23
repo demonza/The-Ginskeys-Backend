@@ -54,7 +54,7 @@ app.options('*', cors(corsOptions)); // pre-flight for all routes
 app.use(express.json());
 
 // ─── ROUTES ───────────────────────────────────────────
-//app.use('/api/auth',         authRoutes);
+app.use('/api/auth',         authRoutes);
 //app.use('/api/transactions', transactionRoutes);
 //app.use('/api/invites',      inviteRoutes);
 //app.use('/api/tours',        tourRoutes);
