@@ -56,9 +56,9 @@ app.use(express.json());
 // ─── ROUTES ───────────────────────────────────────────
 app.use('/api/auth',         authRoutes);
 app.use('/api/transactions', transactionRoutes);
-//app.use('/api/invites',      inviteRoutes);
-//app.use('/api/tours',        tourRoutes);
-//app.use('/api/audit',        auditRoutes);
+app.use('/api/invites',      inviteRoutes);
+app.use('/api/tours',        tourRoutes);
+app.use('/api/audit',        auditRoutes);
 
 // ─── HEALTH ───────────────────────────────────────────
 app.get('/', (req, res) => {
