@@ -22,7 +22,11 @@ const EXTRA_ORIGINS = (process.env.FRONTEND_URL || '')
 
 const ALLOWED_ORIGINS = new Set([
   ...EXTRA_ORIGINS,
-  'the-ginskeys-backend-production.up.railway.app'// file:// — browser sends literal string "null" as origin
+  'https://the-ginskeys-backend-production.up.railway.app',
+  'null', // 🔥 permite abrir HTML local (file://)
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173'
 ]);
 
 const corsOptions = {
