@@ -62,7 +62,7 @@ app.use('/api/audit',        auditRoutes);
 
 // ─── HEALTH ───────────────────────────────────────────
 app.get('/', (req, res) => {
-  res.send('Server is alive');
+  res.sendFile(path.join(__dirname, 'ginskeys-console.html'));
 });
 app.get('/api/health', (req, res) => res.json({ ok: true, ts: new Date() }));
 
