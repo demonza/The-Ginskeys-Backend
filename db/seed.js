@@ -66,7 +66,7 @@ async function seed() {
     const adminId   = uuid();
     await client.query(`
       INSERT INTO users (id, email, name, role, password_hash, active)
-      VALUES ($1, 'tiago@ginskeys.com', 'Tiago S.', 'admin', $2, true)
+      VALUES ($1, 'tiago@ginskeys.com', 'Tiago M.', 'admin', $2, true)
       ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash
       RETURNING id
     `, [adminId, adminHash]);
@@ -79,9 +79,9 @@ async function seed() {
 
     // ── Other users ─────────────────────────────────
     const otherUsers = [
-      { email:'ana@ginskeys.com',     name:'Ana M.',     role:'manager'     },
-      { email:'ricardo@ginskeys.com', name:'Ricardo F.', role:'accountant'  },
-      { email:'marta@ginskeys.com',   name:'Marta V.',   role:'viewer'      },
+      { email:'fabio@ginskeys.com',     name:'Fábio Batista',     role:'admin'     },
+      { email:'pedro@ginskeys.com', name:'Pedro Nunes.', role:'admin'  },
+      { email:'manel@ginskeys.com',   name:'Manuel Dias',   role:'admin'      },
     ];
     for (const u of otherUsers) {
       const h = await bcrypt.hash('GK!Change2026', SALT_ROUNDS);
@@ -159,9 +159,9 @@ async function seed() {
     console.log('');
     console.log('Login credentials:');
     console.log('  Admin:       tiago@ginskeys.com   / GK!Admin2026');
-    console.log('  Manager:     ana@ginskeys.com     / GK!Change2026');
-    console.log('  Accountant:  ricardo@ginskeys.com / GK!Change2026');
-    console.log('  Viewer:      marta@ginskeys.com   / GK!Change2026');
+    console.log('  Admin:     fabio@ginskeys.com     / GK!Change2026');
+    console.log('  Admin:  pedro@ginskeys.com / GK!Change2026');
+    console.log('  Admin:      manel@ginskeys.com   / GK!Change2026');
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('❌ Seed failed:', err.message);
