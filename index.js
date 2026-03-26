@@ -3,9 +3,20 @@
 // ══════════════════════════════════════════════════════
 const path = require('path');
 require('dotenv').config();
+
+// ─── ENV VALIDATION (fail fast before anything starts) ─
+const REQUIRED_ENV = ['DATABASE_URL', 'JWT_SECRET'];
+const missing = REQUIRED_ENV.filter(k => !process.env[k]);
+if (missing.length) {
+  console.error(`❌ Missing required environment variables: ${missing.join(', ')}`);
+  console.error('   Create a .env file — see .env.example for reference.');
+  process.exit(1);
+}
+
 const express = require('express');
 const cors    = require('cors');
 const helmet  = require('helmet');
+const pool    = require('./db/pool');
 
 const authRoutes        = require('./routes/auth');
 const transactionRoutes = require('./routes/transactions');
@@ -24,10 +35,10 @@ const EXTRA_ORIGINS = (process.env.FRONTEND_URL || '')
 const ALLOWED_ORIGINS = new Set([
   ...EXTRA_ORIGINS,
   'https://the-ginskeys-backend-production.up.railway.app',
-  'null', // 🔥 permite abrir HTML local (file://)
+  'null', // permite abrir HTML local (file://)
   'http://localhost:3000',
   'http://localhost:5173',
-  'http://127.0.0.1:5173'
+  'http://127.0.0.1:5173',
 ]);
 
 const corsOptions = {
@@ -40,8 +51,8 @@ const corsOptions = {
     cb(new Error('CORS: origin not allowed — ' + origin));
   },
   credentials: true,
-  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 // ─── MIDDLEWARE ───────────────────────────────────────
@@ -60,11 +71,21 @@ app.use('/api/invites',      inviteRoutes);
 app.use('/api/tours',        tourRoutes);
 app.use('/api/audit',        auditRoutes);
 
-// ─── HEALTH ───────────────────────────────────────────
+// ─── HEALTH (actually tests the DB connection) ────────
+app.get('/api/health', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT now() AS db_time');
+    res.json({ ok: true, ts: new Date(), db_time: rows[0].db_time });
+  } catch (err) {
+    console.error('Health check DB error:', err.message);
+    res.status(503).json({ ok: false, error: 'Database unreachable', detail: err.message });
+  }
+});
+
+// ─── FRONTEND ─────────────────────────────────────────
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'ginskeys-console.html'));
 });
-app.get('/api/health', (req, res) => res.json({ ok: true, ts: new Date() }));
 
 // ─── ERROR HANDLER ────────────────────────────────────
 app.use((err, req, res, next) => {
@@ -72,13 +93,27 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
 });
 
-const PORT = process.env.PORT || 8080;
+// ─── START ────────────────────────────────────────────
+const PORT = parseInt(process.env.PORT || '8080', 10);
 
-if (!PORT) {
-  console.error("❌ PORT is not defined");
-  process.exit(1);
+async function start() {
+  // Test DB connection before accepting any traffic
+  try {
+    const client = await pool.connect();
+    await client.query('SELECT 1');
+    client.release();
+    console.log('✅ Database connected.');
+  } catch (err) {
+    console.error('❌ Cannot connect to database:', err.message);
+    console.error('   Check DATABASE_URL in your .env file.');
+    process.exit(1);
+  }
+
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🎸 Ginskeys API listening on :${PORT}`);
+    console.log(`   Health:  http://localhost:${PORT}/api/health`);
+    console.log(`   Console: http://localhost:${PORT}/`);
+  });
 }
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Ginskeys API listening on :${PORT}`);
-});
+start();
