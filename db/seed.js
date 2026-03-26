@@ -132,14 +132,25 @@ async function seed() {
         const catKey = t.cat.toLowerCase();
         const catId  = catMap[catKey] || null;
 
+        // Map transactions to tours by tag
+        let tourId = null;
+        if (t.tags && t.tags.includes('tour')) {
+          // Match by year range
+          const txYear = t.date.slice(0, 4);
+          if (txYear === '2022') tourId = tourMap['Concertos 2022'] || null;
+          else if (t.date === '2023-08-01') tourId = tourMap['Tasquinhas 2023'] || null;
+          else if (t.date === '2024-04-01') tourId = tourMap['Semana da Juventude 2024'] || null;
+          else if (t.date === '2024-06-01') tourId = tourMap['Abril em Odemira 2024'] || null;
+        }
+
         await client.query(`
           INSERT INTO transactions
-            (id, date, type, category_id, amount, currency, amount_eur, description, tags, reconciled, created_by)
-          VALUES ($1,$2,$3,$4,$5,'EUR',$5,$6,$7,true,$8)
+            (id, date, type, category_id, amount, currency, amount_eur, description, tags, tour_id, reconciled, created_by)
+          VALUES ($1,$2,$3,$4,$5,'EUR',$5,$6,$7,$8,true,$9)
         `, [
           uuid(), t.date, t.type, catId,
           t.amount, t.desc,
-          t.tags, realAdminId
+          t.tags, tourId, realAdminId
         ]);
       }
       console.log(`✅ Seeded ${sorted.length} transactions.`);
