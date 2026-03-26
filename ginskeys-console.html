@@ -3273,8 +3273,8 @@ function saveInvites(i){ localStorage.setItem('gk_invites', JSON.stringify(i)); 
 function seedAdminIfNeeded(){
   if (API_BASE) return; // backend handles users
   const users = getUsers();
-  if (!users.find(u => u.email === 'tiago@ginskeys.com')){
-    users.push({email:'tiago@ginskeys.com',name:'Tiago S.',role:'admin',passwordHash:'GK!Admin2026',active:true,created:Date.now()});
+  if (!users.find(u => u.email === 'mendonza@theginskeys.com')){
+    users.push({email:'mendonza@theginskeys.com',name:'Mendonza',role:'admin',passwordHash:'GK!Admin2026',active:true,created:Date.now()});
     saveUsers(users);
   }
 }
@@ -3610,7 +3610,7 @@ async function generateInvite(){
 
 // ─── RENDER: USERS (with real invite list) ─────────────
 const BASE_USERS=[
-  {name:'Tiago S.',email:'tiago@ginskeys.com',role:'admin',online:true,initials:'TS',color:'var(--accent)'},
+  {name:'Mendonza',email:'mendonza@theginskeys.com',role:'admin',online:true,initials:'TS',color:'var(--accent)'},
 ];
 // Role display colors map (used in renderUsers and elsewhere)
 const ROLE_COLORS={'admin':'var(--accent)','co-admin':'var(--accent3)','manager':'var(--green2)','accountant':'var(--blue2)','viewer':'var(--amber2)'};
