@@ -3695,8 +3695,7 @@ function renderTourDetail(t){
 // Render detail for most recent tour on load
 if(typeof TOUR_DATA!=='undefined' && TOUR_DATA.length){
   document.addEventListener('DOMContentLoaded',()=>renderTourDetail(TOUR_DATA[TOUR_DATA.length-1]));
-}
-document.addEventListener('DOMContentLoaded', () => {
+
   SESSION = getSession();   // ✅ THIS FIX
 
   if (SESSION) {
