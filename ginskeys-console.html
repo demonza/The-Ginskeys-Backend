@@ -3696,14 +3696,6 @@ function renderTourDetail(t){
 if(typeof TOUR_DATA!=='undefined' && TOUR_DATA.length){
   document.addEventListener('DOMContentLoaded',()=>renderTourDetail(TOUR_DATA[TOUR_DATA.length-1]));
 
-  SESSION = getSession();   // ✅ THIS FIX
-
-  if (SESSION) {
-    enterApp();
-  } else {
-    showForm('login');
-  }
-});
 // ─── EMAIL TEMPLATES ──────────────────────────────────
 const EMAIL_TEMPLATES = {
   invite: (token='GINSK-XXXX-XXXX-XXXX', role='viewer', recipientEmail='band-member@example.com') => `
