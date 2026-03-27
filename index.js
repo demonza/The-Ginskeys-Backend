@@ -85,13 +85,18 @@ app.use('/api/tours',        tourRoutes);
 app.use('/api/audit',        auditRoutes);
 
 // ─── HEALTH (actually tests the DB connection) ────────
-app.get('/api/health', (req, res) => {
-  res.json({ ok: true, ts: new Date() });
-});
-    res.json({ ok: true, ts: new Date(), db_time: rows[0].db_time });
+app.get('/api/health', async (req, res) => {
+  try {
+    const result = await Promise.race([
+      pool.query('SELECT 1'),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('DB timeout')), 2000)
+      )
+    ]);
+
+    res.json({ ok: true });
   } catch (err) {
-    console.error('Health check DB error:', err.message);
-    res.status(503).json({ ok: false, error: 'Database unreachable', detail: err.message });
+    res.status(503).json({ ok: false, error: 'DB slow/unreachable' });
   }
 });
 
