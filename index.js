@@ -57,25 +57,8 @@ const corsOptions = {
 
 // ─── MIDDLEWARE ───────────────────────────────────────
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: 'cross-origin' },
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc:     ["'self'"],
-      scriptSrc:      ["'self'", "'unsafe-inline'", "'unsafe-eval'",
-                       "https://cdnjs.cloudflare.com",
-                       "https://cdn.jsdelivr.net"],
-      styleSrc:       ["'self'", "'unsafe-inline'",
-                       "https://fonts.googleapis.com"],
-      fontSrc:        ["'self'", "https://fonts.gstatic.com"],
-      imgSrc:         ["'self'", "data:"],
-      connectSrc:     ["'self'", "https://the-ginskeys-backend-production.up.railway.app"],
-      scriptSrcAttr:  ["'unsafe-inline'"], // allows inline event handlers (onclick etc.)
-    },
-  },
+  contentSecurityPolicy: false
 }));
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // pre-flight for all routes
-app.use(express.json());
 
 // ─── ROUTES ───────────────────────────────────────────
 app.use('/api/auth',         authRoutes);
