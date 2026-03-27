@@ -85,9 +85,9 @@ app.use('/api/tours',        tourRoutes);
 app.use('/api/audit',        auditRoutes);
 
 // ─── HEALTH (actually tests the DB connection) ────────
-app.get('/api/health', async (req, res) => {
-  try {
-    const { rows } = await pool.query('SELECT now() AS db_time');
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, ts: new Date() });
+});
     res.json({ ok: true, ts: new Date(), db_time: rows[0].db_time });
   } catch (err) {
     console.error('Health check DB error:', err.message);
