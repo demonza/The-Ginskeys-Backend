@@ -49,6 +49,20 @@ async function migrate() {
       );
     `);
 
+    // refresh_tokens table — stores hashed refresh tokens for revocation support
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS refresh_tokens (
+        id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        token_hash TEXT UNIQUE NOT NULL,
+        expires_at TIMESTAMPTZ NOT NULL,
+        revoked_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS idx_refresh_user ON refresh_tokens(user_id);
+      CREATE INDEX IF NOT EXISTS idx_refresh_hash ON refresh_tokens(token_hash);
+    `);
+
     await client.query(`
       CREATE TABLE IF NOT EXISTS categories (
         id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -129,7 +143,6 @@ async function migrate() {
       );
     `);
 
-    // Seed default categories
     await client.query(`
       INSERT INTO categories (name, type) VALUES
         ('Espetáculo',   'income'),
