@@ -23,7 +23,7 @@ router.get('/', requireAuth, requirePerm('createInvite'), async (req, res, next)
 // ─── POST /api/invites ─────────────────────────────
 router.post('/', requireAuth, requirePerm('createInvite'), async (req, res, next) => {
   try {
-    const { email, role, hoursValid = 72 } = req.body;
+    const { email, role, hoursValid = 72 } = req.body || {};
     if (!email || !role) return res.status(400).json({ error: 'email and role required' });
     const validRoles = ['co-admin','manager','accountant','viewer'];
     if (!validRoles.includes(role))
