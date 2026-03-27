@@ -66,14 +66,14 @@ async function seed() {
     const adminId   = uuid();
     await client.query(`
       INSERT INTO users (id, email, name, role, password_hash, active)
-      VALUES ($1, 'tiago@ginskeys.com', 'Tiago M.', 'admin', $2, true)
+      VALUES ($1, 'mendonza@theginskeys.com', 'Mendonza', 'admin', $2, true)
       ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash
       RETURNING id
     `, [adminId, adminHash]);
 
     // Fetch real admin id (might already exist)
     const { rows: adminRows } = await client.query(
-      "SELECT id FROM users WHERE email='tiago@ginskeys.com'"
+      "SELECT id FROM users WHERE email='mendonza@theginskeys.com'"
     );
     const realAdminId = adminRows[0].id;
 
@@ -169,7 +169,7 @@ async function seed() {
     console.log('✅ Seed complete.');
     console.log('');
     console.log('Login credentials:');
-    console.log('  Admin:       tiago@ginskeys.com   / GK!Admin2026');
+    console.log('  Admin:       mendonza@theginskeys.com   / GK!Admin2026');
     console.log('  Admin:     fabio@ginskeys.com     / GK!Change2026');
     console.log('  Admin:  pedro@ginskeys.com / GK!Change2026');
     console.log('  Admin:      manel@ginskeys.com   / GK!Change2026');
