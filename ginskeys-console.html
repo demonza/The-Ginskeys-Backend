@@ -373,6 +373,8 @@ body::before{
   gap:var(--panel-gap);
   background:var(--border);
   flex:1;
+  overflow-y:auto;
+  align-content:start;
 }
 
 /* ─── PANELS ─────────────────────────────────────── */
@@ -414,9 +416,8 @@ body::before{
 .panel-body::-webkit-scrollbar{width:3px}
 
 /* ─── VIEW PAGES ─────────────────────────────────── */
-.view{display:none;flex-direction:column}
-.view.active{display:contents}
-.view.active.new-view{display:flex;flex:1;flex-direction:column;min-height:0;overflow-y:auto}
+.view{display:none !important}
+.view.active{display:flex !important;flex:1;flex-direction:column;min-height:0;overflow-y:auto}
 
 /* ─── BAR CHARTS ─────────────────────────────────── */
 .bar-chart{display:flex;flex-direction:column;gap:7px}
@@ -1649,7 +1650,7 @@ tr:hover .edit-btn{display:inline}
 </div><!-- /dashboard -->
 
 <!-- ─ LEDGER VIEW ─────────────────────────────────── -->
-<div id="view-ledger" class="view" style="flex:1;display:none;flex-direction:column">
+<div id="view-ledger" class="view">
   <div class="ledger-toolbar">
     <button class="ledger-filter-btn active" onclick="filterLedger('all',this)">All</button>
     <button class="ledger-filter-btn" onclick="filterLedger('income',this)">Income</button>
@@ -1680,7 +1681,7 @@ tr:hover .edit-btn{display:inline}
 </div>
 
 <!-- ─ TOURS VIEW ──────────────────────────────────── -->
-<div id="view-tours" class="view" style="flex:1;display:none">
+<div id="view-tours" class="view">
   <div class="main-grid" style="grid-template-columns:280px 1fr">
 
     <div class="panel" style="overflow-y:auto">
@@ -1715,7 +1716,7 @@ tr:hover .edit-btn{display:inline}
 </div>
 
 <!-- ─ STREAMING VIEW ──────────────────────────────── -->
-<div id="view-streaming" class="view" style="flex:1;display:none">
+<div id="view-streaming" class="view">
   <div class="main-grid" style="grid-template-columns:1fr 1fr">
 
     <!-- CDBaby Data Entry Panel -->
@@ -1793,7 +1794,7 @@ tr:hover .edit-btn{display:inline}
 </div>
 
 <!-- ─ ACCESS VIEW ─────────────────────────────────── -->
-<div id="view-access" class="view" style="flex:1;display:none">
+<div id="view-access" class="view">
   <div class="main-grid" style="grid-template-columns:320px 1fr">
     <div class="panel" style="overflow-y:auto">
       <div class="panel-header">
@@ -1833,7 +1834,7 @@ tr:hover .edit-btn{display:inline}
 </div>
 
 <!-- ─ AUDIT LOG VIEW ──────────────────────────────── -->
-<div id="view-audit" class="view" style="flex:1;display:none">
+<div id="view-audit" class="view">
   <div class="main-grid" style="grid-template-columns:1fr 360px">
     <div class="panel" style="overflow-y:auto">
       <div class="panel-header">
@@ -1866,7 +1867,7 @@ tr:hover .edit-btn{display:inline}
 </div>
 
 <!-- ─ ALERTS VIEW ─────────────────────────────────── -->
-<div id="view-alerts" class="view" style="flex:1;display:none">
+<div id="view-alerts" class="view">
   <div class="main-grid" style="grid-template-columns:1fr 1fr">
     <div class="panel" style="overflow-y:auto">
       <div class="panel-header">
@@ -1903,7 +1904,7 @@ tr:hover .edit-btn{display:inline}
 </div>
 
 <!-- ─ SETTINGS VIEW ───────────────────────────────── -->
-<div id="view-settings" class="view" style="flex:1;display:none">
+<div id="view-settings" class="view">
   <div class="main-grid" style="grid-template-columns:1fr 1fr 1fr">
     <div class="panel" style="overflow-y:auto">
       <div class="panel-header">
@@ -1973,7 +1974,7 @@ tr:hover .edit-btn{display:inline}
 <!-- ═══════════════════════════════════════════════════════
      BOOKING CRM VIEW
 ════════════════════════════════════════════════════════ -->
-<div id="view-booking" class="view new-view" style="flex:1;display:none;flex-direction:column">
+<div id="view-booking" class="view new-view">
   <div class="main-grid" style="padding:12px;gap:12px;display:flex;flex-direction:column">
 
   <!-- Context Banner -->
@@ -2106,7 +2107,7 @@ tr:hover .edit-btn{display:inline}
 <!-- ═══════════════════════════════════════════════════════
      RELEASES VIEW
 ════════════════════════════════════════════════════════ -->
-<div id="view-releases" class="view new-view" style="flex:1;display:none;flex-direction:column">
+<div id="view-releases" class="view new-view">
   <div style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
 
     <!-- Context Banner -->
@@ -2246,7 +2247,7 @@ tr:hover .edit-btn{display:inline}
 <!-- ═══════════════════════════════════════════════════════
      PRESS & SYNC VIEW
 ════════════════════════════════════════════════════════ -->
-<div id="view-press" class="view new-view" style="flex:1;display:none;flex-direction:column">
+<div id="view-press" class="view new-view">
   <div style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
 
     <!-- Context Banner -->
@@ -2421,7 +2422,7 @@ tr:hover .edit-btn{display:inline}
 <!-- ═══════════════════════════════════════════════════════
      GIG SPLITS VIEW
 ════════════════════════════════════════════════════════ -->
-<div id="view-splits" class="view new-view" style="flex:1;display:none;flex-direction:column">
+<div id="view-splits" class="view new-view">
   <div style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
 
     <!-- Context Banner -->
@@ -2974,7 +2975,7 @@ function renderSplitHistory() {
 
 // ── WIRE INTO INIT ────────────────────────────────────────
 const _origInitAll = typeof initAll === 'function' ? initAll : null;
-function initAll(){
+function _initAll_old_0(){
   if (API_BASE && SESSION?.token) {
     Promise.all([
       loadLedgerFromApi(),
@@ -3141,7 +3142,7 @@ function initAll(){
 }
 </style>
 
-<div id="view-agent" class="view new-view" style="flex:1;display:none;flex-direction:column">
+<div id="view-agent" class="view new-view">
   <div style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
 
     <!-- Context Banner -->
@@ -3954,8 +3955,7 @@ async function loadAllGrowthData() {
   ]);
 }
 
-const _initAllPrev = initAll;
-function initAll() {
+const _initAllPrev = infunction _initAll_old_1initAll() {
   if (API_BASE && SESSION?.token) {
     Promise.all([
       loadLedgerFromApi(),
@@ -4041,7 +4041,7 @@ function initAll() {
 .time-kpi-lbl { font-size:7px; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; }
 </style>
 
-<div id="view-production" class="view new-view" style="flex:1;display:none;flex-direction:column">
+<div id="view-production" class="view new-view">
   <div style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0">
 
     <!-- Context Banner -->
@@ -5962,10 +5962,7 @@ function _renderAll() {
   renderAuditLog();
   renderAlertRules();
   showEmailTemplate('invite', document.querySelector('.email-tab'));
-  updateSessionExp();
-}
-
-function initAll(){
+  updateSesfunction _initAll_old_2nction initAll(){
   if (API_BASE && SESSION?.token) {
     Promise.all([
       loadLedgerFromApi(),
@@ -6718,13 +6715,11 @@ function switchView(view, tab){
     alert('Your role ('+SESSION.role+') does not have permission to view this section.');
     return;
   }
-  document.querySelectorAll('.view').forEach(v=>{v.classList.remove('active');v.style.display='none'});
+  // Hide all views
+  document.querySelectorAll('.view').forEach(v=>{ v.classList.remove('active'); });
   document.querySelectorAll('.tb-tab').forEach(t=>t.classList.remove('active'));
   const el=document.getElementById('view-'+view);
-  if(el){
-    el.classList.add('active');
-    el.style.display=''; // CSS takes over: .view.active or .view.active.new-view
-  }
+  if(el){ el.classList.add('active'); }
   if(tab) tab.classList.add('active');
   if(view==='streaming') initStreamChart();
   if(view==='audit'){ renderAuditLog(); showEmailTemplate('invite',document.querySelector('.email-tab')); }
