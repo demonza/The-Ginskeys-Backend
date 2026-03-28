@@ -12,18 +12,32 @@ const { writeAudit } = require('../middleware/audit');
 async function callAI(prompt, maxTokens = 1200) {
   // Try Gemini first (free tier — 1,500 calls/day)
   if (process.env.GEMINI_API_KEY) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
-      }),
-    });
-    if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
-    const data = await res.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // Try models in order until one works
+    const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-pro'];
+    let lastErr = 'No model worked';
+    for (const model of models) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (text) return text;
+        }
+        const errBody = await res.text().catch(() => '');
+        lastErr = `Gemini ${model} ${res.status}: ${errBody.slice(0, 150)}`;
+        // 400/403 = bad key or bad request, no point retrying other models
+        if (res.status === 400 || res.status === 403) break;
+      } catch(e) { lastErr = e.message; }
+    }
+    throw new Error(lastErr);
   }
 
   // Fallback to Anthropic if key present
@@ -74,7 +88,7 @@ const BAND_PROFILE = {
 // Curated list of real venues + festival types on the circuit
 const VENUE_DATABASE = [
   // Algarve — tourist corridor
-  { id:'v001', name:'Stevie Rays Blues Bar', city:'Lagos', region:'algarve', type:'bar_venue', capacity:150, genre_fit:'rock', contact_role:'Manager', fee_bracket:'€500–1200', notes:'Blues/rock format. Tourist season Jun–Sep peak.' },
+  { id:'v001', name:"Stevie Ray's Blues Bar", city:'Lagos', region:'algarve', type:'bar_venue', capacity:150, genre_fit:'rock', contact_role:'Manager', fee_bracket:'€500–1200', notes:'Blues/rock format. Tourist season Jun–Sep peak.' },
   { id:'v002', name:'Bon Vivant Music Bar', city:'Lagos', region:'algarve', type:'bar_venue', capacity:120, genre_fit:'rock', contact_role:'Booking Manager', fee_bracket:'€400–900', notes:'Regular live music nights. Mixed international crowd.' },
   { id:'v003', name:'Three Monkeys Bar', city:'Albufeira', region:'algarve', type:'bar_venue', capacity:200, genre_fit:'rock', contact_role:'Events Manager', fee_bracket:'€600–1500', notes:'High-energy venue. Summer season essential.' },
   { id:'v004', name:'Kiss Bar', city:'Albufeira', region:'algarve', type:'bar_venue', capacity:300, genre_fit:'rock', contact_role:'Promoter', fee_bracket:'€800–2000', notes:'Large rock venue. Albufeira strip.' },
