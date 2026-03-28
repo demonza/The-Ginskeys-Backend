@@ -8,6 +8,48 @@ const pool   = require('../db/pool');
 const { requireAuth, requirePerm } = require('../middleware/auth');
 const { writeAudit } = require('../middleware/audit');
 
+// ── AI HELPER — Gemini (free tier) ──────────────────
+async function callAI(prompt, maxTokens = 1200) {
+  // Try Gemini first (free tier — 1,500 calls/day)
+  if (process.env.GEMINI_API_KEY) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
+      }),
+    });
+    if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
+    const data = await res.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  }
+
+  // Fallback to Anthropic if key present
+  if (process.env.ANTHROPIC_API_KEY) {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: maxTokens,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+    if (!res.ok) throw new Error(`Anthropic error: ${res.status}`);
+    const data = await res.json();
+    return data.content?.[0]?.text || '';
+  }
+
+  throw new Error('No AI API key configured. Add GEMINI_API_KEY (free) or ANTHROPIC_API_KEY to Railway Variables.');
+}
+
+
 // ── BAND PROFILE (used to personalise every pitch) ─
 const BAND_PROFILE = {
   name: 'The Ginskeys',
@@ -32,7 +74,7 @@ const BAND_PROFILE = {
 // Curated list of real venues + festival types on the circuit
 const VENUE_DATABASE = [
   // Algarve — tourist corridor
-  { id:'v001', name:'Stevie Rays Blues Bar', city:'Lagos', region:'algarve', type:'bar_venue', capacity:150, genre_fit:'rock', contact_role:'Manager', fee_bracket:'€500–1200', notes:'Blues/rock format. Tourist season Jun–Sep peak.' },
+  { id:'v001', name:'Stevie Ray's Blues Bar', city:'Lagos', region:'algarve', type:'bar_venue', capacity:150, genre_fit:'rock', contact_role:'Manager', fee_bracket:'€500–1200', notes:'Blues/rock format. Tourist season Jun–Sep peak.' },
   { id:'v002', name:'Bon Vivant Music Bar', city:'Lagos', region:'algarve', type:'bar_venue', capacity:120, genre_fit:'rock', contact_role:'Booking Manager', fee_bracket:'€400–900', notes:'Regular live music nights. Mixed international crowd.' },
   { id:'v003', name:'Three Monkeys Bar', city:'Albufeira', region:'algarve', type:'bar_venue', capacity:200, genre_fit:'rock', contact_role:'Events Manager', fee_bracket:'€600–1500', notes:'High-energy venue. Summer season essential.' },
   { id:'v004', name:'Kiss Bar', city:'Albufeira', region:'algarve', type:'bar_venue', capacity:300, genre_fit:'rock', contact_role:'Promoter', fee_bracket:'€800–2000', notes:'Large rock venue. Albufeira strip.' },
@@ -85,28 +127,8 @@ router.post('/pitch', requireAuth, requirePerm('addTxn'), async (req, res, next)
 
     const prompt = buildPitchPrompt(venue, tone, language, proposed_date, additional_context);
 
-    // Call Claude API
-    const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY || '',
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-opus-4-5',
-        max_tokens: 1200,
-        messages: [{ role: 'user', content: prompt }],
-      }),
-    });
-
-    if (!claudeRes.ok) {
-      const err = await claudeRes.text();
-      return res.status(502).json({ error: 'AI generation failed', detail: err });
-    }
-
-    const data = await claudeRes.json();
-    const text = data.content?.[0]?.text || '';
+    // Call AI (Gemini free tier or Anthropic fallback)
+    const text = await callAI(prompt, 1200);
 
     // Parse subject and body
     const subjectMatch = text.match(/SUBJECT:\s*(.+)/i);
@@ -136,22 +158,7 @@ router.post('/followup', requireAuth, requirePerm('addTxn'), async (req, res, ne
 
     const prompt = buildFollowupPrompt(contact, followup_number, language);
 
-    const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY || '',
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-opus-4-5',
-        max_tokens: 800,
-        messages: [{ role: 'user', content: prompt }],
-      }),
-    });
-
-    const data = await claudeRes.json();
-    const text = data.content?.[0]?.text || '';
+    const text = await callAI(prompt, 800);
     const subjectMatch = text.match(/SUBJECT:\s*(.+)/i);
     const bodyMatch    = text.match(/BODY:\s*([\s\S]+)/i);
 
@@ -179,21 +186,7 @@ router.post('/batch', requireAuth, requirePerm('addTxn'), async (req, res, next)
 
       const prompt = buildPitchPrompt(venue, tone, language, proposed_month, '');
       try {
-        const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': process.env.ANTHROPIC_API_KEY || '',
-            'anthropic-version': '2023-06-01',
-          },
-          body: JSON.stringify({
-            model: 'claude-opus-4-5',
-            max_tokens: 800,
-            messages: [{ role: 'user', content: prompt }],
-          }),
-        });
-        const data = await claudeRes.json();
-        const text = data.content?.[0]?.text || '';
+        const text = await callAI(prompt, 800);
         const subjectMatch = text.match(/SUBJECT:\s*(.+)/i);
         const bodyMatch    = text.match(/BODY:\s*([\s\S]+)/i);
         results.push({
