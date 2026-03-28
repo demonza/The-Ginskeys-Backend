@@ -2424,8 +2424,8 @@ tr:hover .edit-btn{display:inline}
 <div id="view-splits" class="view new-view">
   <div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">
 
-    <!-- Context Banner -->
-    <div style="background:linear-gradient(90deg,rgba(255,171,0,.08) 0%,transparent 100%);border-left:3px solid var(--amber2);padding:12px 16px;border-radius:0 2px 2px 0;display:grid;grid-template-columns:1fr repeat(3,auto);gap:16px;align-items:center">
+    <!-- Banner -->
+    <div style="flex-shrink:0;background:linear-gradient(90deg,rgba(255,171,0,.08) 0%,transparent 100%);border-left:3px solid var(--amber2);padding:12px 16px;border-radius:0 2px 2px 0;display:grid;grid-template-columns:1fr repeat(3,auto);gap:16px;align-items:center">
       <div>
         <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--amber2);letter-spacing:.08em">GIG SPLITS</div>
         <div style="font-size:8px;color:var(--muted2);margin-top:2px">10% band fund per gig · after 12 gigs = <span style="color:var(--green3)">€1,332 reserved</span> for next recording</div>
@@ -2440,24 +2440,24 @@ tr:hover .edit-btn{display:inline}
       </div>
       <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
         <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--accent)" id="sp-banner-fund">€0</div>
-        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">BAND FUND TOTAL</div>
+        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">BAND FUND</div>
       </div>
     </div>
 
-    <!-- Splits Intelligence -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;flex-shrink:0">
-
-      <!-- Per-member earnings history -->
+    <!-- Intelligence row -->
+    <div style="flex-shrink:0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
       <div class="panel">
-        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div><span data-i18n="splits_member_earn">Member Earnings</span></div></div></div></div></div></div>
+        <div class="panel-header">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div><span data-i18n="splits_member_earn">Member Earnings</span></div>
+        </div>
         <div id="sp-member-history" style="padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:9px">
-          <div style="color:var(--muted3)">Save gig splits to see per-member earnings history.</div>
+          <div style="color:var(--muted3)">Save gig splits to see per-member earnings.</div>
         </div>
       </div>
-
-      <!-- Band fund tracker -->
       <div class="panel">
-        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_fund">Band Fund Tracker</span></div></div></div></div></div></div>
+        <div class="panel-header">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_fund">Band Fund Tracker</span></div>
+        </div>
         <div class="panel-body" style="display:flex;flex-direction:column;gap:8px">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
             <div style="background:var(--bg4);padding:10px;border-radius:2px;text-align:center">
@@ -2465,54 +2465,54 @@ tr:hover .edit-btn{display:inline}
               <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--amber2)" id="sp-fund-total">€0</div>
             </div>
             <div style="background:var(--bg4);padding:10px;border-radius:2px;text-align:center">
-              <div style="font-size:7px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px">NEXT MILESTONE</div>
+              <div style="font-size:7px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px">TARGET</div>
               <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--text)" id="sp-fund-target">€400</div>
             </div>
           </div>
           <div>
-            <div style="font-size:7px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px">PROGRESS TO NEXT RECORDING SESSION</div>
+            <div style="font-size:7px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px">PROGRESS TO RECORDING SESSION</div>
             <div style="height:8px;background:var(--bg4);border-radius:1px;overflow:hidden;margin-bottom:4px">
-              <div id="sp-fund-bar" style="height:100%;background:linear-gradient(90deg,var(--amber2),var(--accent));transition:width .5s;width:0%"></div>
+              <div id="sp-fund-bar" style="height:100%;background:linear-gradient(90deg,var(--amber2),var(--accent));width:0%;transition:width .5s"></div>
             </div>
             <div style="font-size:7px;color:var(--muted2)" id="sp-fund-progress-text">€0 of €400 target</div>
           </div>
           <div style="font-size:8px;color:var(--muted2);padding:8px;background:var(--bg4);border-radius:2px;line-height:1.6">
-            <span style="color:var(--amber2)">Rule:</span> 10% of every gig gross → band fund. At €1,100/gig avg, you reach €400 after <strong style="color:var(--text)">4 gigs</strong>.
+            <span style="color:var(--amber2)">Rule:</span> 10% per gig. At €1,100 avg → €400 after <strong style="color:var(--text)">4 gigs</strong>.
           </div>
         </div>
       </div>
-
-      <!-- ROIC per gig type -->
       <div class="panel">
-        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="splits_roic">ROIC by Gig Type</span></div></div></div></div></div></div>
+        <div class="panel-header">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="splits_roic">ROIC by Gig Type</span></div>
+        </div>
         <div style="display:flex;flex-direction:column">
           <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:9px">
+            <div style="font-weight:700;color:var(--text)">Wedding / corporate</div>
+            <div style="color:var(--red3);font-size:8px">€200</div>
+            <div style="color:var(--green3)">€2,000 avg</div>
+            <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--amber2)">900%</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:9px">
             <div style="font-weight:700;color:var(--text)">Local festival</div>
-            <div style="color:var(--red3);font-size:8px">€150 costs</div>
+            <div style="color:var(--red3);font-size:8px">€150</div>
             <div style="color:var(--green3)">€1,100 avg</div>
             <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--accent)">633%</div>
           </div>
           <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:9px">
             <div style="font-weight:700;color:var(--text)">Algarve tourist bar</div>
-            <div style="color:var(--red3);font-size:8px">€200 costs</div>
+            <div style="color:var(--red3);font-size:8px">€200</div>
             <div style="color:var(--green3)">€1,200 avg</div>
             <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--green3)">500%</div>
           </div>
           <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:9px">
-            <div style="font-weight:700;color:var(--text)">Wedding / corporate</div>
-            <div style="color:var(--red3);font-size:8px">€200 costs</div>
-            <div style="color:var(--green3)">€2,000 avg</div>
-            <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--amber2)">900%</div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:9px">
             <div style="font-weight:700;color:var(--text)">Lisbon rock club</div>
-            <div style="color:var(--red3);font-size:8px">€250 costs</div>
+            <div style="color:var(--red3);font-size:8px">€250</div>
             <div style="color:var(--green3)">€500 avg</div>
             <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--blue2)">100%</div>
           </div>
           <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:7px 12px;align-items:center;font-size:9px">
             <div style="font-weight:700;color:var(--text)">Support slot</div>
-            <div style="color:var(--red3);font-size:8px">€100 costs</div>
+            <div style="color:var(--red3);font-size:8px">€100</div>
             <div style="color:var(--green3)">€200 avg</div>
             <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--muted2)">100%</div>
           </div>
@@ -2521,628 +2521,68 @@ tr:hover .edit-btn{display:inline}
     </div>
 
     <!-- Calculator + History -->
-    <div style="display:grid;grid-template-columns:380px 1fr;gap:10px;flex:1;min-height:200px">
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_calculator">Gig Split Calculator</span></div></div></div></div></div></div>
-      <div class="panel-body">
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
-          <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">GIG NAME *</div><input id="sp-name" class="login-input" placeholder="Tasquinhas 2026"></div>
-          <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">DATE</div><input id="sp-date" class="login-input" type="date"></div>
-          <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">GROSS REVENUE (€) *</div><input id="sp-gross" class="login-input" type="number" placeholder="1200" oninput="calcSplit()"></div>
-          <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">BAND FUND %</div><input id="sp-fund-pct" class="login-input" type="number" value="10" min="0" max="50" oninput="calcSplit()"></div>
+    <div style="flex:1;display:grid;grid-template-columns:380px 1fr;gap:10px;min-height:180px">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_calculator">Gig Split Calculator</span></div>
         </div>
-
-        <div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:6px">SHARED EXPENSES</div>
-        <div id="sp-expenses-list" style="display:flex;flex-direction:column;gap:4px;margin-bottom:8px"></div>
-        <div style="display:flex;gap:8px;margin-bottom:14px">
-          <input id="sp-exp-label" class="login-input" placeholder="Fuel" style="flex:1">
-          <input id="sp-exp-amt" class="login-input" type="number" placeholder="60" style="width:80px" oninput="calcSplit()">
-          <button class="btn-sm" onclick="addSplitExpense()">+ Add</button>
-        </div>
-
-        <div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:6px">MEMBERS</div>
-        <div id="sp-members-list" style="display:flex;flex-direction:column;gap:4px;margin-bottom:8px"></div>
-        <div style="display:flex;gap:8px;margin-bottom:14px">
-          <input id="sp-member-name" class="login-input" placeholder="Tiago" style="flex:1">
-          <button class="btn-sm" onclick="addSplitMember()">+ Member</button>
-        </div>
-
-        <!-- Live result -->
-        <div id="sp-result" style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:12px;display:none">
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
-            <div style="text-align:center"><div style="font-size:7px;color:var(--muted);letter-spacing:.1em">GROSS</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--text)" id="sp-r-gross">€0</div></div>
-            <div style="text-align:center"><div style="font-size:7px;color:var(--muted);letter-spacing:.1em">EXPENSES</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--red3)" id="sp-r-exp">-€0</div></div>
-            <div style="text-align:center"><div style="font-size:7px;color:var(--muted);letter-spacing:.1em">BAND FUND</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--amber2)" id="sp-r-fund">€0</div></div>
-            <div style="text-align:center"><div style="font-size:7px;color:var(--muted);letter-spacing:.1em">PER MEMBER</div><div style="font-family:var(--display);font-size:24px;font-weight:700;color:var(--green3)" id="sp-r-per">€0</div></div>
+        <div class="panel-body" style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">GIG NAME</div><input id="sp-name" class="login-input" placeholder="Tasquinhas — Mar 2026"></div>
+            <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">DATE</div><input id="sp-date" class="login-input" type="date"></div>
           </div>
-          <div id="sp-member-breakdown" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">GROSS (€)</div><input id="sp-gross" class="login-input" type="number" placeholder="1100" oninput="calcSplitPreview()"></div>
+            <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">BAND FUND %</div><input id="sp-fund-pct" class="login-input" type="number" value="10" oninput="calcSplitPreview()"></div>
+          </div>
+          <div>
+            <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:4px">EXPENSES</div>
+            <div id="sp-expenses-list" style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px"></div>
+            <div style="display:flex;gap:6px">
+              <input id="sp-exp-label" class="login-input" placeholder="Fuel" style="flex:1">
+              <input id="sp-exp-amt" class="login-input" type="number" placeholder="€" style="width:70px">
+              <button class="btn-sm" onclick="addSplitExpense()">+</button>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:4px">MEMBERS</div>
+            <div id="sp-members-list" style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px"></div>
+            <div style="display:flex;gap:6px">
+              <input id="sp-member-name" class="login-input" placeholder="Tiago, Fábio, Pedro, Manuel" style="flex:1">
+              <button class="btn-sm" onclick="addSplitMember()">+</button>
+            </div>
+          </div>
+          <div id="sp-result" style="background:var(--bg4);border-radius:2px;padding:10px;display:none">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;text-align:center;margin-bottom:8px">
+              <div><div style="font-size:7px;color:var(--muted);letter-spacing:.1em">GROSS</div><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--text)" id="sp-r-gross">€0</div></div>
+              <div><div style="font-size:7px;color:var(--muted);letter-spacing:.1em">EXPENSES</div><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--red3)" id="sp-r-exp">€0</div></div>
+              <div><div style="font-size:7px;color:var(--muted);letter-spacing:.1em">BAND FUND</div><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--amber2)" id="sp-r-fund">€0</div></div>
+              <div><div style="font-size:7px;color:var(--muted);letter-spacing:.1em">PER MEMBER</div><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--green3)" id="sp-r-per">€0</div></div>
+            </div>
+            <div id="sp-member-breakdown" style="font-size:8px;color:var(--muted2);margin-bottom:8px"></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn-sm" onclick="calcSplitPreview()" style="background:var(--bg4)">Calculate</button>
+            <button class="login-btn" style="width:auto;padding:0 16px" onclick="saveSplit()">Save Split</button>
+            <div style="font-size:8px;color:var(--muted3)" id="sp-save-status"></div>
+          </div>
         </div>
-
-        <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
-          <button class="login-btn" style="width:auto;padding:0 20px" onclick="saveSplit()">Save Split to DB</button>
-          <button class="btn-sm" onclick="resetSplit()">Clear</button>
-          <div style="font-size:8px;color:var(--muted3)" id="sp-save-status"></div>
+      </div>
+      <div class="panel" style="display:flex;flex-direction:column">
+        <div class="panel-header">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_history">Split History</span></div>
+          <button class="btn-sm" onclick="loadSplits()">↺ Refresh</button>
         </div>
+        <div id="splits-history" style="flex:1;overflow-y:auto;padding:8px"></div>
       </div>
     </div>
 
-    <!-- History -->
-    <div class="panel" style="flex:1;display:flex;flex-direction:column">
-      <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_history">Split History</span></div>
-        <button class="btn-sm" onclick="loadSplits()">↺ Refresh</button>
-      </div>
-      <div id="splits-history" style="flex:1;overflow-y:auto;padding:8px"></div>
-    </div>
-    </div><!-- /2-col grid -->
   </div>
 </div>
 
-<script>
-// ══════════════════════════════════════════════════════════
-// GROWTH ENGINE — Booking, Releases, Press, Splits
-// ══════════════════════════════════════════════════════════
-
-// ── SHARED STATE ──────────────────────────────────────────
-let BOOKING_DATA = [], RELEASES_DATA = [], PRESS_DATA = [], SPLITS_DATA = [];
-let SP_EXPENSES = [], SP_MEMBERS = [];
-
-const STAGE_COLORS = {
-  cold:'var(--muted2)', contacted:'var(--blue2)', negotiating:'var(--amber2)',
-  confirmed:'var(--green3)', completed:'var(--green2)', rejected:'var(--red3)'
-};
-const PRESS_STAGE_COLORS = {
-  target:'var(--muted2)', pitched:'var(--amber2)', following_up:'var(--blue2)',
-  responded:'var(--purple2)', published:'var(--green3)', rejected:'var(--red3)'
-};
-const RELEASE_STAGE_COLORS = {
-  idea:'var(--muted)', recorded:'var(--blue2)', mixed:'var(--purple2)',
-  mastered:'var(--amber2)', artwork:'var(--amber3)', submitted:'var(--accent)',
-  scheduled:'var(--green2)', released:'var(--green3)'
-};
-
-// ── BOOKING ───────────────────────────────────────────────
-async function loadBooking() {
-  if (!API_BASE || !SESSION?.token) return;
-  try {
-    const [contacts, stats] = await Promise.all([
-      apiGet('/booking'),
-      apiGet('/booking/stats'),
-    ]);
-    BOOKING_DATA = contacts;
-    document.getElementById('bk-cold').textContent        = stats.cold || 0;
-    document.getElementById('bk-contacted').textContent   = stats.contacted || 0;
-    document.getElementById('bk-negotiating').textContent = stats.negotiating || 0;
-    document.getElementById('bk-confirmed').textContent   = stats.confirmed || 0;
-    document.getElementById('bk-pipeline').textContent    = '€' + parseFloat(stats.pipeline_value||0).toLocaleString('pt-PT',{minimumFractionDigits:0});
-    document.getElementById('bk-overdue').textContent     = stats.overdue_followups || 0;
-    const badge = document.getElementById('booking-badge');
-    if (badge) {
-      const overdue = parseInt(stats.overdue_followups||0);
-      badge.textContent = overdue;
-      badge.style.display = overdue > 0 ? 'inline-flex' : 'none';
-    }
-    renderBookingList();
-  } catch(e) { console.warn('loadBooking:', e.message); }
-}
-
-function renderBookingList() {
-  const el = document.getElementById('booking-list-body');
-  if (!el) return;
-  const filterStage = document.getElementById('bk-filter-stage')?.value || '';
-  const data = filterStage ? BOOKING_DATA.filter(b => b.stage === filterStage) : BOOKING_DATA;
-  if (!data.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted3);font-size:9px">No contacts yet — add your first booking target above.</div>'; return; }
-  el.innerHTML = `
-    <table style="width:100%;border-collapse:collapse;font-size:9px">
-      <thead><tr style="border-bottom:1px solid var(--border2)">
-        <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">NAME</th>
-        <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">LOCATION</th>
-        <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">STAGE</th>
-        <th style="text-align:right;padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">FEE</th>
-        <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">FOLLOW UP</th>
-        <th style="padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">ACTION</th>
-      </tr></thead>
-      <tbody>
-        ${data.map(b => {
-          const overdue = b.follow_up_date && new Date(b.follow_up_date) < new Date() && !['completed','rejected'].includes(b.stage);
-          return `<tr style="border-bottom:1px solid var(--border1)" class="ledger-row">
-            <td style="padding:7px 10px">
-              <div style="font-weight:700;color:var(--text)">${b.name}</div>
-              <div style="font-size:8px;color:var(--muted3)">${b.type}${b.contact_name?' · '+b.contact_name:''}</div>
-            </td>
-            <td style="padding:7px 10px;color:var(--muted3)">${b.location||'—'}</td>
-            <td style="padding:7px 10px"><span style="color:${STAGE_COLORS[b.stage]||'var(--muted2)'};font-weight:700;font-size:8px;letter-spacing:.08em;text-transform:uppercase">${b.stage}</span></td>
-            <td style="padding:7px 10px;text-align:right;color:var(--green3)">${b.fee_eur?'€'+parseFloat(b.fee_eur).toLocaleString('pt-PT'):'—'}</td>
-            <td style="padding:7px 10px;color:${overdue?'var(--red3)':'var(--muted3)'}">${b.follow_up_date?b.follow_up_date:'-'}${overdue?' ⚠':''}</td>
-            <td style="padding:7px 10px">
-              <select style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:8px;padding:2px 4px" onchange="updateBookingStage('${b.id}',this.value)">
-                ${['cold','contacted','negotiating','confirmed','completed','rejected'].map(s=>`<option value="${s}"${s===b.stage?' selected':''}>${s}</option>`).join('')}
-              </select>
-            </td>
-          </tr>`;
-        }).join('')}
-      </tbody>
-    </table>`;
-}
-
-async function addBookingContact() {
-  const name = document.getElementById('bk-name').value.trim();
-  const statusEl = document.getElementById('bk-add-status');
-  if (!name) { statusEl.textContent = 'Name required'; return; }
-  statusEl.textContent = 'Saving…';
-  try {
-    await apiPost('/booking', {
-      name, type: document.getElementById('bk-type').value,
-      location: document.getElementById('bk-location').value,
-      contact_name: document.getElementById('bk-contact-name').value,
-      contact_email: document.getElementById('bk-contact-email').value,
-      fee_eur: document.getElementById('bk-fee').value || null,
-      date: document.getElementById('bk-date').value || null,
-      follow_up_date: document.getElementById('bk-followup').value || null,
-      notes: document.getElementById('bk-notes').value,
-    });
-    statusEl.textContent = '✓ Saved';
-    ['bk-name','bk-location','bk-contact-name','bk-contact-email','bk-fee','bk-date','bk-followup','bk-notes'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
-    await loadBooking();
-  } catch(e) { statusEl.textContent = '✗ ' + e.message; }
-}
-
-async function updateBookingStage(id, stage) {
-  try {
-    await _apiFetch('PUT', '/booking/'+id, { stage, contacted_at: stage==='contacted'?new Date().toISOString():undefined });
-    await loadBooking();
-    showToast('Stage updated → ' + stage, 'ok');
-  } catch(e) { showToast('Failed: ' + e.message, 'err'); }
-}
-
-// ── RELEASES ──────────────────────────────────────────────
-async function loadReleases() {
-  if (!API_BASE || !SESSION?.token) return;
-  try {
-    RELEASES_DATA = await apiGet('/releases');
-    renderReleasesList();
-  } catch(e) { console.warn('loadReleases:', e.message); }
-}
-
-function renderReleasesList() {
-  const el = document.getElementById('releases-list');
-  if (!el) return;
-  if (!RELEASES_DATA.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted3);font-size:9px">No releases yet — add your first single above.</div>'; return; }
-  el.innerHTML = RELEASES_DATA.map(r => {
-    const checks = [
-      { label:'Artwork', done: r.artwork_done },
-      { label:'Video',   done: r.video_done },
-      { label:'Press',   done: r.press_pitched },
-      { label:'Spotify', done: r.spotify_pitched },
-    ];
-    const doneCount = checks.filter(c=>c.done).length;
-    return `
-    <div style="display:grid;grid-template-columns:8px 1fr auto;gap:12px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border1)">
-      <div style="width:8px;height:8px;border-radius:50%;background:${RELEASE_STAGE_COLORS[r.stage]||'var(--muted)'}"></div>
-      <div>
-        <div style="font-weight:700;color:var(--text);font-size:10px">${r.title} <span style="font-size:8px;color:var(--muted3);font-weight:400;text-transform:uppercase">${r.type}</span></div>
-        <div style="display:flex;gap:8px;margin-top:4px">
-          <span style="font-size:8px;color:${RELEASE_STAGE_COLORS[r.stage]};font-weight:700;text-transform:uppercase">${r.stage}</span>
-          ${r.release_date?`<span style="font-size:8px;color:var(--muted3)">${r.release_date}</span>`:''}
-          <span style="font-size:8px;color:var(--muted3)">${doneCount}/4 tasks done</span>
-        </div>
-        <div style="display:flex;gap:6px;margin-top:4px">
-          ${checks.map(c=>`<span style="font-size:7px;padding:1px 5px;border-radius:1px;background:${c.done?'rgba(0,230,118,.12)':'rgba(255,255,255,.04)'};color:${c.done?'var(--green3)':'var(--muted3)'}">${c.label}</span>`).join('')}
-        </div>
-      </div>
-      <div style="display:flex;gap:6px;align-items:center">
-        <select style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:8px;padding:2px 4px" onchange="updateReleaseStage('${r.id}',this.value)">
-          ${['idea','recorded','mixed','mastered','artwork','submitted','scheduled','released'].map(s=>`<option value="${s}"${s===r.stage?' selected':''}>${s}</option>`).join('')}
-        </select>
-        ${r.spotify_url?`<a href="${r.spotify_url}" target="_blank" style="font-size:8px;color:var(--green3)">▶ Spotify</a>`:''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function addRelease() {
-  const title = document.getElementById('rel-title').value.trim();
-  const statusEl = document.getElementById('rel-add-status');
-  if (!title) { statusEl.textContent = 'Title required'; return; }
-  statusEl.textContent = 'Saving…';
-  try {
-    await apiPost('/releases', {
-      title, type: document.getElementById('rel-type').value,
-      stage: document.getElementById('rel-stage').value,
-      release_date: document.getElementById('rel-date').value || null,
-      spotify_url: document.getElementById('rel-spotify').value || null,
-      artwork_done: document.getElementById('rel-artwork').checked,
-      video_done: document.getElementById('rel-video').checked,
-      press_pitched: document.getElementById('rel-press').checked,
-      spotify_pitched: document.getElementById('rel-spotify-pitched').checked,
-      notes: document.getElementById('rel-notes').value,
-    });
-    statusEl.textContent = '✓ Saved';
-    ['rel-title','rel-date','rel-spotify','rel-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-    await loadReleases();
-  } catch(e) { statusEl.textContent = '✗ ' + e.message; }
-}
-
-async function updateReleaseStage(id, stage) {
-  try {
-    await _apiFetch('PUT', '/releases/'+id, { stage });
-    await loadReleases();
-    showToast('Release → ' + stage, 'ok');
-  } catch(e) { showToast('Failed: ' + e.message, 'err'); }
-}
-
-// ── PRESS & SYNC ──────────────────────────────────────────
-async function loadPress() {
-  if (!API_BASE || !SESSION?.token) return;
-  try {
-    PRESS_DATA = await apiGet('/press');
-    updatePressStats();
-    renderPressList();
-  } catch(e) { console.warn('loadPress:', e.message); }
-}
-
-function updatePressStats() {
-  document.getElementById('pr-target').textContent    = PRESS_DATA.filter(p=>p.stage==='target').length;
-  document.getElementById('pr-pitched').textContent   = PRESS_DATA.filter(p=>['pitched','following_up'].includes(p.stage)).length;
-  document.getElementById('pr-responded').textContent = PRESS_DATA.filter(p=>p.stage==='responded').length;
-  document.getElementById('pr-published').textContent = PRESS_DATA.filter(p=>p.stage==='published').length;
-  const val = PRESS_DATA.reduce((s,p)=>s+parseFloat(p.estimated_value_eur||0),0);
-  document.getElementById('pr-value').textContent = '€' + val.toLocaleString('pt-PT',{minimumFractionDigits:0});
-}
-
-function renderPressList() {
-  const el = document.getElementById('press-list-body');
-  if (!el) return;
-  const filterType = document.getElementById('pr-filter-type')?.value || '';
-  const data = filterType ? PRESS_DATA.filter(p=>p.type===filterType) : PRESS_DATA;
-  if (!data.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted3);font-size:9px">No contacts yet — add your first press target above.</div>'; return; }
-  el.innerHTML = `
-    <table style="width:100%;border-collapse:collapse;font-size:9px">
-      <thead><tr style="border-bottom:1px solid var(--border2)">
-        <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">OUTLET</th>
-        <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">TYPE</th>
-        <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">STAGE</th>
-        <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">RELEASE</th>
-        <th style="text-align:right;padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">VALUE</th>
-        <th style="padding:6px 10px;font-weight:400">ACTION</th>
-      </tr></thead>
-      <tbody>
-        ${data.map(p=>`<tr style="border-bottom:1px solid var(--border1)" class="ledger-row">
-          <td style="padding:7px 10px">
-            <div style="font-weight:700;color:var(--text)">${p.outlet}</div>
-            <div style="font-size:8px;color:var(--muted3)">${p.contact_name||''} ${p.country||''}</div>
-          </td>
-          <td style="padding:7px 10px;color:var(--muted3);text-transform:uppercase;font-size:8px">${p.type}</td>
-          <td style="padding:7px 10px"><span style="color:${PRESS_STAGE_COLORS[p.stage]||'var(--muted2)'};font-weight:700;font-size:8px;text-transform:uppercase">${p.stage.replace('_',' ')}</span></td>
-          <td style="padding:7px 10px;color:var(--muted3);font-size:8px">${p.pitched_release||'—'}</td>
-          <td style="padding:7px 10px;text-align:right;color:var(--green3)">${p.estimated_value_eur?'€'+parseFloat(p.estimated_value_eur).toLocaleString('pt-PT'):'—'}</td>
-          <td style="padding:7px 10px">
-            <select style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:8px;padding:2px 4px" onchange="updatePressStage('${p.id}',this.value)">
-              ${['target','pitched','following_up','responded','published','rejected'].map(s=>`<option value="${s}"${s===p.stage?' selected':''}>${s.replace('_',' ')}</option>`).join('')}
-            </select>
-          </td>
-        </tr>`).join('')}
-      </tbody>
-    </table>`;
-}
-
-async function addPressContact() {
-  const outlet = document.getElementById('pr-outlet').value.trim();
-  const statusEl = document.getElementById('pr-add-status');
-  if (!outlet) { statusEl.textContent = 'Outlet required'; return; }
-  statusEl.textContent = 'Saving…';
-  try {
-    await apiPost('/press', {
-      outlet, type: document.getElementById('pr-type').value,
-      contact_name: document.getElementById('pr-contact').value,
-      contact_email: document.getElementById('pr-email').value,
-      pitched_release: document.getElementById('pr-release').value,
-      estimated_value_eur: document.getElementById('pr-value-input').value || null,
-      follow_up_date: document.getElementById('pr-followup').value || null,
-      country: document.getElementById('pr-country').value || 'PT',
-      notes: document.getElementById('pr-notes').value,
-    });
-    statusEl.textContent = '✓ Saved';
-    ['pr-outlet','pr-contact','pr-email','pr-release','pr-value-input','pr-followup','pr-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-    await loadPress();
-  } catch(e) { statusEl.textContent = '✗ ' + e.message; }
-}
-
-async function updatePressStage(id, stage) {
-  try {
-    await _apiFetch('PUT', '/press/'+id, { stage });
-    await loadPress();
-    showToast('Press → ' + stage, 'ok');
-  } catch(e) { showToast('Failed: ' + e.message, 'err'); }
-}
-
-// ── SPLITS ────────────────────────────────────────────────
-function calcSplit() {
-  const gross = parseFloat(document.getElementById('sp-gross')?.value||0);
-  const fundPct = parseFloat(document.getElementById('sp-fund-pct')?.value||10);
-  if (!gross) { document.getElementById('sp-result').style.display='none'; return; }
-
-  const totalExp = SP_EXPENSES.reduce((s,e)=>s+e.amount,0);
-  const fund = parseFloat((gross * fundPct/100).toFixed(2));
-  const distributable = parseFloat((gross - totalExp - fund).toFixed(2));
-  const perMember = SP_MEMBERS.length > 0 ? parseFloat((distributable/SP_MEMBERS.length).toFixed(2)) : distributable;
-
-  document.getElementById('sp-result').style.display='block';
-  document.getElementById('sp-r-gross').textContent = '€'+gross.toLocaleString('pt-PT',{minimumFractionDigits:2});
-  document.getElementById('sp-r-exp').textContent   = '-€'+totalExp.toLocaleString('pt-PT',{minimumFractionDigits:2});
-  document.getElementById('sp-r-fund').textContent  = '€'+fund.toLocaleString('pt-PT',{minimumFractionDigits:2});
-  document.getElementById('sp-r-per').textContent   = '€'+perMember.toLocaleString('pt-PT',{minimumFractionDigits:2});
-
-  document.getElementById('sp-member-breakdown').innerHTML = SP_MEMBERS.map(m=>`
-    <div style="background:var(--bg4);border-radius:2px;padding:10px 14px;text-align:center;min-width:100px">
-      <div style="font-size:8px;color:var(--muted3);margin-bottom:4px">${m.name.toUpperCase()}</div>
-      <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--green3)">${fmtMoney(perMember)}</div>
-    </div>`).join('');
-}
-
-function addSplitExpense() {
-  const label = document.getElementById('sp-exp-label').value.trim();
-  const amount = parseFloat(document.getElementById('sp-exp-amt').value||0);
-  if (!label || !amount) return;
-  SP_EXPENSES.push({ label, amount });
-  document.getElementById('sp-exp-label').value='';
-  document.getElementById('sp-exp-amt').value='';
-  renderSplitExpenses();
-  calcSplit();
-}
-
-function renderSplitExpenses() {
-  const el = document.getElementById('sp-expenses-list');
-  el.innerHTML = SP_EXPENSES.map((e,i)=>`
-    <div style="display:flex;gap:8px;align-items:center;font-size:9px;padding:4px 8px;background:var(--bg4);border-radius:2px">
-      <span style="flex:1;color:var(--text)">${e.label}</span>
-      <span style="color:var(--red3)">-${fmtMoney(e.amount)}</span>
-      <button class="btn-sm" onclick="removeSplitExpense(${i})" style="padding:0 6px;font-size:9px">✕</button>
-    </div>`).join('');
-}
-
-function removeSplitExpense(i) { SP_EXPENSES.splice(i,1); renderSplitExpenses(); calcSplit(); }
-
-function addSplitMember() {
-  const name = document.getElementById('sp-member-name').value.trim();
-  if (!name || SP_MEMBERS.find(m=>m.name===name)) return;
-  SP_MEMBERS.push({ name });
-  document.getElementById('sp-member-name').value='';
-  renderSplitMembers();
-  calcSplit();
-}
-
-function renderSplitMembers() {
-  const el = document.getElementById('sp-members-list');
-  el.innerHTML = SP_MEMBERS.map((m,i)=>`
-    <div style="display:flex;gap:8px;align-items:center;font-size:9px;padding:4px 8px;background:var(--bg4);border-radius:2px">
-      <span style="flex:1;color:var(--text)">${m.name}</span>
-      <button class="btn-sm" onclick="removeSplitMember(${i})" style="padding:0 6px;font-size:9px">✕</button>
-    </div>`).join('');
-}
-
-function removeSplitMember(i) { SP_MEMBERS.splice(i,1); renderSplitMembers(); calcSplit(); }
-
-function resetSplit() {
-  SP_EXPENSES=[]; SP_MEMBERS=[];
-  ['sp-name','sp-date','sp-gross'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-  document.getElementById('sp-fund-pct').value='10';
-  renderSplitExpenses(); renderSplitMembers();
-  document.getElementById('sp-result').style.display='none';
-  document.getElementById('sp-save-status').textContent='';
-}
-
-async function saveSplit() {
-  const gig_name = document.getElementById('sp-name').value.trim();
-  const gross_eur = document.getElementById('sp-gross').value;
-  const statusEl = document.getElementById('sp-save-status');
-  if (!gig_name || !gross_eur) { statusEl.textContent='Gig name and gross required'; return; }
-  statusEl.textContent='Saving…';
-  try {
-    await apiPost('/splits', {
-      gig_name, gross_eur: parseFloat(gross_eur),
-      gig_date: document.getElementById('sp-date').value || null,
-      band_fund_pct: parseFloat(document.getElementById('sp-fund-pct').value||10),
-      shared_expenses: SP_EXPENSES.map(e=>({label:e.label,amount:e.amount})),
-      members: SP_MEMBERS.map(m=>({name:m.name,personal_expenses:0})),
-    });
-    statusEl.textContent='✓ Saved to DB';
-    await loadSplits();
-    showToast('Split saved', 'ok');
-  } catch(e) { statusEl.textContent='✗ '+e.message; }
-}
-
-async function loadSplits() {
-  if (!API_BASE || !SESSION?.token) return;
-  try {
-    SPLITS_DATA = await apiGet('/splits');
-    renderSplitHistory();
-  } catch(e) { console.warn('loadSplits:', e.message); }
-}
-
-function renderSplitHistory() {
-  const el = document.getElementById('splits-history');
-  if (!el) return;
-  if (!SPLITS_DATA.length) { el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted3);font-size:9px">No splits saved yet.</div>'; return; }
-  el.innerHTML = SPLITS_DATA.map(s=>`
-    <div style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:12px;padding:9px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:9px">
-      <div><div style="font-weight:700;color:var(--text)">${s.gig_name}</div><div style="font-size:8px;color:var(--muted3)">${s.gig_date||'—'} · ${s.member_count} members</div></div>
-      <div style="text-align:right;color:var(--text)">${fmtMoney(parseFloat(s.gross_eur).toFixed(2))}</div>
-      <div style="text-align:right;color:var(--red3)">-${fmtMoney(parseFloat(s.total_expenses_eur).toFixed(2))}</div>
-      <div style="text-align:right;color:var(--amber2)">fund ${fmtMoney(parseFloat(s.band_fund_eur).toFixed(2))}</div>
-      <div style="text-align:right;color:var(--green3);font-weight:700">${fmtMoney(parseFloat(s.per_member_eur).toFixed(2))}/member</div>
-    </div>`).join('');
-}
-
-// ── WIRE INTO INIT ────────────────────────────────────────
-const _origInitAll = typeof initAll === 'function' ? initAll : null;
-function _initAll_old_0(){
-  if (API_BASE && SESSION?.token) {
-    Promise.all([
-      loadLedgerFromApi(),
-      loadStreamingFromApi(),
-    ]).then(() => _renderAll());
-    // Load growth engine data in background
-    loadBooking();
-    loadReleases();
-    loadPress();
-    loadSplits();
-  } else {
-    _renderAll();
-  }
-  initCdbabyMonthSelect();
-}
-</script>
-</div></div></div></div>
 <!-- ═══════════════════════════════════════════════════════
      AI BOOKING AGENT VIEW
 ════════════════════════════════════════════════════════ -->
-<style>
-.agent-venue-card {
-  background: var(--bg3);
-  border: 1px solid var(--border2);
-  border-radius: 2px;
-  padding: 10px 12px;
-  cursor: pointer;
-  transition: border-color .15s, background .15s;
-  position: relative;
-}
-.agent-venue-card:hover { border-color: var(--accent); background: var(--bg4); }
-.agent-venue-card.selected { border-color: var(--accent); background: rgba(255,60,30,.06); }
-.agent-venue-card.selected::after {
-  content: '✓';
-  position: absolute;
-  top: 8px; right: 10px;
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 700;
-}
-.venue-name { font-size: 10px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-.venue-city { font-size: 8px; color: var(--muted3); }
-.venue-fee  { font-size: 8px; color: var(--green3); margin-top: 4px; font-weight: 700; }
-.venue-type { font-size: 7px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
-.pitch-box {
-  background: var(--bg3);
-  border: 1px solid var(--border2);
-  border-radius: 2px;
-  padding: 14px 16px;
-  font-size: 9px;
-  line-height: 1.7;
-  color: var(--text);
-  white-space: pre-wrap;
-  font-family: var(--mono);
-  min-height: 200px;
-  position: relative;
-}
-.pitch-subject {
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--accent);
-  margin-bottom: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border2);
-  letter-spacing: .04em;
-}
-.agent-mode-btn {
-  padding: 8px 16px;
-  border: 1px solid var(--border2);
-  border-radius: 2px;
-  background: var(--bg3);
-  color: var(--muted2);
-  font-family: var(--mono);
-  font-size: 9px;
-  cursor: pointer;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  transition: all .15s;
-}
-.agent-mode-btn:hover { border-color: var(--accent); color: var(--accent); }
-.agent-mode-btn.active-mode { background: var(--accent); border-color: var(--accent); color: #fff; }
-.region-pill {
-  padding: 3px 10px;
-  border-radius: 1px;
-  font-size: 8px;
-  border: 1px solid var(--border2);
-  cursor: pointer;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  transition: all .15s;
-  background: var(--bg3);
-  color: var(--muted2);
-}
-.region-pill:hover, .region-pill.active-region { background: var(--bg4); border-color: var(--border2); color: var(--text); }
-.region-pill.active-region { border-color: var(--accent); color: var(--accent); }
-.gmail-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: #ea4335;
-  color: #fff;
-  border: none;
-  border-radius: 2px;
-  font-family: var(--mono);
-  font-size: 9px;
-  cursor: pointer;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  transition: opacity .15s;
-}
-.gmail-btn:hover { opacity: .85; }
-.gmail-btn:disabled { opacity: .4; cursor: not-allowed; }
-.copy-btn {
-  padding: 6px 14px;
-  background: var(--bg4);
-  border: 1px solid var(--border2);
-  border-radius: 2px;
-  color: var(--muted2);
-  font-family: var(--mono);
-  font-size: 8px;
-  cursor: pointer;
-  letter-spacing: .06em;
-  transition: all .15s;
-}
-.copy-btn:hover { border-color: var(--green3); color: var(--green3); }
-.agent-stat {
-  background: var(--bg3);
-  border: 1px solid var(--border2);
-  border-radius: 2px;
-  padding: 10px 14px;
-  text-align: center;
-}
-.agent-stat-val { font-family: var(--display); font-size: 22px; font-weight: 700; }
-.agent-stat-lbl { font-size: 7px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; margin-top: 2px; }
-.loading-pulse {
-  animation: pulse 1.2s ease-in-out infinite;
-  color: var(--accent);
-}
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-.batch-pitch-item {
-  background: var(--bg3);
-  border: 1px solid var(--border2);
-  border-radius: 2px;
-  margin-bottom: 8px;
-  overflow: hidden;
-}
-.batch-pitch-hdr {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  cursor: pointer;
-  border-bottom: 1px solid var(--border2);
-}
-.batch-pitch-body {
-  padding: 10px 12px;
-  display: none;
-  font-size: 9px;
-  white-space: pre-wrap;
-  font-family: var(--mono);
-  color: var(--text);
-  line-height: 1.7;
-  background: var(--bg4);
-}
-</style>
 
 <div id="view-agent" class="view new-view">
   <div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">
@@ -3973,75 +3413,6 @@ function _initAll_old_1() {
 <!-- ═══════════════════════════════════════════════════════
      LIVE PRODUCTION VIEW
 ════════════════════════════════════════════════════════ -->
-<style>
-.prod-tab-bar { display:flex; gap:0; border-bottom:1px solid var(--border2); margin-bottom:14px; }
-.prod-tab {
-  padding:8px 16px; font-size:9px; letter-spacing:.1em; text-transform:uppercase;
-  color:var(--muted2); cursor:pointer; border-bottom:2px solid transparent;
-  transition:all .15s; font-family:var(--mono);
-}
-.prod-tab:hover { color:var(--text); }
-.prod-tab.pt-active { color:var(--accent); border-bottom-color:var(--accent); }
-.prod-sub { display:none; }
-.prod-sub.ps-active { display:block; }
-.phase-block { margin-bottom:16px; }
-.phase-title {
-  font-size:8px; color:var(--muted); letter-spacing:.15em; text-transform:uppercase;
-  margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid var(--border2);
-  display:flex; align-items:center; justify-content:space-between;
-}
-.check-item {
-  display:grid; grid-template-columns:22px 1fr auto auto;
-  gap:10px; padding:7px 10px; align-items:center;
-  border-radius:2px; transition:background .1s; font-size:9px;
-}
-.check-item:hover { background:var(--bg4); }
-.check-item.done-item { opacity:.5; }
-.check-cb { width:16px; height:16px; cursor:pointer; accent-color:var(--accent); }
-.check-task { color:var(--text); }
-.check-owner {
-  font-size:7px; padding:2px 7px; border-radius:1px;
-  background:var(--bg4); color:var(--muted2); letter-spacing:.08em;
-}
-.check-done-at { font-size:7px; color:var(--muted); white-space:nowrap; }
-.song-row {
-  display:grid; grid-template-columns:32px 1fr 60px 50px 60px 80px auto;
-  gap:8px; padding:6px 10px; align-items:center; font-size:9px;
-  border-bottom:1px solid var(--border1);
-}
-.song-pos { color:var(--muted); font-weight:700; text-align:center; }
-.song-title { color:var(--text); font-weight:700; }
-.song-key { color:var(--purple2); }
-.song-bpm { color:var(--amber2); }
-.song-dur { color:var(--muted3); }
-.song-tuning { color:var(--blue2); font-size:8px; }
-.rider-section { background:var(--bg3); border:1px solid var(--border2); border-radius:2px; margin-bottom:10px; }
-.rider-section-hdr {
-  padding:9px 14px; font-size:9px; font-weight:700; color:var(--text);
-  letter-spacing:.06em; border-bottom:1px solid var(--border2);
-  display:flex; align-items:center; justify-content:space-between;
-  cursor:pointer;
-}
-.rider-section-body { padding:12px 14px; font-size:9px; line-height:1.8; color:var(--text); }
-.input-row {
-  display:grid; grid-template-columns:30px 40px 1fr 100px 60px 60px;
-  gap:8px; padding:5px 8px; font-size:9px; border-bottom:1px solid var(--border1);
-  align-items:center;
-}
-.input-row.hdr-row { color:var(--muted); font-size:8px; letter-spacing:.08em; }
-.advance-grid {
-  display:grid; grid-template-columns:1fr 1fr;
-  gap:8px; margin-bottom:14px;
-}
-.advance-field { display:flex; flex-direction:column; gap:4px; }
-.advance-label { font-size:7px; color:var(--muted3); letter-spacing:.1em; text-transform:uppercase; }
-.time-kpi {
-  background:var(--bg4); border-radius:2px; padding:10px 14px;
-  display:flex; flex-direction:column; gap:2px;
-}
-.time-kpi-val { font-family:var(--display); font-size:20px; font-weight:700; color:var(--accent); }
-.time-kpi-lbl { font-size:7px; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; }
-</style>
 
 <div id="view-production" class="view new-view">
   <div style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0">
