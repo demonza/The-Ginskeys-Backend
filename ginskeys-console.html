@@ -2913,6 +2913,414 @@ tr:hover .edit-btn{display:inline}
 
 <script>
 // ══════════════════════════════════════════════════════════
+// GROWTH ENGINE — Booking, Releases, Press, Splits
+// ══════════════════════════════════════════════════════════
+
+let BOOKING_DATA = [], RELEASES_DATA = [], PRESS_DATA = [], SPLITS_DATA = [];
+let SP_EXPENSES = [], SP_MEMBERS = [];
+
+const STAGE_COLORS = {
+  cold:'var(--muted2)', contacted:'var(--blue2)', negotiating:'var(--amber2)',
+  confirmed:'var(--green3)', completed:'var(--green2)', rejected:'var(--red3)'
+};
+const PRESS_STAGE_COLORS = {
+  target:'var(--muted2)', pitched:'var(--amber2)', following_up:'var(--blue2)',
+  responded:'var(--purple2)', published:'var(--green3)', rejected:'var(--red3)'
+};
+const RELEASE_STAGE_COLORS = {
+  idea:'var(--muted)', recorded:'var(--blue2)', mixed:'var(--purple2)',
+  mastered:'var(--amber2)', artwork:'var(--amber2)', submitted:'var(--accent)',
+  scheduled:'var(--green2)', released:'var(--green3)'
+};
+
+// ── BOOKING ────────────────────────────────────────────────────────────────
+async function loadBooking() {
+  if (!API_BASE || !SESSION?.token) return;
+  try {
+    const [contacts, stats] = await Promise.all([
+      apiGet('/booking'),
+      apiGet('/booking/stats'),
+    ]);
+    BOOKING_DATA = contacts;
+    const set = (id, val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+    set('bk-cold',        stats.cold || 0);
+    set('bk-contacted',   stats.contacted || 0);
+    set('bk-negotiating', stats.negotiating || 0);
+    set('bk-confirmed',   stats.confirmed || 0);
+    set('bk-pipeline',    '€'+parseFloat(stats.pipeline_value||0).toLocaleString('pt-PT',{minimumFractionDigits:0}));
+    set('bk-overdue',     stats.overdue_followups || 0);
+    renderBookingList();
+    updateBookingBanner();
+  } catch(e) { console.warn('loadBooking:', e.message); }
+}
+
+function updateBookingBanner() {
+  const el = document.getElementById('bk-banner-earned');
+  if (!el) return;
+  const earned = BOOKING_DATA.filter(b=>b.stage==='completed').reduce((s,b)=>s+parseFloat(b.fee_eur||0),0);
+  el.textContent = '€'+earned.toLocaleString('pt-PT',{minimumFractionDigits:0});
+  const contacts = document.getElementById('bk-banner-contacts');
+  if (contacts) contacts.textContent = BOOKING_DATA.length;
+  const conv = document.getElementById('bk-banner-conversion');
+  if (conv) {
+    const pct = BOOKING_DATA.length ? Math.round(BOOKING_DATA.filter(b=>['confirmed','completed'].includes(b.stage)).length/BOOKING_DATA.length*100) : 0;
+    conv.textContent = pct+'%';
+  }
+}
+
+function renderBookingList() {
+  const el = document.getElementById('booking-list-body');
+  if (!el) return;
+  const filterStage = document.getElementById('bk-filter-stage')?.value || '';
+  const data = filterStage ? BOOKING_DATA.filter(b=>b.stage===filterStage) : BOOKING_DATA;
+  if (!data.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted3);font-size:9px">No contacts yet — add your first booking target above.</div>'; return; }
+  el.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:9px">
+      <thead><tr style="border-bottom:1px solid var(--border2)">
+        <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">NAME</th>
+        <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">LOCATION</th>
+        <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">STAGE</th>
+        <th style="text-align:right;padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">FEE</th>
+        <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;letter-spacing:.1em;font-weight:400">FOLLOW UP</th>
+        <th style="padding:6px 10px;font-weight:400"></th>
+      </tr></thead>
+      <tbody>
+        ${data.map(b => {
+          const overdue = b.follow_up_date && new Date(b.follow_up_date) < new Date() && !['completed','rejected'].includes(b.stage);
+          return `<tr style="border-bottom:1px solid var(--border1)" class="ledger-row">
+            <td style="padding:7px 10px">
+              <div style="font-weight:700;color:var(--text)">${b.name}</div>
+              <div style="font-size:8px;color:var(--muted3)">${b.type}${b.contact_name?' · '+b.contact_name:''}</div>
+            </td>
+            <td style="padding:7px 10px;color:var(--muted3)">${b.location||'—'}</td>
+            <td style="padding:7px 10px"><span style="color:${STAGE_COLORS[b.stage]||'var(--muted2)'};font-weight:700;font-size:8px;text-transform:uppercase">${b.stage}</span></td>
+            <td style="padding:7px 10px;text-align:right;color:var(--green3)">${b.fee_eur?'€'+parseFloat(b.fee_eur).toLocaleString('pt-PT'):'—'}</td>
+            <td style="padding:7px 10px;color:${overdue?'var(--red3)':'var(--muted3)'}">${b.follow_up_date||'-'}${overdue?' ⚠':''}</td>
+            <td style="padding:7px 10px">
+              <select style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:8px;padding:2px 4px" onchange="updateBookingStage('${b.id}',this.value)">
+                ${['cold','contacted','negotiating','confirmed','completed','rejected'].map(s=>`<option value="${s}"${s===b.stage?' selected':''}>${s}</option>`).join('')}
+              </select>
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+}
+
+async function addBookingContact() {
+  const name = document.getElementById('bk-name').value.trim();
+  const statusEl = document.getElementById('bk-add-status');
+  if (!name) { statusEl.textContent='Name required'; return; }
+  statusEl.textContent='Saving…';
+  try {
+    await apiPost('/booking', {
+      name, type: document.getElementById('bk-type').value,
+      location: document.getElementById('bk-location').value,
+      contact_name: document.getElementById('bk-contact-name').value,
+      contact_email: document.getElementById('bk-contact-email').value,
+      fee_eur: document.getElementById('bk-fee').value||null,
+      date: document.getElementById('bk-date').value||null,
+      follow_up_date: document.getElementById('bk-followup').value||null,
+      notes: document.getElementById('bk-notes').value,
+    });
+    statusEl.textContent='✓ Saved';
+    ['bk-name','bk-location','bk-contact-name','bk-contact-email','bk-fee','bk-date','bk-followup','bk-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+    await loadBooking();
+  } catch(e) { statusEl.textContent='✗ '+e.message; }
+}
+
+async function updateBookingStage(id, stage) {
+  try {
+    await _apiFetch('PUT', '/booking/'+id, { stage });
+    await loadBooking(); showToast('Stage → '+stage,'ok');
+  } catch(e) { showToast('Failed: '+e.message,'err'); }
+}
+
+// ── RELEASES ───────────────────────────────────────────────────────────────
+async function loadReleases() {
+  if (!API_BASE || !SESSION?.token) return;
+  try { RELEASES_DATA = await apiGet('/releases'); renderReleasesList(); updateReleasesBanner(); }
+  catch(e) { console.warn('loadReleases:', e.message); }
+}
+
+function updateReleasesBanner() {
+  const total = document.getElementById('rel-banner-total');
+  if (total) total.textContent = RELEASES_DATA.length;
+  const released = document.getElementById('rel-banner-released');
+  if (released) released.textContent = RELEASES_DATA.filter(r=>r.stage==='released').length;
+  const ready = document.getElementById('rel-banner-ready');
+  if (ready) ready.textContent = RELEASES_DATA.filter(r=>r.stage==='scheduled'||r.stage==='submitted').length;
+  const wip = document.getElementById('rel-banner-wip');
+  if (wip) wip.textContent = RELEASES_DATA.filter(r=>!['released','scheduled','submitted'].includes(r.stage)).length;
+}
+
+function renderReleasesList() {
+  const el = document.getElementById('releases-list');
+  if (!el) return;
+  if (!RELEASES_DATA.length) { el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted3);font-size:9px">No releases yet.</div>'; return; }
+  el.innerHTML = RELEASES_DATA.map(r => {
+    const checks = [{label:'Artwork',done:r.artwork_done},{label:'Video',done:r.video_done},{label:'Press',done:r.press_pitched},{label:'Spotify',done:r.spotify_pitched}];
+    const doneCount = checks.filter(c=>c.done).length;
+    return `<div style="display:grid;grid-template-columns:8px 1fr auto;gap:12px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border1)">
+      <div style="width:8px;height:8px;border-radius:50%;background:${RELEASE_STAGE_COLORS[r.stage]||'var(--muted)'}"></div>
+      <div>
+        <div style="font-weight:700;color:var(--text);font-size:10px">${r.title} <span style="font-size:8px;color:var(--muted3);font-weight:400;text-transform:uppercase">${r.type}</span></div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <span style="font-size:8px;color:${RELEASE_STAGE_COLORS[r.stage]};font-weight:700;text-transform:uppercase">${r.stage}</span>
+          ${r.release_date?`<span style="font-size:8px;color:var(--muted3)">${r.release_date}</span>`:''}
+          <span style="font-size:8px;color:var(--muted3)">${doneCount}/4 tasks</span>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:4px">
+          ${checks.map(c=>`<span style="font-size:7px;padding:1px 5px;border-radius:1px;background:${c.done?'rgba(0,230,118,.12)':'rgba(255,255,255,.04)'};color:${c.done?'var(--green3)':'var(--muted3)'}">${c.label}</span>`).join('')}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <select style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:8px;padding:2px 4px" onchange="updateReleaseStage('${r.id}',this.value)">
+          ${['idea','recorded','mixed','mastered','artwork','submitted','scheduled','released'].map(s=>`<option value="${s}"${s===r.stage?' selected':''}>${s}</option>`).join('')}
+        </select>
+        ${r.spotify_url?`<a href="${r.spotify_url}" target="_blank" style="font-size:8px;color:var(--green3)">▶ Spotify</a>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function addRelease() {
+  const title = document.getElementById('rel-title').value.trim();
+  const statusEl = document.getElementById('rel-add-status');
+  if (!title) { statusEl.textContent='Title required'; return; }
+  statusEl.textContent='Saving…';
+  try {
+    await apiPost('/releases', {
+      title, type: document.getElementById('rel-type').value,
+      stage: document.getElementById('rel-stage').value,
+      release_date: document.getElementById('rel-date').value||null,
+      spotify_url: document.getElementById('rel-spotify').value||null,
+      artwork_done: document.getElementById('rel-artwork').checked,
+      video_done: document.getElementById('rel-video').checked,
+      press_pitched: document.getElementById('rel-press').checked,
+      spotify_pitched: document.getElementById('rel-spotify-pitched').checked,
+      notes: document.getElementById('rel-notes').value,
+    });
+    statusEl.textContent='✓ Saved';
+    ['rel-title','rel-date','rel-spotify','rel-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+    await loadReleases();
+  } catch(e) { statusEl.textContent='✗ '+e.message; }
+}
+
+async function updateReleaseStage(id, stage) {
+  try { await _apiFetch('PUT','/releases/'+id,{stage}); await loadReleases(); showToast('Release → '+stage,'ok'); }
+  catch(e) { showToast('Failed: '+e.message,'err'); }
+}
+
+function renderReleaseChecklist() {}  // placeholder
+
+// ── PRESS & SYNC ───────────────────────────────────────────────────────────
+async function loadPress() {
+  if (!API_BASE || !SESSION?.token) return;
+  try { PRESS_DATA = await apiGet('/press'); renderPressList(); updatePressBanner(); }
+  catch(e) { console.warn('loadPress:', e.message); }
+}
+
+function updatePressBanner() {
+  const set = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+  set('pr-banner-published', PRESS_DATA.filter(p=>p.stage==='published').length);
+  set('pr-banner-active',    PRESS_DATA.filter(p=>['pitched','following_up'].includes(p.stage)).length);
+  set('pr-banner-sync',      PRESS_DATA.filter(p=>p.type==='sync').length);
+  const pts = document.getElementById('pr-target');
+  if (pts) pts.textContent = PRESS_DATA.filter(p=>p.stage==='target').length;
+  const ppi = document.getElementById('pr-pitched');
+  if (ppi) ppi.textContent = PRESS_DATA.filter(p=>['pitched','following_up'].includes(p.stage)).length;
+  const pre = document.getElementById('pr-responded');
+  if (pre) pre.textContent = PRESS_DATA.filter(p=>p.stage==='responded').length;
+  const ppu = document.getElementById('pr-published');
+  if (ppu) ppu.textContent = PRESS_DATA.filter(p=>p.stage==='published').length;
+  const pv = document.getElementById('pr-value');
+  if (pv) pv.textContent = '€'+PRESS_DATA.reduce((s,p)=>s+parseFloat(p.estimated_value_eur||0),0).toLocaleString('pt-PT',{minimumFractionDigits:0});
+}
+
+function renderPressList() {
+  const el = document.getElementById('press-list-body');
+  if (!el) return;
+  const filterType = document.getElementById('pr-filter-type')?.value||'';
+  const data = filterType ? PRESS_DATA.filter(p=>p.type===filterType) : PRESS_DATA;
+  if (!data.length) { el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted3);font-size:9px">No contacts yet.</div>'; return; }
+  el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:9px">
+    <thead><tr style="border-bottom:1px solid var(--border2)">
+      <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;font-weight:400;letter-spacing:.1em">OUTLET</th>
+      <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;font-weight:400;letter-spacing:.1em">TYPE</th>
+      <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;font-weight:400;letter-spacing:.1em">STAGE</th>
+      <th style="text-align:left;padding:6px 10px;color:var(--muted3);font-size:8px;font-weight:400;letter-spacing:.1em">RELEASE</th>
+      <th style="text-align:right;padding:6px 10px;color:var(--muted3);font-size:8px;font-weight:400;letter-spacing:.1em">VALUE</th>
+      <th style="padding:6px 10px;font-weight:400"></th>
+    </tr></thead>
+    <tbody>
+      ${data.map(p=>`<tr style="border-bottom:1px solid var(--border1)" class="ledger-row">
+        <td style="padding:7px 10px"><div style="font-weight:700;color:var(--text)">${p.outlet}</div><div style="font-size:8px;color:var(--muted3)">${p.contact_name||''}</div></td>
+        <td style="padding:7px 10px;color:var(--muted3);text-transform:uppercase;font-size:8px">${p.type}</td>
+        <td style="padding:7px 10px"><span style="color:${PRESS_STAGE_COLORS[p.stage]||'var(--muted2)'};font-weight:700;font-size:8px;text-transform:uppercase">${(p.stage||'').replace('_',' ')}</span></td>
+        <td style="padding:7px 10px;color:var(--muted3);font-size:8px">${p.pitched_release||'—'}</td>
+        <td style="padding:7px 10px;text-align:right;color:var(--green3)">${p.estimated_value_eur?'€'+parseFloat(p.estimated_value_eur).toLocaleString('pt-PT'):'—'}</td>
+        <td style="padding:7px 10px">
+          <select style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:8px;padding:2px 4px" onchange="updatePressStage('${p.id}',this.value)">
+            ${['target','pitched','following_up','responded','published','rejected'].map(s=>`<option value="${s}"${s===p.stage?' selected':''}>${s.replace('_',' ')}</option>`).join('')}
+          </select>
+        </td>
+      </tr>`).join('')}
+    </tbody></table>`;
+}
+
+async function addPressContact() {
+  const outlet = document.getElementById('pr-outlet').value.trim();
+  const statusEl = document.getElementById('pr-add-status');
+  if (!outlet) { statusEl.textContent='Outlet required'; return; }
+  statusEl.textContent='Saving…';
+  try {
+    await apiPost('/press', {
+      outlet, type: document.getElementById('pr-type').value,
+      contact_name: document.getElementById('pr-contact').value,
+      contact_email: document.getElementById('pr-email').value,
+      pitched_release: document.getElementById('pr-release').value,
+      follow_up_date: document.getElementById('pr-followup').value||null,
+      country: 'PT',
+      notes: document.getElementById('pr-notes').value,
+      stage: 'target',
+    });
+    statusEl.textContent='✓ Saved';
+    ['pr-outlet','pr-contact','pr-email','pr-release','pr-followup','pr-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+    await loadPress();
+  } catch(e) { statusEl.textContent='✗ '+e.message; }
+}
+
+async function updatePressStage(id, stage) {
+  try { await _apiFetch('PUT','/press/'+id,{stage}); await loadPress(); showToast('Press → '+stage,'ok'); }
+  catch(e) { showToast('Failed: '+e.message,'err'); }
+}
+
+// ── SPLITS ─────────────────────────────────────────────────────────────────
+function calcSplitPreview() { calcSplit(); }
+
+function calcSplit() {
+  const gross = parseFloat(document.getElementById('sp-gross')?.value||0);
+  const fundPct = parseFloat(document.getElementById('sp-fund-pct')?.value||10);
+  if (!gross) { const r=document.getElementById('sp-result'); if(r) r.style.display='none'; return; }
+  const totalExp = SP_EXPENSES.reduce((s,e)=>s+e.amount,0);
+  const fund = parseFloat((gross*fundPct/100).toFixed(2));
+  const distributable = parseFloat((gross-totalExp-fund).toFixed(2));
+  const perMember = SP_MEMBERS.length>0 ? parseFloat((distributable/SP_MEMBERS.length).toFixed(2)) : distributable;
+  const r = document.getElementById('sp-result');
+  if (r) r.style.display='block';
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('sp-r-gross','€'+gross.toLocaleString('pt-PT',{minimumFractionDigits:2}));
+  set('sp-r-exp',  '-€'+totalExp.toLocaleString('pt-PT',{minimumFractionDigits:2}));
+  set('sp-r-fund', '€'+fund.toLocaleString('pt-PT',{minimumFractionDigits:2}));
+  set('sp-r-per',  '€'+perMember.toLocaleString('pt-PT',{minimumFractionDigits:2}));
+  const bd = document.getElementById('sp-member-breakdown');
+  if (bd) bd.innerHTML = SP_MEMBERS.map(m=>`
+    <div style="background:var(--bg4);border-radius:2px;padding:10px 14px;text-align:center;min-width:100px">
+      <div style="font-size:8px;color:var(--muted3);margin-bottom:4px">${m.name.toUpperCase()}</div>
+      <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--green3)">€${perMember.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div>
+    </div>`).join('');
+  const fb = document.getElementById('sp-fund-bar');
+  if (fb) { const target=parseFloat(document.getElementById('sp-fund-target')?.textContent?.replace(/[^0-9.]/g,'')||400); fb.style.width=Math.min(100,fund/target*100)+'%'; }
+}
+
+function addSplitExpense() {
+  const label=document.getElementById('sp-exp-label').value.trim();
+  const amount=parseFloat(document.getElementById('sp-exp-amt').value||0);
+  if (!label||!amount) return;
+  SP_EXPENSES.push({label,amount});
+  document.getElementById('sp-exp-label').value='';
+  document.getElementById('sp-exp-amt').value='';
+  const el=document.getElementById('sp-expenses-list');
+  if(el) el.innerHTML=SP_EXPENSES.map((e,i)=>`<div style="display:flex;gap:8px;align-items:center;font-size:9px;padding:4px 8px;background:var(--bg4);border-radius:2px"><span style="flex:1;color:var(--text)">${e.label}</span><span style="color:var(--red3)">-€${e.amount.toFixed(2)}</span><button class="btn-sm" onclick="SP_EXPENSES.splice(${i},1);addSplitExpense()" style="padding:0 6px">✕</button></div>`).join('');
+  calcSplit();
+}
+
+function addSplitMember() {
+  const name=document.getElementById('sp-member-name').value.trim();
+  if (!name||SP_MEMBERS.find(m=>m.name===name)) return;
+  SP_MEMBERS.push({name});
+  document.getElementById('sp-member-name').value='';
+  const el=document.getElementById('sp-members-list');
+  if(el) el.innerHTML=SP_MEMBERS.map((m,i)=>`<div style="display:flex;gap:8px;align-items:center;font-size:9px;padding:4px 8px;background:var(--bg4);border-radius:2px"><span style="flex:1;color:var(--text)">${m.name}</span><button class="btn-sm" onclick="SP_MEMBERS.splice(${i},1);addSplitMember()" style="padding:0 6px">✕</button></div>`).join('');
+  calcSplit();
+}
+
+function resetSplit() {
+  SP_EXPENSES=[]; SP_MEMBERS=[];
+  ['sp-name','sp-date','sp-gross'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const fp=document.getElementById('sp-fund-pct'); if(fp) fp.value='10';
+  const el=document.getElementById('sp-expenses-list'); if(el) el.innerHTML='';
+  const ml=document.getElementById('sp-members-list'); if(ml) ml.innerHTML='';
+  const rs=document.getElementById('sp-result'); if(rs) rs.style.display='none';
+  const ss=document.getElementById('sp-save-status'); if(ss) ss.textContent='';
+}
+
+async function saveSplit() {
+  const gig_name=document.getElementById('sp-name').value.trim();
+  const gross_eur=document.getElementById('sp-gross').value;
+  const statusEl=document.getElementById('sp-save-status');
+  if (!gig_name||!gross_eur) { statusEl.textContent='Gig name and gross required'; return; }
+  statusEl.textContent='Saving…';
+  try {
+    await apiPost('/splits',{
+      gig_name, gross_eur:parseFloat(gross_eur),
+      gig_date:document.getElementById('sp-date').value||null,
+      band_fund_pct:parseFloat(document.getElementById('sp-fund-pct').value||10),
+      shared_expenses:SP_EXPENSES.map(e=>({label:e.label,amount:e.amount})),
+      members:SP_MEMBERS.map(m=>({name:m.name,personal_expenses:0})),
+    });
+    statusEl.textContent='✓ Saved';
+    await loadSplits(); showToast('Split saved','ok');
+  } catch(e) { statusEl.textContent='✗ '+e.message; }
+}
+
+async function loadSplits() {
+  if (!API_BASE || !SESSION?.token) return;
+  try { SPLITS_DATA=await apiGet('/splits'); renderSplitHistory(); updateSplitsBanner(); }
+  catch(e) { console.warn('loadSplits:', e.message); }
+}
+
+function updateSplitsBanner() {
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('sp-banner-total', SPLITS_DATA.length);
+  const earned=SPLITS_DATA.reduce((s,sp)=>s+parseFloat(sp.gross_eur||0),0);
+  set('sp-banner-earned','€'+earned.toLocaleString('pt-PT',{minimumFractionDigits:0}));
+  const fund=SPLITS_DATA.reduce((s,sp)=>s+parseFloat(sp.band_fund_eur||0),0);
+  set('sp-banner-fund','€'+fund.toLocaleString('pt-PT',{minimumFractionDigits:0}));
+  const fb=document.getElementById('sp-fund-total'); if(fb) fb.textContent='€'+fund.toLocaleString('pt-PT',{minimumFractionDigits:0});
+}
+
+function renderSplitHistory() {
+  const el=document.getElementById('splits-history');
+  if (!el) return;
+  if (!SPLITS_DATA.length) { el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted3);font-size:9px">No splits saved yet.</div>'; return; }
+  el.innerHTML=SPLITS_DATA.map(s=>`
+    <div style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:12px;padding:9px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:9px">
+      <div><div style="font-weight:700;color:var(--text)">${s.gig_name}</div><div style="font-size:8px;color:var(--muted3)">${s.gig_date||'—'} · ${s.member_count||'?'} members</div></div>
+      <div style="text-align:right;color:var(--text)">€${parseFloat(s.gross_eur||0).toFixed(2)}</div>
+      <div style="text-align:right;color:var(--red3)">-€${parseFloat(s.total_expenses_eur||0).toFixed(2)}</div>
+      <div style="text-align:right;color:var(--amber2)">fund €${parseFloat(s.band_fund_eur||0).toFixed(2)}</div>
+      <div style="text-align:right;color:var(--green3);font-weight:700">€${parseFloat(s.per_member_eur||0).toFixed(2)}/mbr</div>
+    </div>`).join('');
+}
+
+// ── LOAD ALL GROWTH DATA ───────────────────────────────────────────────────
+async function loadAllGrowthData() {
+  await Promise.allSettled([
+    loadBooking(),
+    loadReleases(),
+    loadPress(),
+    loadSplits(),
+  ]);
+}
+
+// ── PRODUCTION HELPERS (stubs, real fns in production script) ──────────────
+function updateProductionBanner() {}
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════════
 // AI BOOKING AGENT ENGINE
 // ══════════════════════════════════════════════════════════
 
