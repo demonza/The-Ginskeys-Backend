@@ -1438,6 +1438,10 @@ tr:hover .edit-btn{display:inline}
       <div class="ccy-btn" onclick="setCcy(this,'USD')">USD</div>
       <div class="ccy-btn" onclick="setCcy(this,'GBP')">GBP</div>
     </div>
+    <div class="ccy-group" style="margin-left:6px">
+      <div class="ccy-btn lang-btn active" data-lang="en" onclick="setLang('en')">EN</div>
+      <div class="ccy-btn lang-btn" data-lang="pt" onclick="setLang('pt')">PT</div>
+    </div>
   </div>
 </header>
 
@@ -1462,42 +1466,42 @@ tr:hover .edit-btn{display:inline}
 <!-- ══ KPI STRIP ═════════════════════════════════════ -->
 <div class="kpi-strip" style="grid-template-columns:repeat(8,1fr)">
   <div class="kpi-card green">
-    <div class="kpi-label">Total Balance</div>
+    <div class="kpi-label" data-i18n="kpi_balance">Total Balance</div>
     <div class="kpi-value green" id="kpi-total-balance">€ 1,626.65</div>
     <div class="kpi-sub up" id="kpi-balance-change">+€0 vs last txn</div>
   </div>
   <div class="kpi-card blue">
-    <div class="kpi-label">Cash Runway</div>
+    <div class="kpi-label" data-i18n="kpi_runway">Cash Runway</div>
     <div class="kpi-value blue" id="kpi-runway">— mo</div>
     <div class="kpi-sub neutral" id="kpi-runway-sub">at current burn</div>
   </div>
   <div class="kpi-card accent">
-    <div class="kpi-label">YTD Revenue</div>
+    <div class="kpi-label" data-i18n="kpi_ytd_rev">YTD Revenue</div>
     <div class="kpi-value accent" id="kpi-ytd-rev">€ 0</div>
     <div class="kpi-sub neutral" id="kpi-ytd-rev-change">vs prior year</div>
   </div>
   <div class="kpi-card red">
-    <div class="kpi-label">YTD Expenses</div>
+    <div class="kpi-label" data-i18n="kpi_ytd_exp">YTD Expenses</div>
     <div class="kpi-value red" id="kpi-ytd-exp">€ —</div>
     <div class="kpi-sub neutral" id="kpi-ytd-exp-change">YoY</div>
   </div>
   <div class="kpi-card amber">
-    <div class="kpi-label">Net Margin</div>
+    <div class="kpi-label" data-i18n="kpi_net_margin">Net Margin</div>
     <div class="kpi-value amber" id="kpi-net-margin">—%</div>
     <div class="kpi-sub neutral" id="kpi-net-margin-sub">MoM | YoY</div>
   </div>
   <div class="kpi-card purple">
-    <div class="kpi-label">Gross Margin</div>
+    <div class="kpi-label" data-i18n="kpi_gross_margin">Gross Margin</div>
     <div class="kpi-value purple" id="kpi-gross-margin">—%</div>
     <div class="kpi-sub neutral" id="kpi-gross-margin-sub">YTD</div>
   </div>
   <div class="kpi-card" style="--after-bg:var(--blue2)">
-    <div class="kpi-label">EBITDA (trailing)</div>
+    <div class="kpi-label" data-i18n="kpi_ebitda">EBITDA (trailing)</div>
     <div class="kpi-value white" id="kpi-ebitda">€ —</div>
     <div class="kpi-sub neutral">12-month net</div>
   </div>
   <div class="kpi-card" style="--after-bg:var(--green2)">
-    <div class="kpi-label">Free Cash Flow</div>
+    <div class="kpi-label" data-i18n="kpi_fcf">Free Cash Flow</div>
     <div class="kpi-value white" id="kpi-fcf">€ —</div>
     <div class="kpi-sub neutral" id="kpi-fcf-sub">trailing − capex</div>
   </div>
@@ -1513,7 +1517,7 @@ tr:hover .edit-btn{display:inline}
   <!-- Revenue by source -->
   <div class="panel" style="grid-row:1; grid-column:1">
     <div class="panel-header">
-      <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Revenue by Source</div>
+      <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div><span data-i18n="revenue_by_source">Revenue by Source</span></div>
       <span class="panel-shortcut">F2</span>
     </div>
     <div style="padding:10px 12px;flex:1;display:flex;flex-direction:column;gap:6px" id="rev-source-panel"></div>
@@ -1522,7 +1526,7 @@ tr:hover .edit-btn{display:inline}
   <!-- Cash flow chart -->
   <div class="panel" style="grid-row:1 / span 2; grid-column:2">
     <div class="panel-header">
-      <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Cash Flow — 12 Months</div>
+      <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="cash_flow_12m">Cash Flow — 12 Months</span></div>
       <span class="panel-badge">MAR 25 → MAR 26</span>
     </div>
     <div class="chart-container">
@@ -1552,7 +1556,7 @@ tr:hover .edit-btn{display:inline}
   <!-- Alerts panel -->
   <div class="panel row-span-2" style="grid-row:1 / span 2; grid-column:3">
     <div class="panel-header">
-      <div class="panel-title"><div class="panel-title-dot" style="background:var(--red2)"></div>Live Alerts</div>
+      <div class="panel-title"><div class="panel-title-dot" style="background:var(--red2)"></div><span data-i18n="live_alerts">Live Alerts</span></div>
       <span class="panel-shortcut">F5</span>
     </div>
     <div class="panel-body">
@@ -1582,7 +1586,7 @@ tr:hover .edit-btn{display:inline}
   <!-- Tour P&L -->
   <div class="panel" style="grid-row:2; grid-column:1">
     <div class="panel-header">
-      <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Tour P&amp;L</div>
+      <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="tour_pnl">Tour P&amp;L</span></div>
       <span class="panel-shortcut">F3</span>
     </div>
     <div class="panel-body" id="tour-pnl-panel"></div>
@@ -1591,7 +1595,7 @@ tr:hover .edit-btn{display:inline}
   <!-- Recent transactions -->
   <div class="panel col-span-2" style="grid-row:3; grid-column:1 / span 3">
     <div class="panel-header">
-      <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div>Recent Transactions</div>
+      <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div><span data-i18n="recent_transactions">Recent Transactions</span></div>
       <div style="display:flex;gap:6px;align-items:center">
         <span class="panel-badge">LEDGER FEED</span>
         <span class="panel-shortcut">F4</span>
@@ -1600,7 +1604,7 @@ tr:hover .edit-btn{display:inline}
     <div class="ledger-wrap" style="max-height:220px">
       <table class="ledger-table">
         <thead><tr>
-          <th>Date</th><th>Description</th><th>Type</th><th>Category</th><th>Tags</th><th style="text-align:right">Amount</th><th style="text-align:right">Balance</th>
+          <th><span data-i18n="ledger_date">Date</span></th><th><span data-i18n="ledger_desc">Description</span></th><th><span data-i18n="ledger_type">Type</span></th><th><span data-i18n="ledger_cat">Category</span></th><th><span data-i18n="ledger_tags">Tags</span></th><th style="text-align:right"><span data-i18n="ledger_amount">Amount</span></th><th style="text-align:right"><span data-i18n="ledger_balance">Balance</span></th>
         </tr></thead>
         <tbody id="dash-ledger-body"></tbody>
       </table>
@@ -1661,7 +1665,7 @@ tr:hover .edit-btn{display:inline}
   <div class="ledger-wrap" style="flex:1">
     <table class="ledger-table">
       <thead><tr>
-        <th>Date</th><th>ID</th><th>Description</th><th>Type</th><th>Category</th><th>Tags</th><th style="text-align:right">Amount</th><th style="text-align:right">Balance</th><th>Rec.</th><th id="ledger-actions-th"></th>
+        <th><span data-i18n="ledger_date">Date</span></th><th>ID</th><th><span data-i18n="ledger_desc">Description</span></th><th><span data-i18n="ledger_type">Type</span></th><th><span data-i18n="ledger_cat">Category</span></th><th><span data-i18n="ledger_tags">Tags</span></th><th style="text-align:right"><span data-i18n="ledger_amount">Amount</span></th><th style="text-align:right"><span data-i18n="ledger_balance">Balance</span></th><th>Rec.</th><th id="ledger-actions-th"></th>
       </tr></thead>
       <tbody id="full-ledger-body"></tbody>
     </table>
@@ -1699,7 +1703,7 @@ tr:hover .edit-btn{display:inline}
         <div class="section-head" style="margin-top:12px">Tour Transactions</div>
         <div class="ledger-wrap" style="max-height:260px">
           <table class="ledger-table">
-            <thead><tr><th>Date</th><th>Description</th><th>Type</th><th style="text-align:right">Amount</th></tr></thead>
+            <thead><tr><th><span data-i18n="ledger_date">Date</span></th><th><span data-i18n="ledger_desc">Description</span></th><th><span data-i18n="ledger_type">Type</span></th><th style="text-align:right"><span data-i18n="ledger_amount">Amount</span></th></tr></thead>
             <tbody id="tour-ledger-body"></tbody>
           </table>
         </div>
@@ -2132,7 +2136,7 @@ function renderRevSource(){
     <div class="bar-row">
       <div class="bar-label">${s.label}</div>
       <div class="bar-track"><div class="bar-fill" style="width:${(s.val/max*100).toFixed(0)}%;background:${s.color};opacity:.85"></div></div>
-      <div class="bar-num">€${s.val>=1000?(s.val/1000).toFixed(1)+'K':s.val.toFixed(2)}</div>
+      <div class="bar-num">${fmtMoneyShort(s.val)}</div>
       <div class="bar-pct">${total>0?(s.val/total*100).toFixed(0):'0'}%</div>
     </div>
   `).join('');
@@ -2242,7 +2246,7 @@ function initCFChart(){
       backgroundColor:'#0a1018',borderColor:'#243c54',borderWidth:1,
       titleColor:'#b8ccd8',bodyColor:'#5a7a92',
       titleFont:{family:'IBM Plex Mono',size:9},bodyFont:{family:'IBM Plex Mono',size:9},
-      callbacks:{label:c=>`${c.dataset.label}: €${c.parsed.y.toLocaleString()}`}
+      callbacks:{label:c=>`${c.dataset.label}: ${fmtMoneyShort(c.parsed.y)}`}
     }},
     scales:{
       x:{
@@ -2291,7 +2295,7 @@ function initBalanceChart(){
       backgroundColor:'#0a1018',borderColor:'#243c54',borderWidth:1,
       titleColor:'#b8ccd8',bodyColor:'#5a7a92',
       titleFont:{family:'IBM Plex Mono',size:9},bodyFont:{family:'IBM Plex Mono',size:9},
-      callbacks:{label:c=>`${c.dataset.label}: €${c.parsed.y.toLocaleString()}`}
+      callbacks:{label:c=>`${c.dataset.label}: ${fmtMoneyShort(c.parsed.y)}`}
     }},
     scales:{
       x:{
@@ -2494,7 +2498,7 @@ function initDcfChart(){
   const {labels,cashFlows,discounted,dcfValue,terminal,terminalPv,avgNet,trailingRev} = getDcfSeries();
   const summary=document.getElementById('dcf-summary');
   const revMultiple = trailingRev>0 ? dcfValue/trailingRev : null;
-  if(summary) summary.textContent = `DCF: €${dcfValue.toLocaleString(undefined,{maximumFractionDigits:0})} | Rev multiple: ${revMultiple?revMultiple.toFixed(1)+'x':'—'} | Avg net: €${avgNet.toFixed(0)}`;
+  if(summary) summary.textContent = `DCF: ${fmtMoney(dcfValue.toLocaleString(undefined,{maximumFractionDigits:0}))} | Rev multiple: ${revMultiple?revMultiple.toFixed(1)+'x':'—'} | Avg net: ${fmtMoney(avgNet)}`;
 
   dcfChartInst=new Chart(canvas,{type:'line',data:{
     labels,
@@ -2507,7 +2511,7 @@ function initDcfChart(){
     plugins:{legend:{display:true,labels:{color:'#b8ccd8',font:{family:'IBM Plex Mono',size:9},boxWidth:10}},
       tooltip:{backgroundColor:'#0a1018',borderColor:'#243c54',borderWidth:1,titleColor:'#b8ccd8',bodyColor:'#5a7a92',
         titleFont:{family:'IBM Plex Mono',size:9},bodyFont:{family:'IBM Plex Mono',size:9},
-        callbacks:{label:c=>`€${c.parsed.y.toLocaleString(undefined,{maximumFractionDigits:0})}`}
+        callbacks:{label:c=>`${fmtMoney(c.parsed.y.toLocaleString(undefined,{maximumFractionDigits:0}))}`}
       }
     },
     scales:{
@@ -2521,7 +2525,7 @@ function refreshDcfChart(){
   const {labels,cashFlows,discounted,dcfValue,avgNet,trailingRev} = getDcfSeries();
   const revMultiple = trailingRev>0 ? dcfValue/trailingRev : null;
   const summary=document.getElementById('dcf-summary');
-  if(summary) summary.textContent = `DCF: €${dcfValue.toLocaleString(undefined,{maximumFractionDigits:0})} | Rev multiple: ${revMultiple?revMultiple.toFixed(1)+'x':'—'} | Avg net: €${avgNet.toFixed(0)}`;
+  if(summary) summary.textContent = `DCF: ${fmtMoney(dcfValue.toLocaleString(undefined,{maximumFractionDigits:0}))} | Rev multiple: ${revMultiple?revMultiple.toFixed(1)+'x':'—'} | Avg net: ${fmtMoney(avgNet)}`;
   dcfChartInst.data.labels = labels;
   dcfChartInst.data.datasets[0].data = cashFlows;
   dcfChartInst.data.datasets[1].data = discounted;
@@ -2553,7 +2557,7 @@ function initProfitChart(){
     responsive:true,maintainAspectRatio:false,
     plugins:{legend:{display:true,labels:{color:'#b8ccd8',font:{family:'IBM Plex Mono',size:9},boxWidth:10}},
       tooltip:{backgroundColor:'#0a1018',borderColor:'#243c54',borderWidth:1,titleColor:'#b8ccd8',bodyColor:'#5a7a92',titleFont:{family:'IBM Plex Mono',size:9},bodyFont:{family:'IBM Plex Mono',size:9},
-        callbacks:{label:c=>c.dataset.label==='Margin %'?`${c.parsed.y.toFixed(1)}%`:`€${c.parsed.y.toLocaleString(undefined,{maximumFractionDigits:0})}`}
+        callbacks:{label:c=>c.dataset.label==='Margin %'?`${c.parsed.y.toFixed(1)}%`:`${fmtMoney(c.parsed.y.toLocaleString(undefined,{maximumFractionDigits:0}))}`}
       }
     },
     scales:{
@@ -2615,7 +2619,7 @@ function initHealthChart(){
     responsive:true,maintainAspectRatio:false,
     plugins:{legend:{display:true,labels:{color:'#b8ccd8',font:{family:'IBM Plex Mono',size:9},boxWidth:10}},
       tooltip:{backgroundColor:'#0a1018',borderColor:'#243c54',borderWidth:1,titleColor:'#b8ccd8',bodyColor:'#5a7a92',titleFont:{family:'IBM Plex Mono',size:9},bodyFont:{family:'IBM Plex Mono',size:9},
-        callbacks:{label:c=>`${c.dataset.label}: €${Math.abs(c.parsed.y).toLocaleString(undefined,{maximumFractionDigits:0})}`}
+        callbacks:{label:c=>`${c.dataset.label}: ${fmtMoney(Math.abs(c.parsed.y).toLocaleString(undefined,{maximumFractionDigits:0}))}`}
       }
     },
     scales:{
@@ -2647,10 +2651,10 @@ function updateFinancialKpis(){
   const prev=sortedByDate[sortedByDate.length-2];
   const balanceEl=document.getElementById('kpi-total-balance');
   const balanceChangeEl=document.getElementById('kpi-balance-change');
-  if(balanceEl) balanceEl.textContent=`€ ${latest.balance.toLocaleString()}`;
+  if(balanceEl) balanceEl.textContent = fmtMoney(latest.balance);
   if(balanceChangeEl&&prev){
     const diff=latest.balance-prev.balance;
-    balanceChangeEl.textContent=`${diff>=0?'+':''}€${diff.toLocaleString()} vs last txn`;
+    balanceChangeEl.textContent=`${diff>=0?'+':''}${fmtMoney(diff)} ${t('vs_last_txn')}`;
   }
 
   const now=new Date();
@@ -2664,31 +2668,29 @@ function updateFinancialKpis(){
   const ytdExpEl=document.getElementById('kpi-ytd-exp');
   const ytdRevChEl=document.getElementById('kpi-ytd-rev-change');
   const ytdExpChEl=document.getElementById('kpi-ytd-exp-change');
-  if(ytdRevEl) ytdRevEl.textContent='€ '+ytdRev.toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2});
-  if(ytdExpEl) ytdExpEl.textContent='€ '+ytdExp.toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(ytdRevEl) ytdRevEl.textContent = fmtMoney(ytdRev);
+  if(ytdExpEl) ytdExpEl.textContent = fmtMoney(ytdExp);
   if(ytdRevChEl){
     if(ytdRevLastYear>0){const pct=((ytdRev-ytdRevLastYear)/ytdRevLastYear*100);ytdRevChEl.textContent=(pct>=0?'▲ +':'▼ ')+pct.toFixed(1)+'% vs '+lastYear;ytdRevChEl.className='kpi-sub '+(pct>=0?'up':'down');}
-    else ytdRevChEl.textContent='No '+lastYear+' data';
+    else ytdRevChEl.textContent=t('no_data')+' '+lastYear;
   }
   if(ytdExpChEl){
     if(ytdExpLastYear>0){const pct=((ytdExp-ytdExpLastYear)/ytdExpLastYear*100);ytdExpChEl.textContent=(pct>=0?'▲ +':'▼ ')+pct.toFixed(1)+'% vs '+lastYear;ytdExpChEl.className='kpi-sub '+(pct>=0?'down':'up');}
-    else ytdExpChEl.textContent='No '+lastYear+' data';
+    else ytdExpChEl.textContent=t('no_data')+' '+lastYear;
   }
 
-  // Gross margin (COGS = distribution/studio/artwork)
   const COGS_CATS=['Distribuição','Estúdio','Artwork'];
   const ytdCogs = entries.filter(e=>new Date(e.date).getFullYear()===year && e.amount<0 && COGS_CATS.includes(e.cat)).reduce((s,e)=>s+Math.abs(e.amount),0);
   const grossMargin = ytdRev? (ytdRev - ytdCogs)/ytdRev : null;
   const grossMarginEl=document.getElementById('kpi-gross-margin');
   const grossMarginSubEl=document.getElementById('kpi-gross-margin-sub');
   if(grossMarginEl) grossMarginEl.textContent = grossMargin!==null ? `${(grossMargin*100).toFixed(1)}%` : '—';
-  if(grossMarginSubEl) grossMarginSubEl.textContent = `COGS: €${ytdCogs.toLocaleString()}`;
+  if(grossMarginSubEl) grossMarginSubEl.textContent = `COGS: ${fmtMoney(ytdCogs)}`;
 
   const {months,marginRate,mom,yoy} = getMarginGrowthSeries();
   const lastIdx=months.length-1;
   const netMarginEl=document.getElementById('kpi-net-margin');
   const netMarginSubEl=document.getElementById('kpi-net-margin-sub');
-
   const margin=marginRate[lastIdx]??0;
   if(netMarginEl) netMarginEl.textContent=`${(margin*100).toFixed(1)}%`;
   if(netMarginSubEl){
@@ -2698,7 +2700,6 @@ function updateFinancialKpis(){
   }
 
   const trailing=12;
-
   const groupedByMonth={};
   entries.forEach(e=>{
     const m=`${new Date(e.date).getFullYear()}-${String(new Date(e.date).getMonth()+1).padStart(2,'0')}`;
@@ -2724,45 +2725,36 @@ function updateFinancialKpis(){
   const runwayEl=document.getElementById('kpi-runway');
   const runwaySubEl=document.getElementById('kpi-runway-sub');
   if(runwayEl) runwayEl.textContent = runwayLabel;
-  if(runwaySubEl) runwaySubEl.textContent = `Based on last ${trailingMonths.length} mo burn (€${avgBurn.toLocaleString()}/mo)`;
+  if(runwaySubEl) runwaySubEl.textContent = `${t('runway_based')} ${trailingMonths.length} ${t('runway_mo_burn')} (${fmtMoney(avgBurn)}/mo)`;
 
   const tickerRunwayEl=document.getElementById('ticker-runway');
-  if(tickerRunwayEl) tickerRunwayEl.textContent=`⚠ Cash runway: ${runwayLabel} at current burn`;
+  if(tickerRunwayEl) tickerRunwayEl.textContent=`⚠ Cash runway: ${runwayLabel} ${t('runway_sub')}`;
 
   const alertRunwayBody=document.getElementById('alert-runway-body');
-  if(alertRunwayBody) alertRunwayBody.textContent = `At current burn (€${avgBurn.toLocaleString()}/mo), runway is ${runwayLabel}.`;
-
+  if(alertRunwayBody) alertRunwayBody.textContent = `${t('runway_based')} (${fmtMoney(avgBurn)}/mo), runway is ${runwayLabel}.`;
 
   const ebitdaEl=document.getElementById('kpi-ebitda');
   const fcfEl=document.getElementById('kpi-fcf');
   const fcfSubEl=document.getElementById('kpi-fcf-sub');
+  if(ebitdaEl) ebitdaEl.textContent = fmtMoney(trailingNet);
 
-  // EBITDA as proxy for net income (no interest/taxes/dep in ledger)
-  if(ebitdaEl) ebitdaEl.textContent=`€ ${trailingNet.toLocaleString()}`;
-
-  // FCF = net - capex (capex = equipment expenses)
   const capex=entries.filter(e=>e.cat==='Equipamento'&&e.amount<0).reduce((s,e)=>s+Math.abs(e.amount),0);
   const fcf=trailingNet - capex;
-  if(fcfEl) fcfEl.textContent=`€ ${fcf.toLocaleString()}`;
+  if(fcfEl) fcfEl.textContent = fmtMoney(fcf);
 
-  // Quarterly FCF
   const q1Start=new Date(year,0,1);
   const q1End=new Date(year,2,31);
-  const q1Entries=entries.filter(e=>{
-    const d=new Date(e.date);
-    return d>=q1Start&&d<=q1End;
-  });
+  const q1Entries=entries.filter(e=>{const d=new Date(e.date);return d>=q1Start&&d<=q1End;});
   const q1Net=q1Entries.reduce((s,e)=>s+e.amount,0);
   const q1Capex=q1Entries.filter(e=>e.cat==='Equipamento'&&e.amount<0).reduce((s,e)=>s+Math.abs(e.amount),0);
   const q1Fcf=q1Net - q1Capex;
 
-  // YTD FCF
   const ytdEntries=entries.filter(e=>new Date(e.date).getFullYear()===year);
   const ytdNet=ytdEntries.reduce((s,e)=>s+e.amount,0);
   const ytdCapex=ytdEntries.filter(e=>e.cat==='Equipamento'&&e.amount<0).reduce((s,e)=>s+Math.abs(e.amount),0);
   const ytdFcf=ytdNet - ytdCapex;
 
-  if(fcfSubEl) fcfSubEl.textContent=`Q1: €${q1Fcf.toLocaleString()} | YTD: €${ytdFcf.toLocaleString()}`;
+  if(fcfSubEl) fcfSubEl.textContent=`Q1: ${fmtMoney(q1Fcf.toLocaleString())} | YTD: ${fmtMoney(ytdFcf.toLocaleString())}`;
 }
 
 // ─── RENDER: STREAMING CHART ──────────────────────────
@@ -2798,7 +2790,7 @@ function renderPlatforms(containerId){
   document.getElementById(containerId).innerHTML=PLATFORM_DATA.map(p=>`
     <div class="platform-card">
       <div class="platform-name" style="color:${p.color}">${p.name}</div>
-      <div class="platform-rev">€${p.rev}<span style="font-size:11px;font-weight:400;color:var(--muted3)">/mo</span></div>
+      <div class="platform-rev">${fmtMoney(p.rev)}<span style="font-size:11px;font-weight:400;color:var(--muted3)">/mo</span></div>
       <div class="platform-streams">${p.streams.toLocaleString()} streams</div>
       <div class="platform-bar-track"><div class="platform-bar-fill" style="width:${(p.rev/maxR*100).toFixed(0)}%;background:${p.color};opacity:.7"></div></div>
       <div class="platform-change ${p.change>=0?'up':'down'}">${p.change>=0?'▲':'▼'} ${Math.abs(p.change)}% MoM</div>
@@ -2836,10 +2828,10 @@ function renderLedgerRows(data,tbodyId,full=false){
       <td><span class="badge ${r.type}">${r.type.toUpperCase()}</span></td>
       <td class="cat-cell">${r.cat}</td>
       <td><div class="tag-list">${(r.tags||[]).slice(0,2).map(tagBadge).join('')}</div></td>
-      <td style="text-align:right"><span class="amount ${r.amount>0?'pos':'neg'}">${r.amount>0?'+':''}€${Math.abs(r.amount).toLocaleString('pt-PT',{minimumFractionDigits:2})}</span></td>
-      ${full?`<td class="bal-cell">€${r.balance.toLocaleString('pt-PT',{minimumFractionDigits:2})}</td>
+      <td style="text-align:right"><span class="amount ${r.amount>0?'pos':'neg'}">${r.amount>0?'+':''}${fmtMoney(Math.abs(r.amount))}</span></td>
+      ${full?`<td class="bal-cell">${fmtMoney(r.balance)}</td>
       <td style="text-align:center;font-size:9px">${r.reconciled?'<span style="color:var(--green2)">✓</span>':'<span style="color:var(--amber2)">○</span>'}</td>`
-      :'<td class="bal-cell">€'+r.balance.toLocaleString('pt-PT',{minimumFractionDigits:2})+'</td>'}
+      :'<td class="bal-cell">'+fmtMoney(r.balance)+'</td>'}
       ${actionBtns}
     </tr>`;
   }).join('');
@@ -2892,10 +2884,10 @@ function renderTourPnl(){
       </div>
       <div class="tour-meta-grid">
         <div class="tour-meta-item"><div class="tour-meta-label">Shows</div><div class="tour-meta-val">${t.shows}</div></div>
-        <div class="tour-meta-item"><div class="tour-meta-label">Revenue</div><div class="tour-meta-val">€${t.revenue.toLocaleString()}</div></div>
-        <div class="tour-meta-item"><div class="tour-meta-label">Costs</div><div class="tour-meta-val">€${t.costs.toLocaleString()}</div></div>
+        <div class="tour-meta-item"><div class="tour-meta-label">Revenue</div><div class="tour-meta-val">${fmtMoney(t.revenue.toLocaleString())}</div></div>
+        <div class="tour-meta-item"><div class="tour-meta-label">Costs</div><div class="tour-meta-val">${fmtMoney(t.costs.toLocaleString())}</div></div>
       </div>
-      <div class="tour-pnl ${net>0?'profit':net<0?'loss':'warn'}">${net>0?'+':''}€${net.toLocaleString()} NET</div>
+      <div class="tour-pnl ${net>0?'profit':net<0?'loss':'warn'}">${net>0?'+':''}${fmtMoney(net.toLocaleString())} NET</div>
       <div class="tour-progress-wrap">
         <div class="tour-progress-label"><span>Budget usage</span><span>${budgetPct}%</span></div>
         <div class="tour-progress-track"><div class="tour-progress-fill" style="width:${Math.min(budgetPct,100)}%;background:${budgetPct>85?'var(--amber2)':budgetPct>100?'var(--red2)':'var(--green2)'}"></div></div>
@@ -2916,7 +2908,7 @@ function renderToursList(){
         <div onclick="renderTourDetail(TOUR_DATA[${i}])" style="flex:1">
           <div class="tour-name">${t.name}</div>
           <div style="font-size:8px;color:var(--muted3);margin-bottom:4px">${t.start} → ${t.end} · ${t.shows} show${t.shows!==1?'s':''}</div>
-          <div class="tour-pnl ${net>=0?'profit':'loss'}">${net>=0?'+':''}€${net.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div>
+          <div class="tour-pnl ${net>=0?'profit':'loss'}">${net>=0?'+':''}${fmtMoney(net.toLocaleString('pt-PT',{minimumFractionDigits:2}))}</div>
         </div>
         ${canEdit?`<button class="edit-btn" style="display:inline;margin-top:2px" onclick="openTourModal(${i})">✎</button>`:''}
       </div>
@@ -2937,7 +2929,7 @@ function renderTourLedger(){
       <td class="date-cell">${r.date.slice(5)}</td>
       <td class="desc-cell">${r.desc}</td>
       <td><span class="badge ${r.type}">${r.type.toUpperCase()}</span></td>
-      <td style="text-align:right"><span class="amount ${r.amount>0?'pos':'neg'}">${r.amount>0?'+':''}€${Math.abs(r.amount).toLocaleString()}</span></td>
+      <td style="text-align:right"><span class="amount ${r.amount>0?'pos':'neg'}">${r.amount>0?'+':''}${fmtMoney(Math.abs(r.amount))}</span></td>
     </tr>
   `).join('');
 }
@@ -2960,7 +2952,7 @@ function renderTourExpenseChart(){
     <div class="bar-row">
       <div class="bar-label">${c.l}</div>
       <div class="bar-track"><div class="bar-fill" style="width:${(c.v/max*100).toFixed(0)}%;background:var(--red2);opacity:.75"></div></div>
-      <div class="bar-num">€${c.v>=1000?(c.v/1000).toFixed(1)+'K':c.v.toFixed(2)}</div>
+      <div class="bar-num">${fmtMoney(c.v>=1000?(c.v/1000).toFixed(1)+'K':c.v.toFixed(2))}</div>
     </div>
   `).join('')}</div>`;
 }
@@ -3074,10 +3066,384 @@ function toggleScanlines(el){
 }
 
 // ─── CURRENCY ─────────────────────────────────────────
-function setCcy(btn,ccy){
-  document.querySelectorAll('.ccy-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+// ══════════════════════════════════════════════════════════
+// CURRENCY + LANGUAGE ENGINE
+// ══════════════════════════════════════════════════════════
+
+// ── CURRENCY ─────────────────────────────────────────────
+const FX_RATES = { EUR: 1, USD: 1.08, GBP: 0.86 };
+const CCY_SYMBOLS = { EUR: '€', USD: '$', GBP: '£' };
+const CCY_LOCALES = { EUR: 'pt-PT', USD: 'en-US', GBP: 'en-GB' };
+let ACTIVE_CCY = 'EUR';
+
+function toActiveCcy(eurAmount) {
+  return eurAmount * FX_RATES[ACTIVE_CCY];
 }
+
+function fmtMoney(eurAmount, opts = {}) {
+  const converted = toActiveCcy(eurAmount);
+  const sym = CCY_SYMBOLS[ACTIVE_CCY];
+  const locale = CCY_LOCALES[ACTIVE_CCY];
+  const abs = Math.abs(converted);
+  const sign = converted < 0 ? '-' : (opts.showPlus && converted > 0 ? '+' : '');
+  if (abs >= 1000) {
+    return sign + sym + ' ' + abs.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  return sign + sym + ' ' + abs.toFixed(2);
+}
+
+function fmtMoneyShort(eurAmount) {
+  const v = toActiveCcy(eurAmount);
+  const sym = CCY_SYMBOLS[ACTIVE_CCY];
+  const abs = Math.abs(v);
+  const sign = v < 0 ? '-' : '';
+  if (abs >= 1000000) return sign + sym + (abs/1000000).toFixed(1) + 'M';
+  if (abs >= 1000)    return sign + sym + (abs/1000).toFixed(1) + 'K';
+  return sign + sym + abs.toFixed(0);
+}
+
+// ── LIVE FX RATES (fetched on load, fallback to static) ──────
+const FX_FALLBACK = { EUR: 1, USD: 1.08, GBP: 0.86 };
+// ── LANGUAGE ─────────────────────────────────────────────
+let ACTIVE_LANG = localStorage.getItem('gk_lang') || 'en';
+async function fetchLiveFx() {
+  try {
+    const r = await fetch('https://api.frankfurter.app/latest?base=EUR&symbols=USD,GBP');
+    if (!r.ok) return;
+    const d = await r.json();
+    FX_RATES.USD = d.rates.USD;
+    FX_RATES.GBP = d.rates.GBP;
+    console.log('[GKS] Live FX loaded:', FX_RATES);
+  } catch(e) {
+    console.warn('[GKS] FX fetch failed, using fallback rates');
+  }
+}
+
+function setCcy(btn, ccy) {
+  ACTIVE_CCY = ccy;
+  localStorage.setItem('gk_ccy', ccy);
+  document.querySelectorAll('.ccy-btn:not(.lang-btn)').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Re-render everything that shows money
+  updateFinancialKpis();
+  renderLedgerRows(LEDGER_DATA.slice(0, 8), 'dash-ledger-body', false);
+  renderLedgerRows(LEDGER_DATA, 'full-ledger-body', true);
+  renderRevSource();
+  updateReconcileStrip();
+  renderPlatforms('dash-platform-grid');
+  renderPlatforms('stream-platform-full');
+  updateBookingBanner();
+  updateSplitsBanner();
+  // Redraw charts with new currency
+  initChartsDelayed();
+  showToast(t('currency_switched') + ' ' + ccy, 'ok');
+}
+
+function setLang(lang) {
+  ACTIVE_LANG = lang;
+  localStorage.setItem('gk_lang', lang);
+  applyTranslations();
+  if (LEDGER_DATA.length) {
+    renderLedgerRows(LEDGER_DATA.slice(0,8), 'dash-ledger-body', false);
+    renderLedgerRows(LEDGER_DATA, 'full-ledger-body', true);
+    renderRevSource();
+    updateReconcileStrip();
+    initChartsDelayed();
+  }
+  showToast(t('alert_lang_switched'), 'ok');
+}
+
+
+const TRANSLATIONS = {
+  en: {
+    // Tabs
+    tab_dashboard:   'Dashboard',
+    tab_ledger:      'Ledger',
+    tab_tours:       'Tours',
+    tab_streaming:   'Streaming',
+    tab_access:      'Access',
+    tab_audit:       'Audit Log',
+    tab_alerts:      'Alerts',
+    tab_settings:    'Settings',
+    tab_booking:     'Booking',
+    tab_releases:    'Releases',
+    tab_press:       'Press & Sync',
+    tab_splits:      'Splits',
+    tab_agent:       '⚡ Agent',
+    tab_production:  '🎚 Production',
+    // KPI labels
+    kpi_balance:     'Total Balance',
+    kpi_runway:      'Cash Runway',
+    kpi_ytd_rev:     'YTD Revenue',
+    kpi_ytd_exp:     'YTD Expenses',
+    kpi_net_margin:  'Net Margin',
+    kpi_gross_margin:'Gross Margin',
+    kpi_ebitda:      'EBITDA (trailing)',
+    kpi_fcf:         'Free Cash Flow',
+    // Runway
+    runway_sub:      'at current burn',
+    runway_based:    'Based on last',
+    runway_mo_burn:  'mo burn',
+    // Common
+    vs_last_txn:     'vs last txn',
+    vs_prior_year:   'vs prior year',
+    no_data:         'No data',
+    // Ledger
+    ledger_date:     'Date',
+    ledger_desc:     'Description',
+    ledger_type:     'Type',
+    ledger_cat:      'Category',
+    ledger_amount:   'Amount',
+    ledger_balance:  'Balance',
+    ledger_tags:     'Tags',
+    // Booking
+    booking_add:     'Add Booking Contact',
+    booking_pipeline:'Pipeline',
+    booking_cold:    'COLD',
+    booking_contacted:'CONTACTED',
+    booking_negotiating:'NEGOTIATING',
+    booking_confirmed:'CONFIRMED',
+    booking_pipeline_val:'PIPELINE €',
+    booking_overdue: 'OVERDUE',
+    // Buttons
+    btn_save:        'Save',
+    btn_add:         'Add',
+    btn_refresh:     '↺ Refresh',
+    btn_generate:    '⚡ Generate',
+    btn_print:       '⎙ Print / PDF',
+    // Alerts
+    alert_lang_switched: 'Language switched to English',
+    currency_switched:   'Currency:',
+    // Sections
+    recent_transactions: 'Recent Transactions',
+    revenue_by_source:   'Revenue by Source',
+    cash_flow_12m:       'Cash Flow — 12 Months',
+    live_alerts:         'Live Alerts',
+    tour_pnl:            'Tour P&L',
+    // Production
+    prod_show_advance:   'Show Advance',
+    prod_tech_rider:     'Tech Rider',
+    prod_setlist:        'Setlist',
+    prod_checklist:      'Show Checklist',
+    prod_create_show:    'Create Show',
+    prod_upcoming:       'Upcoming Shows',
+    // Booking
+    booking_forecast:    'Revenue Forecast',
+    booking_followup_q:  'Follow-up Queue',
+    booking_velocity:    'Stage Velocity',
+    // Agent
+    agent_title:         'AI BOOKING AGENT',
+    agent_single:        'Single Venue Pitch',
+    agent_batch:         'Batch Campaign',
+    agent_followup:      'Follow-Up Generator',
+    agent_generate:      '⚡ Generate Pitch',
+    agent_open_gmail:    '✉ Open in Gmail',
+    agent_copy:          'Copy',
+    // Releases
+    rel_calendar:        'Release Calendar',
+    rel_checklist:       'Pre-Release Checklist',
+    rel_benchmarks:      'Streaming Benchmarks',
+    rel_add:             'Add Release',
+    // Press
+    press_targets:       'Priority Targets',
+    press_timing:        'Pitch Timing Guide',
+    press_sync:          'Sync Opportunity',
+    // Splits
+    splits_member_earn:  'Member Earnings',
+    splits_fund:         'Band Fund Tracker',
+    splits_roic:         'ROIC by Gig Type',
+    splits_calculator:   'Gig Split Calculator',
+    splits_history:      'Split History',
+    // Common new
+    save_to_db:          'Save to DB',
+    load_from_db:        '↺ Load from DB',
+    add_contact:         'Add Contact',
+    no_contacts:         'No contacts yet.',
+    no_shows:            'No shows yet.',
+    no_setlists:         'No setlists yet.',
+  },
+  pt: {
+    // Tabs
+    tab_dashboard:   'Painel',
+    tab_ledger:      'Livro',
+    tab_tours:       'Digressões',
+    tab_streaming:   'Streaming',
+    tab_access:      'Acesso',
+    tab_audit:       'Registo',
+    tab_alerts:      'Alertas',
+    tab_settings:    'Definições',
+    tab_booking:     'Reservas',
+    tab_releases:    'Lançamentos',
+    tab_press:       'Imprensa & Sync',
+    tab_splits:      'Divisão',
+    tab_agent:       '⚡ Agente',
+    tab_production:  '🎚 Produção',
+    // KPI labels
+    kpi_balance:     'Saldo Total',
+    kpi_runway:      'Autonomia Financeira',
+    kpi_ytd_rev:     'Receita YTD',
+    kpi_ytd_exp:     'Despesas YTD',
+    kpi_net_margin:  'Margem Líquida',
+    kpi_gross_margin:'Margem Bruta',
+    kpi_ebitda:      'EBITDA (últimos 12m)',
+    kpi_fcf:         'Fluxo de Caixa Livre',
+    // Runway
+    runway_sub:      'ao ritmo atual',
+    runway_based:    'Com base nos últimos',
+    runway_mo_burn:  'meses',
+    // Common
+    vs_last_txn:     'vs última transação',
+    vs_prior_year:   'vs ano anterior',
+    no_data:         'Sem dados',
+    // Ledger
+    ledger_date:     'Data',
+    ledger_desc:     'Descrição',
+    ledger_type:     'Tipo',
+    ledger_cat:      'Categoria',
+    ledger_amount:   'Valor',
+    ledger_balance:  'Saldo',
+    ledger_tags:     'Tags',
+    // Booking
+    booking_add:     'Adicionar Contacto',
+    booking_pipeline:'Pipeline',
+    booking_cold:    'FRIO',
+    booking_contacted:'CONTACTADO',
+    booking_negotiating:'NEGOCIAÇÃO',
+    booking_confirmed:'CONFIRMADO',
+    booking_pipeline_val:'PIPELINE',
+    booking_overdue: 'ATRASADO',
+    // Buttons
+    btn_save:        'Guardar',
+    btn_add:         'Adicionar',
+    btn_refresh:     '↺ Atualizar',
+    btn_generate:    '⚡ Gerar',
+    btn_print:       '⎙ Imprimir / PDF',
+    // Alerts
+    alert_lang_switched: 'Idioma alterado para Português',
+    currency_switched:   'Moeda:',
+    // Sections
+    recent_transactions: 'Transações Recentes',
+    revenue_by_source:   'Receita por Fonte',
+    cash_flow_12m:       'Fluxo de Caixa — 12 Meses',
+    live_alerts:         'Alertas em Tempo Real',
+    tour_pnl:            'P&L Digressões',
+    // Production
+    prod_show_advance:   'Avanço de Espetáculo',
+    prod_tech_rider:     'Rider Técnico',
+    prod_setlist:        'Alinhamento',
+    prod_checklist:      'Lista de Verificação',
+    prod_create_show:    'Criar Espetáculo',
+    prod_upcoming:       'Próximos Espetáculos',
+    // Booking
+    booking_forecast:    'Previsão de Receita',
+    booking_followup_q:  'Fila de Seguimento',
+    booking_velocity:    'Velocidade do Pipeline',
+    // Agent
+    agent_title:         'AGENTE DE RESERVAS IA',
+    agent_single:        'Pitch Individual',
+    agent_batch:         'Campanha em Lote',
+    agent_followup:      'Gerar Seguimento',
+    agent_generate:      '⚡ Gerar Pitch',
+    agent_open_gmail:    '✉ Abrir no Gmail',
+    agent_copy:          'Copiar',
+    // Releases
+    rel_calendar:        'Calendário de Lançamentos',
+    rel_checklist:       'Lista Pré-Lançamento',
+    rel_benchmarks:      'Benchmarks de Streaming',
+    rel_add:             'Adicionar Lançamento',
+    // Press
+    press_targets:       'Alvos Prioritários',
+    press_timing:        'Guia de Timing',
+    press_sync:          'Oportunidade Sync',
+    // Splits
+    splits_member_earn:  'Ganhos por Membro',
+    splits_fund:         'Fundo da Banda',
+    splits_roic:         'ROIC por Tipo de Gig',
+    splits_calculator:   'Calculadora de Divisão',
+    splits_history:      'Histórico',
+    // Common new
+    save_to_db:          'Guardar na BD',
+    load_from_db:        '↺ Carregar da BD',
+    add_contact:         'Adicionar Contacto',
+    no_contacts:         'Sem contactos ainda.',
+    no_shows:            'Sem espetáculos ainda.',
+    no_setlists:         'Sem alinhamentos ainda.',
+  }
+};
+
+function t(key) {
+  return TRANSLATIONS[ACTIVE_LANG]?.[key] || TRANSLATIONS.en[key] || key;
+}
+
+// Elements that get translated — map of selector → translation key
+const TRANSLATE_MAP = [
+  // KPI labels
+  { sel: '.kpi-card:nth-child(1) .kpi-label',   key: 'kpi_balance' },
+  { sel: '.kpi-card:nth-child(2) .kpi-label',   key: 'kpi_runway' },
+  { sel: '.kpi-card:nth-child(3) .kpi-label',   key: 'kpi_ytd_rev' },
+  { sel: '.kpi-card:nth-child(4) .kpi-label',   key: 'kpi_ytd_exp' },
+  { sel: '.kpi-card:nth-child(5) .kpi-label',   key: 'kpi_net_margin' },
+  { sel: '.kpi-card:nth-child(6) .kpi-label',   key: 'kpi_gross_margin' },
+  { sel: '.kpi-card:nth-child(7) .kpi-label',   key: 'kpi_ebitda' },
+  { sel: '.kpi-card:nth-child(8) .kpi-label',   key: 'kpi_fcf' },
+  // Tabs (use data-i18n attribute approach)
+];
+
+function applyTranslations() {
+  // ── Tabs ─────────────────────────────────────────────
+  const tabMap = {
+    dashboard: 'tab_dashboard', ledger: 'tab_ledger', tours: 'tab_tours',
+    streaming: 'tab_streaming', access: 'tab_access', audit: 'tab_audit',
+    alerts: 'tab_alerts', settings: 'tab_settings', booking: 'tab_booking',
+    releases: 'tab_releases', press: 'tab_press', splits: 'tab_splits',
+    agent: 'tab_agent', production: 'tab_production',
+  };
+  document.querySelectorAll('.tb-tab[data-view]').forEach(tab => {
+    const view = tab.getAttribute('data-view');
+    if (tabMap[view]) {
+      const badge = tab.querySelector('.tab-badge');
+      tab.textContent = t(tabMap[view]);
+      if (badge) tab.appendChild(badge);
+    }
+  });
+
+  // ── KPI labels ────────────────────────────────────────
+  const kpiCards = document.querySelectorAll('.kpi-card');
+  const kpiKeys = ['kpi_balance','kpi_runway','kpi_ytd_rev','kpi_ytd_exp',
+                   'kpi_net_margin','kpi_gross_margin','kpi_ebitda','kpi_fcf'];
+  kpiCards.forEach((card, i) => {
+    const lbl = card.querySelector('.kpi-label');
+    if (lbl && kpiKeys[i]) lbl.textContent = t(kpiKeys[i]);
+  });
+
+  // ── data-i18n attributes ──────────────────────────────
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+
+  // ── Lang button active state ──────────────────────────
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-lang') === ACTIVE_LANG);
+  });
+
+  // ── Booking KPI labels ────────────────────────────────
+  const bkLabels = {
+    'bk-cold': 'booking_cold', 'bk-contacted': 'booking_contacted',
+    'bk-negotiating': 'booking_negotiating', 'bk-confirmed': 'booking_confirmed',
+    'bk-pipeline': 'booking_pipeline_val', 'bk-overdue': 'booking_overdue',
+  };
+  document.querySelectorAll('#booking-kpi-row .panel').forEach((card, i) => {
+    const lbl = card.querySelector('div:first-child');
+    const keys = ['booking_cold','booking_contacted','booking_negotiating',
+                  'booking_confirmed','booking_pipeline_val','booking_overdue'];
+    if (lbl && keys[i]) lbl.textContent = t(keys[i]);
+  });
+
+  // ── Re-render financial data with new labels/currency ─
+  updateFinancialKpis();
+  renderRevSource();
+}
+
 
 // ─── EXPORT CSV ───────────────────────────────────────
 function exportCSV(){
@@ -3619,6 +3985,7 @@ function enterApp(){
     }
   }
   applyRolePermissions();
+  applyTranslations();
   initAll();
 }
 
@@ -3795,9 +4162,9 @@ function renderTourDetail(t){
   if(hdr) hdr.innerHTML=`<div class="panel-title-dot" style="background:var(--blue2)"></div>Tour Detail — ${t.name}`;
   const kpisEl=document.getElementById('tour-detail-kpis');
   if(kpisEl) kpisEl.innerHTML=`
-    <div><div class="kpi-label">Net Profit</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:${net>=0?'var(--green3)':'var(--red3)'}">${net>=0?'+':''}€${net.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div></div>
-    <div><div class="kpi-label">Revenue</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--white)">€${t.revenue.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div></div>
-    <div><div class="kpi-label">Costs</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--red3)">€${t.costs.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div></div>
+    <div><div class="kpi-label">Net Profit</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:${net>=0?'var(--green3)':'var(--red3)'}">${net>=0?'+':''}${fmtMoney(net.toLocaleString('pt-PT',{minimumFractionDigits:2}))}</div></div>
+    <div><div class="kpi-label">Revenue</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--white)">${fmtMoney(t.revenue.toLocaleString('pt-PT',{minimumFractionDigits:2}))}</div></div>
+    <div><div class="kpi-label">Costs</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--red3)">${fmtMoney(t.costs.toLocaleString('pt-PT',{minimumFractionDigits:2}))}</div></div>
     <div><div class="kpi-label">Margin</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--amber3)">${margin}%</div></div>
     <div><div class="kpi-label">Shows</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--text)">${t.shows}</div></div>
     <div><div class="kpi-label">Budget Used</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:${budgetPct>85?'var(--amber3)':'var(--green3)'}">${budgetPct}%</div></div>
@@ -3812,7 +4179,7 @@ function renderTourDetail(t){
         <td class="date-cell">${r.date}</td>
         <td class="desc-cell">${r.desc}</td>
         <td><span class="badge ${r.type}">${r.type.toUpperCase()}</span></td>
-        <td style="text-align:right"><span class="amount ${r.amount>0?'pos':'neg'}">${r.amount>0?'+':''}€${Math.abs(r.amount).toLocaleString('pt-PT',{minimumFractionDigits:2})}</span></td>
+        <td style="text-align:right"><span class="amount ${r.amount>0?'pos':'neg'}">${r.amount>0?'+':''}${fmtMoney(Math.abs(r.amount))}</span></td>
       </tr>`).join(''):'<tr><td colspan="4" style="color:var(--muted3);padding:10px 8px;font-size:8px">No transactions tagged for this tour.</td></tr>';
   }
 }
@@ -4024,7 +4391,7 @@ function confirmDeleteTxn(idx){
   if(!can('deleteTransaction')){ showToast('Permission denied','err'); return; }
   const t=LEDGER_DATA[idx];
   if(!t) return;
-  if(!confirm('Delete transaction: '+t.desc+' (€'+Math.abs(t.amount).toFixed(2)+')?')) return;
+  if(!confirm('Delete transaction: '+t.desc+' ('+fmtMoney(Math.abs(t.amount))+')?')) return;
   LEDGER_DATA.splice(idx,1);
   recalcBalances();
   auditLog('TXN_DELETE','Deleted: '+t.desc,'€'+Math.abs(t.amount).toFixed(2),'');
@@ -4384,6 +4751,20 @@ async function forceSync(btn){
 // ─── BOOT ─────────────────────────────────────────────
 seedAdminIfNeeded();
 SESSION = getSession();
+// Restore saved currency preference
+const _savedCcy = localStorage.getItem('gk_ccy');
+if (_savedCcy && ['EUR','USD','GBP'].includes(_savedCcy)) {
+  ACTIVE_CCY = _savedCcy;
+  document.querySelectorAll('.ccy-btn:not(.lang-btn)').forEach(b => {
+    b.classList.toggle('active', b.textContent === _savedCcy);
+  });
+}
+// Fetch live FX rates then re-apply currency if not EUR
+fetchLiveFx().then(() => {
+  if (ACTIVE_CCY !== 'EUR' && LEDGER_DATA.length) updateFinancialKpis();
+});
+// Always apply translations on boot — sets button states + labels
+applyTranslations();
 checkApiHealth(); // runs async, non-blocking — shows toast if backend unreachable
 if (SESSION){
   // If in API mode, do a silent /me check to validate token is still good
@@ -4719,7 +5100,7 @@ async function loadStreamingFromApi() {
 
     <!-- Add contact -->
     <div class="panel">
-      <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Add Booking Contact</div></div>
+      <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div><span data-i18n="booking_add">Add Booking Contact</span></div>
       <div class="panel-body" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
         <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">VENUE / FESTIVAL NAME *</div><input id="bk-name" class="login-input" placeholder="Tasquinhas do Povo"></div>
         <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">TYPE</div>
@@ -4745,7 +5126,7 @@ async function loadStreamingFromApi() {
     <!-- Contact list -->
     <div class="panel" style="flex:1">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Pipeline</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="booking_pipeline">Pipeline</span>
         <div style="display:flex;gap:6px">
           <select id="bk-filter-stage" style="background:var(--bg2);color:var(--text);border:1px solid var(--border2);font-family:var(--mono);font-size:8px;padding:2px 6px" onchange="renderBookingList()">
             <option value="">All Stages</option>
@@ -4796,7 +5177,7 @@ async function loadStreamingFromApi() {
 
       <!-- Release Calendar -->
       <div class="panel">
-        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Release Calendar</div></div>
+        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div><span data-i18n="rel_calendar">Release Calendar</span></div>
         <div id="rel-calendar" style="padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:9px">
           <div style="color:var(--muted3)">No releases scheduled yet.</div>
         </div>
@@ -4807,7 +5188,7 @@ async function loadStreamingFromApi() {
 
       <!-- Checklist per release -->
       <div class="panel">
-        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div>Pre-Release Checklist</div></div>
+        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div><span data-i18n="rel_checklist">Pre-Release Checklist</span></div>
         <div id="rel-checklist-panel" style="padding:10px 12px;display:flex;flex-direction:column;gap:4px;font-size:9px">
           <div style="color:var(--muted3)">Select a release to see its checklist status.</div>
         </div>
@@ -4820,7 +5201,7 @@ async function loadStreamingFromApi() {
 
       <!-- Streaming benchmark -->
       <div class="panel">
-        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Streaming Benchmarks</div></div>
+        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="rel_benchmarks">Streaming Benchmarks</span></div>
         <div class="panel-body" style="display:flex;flex-direction:column;gap:6px">
           <div style="font-size:8px;color:var(--muted2);margin-bottom:4px">What consistent releasing achieves</div>
           <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--bg4);border-radius:2px">
@@ -4857,7 +5238,7 @@ async function loadStreamingFromApi() {
 
     <!-- Add release -->
     <div class="panel">
-      <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Add Release</div></div>
+      <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div><span data-i18n="rel_add">Add Release</span></div>
       <div class="panel-body" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
         <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">TITLE *</div><input id="rel-title" class="login-input" placeholder="All I See"></div>
         <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">TYPE</div>
@@ -4884,7 +5265,7 @@ async function loadStreamingFromApi() {
         </div>
         <div style="grid-column:1/-1"><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">NOTES</div><input id="rel-notes" class="login-input" style="width:100%" placeholder="e.g. Lead single. Video filmed at Praia de Sines."></div>
         <div style="grid-column:1/-1;display:flex;gap:8px;align-items:center">
-          <button class="login-btn" style="width:auto;padding:0 20px" onclick="addRelease()">Add Release</button>
+          <button class="login-btn" style="width:auto;padding:0 20px" onclick="addRelease()" data-i18n="rel_add">Add Release</button>
           <div style="font-size:8px;color:var(--muted3)" id="rel-add-status"></div>
         </div>
       </div>
@@ -4893,7 +5274,7 @@ async function loadStreamingFromApi() {
     <!-- Release tracker -->
     <div class="panel" style="flex:1">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Release Pipeline</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div><span data-i18n="booking_pipeline">Release Pipeline</span>
         <button class="btn-sm" onclick="loadReleases()">↺ Refresh</button>
       </div>
       <div id="releases-list" style="padding:8px"></div>
@@ -4932,7 +5313,7 @@ async function loadStreamingFromApi() {
 
       <!-- Priority targets -->
       <div class="panel">
-        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Priority Targets</div></div>
+        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div><span data-i18n="press_targets">Priority Targets</span></div>
         <div style="display:flex;flex-direction:column">
           <div style="display:flex;align-items:center;gap:10px;padding:7px 12px;border-bottom:1px solid var(--border1)">
             <div style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0"></div>
@@ -4969,7 +5350,7 @@ async function loadStreamingFromApi() {
 
       <!-- Pitch timing guide -->
       <div class="panel">
-        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Pitch Timing Guide</div></div>
+        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="press_timing">Pitch Timing Guide</span></div>
         <div style="display:flex;flex-direction:column;gap:0">
           <div style="display:grid;grid-template-columns:70px 1fr;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border1);align-items:center">
             <div style="font-family:var(--display);font-size:11px;font-weight:700;color:var(--green3)">−8 weeks</div>
@@ -5000,7 +5381,7 @@ async function loadStreamingFromApi() {
 
       <!-- Sync opportunity -->
       <div class="panel">
-        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Sync Opportunity (Jungle Tribe)</div></div>
+        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div><span data-i18n="press_sync">Sync Opportunity (Jungle Tribe)</span></div>
         <div class="panel-body" style="display:flex;flex-direction:column;gap:8px">
           <div style="font-size:8px;color:var(--muted2)">Your psytrance catalog is sync-ready. Submit now — zero upfront cost.</div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:var(--bg4);border-radius:2px;border-left:2px solid var(--green3)">
@@ -5107,7 +5488,7 @@ async function loadStreamingFromApi() {
 
       <!-- Per-member earnings history -->
       <div class="panel">
-        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Member Earnings</div></div>
+        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div><span data-i18n="splits_member_earn">Member Earnings</span></div>
         <div id="sp-member-history" style="padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:9px">
           <div style="color:var(--muted3)">Save gig splits to see per-member earnings history.</div>
         </div>
@@ -5115,7 +5496,7 @@ async function loadStreamingFromApi() {
 
       <!-- Band fund tracker -->
       <div class="panel">
-        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Band Fund Tracker</div></div>
+        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_fund">Band Fund Tracker</span></div>
         <div class="panel-body" style="display:flex;flex-direction:column;gap:8px">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
             <div style="background:var(--bg4);padding:10px;border-radius:2px;text-align:center">
@@ -5142,7 +5523,7 @@ async function loadStreamingFromApi() {
 
       <!-- ROIC per gig type -->
       <div class="panel">
-        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>ROIC by Gig Type</div></div>
+        <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="splits_roic">ROIC by Gig Type</span></div>
         <div style="display:flex;flex-direction:column">
           <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:9px">
             <div style="font-weight:700;color:var(--text)">Local festival</div>
@@ -5180,7 +5561,7 @@ async function loadStreamingFromApi() {
 
     <!-- Calculator -->
     <div class="panel">
-      <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Gig Split Calculator</div></div>
+      <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_calculator">Gig Split Calculator</span></div>
       <div class="panel-body">
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
           <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">GIG NAME *</div><input id="sp-name" class="login-input" placeholder="Tasquinhas 2026"></div>
@@ -5226,7 +5607,7 @@ async function loadStreamingFromApi() {
     <!-- History -->
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Split History</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_history">Split History</span>
         <button class="btn-sm" onclick="loadSplits()">↺ Refresh</button>
       </div>
       <div id="splits-history" style="overflow-y:auto;max-height:320px"></div>
@@ -5532,7 +5913,7 @@ function calcSplit() {
   document.getElementById('sp-member-breakdown').innerHTML = SP_MEMBERS.map(m=>`
     <div style="background:var(--bg4);border-radius:2px;padding:10px 14px;text-align:center;min-width:100px">
       <div style="font-size:8px;color:var(--muted3);margin-bottom:4px">${m.name.toUpperCase()}</div>
-      <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--green3)">€${perMember.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div>
+      <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--green3)">${fmtMoney(perMember.toLocaleString('pt-PT',{minimumFractionDigits:2}))}</div>
     </div>`).join('');
 }
 
@@ -5552,7 +5933,7 @@ function renderSplitExpenses() {
   el.innerHTML = SP_EXPENSES.map((e,i)=>`
     <div style="display:flex;gap:8px;align-items:center;font-size:9px;padding:4px 8px;background:var(--bg4);border-radius:2px">
       <span style="flex:1;color:var(--text)">${e.label}</span>
-      <span style="color:var(--red3)">-€${e.amount.toFixed(2)}</span>
+      <span style="color:var(--red3)">-${fmtMoney(e.amount)}</span>
       <button class="btn-sm" onclick="removeSplitExpense(${i})" style="padding:0 6px;font-size:9px">✕</button>
     </div>`).join('');
 }
@@ -5623,10 +6004,10 @@ function renderSplitHistory() {
   el.innerHTML = SPLITS_DATA.map(s=>`
     <div style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:12px;padding:9px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:9px">
       <div><div style="font-weight:700;color:var(--text)">${s.gig_name}</div><div style="font-size:8px;color:var(--muted3)">${s.gig_date||'—'} · ${s.member_count} members</div></div>
-      <div style="text-align:right;color:var(--text)">€${parseFloat(s.gross_eur).toFixed(2)}</div>
-      <div style="text-align:right;color:var(--red3)">-€${parseFloat(s.total_expenses_eur).toFixed(2)}</div>
-      <div style="text-align:right;color:var(--amber2)">fund €${parseFloat(s.band_fund_eur).toFixed(2)}</div>
-      <div style="text-align:right;color:var(--green3);font-weight:700">€${parseFloat(s.per_member_eur).toFixed(2)}/member</div>
+      <div style="text-align:right;color:var(--text)">${fmtMoney(parseFloat(s.gross_eur).toFixed(2))}</div>
+      <div style="text-align:right;color:var(--red3)">-${fmtMoney(parseFloat(s.total_expenses_eur).toFixed(2))}</div>
+      <div style="text-align:right;color:var(--amber2)">fund ${fmtMoney(parseFloat(s.band_fund_eur).toFixed(2))}</div>
+      <div style="text-align:right;color:var(--green3);font-weight:700">${fmtMoney(parseFloat(s.per_member_eur).toFixed(2))}/member</div>
     </div>`).join('');
 }
 
@@ -5853,9 +6234,9 @@ const GROWTH_PERM_MAP = { booking:'addTxn', releases:'addTxn', press:'addTxn', s
     <!-- Mode selector -->
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <span style="font-size:8px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">MODE:</span>
-      <button class="agent-mode-btn active-mode" id="mode-btn-single" onclick="setAgentMode('single')">Single Venue Pitch</button>
-      <button class="agent-mode-btn" id="mode-btn-batch" onclick="setAgentMode('batch')">Batch Campaign (up to 10)</button>
-      <button class="agent-mode-btn" id="mode-btn-followup" onclick="setAgentMode('followup')">Follow-Up Generator</button>
+      <button class="agent-mode-btn active-mode" id="mode-btn-single" onclick="setAgentMode('single')" data-i18n="agent_single">Single Venue Pitch</button>
+      <button class="agent-mode-btn" id="mode-btn-batch" onclick="setAgentMode('batch')" data-i18n="agent_batch">Batch Campaign (up to 10)</button>
+      <button class="agent-mode-btn" id="mode-btn-followup" onclick="setAgentMode('followup')" data-i18n="agent_followup">Follow-Up Generator</button>
     </div>
 
     <!-- ── SINGLE MODE ── -->
@@ -6498,7 +6879,7 @@ function updateSplitsMiddle() {
 
   el('sp-fund-total',   '€'+totalFund.toFixed(2));
   el('sp-fund-target',  totalFund >= target ? '✓ FUNDED' : '€'+target);
-  el('sp-fund-progress-text', `€${totalFund.toFixed(2)} of €${target} target (${pct}%)`);
+  el('sp-fund-progress-text', `${fmtMoney(totalFund)} of ${fmtMoney(target)} target (${pct}%)`);
   elStyle('sp-fund-bar', 'width', pct+'%');
 
   // Per-member history
@@ -6527,7 +6908,7 @@ function updateSplitsMiddle() {
       <div style="padding:8px 12px">
         <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:9px">
           <span style="font-weight:700;color:var(--text)">${name}</span>
-          <span style="color:var(--green3);font-weight:700">€${total.toFixed(2)}</span>
+          <span style="color:var(--green3);font-weight:700">${fmtMoney(total.toFixed(2))}</span>
         </div>
         <div style="height:6px;background:var(--bg4);border-radius:1px;overflow:hidden">
           <div style="height:100%;background:var(--green3);width:${Math.round(total/maxEarned*100)}%"></div>
@@ -6732,10 +7113,10 @@ function initAll() {
 
     <!-- Sub-navigation -->
     <div class="prod-tab-bar">
-      <div class="prod-tab pt-active" onclick="switchProdTab('advance',this)">Show Advance</div>
-      <div class="prod-tab" onclick="switchProdTab('rider',this)">Tech Rider</div>
-      <div class="prod-tab" onclick="switchProdTab('setlist',this)">Setlist</div>
-      <div class="prod-tab" onclick="switchProdTab('checklist',this)">Show Checklist</div>
+      <div class="prod-tab pt-active" onclick="switchProdTab('advance',this)" data-i18n="prod_show_advance">Show Advance</div>
+      <div class="prod-tab" onclick="switchProdTab('rider',this)" data-i18n="prod_tech_rider">Tech Rider</div>
+      <div class="prod-tab" onclick="switchProdTab('setlist',this)" data-i18n="prod_setlist">Setlist</div>
+      <div class="prod-tab" onclick="switchProdTab('checklist',this)" data-i18n="prod_checklist">Show Checklist</div>
     </div>
 
     <!-- ── SHOW ADVANCE ── -->
