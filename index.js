@@ -25,6 +25,7 @@ const streamingRoutes   = require('./routes/streaming');
 const bookingRoutes     = require('./routes/booking');
 const releasesRoutes    = require('./routes/releases');
 const pressRoutes       = require('./routes/press');
+const splitsRoutes      = require('./routes/splits');
 const agentRoutes       = require('./routes/agent');
 const productionRoutes  = require('./routes/production');
 
