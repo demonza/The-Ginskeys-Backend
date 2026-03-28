@@ -2498,7 +2498,7 @@ function initDcfChart(){
   const {labels,cashFlows,discounted,dcfValue,terminal,terminalPv,avgNet,trailingRev} = getDcfSeries();
   const summary=document.getElementById('dcf-summary');
   const revMultiple = trailingRev>0 ? dcfValue/trailingRev : null;
-  if(summary) summary.textContent = `DCF: ${fmtMoney(dcfValue.toLocaleString(undefined,{maximumFractionDigits:0}))} | Rev multiple: ${revMultiple?revMultiple.toFixed(1)+'x':'—'} | Avg net: ${fmtMoney(avgNet)}`;
+  if(summary) summary.textContent = `DCF: ${fmtMoney(dcfValue)} | Rev multiple: ${revMultiple?revMultiple.toFixed(1)+'x':'—'} | Avg net: ${fmtMoney(avgNet)}`;
 
   dcfChartInst=new Chart(canvas,{type:'line',data:{
     labels,
@@ -2511,7 +2511,7 @@ function initDcfChart(){
     plugins:{legend:{display:true,labels:{color:'#b8ccd8',font:{family:'IBM Plex Mono',size:9},boxWidth:10}},
       tooltip:{backgroundColor:'#0a1018',borderColor:'#243c54',borderWidth:1,titleColor:'#b8ccd8',bodyColor:'#5a7a92',
         titleFont:{family:'IBM Plex Mono',size:9},bodyFont:{family:'IBM Plex Mono',size:9},
-        callbacks:{label:c=>`${fmtMoney(c.parsed.y.toLocaleString(undefined,{maximumFractionDigits:0}))}`}
+        callbacks:{label:c=>`${fmtMoney(c.parsed.y)}`}
       }
     },
     scales:{
@@ -2525,7 +2525,7 @@ function refreshDcfChart(){
   const {labels,cashFlows,discounted,dcfValue,avgNet,trailingRev} = getDcfSeries();
   const revMultiple = trailingRev>0 ? dcfValue/trailingRev : null;
   const summary=document.getElementById('dcf-summary');
-  if(summary) summary.textContent = `DCF: ${fmtMoney(dcfValue.toLocaleString(undefined,{maximumFractionDigits:0}))} | Rev multiple: ${revMultiple?revMultiple.toFixed(1)+'x':'—'} | Avg net: ${fmtMoney(avgNet)}`;
+  if(summary) summary.textContent = `DCF: ${fmtMoney(dcfValue)} | Rev multiple: ${revMultiple?revMultiple.toFixed(1)+'x':'—'} | Avg net: ${fmtMoney(avgNet)}`;
   dcfChartInst.data.labels = labels;
   dcfChartInst.data.datasets[0].data = cashFlows;
   dcfChartInst.data.datasets[1].data = discounted;
@@ -2557,7 +2557,7 @@ function initProfitChart(){
     responsive:true,maintainAspectRatio:false,
     plugins:{legend:{display:true,labels:{color:'#b8ccd8',font:{family:'IBM Plex Mono',size:9},boxWidth:10}},
       tooltip:{backgroundColor:'#0a1018',borderColor:'#243c54',borderWidth:1,titleColor:'#b8ccd8',bodyColor:'#5a7a92',titleFont:{family:'IBM Plex Mono',size:9},bodyFont:{family:'IBM Plex Mono',size:9},
-        callbacks:{label:c=>c.dataset.label==='Margin %'?`${c.parsed.y.toFixed(1)}%`:`${fmtMoney(c.parsed.y.toLocaleString(undefined,{maximumFractionDigits:0}))}`}
+        callbacks:{label:c=>c.dataset.label==='Margin %'?`${c.parsed.y.toFixed(1)}%`:`${fmtMoney(c.parsed.y)}`}
       }
     },
     scales:{
@@ -2619,7 +2619,7 @@ function initHealthChart(){
     responsive:true,maintainAspectRatio:false,
     plugins:{legend:{display:true,labels:{color:'#b8ccd8',font:{family:'IBM Plex Mono',size:9},boxWidth:10}},
       tooltip:{backgroundColor:'#0a1018',borderColor:'#243c54',borderWidth:1,titleColor:'#b8ccd8',bodyColor:'#5a7a92',titleFont:{family:'IBM Plex Mono',size:9},bodyFont:{family:'IBM Plex Mono',size:9},
-        callbacks:{label:c=>`${c.dataset.label}: ${fmtMoney(Math.abs(c.parsed.y).toLocaleString(undefined,{maximumFractionDigits:0}))}`}
+        callbacks:{label:c=>`${c.dataset.label}: ${fmtMoney(Math.abs(c.parsed.y))}`}
       }
     },
     scales:{
@@ -2754,7 +2754,7 @@ function updateFinancialKpis(){
   const ytdCapex=ytdEntries.filter(e=>e.cat==='Equipamento'&&e.amount<0).reduce((s,e)=>s+Math.abs(e.amount),0);
   const ytdFcf=ytdNet - ytdCapex;
 
-  if(fcfSubEl) fcfSubEl.textContent=`Q1: ${fmtMoney(q1Fcf.toLocaleString())} | YTD: ${fmtMoney(ytdFcf.toLocaleString())}`;
+  if(fcfSubEl) fcfSubEl.textContent=`Q1: ${fmtMoney(q1Fcf)} | YTD: ${fmtMoney(ytdFcf)}`;
 }
 
 // ─── RENDER: STREAMING CHART ──────────────────────────
@@ -2884,10 +2884,10 @@ function renderTourPnl(){
       </div>
       <div class="tour-meta-grid">
         <div class="tour-meta-item"><div class="tour-meta-label">Shows</div><div class="tour-meta-val">${t.shows}</div></div>
-        <div class="tour-meta-item"><div class="tour-meta-label">Revenue</div><div class="tour-meta-val">${fmtMoney(t.revenue.toLocaleString())}</div></div>
-        <div class="tour-meta-item"><div class="tour-meta-label">Costs</div><div class="tour-meta-val">${fmtMoney(t.costs.toLocaleString())}</div></div>
+        <div class="tour-meta-item"><div class="tour-meta-label">Revenue</div><div class="tour-meta-val">${fmtMoney(t.revenue)}</div></div>
+        <div class="tour-meta-item"><div class="tour-meta-label">Costs</div><div class="tour-meta-val">${fmtMoney(t.costs)}</div></div>
       </div>
-      <div class="tour-pnl ${net>0?'profit':net<0?'loss':'warn'}">${net>0?'+':''}${fmtMoney(net.toLocaleString())} NET</div>
+      <div class="tour-pnl ${net>0?'profit':net<0?'loss':'warn'}">${net>0?'+':''}${fmtMoney(net)} NET</div>
       <div class="tour-progress-wrap">
         <div class="tour-progress-label"><span>Budget usage</span><span>${budgetPct}%</span></div>
         <div class="tour-progress-track"><div class="tour-progress-fill" style="width:${Math.min(budgetPct,100)}%;background:${budgetPct>85?'var(--amber2)':budgetPct>100?'var(--red2)':'var(--green2)'}"></div></div>
@@ -2908,7 +2908,7 @@ function renderToursList(){
         <div onclick="renderTourDetail(TOUR_DATA[${i}])" style="flex:1">
           <div class="tour-name">${t.name}</div>
           <div style="font-size:8px;color:var(--muted3);margin-bottom:4px">${t.start} → ${t.end} · ${t.shows} show${t.shows!==1?'s':''}</div>
-          <div class="tour-pnl ${net>=0?'profit':'loss'}">${net>=0?'+':''}${fmtMoney(net.toLocaleString('pt-PT',{minimumFractionDigits:2}))}</div>
+          <div class="tour-pnl ${net>=0?'profit':'loss'}">${net>=0?'+':''}${fmtMoney(net)}</div>
         </div>
         ${canEdit?`<button class="edit-btn" style="display:inline;margin-top:2px" onclick="openTourModal(${i})">✎</button>`:''}
       </div>
@@ -4162,9 +4162,9 @@ function renderTourDetail(t){
   if(hdr) hdr.innerHTML=`<div class="panel-title-dot" style="background:var(--blue2)"></div>Tour Detail — ${t.name}`;
   const kpisEl=document.getElementById('tour-detail-kpis');
   if(kpisEl) kpisEl.innerHTML=`
-    <div><div class="kpi-label">Net Profit</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:${net>=0?'var(--green3)':'var(--red3)'}">${net>=0?'+':''}${fmtMoney(net.toLocaleString('pt-PT',{minimumFractionDigits:2}))}</div></div>
-    <div><div class="kpi-label">Revenue</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--white)">${fmtMoney(t.revenue.toLocaleString('pt-PT',{minimumFractionDigits:2}))}</div></div>
-    <div><div class="kpi-label">Costs</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--red3)">${fmtMoney(t.costs.toLocaleString('pt-PT',{minimumFractionDigits:2}))}</div></div>
+    <div><div class="kpi-label">Net Profit</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:${net>=0?'var(--green3)':'var(--red3)'}">${net>=0?'+':''}${fmtMoney(net)}</div></div>
+    <div><div class="kpi-label">Revenue</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--white)">${fmtMoney(t.revenue)}</div></div>
+    <div><div class="kpi-label">Costs</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--red3)">${fmtMoney(t.costs)}</div></div>
     <div><div class="kpi-label">Margin</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--amber3)">${margin}%</div></div>
     <div><div class="kpi-label">Shows</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--text)">${t.shows}</div></div>
     <div><div class="kpi-label">Budget Used</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:${budgetPct>85?'var(--amber3)':'var(--green3)'}">${budgetPct}%</div></div>
@@ -5913,7 +5913,7 @@ function calcSplit() {
   document.getElementById('sp-member-breakdown').innerHTML = SP_MEMBERS.map(m=>`
     <div style="background:var(--bg4);border-radius:2px;padding:10px 14px;text-align:center;min-width:100px">
       <div style="font-size:8px;color:var(--muted3);margin-bottom:4px">${m.name.toUpperCase()}</div>
-      <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--green3)">${fmtMoney(perMember.toLocaleString('pt-PT',{minimumFractionDigits:2}))}</div>
+      <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--green3)">${fmtMoney(perMember)}</div>
     </div>`).join('');
 }
 
