@@ -2201,7 +2201,8 @@ tr:hover .edit-btn{display:inline}
       </div>
     </div>
 
-    <!-- Add release -->
+    <!-- Add release + pipeline in 2-col layout -->
+    <div style="display:grid;grid-template-columns:420px 1fr;gap:10px;flex:1;min-height:0">
     <div class="panel">
       <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div><span data-i18n="rel_add">Add Release</span></div>
       <div class="panel-body" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
@@ -2237,17 +2238,18 @@ tr:hover .edit-btn{display:inline}
     </div>
 
     <!-- Release tracker -->
-    <div class="panel" style="flex:1">
+    <div class="panel" style="flex:1;display:flex;flex-direction:column">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div><span data-i18n="booking_pipeline">Release Pipeline</span>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div><span data-i18n="booking_pipeline">Release Pipeline</span></div>
         <button class="btn-sm" onclick="loadReleases()">↺ Refresh</button>
       </div>
-      <div id="releases-list" style="padding:8px"></div>
+      <div id="releases-list" style="padding:8px;flex:1;overflow-y:auto"></div>
     </div>
+    </div><!-- /2-col grid -->
   </div>
 </div>
 
-</div></div></div></div></div>
+</div></div></div></div>
 <!-- ═══════════════════════════════════════════════════════
      PRESS & SYNC VIEW
 ════════════════════════════════════════════════════════ -->
@@ -2379,7 +2381,8 @@ tr:hover .edit-btn{display:inline}
       <div class="panel" style="padding:10px 12px;text-align:center"><div style="font-size:7px;color:var(--muted);letter-spacing:.1em">EST. VALUE</div><div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green3)" id="pr-value">€0</div></div>
     </div>
 
-    <!-- Add contact -->
+    <!-- Add contact + pipeline in 2-col layout -->
+    <div style="display:grid;grid-template-columns:420px 1fr;gap:10px;flex:1;min-height:0">
     <div class="panel">
       <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Add Press / Sync Contact</div></div>
       <div class="panel-body" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
@@ -2418,11 +2421,11 @@ tr:hover .edit-btn{display:inline}
           <button class="btn-sm" onclick="loadPress()">↺ Refresh</button>
         </div>
       </div>
-      <div id="press-list-body" style="overflow-y:auto;max-height:420px"></div>
+      <div id="press-list-body" style="flex:1;overflow-y:auto;padding:8px"></div>
     </div>
+    </div><!-- /2-col grid -->
   </div>
 </div>
-
 </div></div></div>
 <!-- ═══════════════════════════════════════════════════════
      GIG SPLITS VIEW
@@ -2526,7 +2529,8 @@ tr:hover .edit-btn{display:inline}
       </div>
     </div>
 
-    <!-- Calculator -->
+    <!-- Calculator + History in 2-col layout -->
+    <div style="display:grid;grid-template-columns:420px 1fr;gap:10px;flex:1;min-height:0">
     <div class="panel">
       <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_calculator">Gig Split Calculator</span></div>
       <div class="panel-body">
@@ -2572,13 +2576,14 @@ tr:hover .edit-btn{display:inline}
     </div>
 
     <!-- History -->
-    <div class="panel">
+    <div class="panel" style="flex:1;display:flex;flex-direction:column">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_history">Split History</span>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_history">Split History</span></div>
         <button class="btn-sm" onclick="loadSplits()">↺ Refresh</button>
       </div>
-      <div id="splits-history" style="overflow-y:auto;max-height:320px"></div>
+      <div id="splits-history" style="flex:1;overflow-y:auto;padding:8px"></div>
     </div>
+    </div><!-- /2-col grid -->
   </div>
 </div>
 
@@ -2997,7 +3002,7 @@ function _initAll_old_0(){
   initCdbabyMonthSelect();
 }
 </script>
-</div></div></div></div></div>
+</div></div></div></div>
 <!-- ═══════════════════════════════════════════════════════
      AI BOOKING AGENT VIEW
 ════════════════════════════════════════════════════════ -->
