@@ -1001,6 +1001,76 @@ tr:hover .edit-btn{display:inline}
   .panel.col-span-2,.panel.col-span-3{grid-column:auto}
   .tb-right .ccy-group,.tb-right .tb-role-badge{display:none}
 }
+
+/* ─── AGENT VIEW ─────────────────────────────────────── */
+.agent-venue-card{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:2px;
+  padding:10px 12px;cursor:pointer;transition:border-color .15s,background .15s;
+}
+.agent-venue-card:hover{border-color:var(--border3);background:var(--bg4)}
+.agent-venue-card.selected{border-color:var(--accent);background:rgba(255,92,26,.06)}
+.agent-mode-btn{
+  background:var(--bg3);border:1px solid var(--border2);color:var(--muted2);
+  font-family:var(--mono);font-size:8px;letter-spacing:.08em;padding:6px 14px;
+  cursor:pointer;transition:all .15s;border-radius:1px;
+}
+.agent-mode-btn:hover{color:var(--text);border-color:var(--border3)}
+.active-mode{color:var(--accent)!important;border-color:var(--accent)!important;background:rgba(255,92,26,.08)!important}
+.agent-pitch-output{
+  padding:10px 12px;display:none;font-size:9px;white-space:pre-wrap;
+  font-family:var(--mono);color:var(--text);line-height:1.7;background:var(--bg4);
+}
+
+/* ─── PRODUCTION VIEW ────────────────────────────────── */
+.prod-tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border2);margin-bottom:14px;flex-shrink:0}
+.prod-tab{
+  padding:8px 16px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted2);cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .15s;font-family:var(--mono);
+}
+.prod-tab:hover{color:var(--text)}
+.prod-tab.pt-active{color:var(--accent);border-bottom-color:var(--accent)}
+.prod-sub{display:none}
+.prod-sub.ps-active{display:block}
+.phase-block{margin-bottom:16px}
+.phase-title{
+  font-size:8px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;
+  margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.check-item{
+  display:grid;grid-template-columns:22px 1fr auto auto;
+  gap:10px;padding:7px 10px;align-items:center;
+  border-radius:2px;transition:background .1s;font-size:9px;
+}
+.check-item:hover{background:var(--bg4)}
+.check-item.done-item{opacity:.5}
+.check-cb{width:16px;height:16px;cursor:pointer;accent-color:var(--accent)}
+.check-owner{font-size:7px;padding:2px 7px;border-radius:1px;background:var(--bg4);color:var(--muted2);letter-spacing:.08em}
+.check-done-at{font-size:7px;color:var(--muted);white-space:nowrap}
+.song-row{
+  display:grid;grid-template-columns:32px 1fr 60px 50px 60px 80px auto;
+  gap:8px;padding:6px 10px;align-items:center;font-size:9px;
+  border-bottom:1px solid var(--border1);
+}
+.rider-section{background:var(--bg3);border:1px solid var(--border2);border-radius:2px;margin-bottom:10px}
+.rider-section-hdr{
+  padding:9px 14px;font-size:9px;font-weight:700;color:var(--text);
+  letter-spacing:.06em;border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+}
+.rider-section-body{padding:12px 14px;font-size:9px;line-height:1.8;color:var(--text)}
+.input-row{
+  display:grid;grid-template-columns:30px 40px 1fr 100px 60px 60px;
+  gap:8px;padding:5px 8px;font-size:9px;border-bottom:1px solid var(--border1);align-items:center;
+}
+.input-row.hdr-row{color:var(--muted);font-size:8px;letter-spacing:.08em}
+.advance-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.advance-field{display:flex;flex-direction:column;gap:4px}
+.advance-label{font-size:7px;color:var(--muted3);letter-spacing:.1em;text-transform:uppercase}
+.time-kpi{background:var(--bg4);border-radius:2px;padding:10px 14px;display:flex;flex-direction:column;gap:2px}
+.time-kpi-val{font-family:var(--display);font-size:20px;font-weight:700;color:var(--accent)}
+.time-kpi-lbl{font-size:7px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -3415,13 +3485,13 @@ function _initAll_old_1() {
 ════════════════════════════════════════════════════════ -->
 
 <div id="view-production" class="view new-view">
-  <div style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0">
+  <div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">
 
-    <!-- Context Banner -->
-    <div style="background:linear-gradient(90deg,rgba(0,230,118,.06) 0%,transparent 100%);border-left:3px solid var(--green3);padding:12px 16px;border-radius:0 2px 2px 0;margin-bottom:12px;display:grid;grid-template-columns:1fr repeat(4,auto);gap:16px;align-items:center">
+    <!-- Banner -->
+    <div style="flex-shrink:0;background:linear-gradient(90deg,rgba(0,230,118,.06) 0%,transparent 100%);border-left:3px solid var(--green3);padding:12px 16px;border-radius:0 2px 2px 0;display:grid;grid-template-columns:1fr repeat(4,auto);gap:16px;align-items:center">
       <div>
         <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--green3);letter-spacing:.08em">LIVE PRODUCTION</div>
-        <div style="font-size:8px;color:var(--muted2);margin-top:2px">Show Advance → Tech Rider → Setlist → Checklist · Professional stage management built in</div>
+        <div style="font-size:8px;color:var(--muted2);margin-top:2px">Show Advance · Tech Rider · Setlist · Show Checklist</div>
       </div>
       <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
         <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--text)" id="prod-banner-shows">0</div>
@@ -3441,19 +3511,17 @@ function _initAll_old_1() {
       </div>
     </div>
 
-    <!-- Sub-navigation -->
-    <div class="prod-tab-bar">
-      <div class="prod-tab pt-active" onclick="switchProdTab('advance',this)" data-i18n="prod_show_advance">Show Advance</div>
-      <div class="prod-tab" onclick="switchProdTab('rider',this)" data-i18n="prod_tech_rider">Tech Rider</div>
-      <div class="prod-tab" onclick="switchProdTab('setlist',this)" data-i18n="prod_setlist">Setlist</div>
-      <div class="prod-tab" onclick="switchProdTab('checklist',this)" data-i18n="prod_checklist">Show Checklist</div>
+    <!-- Sub-tabs -->
+    <div class="prod-tab-bar" style="flex-shrink:0">
+      <div class="prod-tab pt-active" onclick="switchProdTab('advance',this)">Show Advance</div>
+      <div class="prod-tab" onclick="switchProdTab('rider',this)">Tech Rider</div>
+      <div class="prod-tab" onclick="switchProdTab('setlist',this)">Setlist</div>
+      <div class="prod-tab" onclick="switchProdTab('checklist',this)">Show Checklist</div>
     </div>
 
     <!-- ── SHOW ADVANCE ── -->
-    <div class="prod-sub ps-active" id="prod-advance">
-      <div style="display:grid;grid-template-columns:340px 1fr;gap:14px">
-
-        <!-- New show form -->
+    <div class="prod-sub ps-active" id="prod-advance" style="flex:1;overflow-y:auto">
+      <div style="display:grid;grid-template-columns:360px 1fr;gap:14px">
         <div>
           <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">CREATE SHOW ADVANCE</div>
           <div style="display:flex;flex-direction:column;gap:8px">
@@ -3466,14 +3534,14 @@ function _initAll_old_1() {
               <div class="advance-field"><div class="advance-label">Doors</div><input id="sh-doors" class="login-input" type="time" value="21:00"></div>
               <div class="advance-field"><div class="advance-label">Show</div><input id="sh-show" class="login-input" type="time" value="22:00"></div>
             </div>
-            <div class="advance-field"><div class="advance-label">Set Length (min)</div><input id="sh-setlen" class="login-input" type="number" value="60" placeholder="60"></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+              <div class="advance-field"><div class="advance-label">Set (min)</div><input id="sh-setlen" class="login-input" type="number" value="60"></div>
               <div class="advance-field"><div class="advance-label">Stage W (m)</div><input id="sh-sw" class="login-input" type="number" step="0.5" placeholder="8"></div>
               <div class="advance-field"><div class="advance-label">Stage D (m)</div><input id="sh-sd" class="login-input" type="number" step="0.5" placeholder="6"></div>
             </div>
             <div class="advance-field"><div class="advance-label">PA System</div><input id="sh-pa" class="login-input" placeholder="L-Acoustics / d&b / RCF / house"></div>
             <div class="advance-field"><div class="advance-label">FOH Console</div><input id="sh-foh" class="login-input" placeholder="Allen & Heath Avantis / SQ-6 / house"></div>
-            <div class="advance-field"><div class="advance-label">Monitor Console</div><input id="sh-mon" class="login-input" placeholder="Separate mon desk / FOH controlled"></div>
+            <div class="advance-field"><div class="advance-label">Monitor Console</div><input id="sh-mon" class="login-input" placeholder="Separate / FOH controlled"></div>
             <div class="advance-field"><div class="advance-label">Notes</div><input id="sh-notes" class="login-input" placeholder="2 dressing rooms. Parking backstage."></div>
             <div style="display:flex;gap:8px;align-items:center">
               <button class="login-btn" style="width:auto;padding:0 20px" onclick="createShow()">Create Show</button>
@@ -3481,21 +3549,23 @@ function _initAll_old_1() {
             </div>
           </div>
         </div>
-
-        <!-- Show list -->
         <div>
           <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">UPCOMING SHOWS</div>
-          <div id="shows-list" style="display:flex;flex-direction:column;gap:8px"></div>
+          <div id="shows-list" style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:9px;color:var(--muted3);padding:12px">No shows yet. Create your first show advance.</div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- ── TECH RIDER ── -->
-    <div class="prod-sub" id="prod-rider">
-      <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;margin-bottom:14px">
+    <div class="prod-sub" id="prod-rider" style="flex:1;overflow-y:auto">
+
+      <!-- Header bar -->
+      <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--accent)">
         <div>
-          <div style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--text);letter-spacing:.1em">THE GINSKEYS — TECHNICAL RIDER</div>
-          <div style="font-size:8px;color:var(--muted2);margin-top:2px">Hard Rock · 4 piece · Sines, Portugal · Updated March 2026</div>
+          <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--text);letter-spacing:.12em">THE GINSKEYS</div>
+          <div style="font-size:9px;color:var(--muted2);letter-spacing:.1em;margin-top:2px">TECHNICAL RIDER · HARD ROCK · 4 PIECE · SINES, PORTUGAL · v2.0 MAR 2026</div>
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn-sm" onclick="printRider()">⎙ Print / PDF</button>
@@ -3503,189 +3573,227 @@ function _initAll_old_1() {
         </div>
       </div>
 
-      <!-- Band lineup -->
-      <div class="rider-section">
-        <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-          <span>01 — Band Lineup</span><span>▼</span>
-        </div>
-        <div class="rider-section-body">
-          <table style="width:100%;border-collapse:collapse">
-            <tr style="border-bottom:1px solid var(--border2)">
-              <th style="text-align:left;padding:5px 8px;font-size:8px;color:var(--muted);letter-spacing:.1em;font-weight:400">MEMBER</th>
-              <th style="text-align:left;padding:5px 8px;font-size:8px;color:var(--muted);letter-spacing:.1em;font-weight:400">INSTRUMENT</th>
-              <th style="text-align:left;padding:5px 8px;font-size:8px;color:var(--muted);letter-spacing:.1em;font-weight:400">POSITION</th>
-              <th style="text-align:left;padding:5px 8px;font-size:8px;color:var(--muted);letter-spacing:.1em;font-weight:400">INPUTS</th>
-            </tr>
-            <tr style="border-bottom:1px solid var(--border1)">
-              <td style="padding:6px 8px;font-weight:700">Fábio</td>
-              <td style="padding:6px 8px">Lead Guitar + Lead Vocals</td>
-              <td style="padding:6px 8px;color:var(--muted3)">Centre / Stage Right</td>
-              <td style="padding:6px 8px;color:var(--muted3)">1× guitar amp (mic'd SM57) + 1× vocal SM58</td>
-            </tr>
-            <tr style="border-bottom:1px solid var(--border1)">
-              <td style="padding:6px 8px;font-weight:700">Pedro</td>
-              <td style="padding:6px 8px">Bass</td>
-              <td style="padding:6px 8px;color:var(--muted3)">Stage Left</td>
-              <td style="padding:6px 8px;color:var(--muted3)">1× bass amp (DI + mic) or DI only</td>
-            </tr>
-            <tr style="border-bottom:1px solid var(--border1)">
-              <td style="padding:6px 8px;font-weight:700">Manuel</td>
-              <td style="padding:6px 8px">Drums</td>
-              <td style="padding:6px 8px;color:var(--muted3)">Centre Rear</td>
-              <td style="padding:6px 8px;color:var(--muted3)">Kick / Snare T+B / HH / 3× Toms / 2× OH</td>
-            </tr>
-            <tr>
-              <td style="padding:6px 8px;font-weight:700">Tiago</td>
-              <td style="padding:6px 8px">Rhythm Guitar + BG Vocals</td>
-              <td style="padding:6px 8px;color:var(--muted3)">Stage Right</td>
-              <td style="padding:6px 8px;color:var(--muted3)">1× guitar amp (mic'd SM57) + 1× vocal SM58</td>
-            </tr>
-          </table>
-        </div>
-      </div>
+      <!-- Two-column layout: technical left, production right -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
 
-      <!-- Input list -->
-      <div class="rider-section">
-        <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-          <span>02 — Input List / Patch</span><span>▼</span>
-        </div>
-        <div class="rider-section-body">
-          <div class="input-row hdr-row">
-            <div>CH</div><div>TYPE</div><div>SOURCE</div><div>MIC / DI</div><div>STAND</div><div>NOTES</div>
-          </div>
-          <div class="input-row"><div style="color:var(--accent);font-weight:700">1</div><div style="color:var(--muted2)">MIC</div><div>Kick Drum</div><div style="color:var(--purple2)">Beta 91A / D112</div><div style="color:var(--muted3)">None</div><div style="color:var(--muted3)">Inside kick, gate req.</div></div>
-          <div class="input-row"><div style="color:var(--accent);font-weight:700">2</div><div style="color:var(--muted2)">MIC</div><div>Snare Top</div><div style="color:var(--purple2)">SM57</div><div style="color:var(--muted3)">Short boom</div><div style="color:var(--muted3)">–</div></div>
-          <div class="input-row"><div style="color:var(--accent);font-weight:700">3</div><div style="color:var(--muted2)">MIC</div><div>Snare Bottom</div><div style="color:var(--purple2)">SM57</div><div style="color:var(--muted3)">Short boom</div><div style="color:var(--muted3)">Phase flip</div></div>
-          <div class="input-row"><div style="color:var(--accent);font-weight:700">4</div><div style="color:var(--muted2)">MIC</div><div>Hi-Hat</div><div style="color:var(--purple2)">SM81 / C451</div><div style="color:var(--muted3)">Short boom</div><div style="color:var(--muted3)">–</div></div>
-          <div class="input-row"><div style="color:var(--accent);font-weight:700">5</div><div style="color:var(--muted2)">MIC</div><div>Tom 1</div><div style="color:var(--purple2)">E904 clip</div><div style="color:var(--muted3)">–</div><div style="color:var(--muted3)">–</div></div>
-          <div class="input-row"><div style="color:var(--accent);font-weight:700">6</div><div style="color:var(--muted2)">MIC</div><div>Tom 2</div><div style="color:var(--purple2)">E904 clip</div><div style="color:var(--muted3)">–</div><div style="color:var(--muted3)">–</div></div>
-          <div class="input-row"><div style="color:var(--accent);font-weight:700">7</div><div style="color:var(--muted2)">MIC</div><div>Tom 3 (floor)</div><div style="color:var(--purple2)">E904 clip</div><div style="color:var(--muted3)">–</div><div style="color:var(--muted3)">–</div></div>
-          <div class="input-row"><div style="color:var(--accent);font-weight:700">8</div><div style="color:var(--muted2)">MIC</div><div>OH Left</div><div style="color:var(--purple2)">SM81 / C451</div><div style="color:var(--muted3)">Tall boom</div><div style="color:var(--muted3)">–</div></div>
-          <div class="input-row"><div style="color:var(--accent);font-weight:700">9</div><div style="color:var(--muted2)">MIC</div><div>OH Right</div><div style="color:var(--purple2)">SM81 / C451</div><div style="color:var(--muted3)">Tall boom</div><div style="color:var(--muted3)">–</div></div>
-          <div class="input-row"><div style="color:var(--accent);font-weight:700">10</div><div style="color:var(--muted2)">DI</div><div>Bass (direct)</div><div style="color:var(--purple2)">Radial J48</div><div style="color:var(--muted3)">–</div><div style="color:var(--muted3)">Pre-amp out preferred</div></div>
-          <div class="input-row"><div style="color:var(--accent);font-weight:700">11</div><div style="color:var(--muted2)">MIC</div><div>Bass Amp</div><div style="color:var(--purple2)">SM57 / Beta 52</div><div style="color:var(--muted3)">Short boom</div><div style="color:var(--muted3)">Optional, see above</div></div>
-          <div class="input-row"><div style="color:var(--accent);font-weight:700">12</div><div style="color:var(--muted2)">MIC</div><div>Guitar 1 Amp</div><div style="color:var(--purple2)">SM57</div><div style="color:var(--muted3)">Short boom</div><div style="color:var(--muted3)">Off-axis cap preferred</div></div>
-          <div class="input-row"><div style="color:var(--accent);font-weight:700">13</div><div style="color:var(--muted2)">MIC</div><div>Guitar 2 Amp</div><div style="color:var(--purple2)">SM57</div><div style="color:var(--muted3)">Short boom</div><div style="color:var(--muted3)">Off-axis cap preferred</div></div>
-          <div class="input-row"><div style="color:var(--accent);font-weight:700">14</div><div style="color:var(--muted2)">MIC</div><div>Vocal 1 (lead)</div><div style="color:var(--purple2)">SM58</div><div style="color:var(--muted3)">Tall boom</div><div style="color:var(--muted3)">Lead vocal – priority</div></div>
-          <div class="input-row"><div style="color:var(--accent);font-weight:700">15</div><div style="color:var(--muted2)">MIC</div><div>Vocal 2 (BG)</div><div style="color:var(--purple2)">SM58</div><div style="color:var(--muted3)">Tall boom</div><div style="color:var(--muted3)">Rhythm guitar player</div></div>
-        </div>
-      </div>
+        <!-- LEFT COLUMN -->
+        <div style="display:flex;flex-direction:column;gap:10px">
 
-      <!-- Monitor requirements -->
-      <div class="rider-section">
-        <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-          <span>03 — Monitor Requirements</span><span>▼</span>
-        </div>
-        <div class="rider-section-body">
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-            <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:2px solid var(--accent)">
-              <div style="font-size:8px;font-weight:700;margin-bottom:4px">Mix 1 — Lead Vocal (Fábio)</div>
-              <div style="font-size:8px;color:var(--muted3)">Vocal (self loud) · Guitar (self low) · Kick · Snare · Bass (low)</div>
+          <!-- 01 Band Lineup -->
+          <div class="rider-section">
+            <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
+              <span style="color:var(--accent)">01</span>&nbsp;&nbsp;BAND LINEUP<span>▼</span>
             </div>
-            <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:2px solid var(--blue2)">
-              <div style="font-size:8px;font-weight:700;margin-bottom:4px">Mix 2 — Bass (Pedro)</div>
-              <div style="font-size:8px;color:var(--muted3)">Kick · Snare · Guitar 1 · Vocal 1 · Bass (self med)</div>
-            </div>
-            <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:2px solid var(--green2)">
-              <div style="font-size:8px;font-weight:700;margin-bottom:4px">Mix 3 — Drums (Manuel)</div>
-              <div style="font-size:8px;color:var(--muted3)">Vocal 1 · Guitar 1 · Bass · Click (optional)</div>
-            </div>
-            <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:2px solid var(--amber2)">
-              <div style="font-size:8px;font-weight:700;margin-bottom:4px">Mix 4 — BG Vocal (Tiago)</div>
-              <div style="font-size:8px;color:var(--muted3)">Vocal 1 · Vocal 2 (self) · Guitar 1 · Kick · Bass (low)</div>
+            <div class="rider-section-body">
+              <table style="width:100%;border-collapse:collapse">
+                <tr style="border-bottom:1px solid var(--border2)">
+                  <th style="text-align:left;padding:5px 8px;font-size:7px;color:var(--muted);letter-spacing:.12em;font-weight:400">MEMBER</th>
+                  <th style="text-align:left;padding:5px 8px;font-size:7px;color:var(--muted);letter-spacing:.12em;font-weight:400">ROLE</th>
+                  <th style="text-align:left;padding:5px 8px;font-size:7px;color:var(--muted);letter-spacing:.12em;font-weight:400">POSITION</th>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border1)">
+                  <td style="padding:7px 8px;font-weight:700;color:var(--accent)">FÁBIO</td>
+                  <td style="padding:7px 8px">Lead Guitar + Lead Vocals</td>
+                  <td style="padding:7px 8px;color:var(--muted3)">Centre / Stage Right</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border1)">
+                  <td style="padding:7px 8px;font-weight:700;color:var(--accent)">PEDRO</td>
+                  <td style="padding:7px 8px">Bass</td>
+                  <td style="padding:7px 8px;color:var(--muted3)">Stage Left</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border1)">
+                  <td style="padding:7px 8px;font-weight:700;color:var(--accent)">MANUEL</td>
+                  <td style="padding:7px 8px">Drums</td>
+                  <td style="padding:7px 8px;color:var(--muted3)">Centre Rear</td>
+                </tr>
+                <tr>
+                  <td style="padding:7px 8px;font-weight:700;color:var(--accent)">TIAGO</td>
+                  <td style="padding:7px 8px">Rhythm Guitar + BG Vocals</td>
+                  <td style="padding:7px 8px;color:var(--muted3)">Stage Right</td>
+                </tr>
+              </table>
             </div>
           </div>
-          <div style="margin-top:10px;font-size:8px;color:var(--muted2)">
-            Minimum 4× wedge monitors. Preferred: coax wedges or QSC KW series. IEM acceptable if provided. All mixes separate if possible.
-          </div>
-        </div>
-      </div>
 
-      <!-- Backline -->
-      <div class="rider-section">
-        <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-          <span>04 — Backline &amp; Equipment</span><span>▼</span>
-        </div>
-        <div class="rider-section-body">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div>
-              <div style="font-size:8px;color:var(--accent);letter-spacing:.1em;margin-bottom:8px">BAND PROVIDES</div>
-              <div style="font-size:9px;color:var(--muted2);line-height:2">
-                ▸ All guitars and bass<br>
-                ▸ Guitar amp head (Marshall / Mesa Boogie depending on show)<br>
-                ▸ Bass amp head<br>
-                ▸ All instrument cables (jack-to-jack)<br>
-                ▸ All pedal boards + PSUs<br>
-                ▸ Vocal mics (SM58 ×2) — if preferred<br>
-                ▸ Gaffer tape, spare strings, spare 9V
+          <!-- 02 Input List -->
+          <div class="rider-section">
+            <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
+              <span style="color:var(--accent)">02</span>&nbsp;&nbsp;INPUT LIST / PATCH (15 CH)<span>▼</span>
+            </div>
+            <div class="rider-section-body" style="padding:0">
+              <div class="input-row hdr-row" style="background:var(--bg4)">
+                <div>CH</div><div>TYPE</div><div>SOURCE</div><div>MIC / DI</div><div>STAND</div><div>NOTES</div>
               </div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">1</div><div style="color:var(--muted2)">MIC</div><div>Kick Drum</div><div style="color:var(--purple2)">Beta 91A / D112</div><div style="color:var(--muted3)">None</div><div style="color:var(--muted3)">Gate req.</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">2</div><div style="color:var(--muted2)">MIC</div><div>Snare Top</div><div style="color:var(--purple2)">SM57</div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">3</div><div style="color:var(--muted2)">MIC</div><div>Snare Bottom</div><div style="color:var(--purple2)">SM57</div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">Phase flip</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">4</div><div style="color:var(--muted2)">MIC</div><div>Hi-Hat</div><div style="color:var(--purple2)">SM81 / C451</div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">5</div><div style="color:var(--muted2)">MIC</div><div>Tom 1</div><div style="color:var(--purple2)">E904 clip</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">6</div><div style="color:var(--muted2)">MIC</div><div>Tom 2</div><div style="color:var(--purple2)">E904 clip</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">7</div><div style="color:var(--muted2)">MIC</div><div>Tom 3 (floor)</div><div style="color:var(--purple2)">E904 clip</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">8</div><div style="color:var(--muted2)">MIC</div><div>OH Left</div><div style="color:var(--purple2)">SM81 / C451</div><div style="color:var(--muted3)">Tall</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">9</div><div style="color:var(--muted2)">MIC</div><div>OH Right</div><div style="color:var(--purple2)">SM81 / C451</div><div style="color:var(--muted3)">Tall</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row" style="background:rgba(170,0,255,.04)"><div style="color:var(--accent);font-weight:700">10</div><div style="color:var(--muted2)">DI</div><div>Bass (direct)</div><div style="color:var(--purple2)">Radial J48</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">Pre-amp out</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">11</div><div style="color:var(--muted2)">MIC</div><div>Bass Amp</div><div style="color:var(--purple2)">SM57 / β52</div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">Optional</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">12</div><div style="color:var(--muted2)">MIC</div><div>Guitar 1 Amp</div><div style="color:var(--purple2)">SM57</div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">Off-axis</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">13</div><div style="color:var(--muted2)">MIC</div><div>Guitar 2 Amp</div><div style="color:var(--purple2)">SM57</div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">Off-axis</div></div>
+              <div class="input-row" style="background:rgba(255,92,26,.04)"><div style="color:var(--accent);font-weight:700">14</div><div style="color:var(--muted2)">MIC</div><div>Vocal 1 (lead)</div><div style="color:var(--purple2)">SM58</div><div style="color:var(--muted3)">Tall</div><div style="color:var(--green3);font-weight:700">PRIORITY</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">15</div><div style="color:var(--muted2)">MIC</div><div>Vocal 2 (BG)</div><div style="color:var(--purple2)">SM58</div><div style="color:var(--muted3)">Tall</div><div style="color:var(--muted3)">Rhythm gtr</div></div>
             </div>
-            <div>
-              <div style="font-size:8px;color:var(--green3);letter-spacing:.1em;margin-bottom:8px">VENUE TO PROVIDE</div>
-              <div style="font-size:9px;color:var(--muted2);line-height:2">
-                ▸ Guitar cab 4×12 (Marshall 1960 or equivalent)<br>
-                ▸ Bass cab 4×10 or 2×15<br>
-                ▸ Full drum kit: kick, snare, 3 toms, hi-hat, 2 crashes, ride<br>
-                ▸ Drum hardware, throne, rug<br>
-                ▸ All mic stands as per input list<br>
-                ▸ All XLR cables<br>
-                ▸ DI boxes ×2 minimum (Radial preferred)<br>
-                ▸ Power strips ×4 (stage)<br>
-                ▸ Water ×6 bottles on stage
+          </div>
+
+          <!-- 03 FOH Mix Notes -->
+          <div class="rider-section">
+            <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
+              <span style="color:var(--accent)">03</span>&nbsp;&nbsp;FOH MIX NOTES<span>▼</span>
+            </div>
+            <div class="rider-section-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:9px;color:var(--muted2);line-height:1.9">
+                <div>
+                  <div style="font-size:7px;color:var(--accent);letter-spacing:.1em;margin-bottom:6px">GENERAL</div>
+                  ▸ Hard rock — guitars prominent, kick punchy<br>
+                  ▸ Vocals clear above guitars at all times<br>
+                  ▸ No click track · No tracks / playback<br>
+                  ▸ Mono-compatible mix essential
+                </div>
+                <div>
+                  <div style="font-size:7px;color:var(--accent);letter-spacing:.1em;margin-bottom:6px">PER INSTRUMENT</div>
+                  ▸ Kick: tight low-mid, gate, transient shaper<br>
+                  ▸ Guitar: +3dB @ 3–5kHz, cut @ 300Hz<br>
+                  ▸ Bass: DI + amp blend, LP @ 5kHz<br>
+                  ▸ Vocals: plate reverb 1.2s, chorus delay only
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- FOH preferences -->
-      <div class="rider-section">
-        <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-          <span>05 — FOH Mix Notes</span><span>▼</span>
-        </div>
-        <div class="rider-section-body" style="font-size:9px;color:var(--muted2);line-height:2">
-          ▸ Hard rock mix — guitars prominent, kick punchy, vocals clear above guitars<br>
-          ▸ Kick: tight low-mid, gate, transient shaper if available<br>
-          ▸ Guitar: presence boost around 3–5kHz, cut mud around 300Hz<br>
-          ▸ Bass: blend DI + amp mic for definition; low-pass DI at 5kHz<br>
-          ▸ Vocals: light reverb (plate 1.2s), tasteful delay on choruses only<br>
-          ▸ Overall: reference mix — <a href="https://open.spotify.com/track/" style="color:var(--blue2)">Spotify link to be provided</a><br>
-          ▸ No click track required · No tracks / playback
-        </div>
-      </div>
+        <!-- RIGHT COLUMN -->
+        <div style="display:flex;flex-direction:column;gap:10px">
 
-      <!-- Hospitality -->
-      <div class="rider-section">
-        <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-          <span>06 — Hospitality Rider</span><span>▼</span>
-        </div>
-        <div class="rider-section-body" style="font-size:9px;color:var(--muted2);line-height:2">
-          ▸ Dressing room access from load-in<br>
-          ▸ 6× water (stage) + 12× water (dressing room)<br>
-          ▸ Light meal or buy-out of €15/person (4 people)<br>
-          ▸ 6× beer (post-show — local brand fine)<br>
-          ▸ Towels ×4<br>
-          ▸ Parking for 1 van backstage or adjacent<br>
-          <span style="color:var(--muted);font-size:8px">Minimum requirements — not a diva rider. We're easy to work with.</span>
-        </div>
-      </div>
+          <!-- 04 Monitor Requirements -->
+          <div class="rider-section">
+            <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
+              <span style="color:var(--accent)">04</span>&nbsp;&nbsp;MONITOR REQUIREMENTS (4 MIXES)<span>▼</span>
+            </div>
+            <div class="rider-section-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--accent)">
+                  <div style="font-size:8px;font-weight:700;color:var(--text);margin-bottom:4px">MIX 1 — FÁBIO (Lead Vocal)</div>
+                  <div style="font-size:7px;color:var(--muted3);line-height:1.7">Vocal (self, loud) · Guitar (self, low)<br>Kick · Snare · Bass (low)</div>
+                </div>
+                <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--blue2)">
+                  <div style="font-size:8px;font-weight:700;color:var(--text);margin-bottom:4px">MIX 2 — PEDRO (Bass)</div>
+                  <div style="font-size:7px;color:var(--muted3);line-height:1.7">Kick · Snare · Guitar 1<br>Vocal 1 · Bass (self, med)</div>
+                </div>
+                <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--green3)">
+                  <div style="font-size:8px;font-weight:700;color:var(--text);margin-bottom:4px">MIX 3 — MANUEL (Drums)</div>
+                  <div style="font-size:7px;color:var(--muted3);line-height:1.7">Vocal 1 · Guitar 1 · Bass<br>Click track (optional)</div>
+                </div>
+                <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--amber2)">
+                  <div style="font-size:8px;font-weight:700;color:var(--text);margin-bottom:4px">MIX 4 — TIAGO (BG Vocal)</div>
+                  <div style="font-size:7px;color:var(--muted3);line-height:1.7">Vocal 1 · Vocal 2 (self)<br>Guitar 1 · Kick · Bass (low)</div>
+                </div>
+              </div>
+              <div style="margin-top:8px;font-size:8px;color:var(--muted2);padding:8px;background:var(--bg4);border-radius:2px">
+                <span style="color:var(--amber2)">Min:</span> 4× wedge monitors · Preferred: coax or QSC KW · IEM acceptable if provided
+              </div>
+            </div>
+          </div>
 
-      <!-- Contact -->
-      <div style="font-size:8px;color:var(--muted2);padding:10px 0;border-top:1px solid var(--border2);margin-top:4px">
-        Technical contact: <strong style="color:var(--text)">Tiago M.</strong> — tiago@ginskeys.com ·
-        Stage Manager experience: FMM Sines (international acts) · Equipment: L-Acoustics, Allen &amp; Heath Avantis, Avolites Titan
+          <!-- 05 Backline -->
+          <div class="rider-section">
+            <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
+              <span style="color:var(--accent)">05</span>&nbsp;&nbsp;BACKLINE &amp; EQUIPMENT<span>▼</span>
+            </div>
+            <div class="rider-section-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div>
+                  <div style="font-size:7px;color:var(--green3);letter-spacing:.12em;margin-bottom:8px;font-weight:700">BAND PROVIDES</div>
+                  <div style="font-size:8px;color:var(--muted2);line-height:1.9">
+                    ▸ All guitars and bass<br>
+                    ▸ Amp heads (Marshall / Mesa)<br>
+                    ▸ All instrument cables<br>
+                    ▸ All pedalboards + PSUs<br>
+                    ▸ Vocal mics SM58 ×2 (if preferred)<br>
+                    ▸ Gaffer, spare strings, 9V
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size:7px;color:var(--accent);letter-spacing:.12em;margin-bottom:8px;font-weight:700">VENUE PROVIDES</div>
+                  <div style="font-size:8px;color:var(--muted2);line-height:1.9">
+                    ▸ Guitar cab 4×12 (Marshall 1960)<br>
+                    ▸ Bass cab 4×10 or 2×15<br>
+                    ▸ Full drum kit + hardware + throne + rug<br>
+                    ▸ All mic stands per input list<br>
+                    ▸ All XLR cables · DI boxes ×2 (Radial)<br>
+                    ▸ Power strips ×4 · Water ×6 on stage
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 06 Hospitality -->
+          <div class="rider-section">
+            <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
+              <span style="color:var(--accent)">06</span>&nbsp;&nbsp;HOSPITALITY RIDER<span>▼</span>
+            </div>
+            <div class="rider-section-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div>
+                  <div style="font-size:7px;color:var(--blue2);letter-spacing:.12em;margin-bottom:8px;font-weight:700">DRESSING ROOM</div>
+                  <div style="font-size:8px;color:var(--muted2);line-height:1.9">
+                    ▸ Access from load-in<br>
+                    ▸ 12× water bottles<br>
+                    ▸ 4× towels<br>
+                    ▸ Mirror + adequate lighting<br>
+                    ▸ Power outlets ×4<br>
+                    ▸ WiFi access
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size:7px;color:var(--amber2);letter-spacing:.12em;margin-bottom:8px;font-weight:700">CATERING</div>
+                  <div style="font-size:8px;color:var(--muted2);line-height:1.9">
+                    ▸ Light meal or buy-out €15/person (×4)<br>
+                    ▸ 6× water on stage<br>
+                    ▸ 6× beer post-show (local brand fine)<br>
+                    ▸ Coffee / tea available<br>
+                    ▸ Parking: 1 van backstage<br>
+                    ▸ <span style="color:var(--muted3)">Easy to work with — not a diva rider</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact footer -->
+          <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:12px 14px">
+            <div style="font-size:7px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px">TECHNICAL CONTACT</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:8px;color:var(--muted2)">
+              <div>
+                <div style="font-weight:700;color:var(--text);margin-bottom:2px">Tiago M. — Stage Manager</div>
+                <div>tiago@ginskeys.com</div>
+              </div>
+              <div>
+                <div style="color:var(--muted3);font-size:7px;margin-bottom:2px">CREDENTIALS</div>
+                <div>FMM Sines · L-Acoustics · Allen &amp; Heath Avantis · Avolites Titan Quartz</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
 
     <!-- ── SETLIST ── -->
-    <div class="prod-sub" id="prod-setlist">
-      <div style="display:grid;grid-template-columns:300px 1fr;gap:14px">
-        <!-- Create setlist -->
+    <div class="prod-sub" id="prod-setlist" style="flex:1;overflow-y:auto">
+      <div style="display:grid;grid-template-columns:320px 1fr;gap:14px">
         <div>
           <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">NEW SETLIST</div>
           <div style="display:flex;flex-direction:column;gap:8px">
             <div class="advance-field"><div class="advance-label">Setlist Name</div><input id="sl-name" class="login-input" placeholder="Tasquinhas 2026 — 60min"></div>
-            <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-top:4px">SONGS — add one at a time</div>
+            <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-top:4px">ADD SONGS</div>
             <div style="display:grid;grid-template-columns:1fr 60px;gap:6px">
               <input id="sl-song-title" class="login-input" placeholder="Song title">
               <input id="sl-song-key" class="login-input" placeholder="Key" style="text-align:center">
@@ -3695,23 +3803,18 @@ function _initAll_old_1() {
               <input id="sl-song-dur" class="login-input" type="number" placeholder="Sec">
               <input id="sl-song-tuning" class="login-input" placeholder="Tuning" value="Standard">
             </div>
-            <input id="sl-song-notes" class="login-input" placeholder="Notes (e.g. key change at bridge)">
+            <input id="sl-song-notes" class="login-input" placeholder="Notes">
             <div style="display:flex;gap:6px">
               <button class="btn-sm" onclick="addSetlistSong()" style="flex:1">+ Add Song</button>
               <button class="btn-sm" onclick="clearSetlistSongs()">Clear</button>
             </div>
-          </div>
-
-          <!-- Pending songs -->
-          <div id="sl-pending-songs" style="margin-top:12px;display:flex;flex-direction:column;gap:4px"></div>
-
-          <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-            <button class="login-btn" style="width:auto;padding:0 20px" onclick="saveSetlist()">Save Setlist</button>
-            <div style="font-size:8px;color:var(--muted3)" id="sl-status"></div>
+            <div id="sl-pending-songs" style="display:flex;flex-direction:column;gap:4px"></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="login-btn" style="width:auto;padding:0 20px" onclick="saveSetlist()">Save Setlist</button>
+              <div style="font-size:8px;color:var(--muted3)" id="sl-status"></div>
+            </div>
           </div>
         </div>
-
-        <!-- Saved setlists -->
         <div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
             <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">SAVED SETLISTS</div>
@@ -3723,9 +3826,8 @@ function _initAll_old_1() {
     </div>
 
     <!-- ── CHECKLIST ── -->
-    <div class="prod-sub" id="prod-checklist">
-      <div style="display:grid;grid-template-columns:260px 1fr;gap:14px">
-        <!-- Show picker -->
+    <div class="prod-sub" id="prod-checklist" style="flex:1;overflow-y:auto">
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:14px">
         <div>
           <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">SELECT SHOW</div>
           <select id="cl-show-picker" class="login-input" style="width:100%;margin-bottom:10px" onchange="loadChecklist()">
@@ -3733,11 +3835,9 @@ function _initAll_old_1() {
           </select>
           <button class="login-btn" style="width:100%;margin-bottom:8px" onclick="seedChecklist()">⚡ Generate Default Checklist</button>
           <div style="font-size:8px;color:var(--muted2);line-height:1.7">
-            Generates 40-item hard-rock show checklist across 5 phases: Pre-show, Load-in, Soundcheck, Show Day, Post-show. Each item is owner-assigned.
+            Generates 40-item checklist: Pre-show · Load-in · Soundcheck · Show Day · Post-show. Each item owner-assigned.
           </div>
           <div id="cl-seed-status" style="font-size:8px;color:var(--muted3);margin-top:8px"></div>
-
-          <!-- Progress -->
           <div id="cl-progress-wrap" style="margin-top:14px;display:none">
             <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px">OVERALL PROGRESS</div>
             <div style="height:6px;background:var(--bg4);border-radius:1px;overflow:hidden;margin-bottom:4px">
@@ -3746,14 +3846,13 @@ function _initAll_old_1() {
             <div style="font-size:8px;color:var(--muted2)" id="cl-progress-text">0 / 0 done</div>
           </div>
         </div>
-
-        <!-- Checklist display -->
-        <div id="checklist-display" style="overflow-y:auto;max-height:600px"></div>
+        <div id="checklist-display" style="overflow-y:auto"></div>
       </div>
     </div>
 
-  </div><!-- /padding -->
-</div><!-- /view-production -->
+  </div>
+</div>
+
 
 </div><!-- /content-wrap -->
 
