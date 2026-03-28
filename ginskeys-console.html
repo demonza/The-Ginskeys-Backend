@@ -6541,25 +6541,6 @@ function updateProductionBanner() {
   el('prod-banner-checklist', upcoming.length ? upcoming[0].show_date : '—');
 }
 
-  if (!BOOKING_DATA.length) return;
-  const total = BOOKING_DATA.length;
-  const completed = BOOKING_DATA.filter(b=>b.stage==='completed').length;
-  const earned = BOOKING_DATA.filter(b=>b.stage==='completed').reduce((s,b)=>s+parseFloat(b.fee_eur||0),0);
-  const conversion = total > 0 ? Math.round(completed/total*100) : 0;
-  const overdue = BOOKING_DATA.filter(b=>b.follow_up_date&&new Date(b.follow_up_date)<new Date()&&!['completed','rejected'].includes(b.stage));
-  const nextAction = overdue.length
-    ? `Follow up overdue: ${overdue[0].name}`
-    : BOOKING_DATA.find(b=>b.stage==='negotiating')
-    ? `Close negotiation: ${BOOKING_DATA.find(b=>b.stage==='negotiating').name}`
-    : BOOKING_DATA.find(b=>b.stage==='cold')
-    ? `Contact: ${BOOKING_DATA.find(b=>b.stage==='cold').name}`
-    : 'Add new venue targets';
-  const el = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
-  el('bk-next-action', nextAction);
-  el('bk-banner-earned', '€'+earned.toLocaleString('pt-PT',{minimumFractionDigits:0}));
-  el('bk-banner-contacts', total);
-  el('bk-banner-conversion', conversion+'%');
-}
 
 // Update banners after data loads — called directly from initAll
 async function loadAllGrowthData() {
