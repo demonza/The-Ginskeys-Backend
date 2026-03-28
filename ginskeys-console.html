@@ -4634,6 +4634,26 @@ async function loadStreamingFromApi() {
 <div id="view-booking" class="view" style="flex:1;display:none;flex-direction:column">
   <div class="main-grid" style="padding:12px;gap:12px;display:flex;flex-direction:column">
 
+  <!-- Context Banner -->
+  <div id="booking-context-banner" style="background:linear-gradient(90deg,rgba(255,60,30,.08) 0%,transparent 100%);border-left:3px solid var(--accent);padding:12px 16px;margin:12px 12px 0;border-radius:0 2px 2px 0;display:grid;grid-template-columns:1fr repeat(3,auto);gap:16px;align-items:center">
+    <div>
+      <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.08em">BOOKING PIPELINE</div>
+      <div style="font-size:8px;color:var(--muted2);margin-top:2px">Next action: <span id="bk-next-action" style="color:var(--amber2)">Loading...</span></div>
+    </div>
+    <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+      <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green3)" id="bk-banner-earned">€0</div>
+      <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">EARNED (completed)</div>
+    </div>
+    <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+      <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--blue2)" id="bk-banner-contacts">0</div>
+      <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">TOTAL CONTACTS</div>
+    </div>
+    <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+      <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--amber2)" id="bk-banner-conversion">0%</div>
+      <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">CONVERSION RATE</div>
+    </div>
+  </div>
+
     <!-- Pipeline KPIs -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px" id="booking-kpi-row">
       <div class="panel" style="padding:10px 12px;text-align:center"><div style="font-size:7px;color:var(--muted);letter-spacing:.1em">COLD</div><div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--muted2)" id="bk-cold">0</div></div>
@@ -4694,6 +4714,30 @@ async function loadStreamingFromApi() {
 <div id="view-releases" class="view" style="flex:1;display:none;flex-direction:column">
   <div style="padding:12px;display:flex;flex-direction:column;gap:12px">
 
+    <!-- Context Banner -->
+    <div style="background:linear-gradient(90deg,rgba(170,0,255,.08) 0%,transparent 100%);border-left:3px solid var(--purple2);padding:12px 16px;border-radius:0 2px 2px 0;display:grid;grid-template-columns:1fr repeat(4,auto);gap:16px;align-items:center">
+      <div>
+        <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--purple2);letter-spacing:.08em">RELEASE PIPELINE</div>
+        <div style="font-size:8px;color:var(--muted2);margin-top:2px">Hard rock live attendance up <span style="color:var(--green3)">+14% in 2025</span> — release consistently to ride the wave</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)" id="rel-banner-total-wrap">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--text)" id="rel-banner-total">0</div>
+        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">TOTAL RELEASES</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green3)" id="rel-banner-released">0</div>
+        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">LIVE ON DSPs</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--amber2)" id="rel-banner-ready">0</div>
+        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">READY TO RELEASE</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--muted2)" id="rel-banner-wip">0</div>
+        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">IN PROGRESS</div>
+      </div>
+    </div>
+
     <!-- Add release -->
     <div class="panel">
       <div class="panel-header"><div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Add Release</div></div>
@@ -4745,6 +4789,26 @@ async function loadStreamingFromApi() {
 ════════════════════════════════════════════════════════ -->
 <div id="view-press" class="view" style="flex:1;display:none;flex-direction:column">
   <div style="padding:12px;display:flex;flex-direction:column;gap:12px">
+
+    <!-- Context Banner -->
+    <div style="background:linear-gradient(90deg,rgba(41,121,255,.08) 0%,transparent 100%);border-left:3px solid var(--blue2);padding:12px 16px;border-radius:0 2px 2px 0;display:grid;grid-template-columns:1fr repeat(3,auto);gap:16px;align-items:center">
+      <div>
+        <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--blue2);letter-spacing:.08em">PRESS & SYNC PIPELINE</div>
+        <div style="font-size:8px;color:var(--muted2);margin-top:2px">One Rock FM playlist = <span style="color:var(--green3)">10–15× streaming spike</span> · One sync placement = <span style="color:var(--green3)">€200–2,000 passive</span></div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green3)" id="pr-banner-published">0</div>
+        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">PUBLISHED</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--amber2)" id="pr-banner-active">0</div>
+        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">ACTIVE PITCHES</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--purple2)" id="pr-banner-sync">0</div>
+        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">SYNC TARGETS</div>
+      </div>
+    </div>
 
     <!-- Stats row -->
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
@@ -4804,6 +4868,26 @@ async function loadStreamingFromApi() {
 ════════════════════════════════════════════════════════ -->
 <div id="view-splits" class="view" style="flex:1;display:none;flex-direction:column">
   <div style="padding:12px;display:flex;flex-direction:column;gap:12px">
+
+    <!-- Context Banner -->
+    <div style="background:linear-gradient(90deg,rgba(255,171,0,.08) 0%,transparent 100%);border-left:3px solid var(--amber2);padding:12px 16px;border-radius:0 2px 2px 0;display:grid;grid-template-columns:1fr repeat(3,auto);gap:16px;align-items:center">
+      <div>
+        <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--amber2);letter-spacing:.08em">GIG SPLITS</div>
+        <div style="font-size:8px;color:var(--muted2);margin-top:2px">10% band fund per gig · after 12 gigs = <span style="color:var(--green3)">€1,332 reserved</span> for next recording</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--text)" id="sp-banner-total">0</div>
+        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">GIGS LOGGED</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green3)" id="sp-banner-earned">€0</div>
+        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">TOTAL EARNED</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--accent)" id="sp-banner-fund">€0</div>
+        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">BAND FUND TOTAL</div>
+      </div>
+    </div>
 
     <!-- Calculator -->
     <div class="panel">
@@ -5433,6 +5517,36 @@ const GROWTH_PERM_MAP = { booking:'addTxn', releases:'addTxn', press:'addTxn', s
 <div id="view-agent" class="view" style="flex:1;display:none;flex-direction:column">
   <div style="padding:12px;display:flex;flex-direction:column;gap:12px">
 
+    <!-- Context Banner -->
+    <div style="background:linear-gradient(90deg,rgba(255,60,30,.1) 0%,transparent 100%);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 2px 2px 0;margin-bottom:4px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">PLAYBOOK — HOW THIS WORKS</div>
+          <div style="font-size:9px;color:var(--text);line-height:1.7">
+            <span style="color:var(--accent);font-weight:700">1.</span> Filter venues by region &amp; type &nbsp;·&nbsp;
+            <span style="color:var(--accent);font-weight:700">2.</span> Click a venue to select it &nbsp;·&nbsp;
+            <span style="color:var(--accent);font-weight:700">3.</span> Set language + tone &nbsp;·&nbsp;
+            <span style="color:var(--accent);font-weight:700">4.</span> Hit Generate — Claude writes a personalised pitch &nbsp;·&nbsp;
+            <span style="color:var(--accent);font-weight:700">5.</span> Click Open in Gmail → review → send
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;padding-left:16px;border-left:1px solid var(--border2);flex-shrink:0">
+          <div style="text-align:center">
+            <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--green3)">€900</div>
+            <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">AVG FEE/GIG</div>
+          </div>
+          <div style="text-align:center;padding-left:10px;border-left:1px solid var(--border2)">
+            <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--amber2)">15%</div>
+            <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">CONVERT RATE</div>
+          </div>
+          <div style="text-align:center;padding-left:10px;border-left:1px solid var(--border2)">
+            <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--accent)">~6</div>
+            <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">GIGS/MO TARGET</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Header + stats -->
     <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start">
       <div>
@@ -5954,8 +6068,95 @@ function copyFollowup() {
   navigator.clipboard.writeText(`Subject: ${AGENT_FOLLOWUP_PITCH.subject}\n\n${AGENT_FOLLOWUP_PITCH.body}`).then(() => showToast('Copied', 'ok'));
 }
 
-// ── INIT HOOK ─────────────────────────────────────────────
-// Override initAll to also load agent venues
+// ── BANNER UPDATERS ───────────────────────────────────────
+function updateBookingBanner() {
+  if (!BOOKING_DATA.length) return;
+  const total = BOOKING_DATA.length;
+  const completed = BOOKING_DATA.filter(b=>b.stage==='completed').length;
+  const earned = BOOKING_DATA.filter(b=>b.stage==='completed').reduce((s,b)=>s+parseFloat(b.fee_eur||0),0);
+  const conversion = total > 0 ? Math.round(completed/total*100) : 0;
+  const overdue = BOOKING_DATA.filter(b=>b.follow_up_date&&new Date(b.follow_up_date)<new Date()&&!['completed','rejected'].includes(b.stage));
+  const nextAction = overdue.length
+    ? `Follow up overdue: ${overdue[0].name}`
+    : BOOKING_DATA.find(b=>b.stage==='negotiating')
+    ? `Close negotiation: ${BOOKING_DATA.find(b=>b.stage==='negotiating').name}`
+    : BOOKING_DATA.find(b=>b.stage==='cold')
+    ? `Contact: ${BOOKING_DATA.find(b=>b.stage==='cold').name}`
+    : 'Add new venue targets';
+  const el = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+  el('bk-next-action', nextAction);
+  el('bk-banner-earned', '€'+earned.toLocaleString('pt-PT',{minimumFractionDigits:0}));
+  el('bk-banner-contacts', total);
+  el('bk-banner-conversion', conversion+'%');
+}
+
+function updateReleasesBanner() {
+  if (!RELEASES_DATA.length) {
+    ['rel-banner-total','rel-banner-released','rel-banner-ready','rel-banner-wip'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='0';});
+    return;
+  }
+  const el = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+  el('rel-banner-total',    RELEASES_DATA.length);
+  el('rel-banner-released', RELEASES_DATA.filter(r=>r.stage==='released').length);
+  el('rel-banner-ready',    RELEASES_DATA.filter(r=>['mastered','artwork','submitted','scheduled'].includes(r.stage)).length);
+  el('rel-banner-wip',      RELEASES_DATA.filter(r=>['idea','recorded','mixed'].includes(r.stage)).length);
+}
+
+function updatePressBanner() {
+  if (!PRESS_DATA.length) return;
+  const el = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+  el('pr-banner-published', PRESS_DATA.filter(p=>p.stage==='published').length);
+  el('pr-banner-active',    PRESS_DATA.filter(p=>['pitched','following_up','responded'].includes(p.stage)).length);
+  el('pr-banner-sync',      PRESS_DATA.filter(p=>p.type==='sync').length);
+}
+
+function updateSplitsBanner() {
+  if (!SPLITS_DATA.length) return;
+  const totalEarned = SPLITS_DATA.reduce((s,sp)=>s+parseFloat(sp.gross_eur||0),0);
+  const totalFund   = SPLITS_DATA.reduce((s,sp)=>s+parseFloat(sp.band_fund_eur||0),0);
+  const el = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+  el('sp-banner-total',  SPLITS_DATA.length);
+  el('sp-banner-earned', '€'+totalEarned.toLocaleString('pt-PT',{minimumFractionDigits:0}));
+  el('sp-banner-fund',   '€'+totalFund.toLocaleString('pt-PT',{minimumFractionDigits:0}));
+}
+
+function updateProductionBanner() {
+  if (!PROD_SHOWS.length) return;
+  const upcoming = PROD_SHOWS.filter(s=>new Date(s.show_date)>=new Date());
+  const el = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+  el('prod-banner-shows',    PROD_SHOWS.length);
+  el('prod-banner-setlists', PROD_SETLISTS.length);
+  el('prod-banner-upcoming', upcoming.length);
+  el('prod-banner-checklist', upcoming.length ? upcoming[0].show_date : '—');
+}
+
+// Hook banner updates into data load functions
+const _origLoadBooking = loadBooking;
+async function loadBooking() {
+  await _origLoadBooking.call(this);
+  updateBookingBanner();
+}
+const _origLoadReleases = loadReleases;
+async function loadReleases() {
+  await _origLoadReleases.call(this);
+  updateReleasesBanner();
+}
+const _origLoadPress = loadPress;
+async function loadPress() {
+  await _origLoadPress.call(this);
+  updatePressBanner();
+}
+const _origLoadSplits = loadSplits;
+async function loadSplits() {
+  await _origLoadSplits.call(this);
+  updateSplitsBanner();
+}
+const _origLoadShows = loadShows;
+async function loadShows() {
+  await _origLoadShows.call(this);
+  updateProductionBanner();
+}
+
 const _initAllPrev = initAll;
 function initAll() {
   if (API_BASE && SESSION?.token) {
@@ -6049,6 +6250,30 @@ function initAll() {
 
 <div id="view-production" class="view" style="flex:1;display:none;flex-direction:column">
   <div style="padding:12px;display:flex;flex-direction:column;gap:0">
+
+    <!-- Context Banner -->
+    <div style="background:linear-gradient(90deg,rgba(0,230,118,.06) 0%,transparent 100%);border-left:3px solid var(--green3);padding:12px 16px;border-radius:0 2px 2px 0;margin-bottom:12px;display:grid;grid-template-columns:1fr repeat(4,auto);gap:16px;align-items:center">
+      <div>
+        <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--green3);letter-spacing:.08em">LIVE PRODUCTION</div>
+        <div style="font-size:8px;color:var(--muted2);margin-top:2px">Show Advance → Tech Rider → Setlist → Checklist · Professional stage management built in</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--text)" id="prod-banner-shows">0</div>
+        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">SHOWS LOGGED</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--purple2)" id="prod-banner-setlists">0</div>
+        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">SETLISTS</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--blue2)" id="prod-banner-upcoming">0</div>
+        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">UPCOMING</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--amber2)" id="prod-banner-checklist">—</div>
+        <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">NEXT SHOW</div>
+      </div>
+    </div>
 
     <!-- Sub-navigation -->
     <div class="prod-tab-bar">
