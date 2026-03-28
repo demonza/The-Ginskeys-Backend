@@ -72,7 +72,6 @@ app.use(helmet({
       connectSrc: [
         "'self'",
         "https://the-ginskeys-backend-production.up.railway.app",
-        "https://api.frankfurter.app",
         ...EXTRA_ORIGINS,
       ],
       scriptSrcAttr: ["'unsafe-inline'"],
