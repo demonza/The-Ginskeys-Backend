@@ -32,7 +32,7 @@ const BAND_PROFILE = {
 // Curated list of real venues + festival types on the circuit
 const VENUE_DATABASE = [
   // Algarve — tourist corridor
-  { id:'v001', name:'Stevie Ray's Blues Bar', city:'Lagos', region:'algarve', type:'bar_venue', capacity:150, genre_fit:'rock', contact_role:'Manager', fee_bracket:'€500–1200', notes:'Blues/rock format. Tourist season Jun–Sep peak.' },
+  { id:'v001', name:'Stevie Rays Blues Bar', city:'Lagos', region:'algarve', type:'bar_venue', capacity:150, genre_fit:'rock', contact_role:'Manager', fee_bracket:'€500–1200', notes:'Blues/rock format. Tourist season Jun–Sep peak.' },
   { id:'v002', name:'Bon Vivant Music Bar', city:'Lagos', region:'algarve', type:'bar_venue', capacity:120, genre_fit:'rock', contact_role:'Booking Manager', fee_bracket:'€400–900', notes:'Regular live music nights. Mixed international crowd.' },
   { id:'v003', name:'Three Monkeys Bar', city:'Albufeira', region:'algarve', type:'bar_venue', capacity:200, genre_fit:'rock', contact_role:'Events Manager', fee_bracket:'€600–1500', notes:'High-energy venue. Summer season essential.' },
   { id:'v004', name:'Kiss Bar', city:'Albufeira', region:'algarve', type:'bar_venue', capacity:300, genre_fit:'rock', contact_role:'Promoter', fee_bracket:'€800–2000', notes:'Large rock venue. Albufeira strip.' },
