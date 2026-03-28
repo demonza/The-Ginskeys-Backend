@@ -3955,7 +3955,8 @@ async function loadAllGrowthData() {
   ]);
 }
 
-const _initAllPrev = infunction _initAll_old_1initAll() {
+const _initAllPrev = initAll;
+function _initAll_old_1() {
   if (API_BASE && SESSION?.token) {
     Promise.all([
       loadLedgerFromApi(),
@@ -5962,7 +5963,10 @@ function _renderAll() {
   renderAuditLog();
   renderAlertRules();
   showEmailTemplate('invite', document.querySelector('.email-tab'));
-  updateSesfunction _initAll_old_2nction initAll(){
+  updateSession();
+}
+
+function _initAll_old_2(){
   if (API_BASE && SESSION?.token) {
     Promise.all([
       loadLedgerFromApi(),
