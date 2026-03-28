@@ -1017,9 +1017,34 @@ tr:hover .edit-btn{display:inline}
 .agent-mode-btn:hover{color:var(--text);border-color:var(--border3)}
 .active-mode{color:var(--accent)!important;border-color:var(--accent)!important;background:rgba(255,92,26,.08)!important}
 .agent-pitch-output{
-  padding:10px 12px;display:none;font-size:9px;white-space:pre-wrap;
+  padding:10px 12px;font-size:9px;white-space:pre-wrap;
   font-family:var(--mono);color:var(--text);line-height:1.7;background:var(--bg4);
+  max-height:320px;overflow-y:auto;border-radius:2px;
 }
+.agent-stat{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:2px;
+  padding:8px 14px;text-align:center;
+}
+.agent-stat-val{font-family:var(--display);font-size:18px;font-weight:700}
+.agent-stat-lbl{font-size:7px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+.region-pill{
+  font-size:8px;padding:3px 10px;border-radius:10px;cursor:pointer;
+  border:1px solid var(--border2);color:var(--muted2);
+  transition:all .15s;letter-spacing:.06em;font-family:var(--mono);
+}
+.region-pill:hover{border-color:var(--border3);color:var(--text)}
+.region-pill.active-region{border-color:var(--accent);color:var(--accent);background:rgba(255,92,26,.08)}
+.batch-pitch-item{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:2px;
+  margin-bottom:8px;overflow:hidden;
+}
+.batch-pitch-hdr{
+  padding:8px 12px;display:flex;justify-content:space-between;align-items:center;
+  cursor:pointer;font-size:9px;
+}
+.batch-pitch-hdr:hover{background:var(--bg4)}
+.loading-pulse{animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 /* ─── PRODUCTION VIEW ────────────────────────────────── */
 .prod-tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border2);margin-bottom:14px;flex-shrink:0}
@@ -2657,67 +2682,39 @@ tr:hover .edit-btn{display:inline}
 <div id="view-agent" class="view new-view">
   <div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">
 
-    <!-- Context Banner -->
-    <div style="background:linear-gradient(90deg,rgba(255,60,30,.1) 0%,transparent 100%);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 2px 2px 0;margin-bottom:4px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">PLAYBOOK — HOW THIS WORKS</div>
-          <div style="font-size:9px;color:var(--text);line-height:1.7">
-            <span style="color:var(--accent);font-weight:700">1.</span> Filter venues by region &amp; type &nbsp;·&nbsp;
-            <span style="color:var(--accent);font-weight:700">2.</span> Click a venue to select it &nbsp;·&nbsp;
-            <span style="color:var(--accent);font-weight:700">3.</span> Set language + tone &nbsp;·&nbsp;
-            <span style="color:var(--accent);font-weight:700">4.</span> Hit Generate — Claude writes a personalised pitch &nbsp;·&nbsp;
-            <span style="color:var(--accent);font-weight:700">5.</span> Click Open in Gmail → review → send
-          </div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;padding-left:16px;border-left:1px solid var(--border2);flex-shrink:0">
-          <div style="text-align:center">
-            <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--green3)">€900</div>
-            <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">AVG FEE/GIG</div>
-          </div>
-          <div style="text-align:center;padding-left:10px;border-left:1px solid var(--border2)">
-            <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--amber2)">15%</div>
-            <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">CONVERT RATE</div>
-          </div>
-          <div style="text-align:center;padding-left:10px;border-left:1px solid var(--border2)">
-            <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--accent)">~6</div>
-            <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">GIGS/MO TARGET</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Header + stats -->
-    <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start">
+    <!-- Top bar: title + stats -->
+    <div style="flex-shrink:0;display:grid;grid-template-columns:1fr repeat(4,auto);gap:10px;align-items:center;background:linear-gradient(90deg,rgba(255,92,26,.08) 0%,transparent 60%);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 2px 2px 0">
       <div>
-        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--accent);letter-spacing:.1em;margin-bottom:4px">⚡ AI BOOKING AGENT</div>
-        <div style="font-size:9px;color:var(--muted2);line-height:1.6">Scouts venues across Portugal + Spain. Generates personalised pitch emails in The Ginskeys' voice. You review and send — from your email, on your schedule.</div>
+        <div style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--accent);letter-spacing:.1em">⚡ AI BOOKING AGENT</div>
+        <div style="font-size:8px;color:var(--muted2);margin-top:3px">Powered by Claude · 23 curated venues across Portugal + Spain · Personalised pitches in your voice</div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(4,auto);gap:8px">
-        <div class="agent-stat"><div class="agent-stat-val" style="color:var(--text)" id="ag-total">23</div><div class="agent-stat-lbl">Venues</div></div>
-        <div class="agent-stat"><div class="agent-stat-val" style="color:var(--green3)" id="ag-selected-count">0</div><div class="agent-stat-lbl">Selected</div></div>
-        <div class="agent-stat"><div class="agent-stat-val" style="color:var(--amber2)" id="ag-pipeline">€0</div><div class="agent-stat-lbl">Fee Potential</div></div>
-        <div class="agent-stat"><div class="agent-stat-val" style="color:var(--accent)" id="ag-pitches-gen">0</div><div class="agent-stat-lbl">Pitches Made</div></div>
-      </div>
+      <div class="agent-stat"><div class="agent-stat-val" style="color:var(--text)" id="ag-total">23</div><div class="agent-stat-lbl">Venues</div></div>
+      <div class="agent-stat"><div class="agent-stat-val" style="color:var(--green3)" id="ag-selected-count">0</div><div class="agent-stat-lbl">Selected</div></div>
+      <div class="agent-stat"><div class="agent-stat-val" style="color:var(--amber2)" id="ag-pipeline">€0</div><div class="agent-stat-lbl">Fee Potential</div></div>
+      <div class="agent-stat"><div class="agent-stat-val" style="color:var(--accent)" id="ag-pitches-gen">0</div><div class="agent-stat-lbl">Pitches Sent</div></div>
     </div>
 
     <!-- Mode selector -->
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <span style="font-size:8px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">MODE:</span>
-      <button class="agent-mode-btn active-mode" id="mode-btn-single" onclick="setAgentMode('single')" data-i18n="agent_single">Single Venue Pitch</button>
-      <button class="agent-mode-btn" id="mode-btn-batch" onclick="setAgentMode('batch')" data-i18n="agent_batch">Batch Campaign (up to 10)</button>
-      <button class="agent-mode-btn" id="mode-btn-followup" onclick="setAgentMode('followup')" data-i18n="agent_followup">Follow-Up Generator</button>
+    <div style="flex-shrink:0;display:flex;gap:8px;align-items:center">
+      <span style="font-size:8px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">MODE:</span>
+      <button class="agent-mode-btn active-mode" id="mode-btn-single" onclick="setAgentMode('single')">⚡ Single Venue Pitch</button>
+      <button class="agent-mode-btn" id="mode-btn-batch" onclick="setAgentMode('batch')">📨 Batch Campaign (up to 10)</button>
+      <button class="agent-mode-btn" id="mode-btn-followup" onclick="setAgentMode('followup')">🔁 Follow-Up Generator</button>
+      <div style="margin-left:auto;font-size:8px;color:var(--muted2)">
+        <span style="color:var(--green3)">Tip:</span> Select venues → configure tone → generate → Open in Gmail → send
+      </div>
     </div>
 
     <!-- ── SINGLE MODE ── -->
-    <div id="agent-single-mode">
-      <div style="display:grid;grid-template-columns:1fr 360px;gap:12px">
+    <div id="agent-single-mode" style="flex:1;display:grid;grid-template-columns:1fr 380px;gap:12px;min-height:0">
 
-        <!-- Left: venue browser -->
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <!-- Filters -->
+      <!-- Left: venue browser -->
+      <div style="display:flex;flex-direction:column;gap:8px;min-height:0">
+
+        <!-- Filters -->
+        <div style="flex-shrink:0;background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:10px 12px;display:flex;flex-direction:column;gap:8px">
           <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-            <span style="font-size:8px;color:var(--muted);letter-spacing:.1em">REGION:</span>
+            <span style="font-size:7px;color:var(--muted);letter-spacing:.1em;min-width:50px">REGION</span>
             <div class="region-pill active-region" data-region="" onclick="filterAgentRegion(this,'')">All</div>
             <div class="region-pill" data-region="algarve" onclick="filterAgentRegion(this,'algarve')">Algarve</div>
             <div class="region-pill" data-region="alentejo" onclick="filterAgentRegion(this,'alentejo')">Alentejo</div>
@@ -2726,7 +2723,7 @@ tr:hover .edit-btn{display:inline}
             <div class="region-pill" data-region="spain" onclick="filterAgentRegion(this,'spain')">Spain</div>
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-            <span style="font-size:8px;color:var(--muted);letter-spacing:.1em">TYPE:</span>
+            <span style="font-size:7px;color:var(--muted);letter-spacing:.1em;min-width:50px">TYPE</span>
             <div class="region-pill active-region" data-type="" onclick="filterAgentType(this,'')">All</div>
             <div class="region-pill" data-type="bar_venue" onclick="filterAgentType(this,'bar_venue')">Bar / Venue</div>
             <div class="region-pill" data-type="festival" onclick="filterAgentType(this,'festival')">Festival</div>
@@ -2735,146 +2732,184 @@ tr:hover .edit-btn{display:inline}
             <div class="region-pill" data-type="corporate" onclick="filterAgentType(this,'corporate')">Corporate</div>
             <div class="region-pill" data-type="club_venue" onclick="filterAgentType(this,'club_venue')">Clubs</div>
           </div>
-
-          <!-- Venue grid -->
-          <div id="agent-venue-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:7px;max-height:400px;overflow-y:auto;padding:2px"></div>
         </div>
 
-        <!-- Right: pitch panel -->
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div id="agent-selected-venue-info" style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:10px 12px;display:none">
-            <div style="font-size:7px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px">SELECTED VENUE</div>
-            <div style="font-size:11px;font-weight:700;color:var(--text)" id="ag-sel-name">—</div>
-            <div style="font-size:8px;color:var(--muted3)" id="ag-sel-meta">—</div>
-            <div style="font-size:8px;color:var(--green3);margin-top:4px;font-weight:700" id="ag-sel-fee">—</div>
-            <div style="font-size:8px;color:var(--muted2);margin-top:4px;font-style:italic" id="ag-sel-notes">—</div>
-          </div>
+        <!-- Venue grid -->
+        <div id="agent-venue-grid" style="flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px;overflow-y:auto;padding:2px;align-content:start"></div>
+      </div>
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-            <div>
-              <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">LANGUAGE</div>
-              <select id="ag-lang" class="login-input" style="width:100%">
-                <option value="portuguese">🇵🇹 Portuguese</option>
-                <option value="english">🇬🇧 English</option>
-              </select>
-            </div>
-            <div>
-              <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">TONE</div>
-              <select id="ag-tone" class="login-input" style="width:100%">
-                <option value="professional">Professional</option>
-                <option value="casual">Casual / Friendly</option>
-                <option value="energetic">Energetic</option>
-              </select>
-            </div>
+      <!-- Right: pitch panel -->
+      <div style="display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto">
+
+        <!-- Selected venue info -->
+        <div id="agent-selected-venue-info" style="display:none;background:var(--bg3);border:1px solid var(--accent);border-radius:2px;padding:12px">
+          <div style="font-size:7px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px">SELECTED VENUE</div>
+          <div style="font-family:var(--display);font-size:15px;font-weight:700;color:var(--text)" id="ag-sel-name">—</div>
+          <div style="font-size:8px;color:var(--muted3);margin-top:2px" id="ag-sel-meta">—</div>
+          <div style="font-size:11px;color:var(--green3);margin-top:6px;font-weight:700" id="ag-sel-fee">—</div>
+          <div style="font-size:8px;color:var(--muted2);margin-top:4px;font-style:italic" id="ag-sel-notes">—</div>
+        </div>
+
+        <!-- No venue selected placeholder -->
+        <div id="ag-no-venue-placeholder" style="background:var(--bg3);border:1px dashed var(--border2);border-radius:2px;padding:20px;text-align:center">
+          <div style="font-size:24px;margin-bottom:8px">🎯</div>
+          <div style="font-size:9px;color:var(--muted2)">Click a venue on the left to select it</div>
+        </div>
+
+        <!-- Pitch config -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div>
+            <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">LANGUAGE</div>
+            <select id="ag-lang" class="login-input" style="width:100%">
+              <option value="pt">Português</option>
+              <option value="en">English</option>
+              <option value="es">Español</option>
+            </select>
           </div>
           <div>
-            <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">PROPOSED DATE / PERIOD (optional)</div>
-            <input id="ag-date" class="login-input" placeholder="e.g. June 2026, Summer season, August 15">
+            <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">TONE</div>
+            <select id="ag-tone" class="login-input" style="width:100%">
+              <option value="professional">Professional</option>
+              <option value="friendly">Friendly</option>
+              <option value="bold">Bold / Direct</option>
+              <option value="humble">Humble / Local</option>
+            </select>
           </div>
-          <div>
-            <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">EXTRA CONTEXT (optional)</div>
-            <input id="ag-extra" class="login-input" placeholder="e.g. We're free to support a headline act">
+        </div>
+        <div>
+          <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">PROPOSED DATE / PERIOD</div>
+          <input id="ag-date" class="login-input" style="width:100%" placeholder="e.g. July 2026 or any Saturday in summer">
+        </div>
+        <div>
+          <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">EXTRA CONTEXT (optional)</div>
+          <input id="ag-extra" class="login-input" style="width:100%" placeholder="e.g. We played there in 2024 and sold out">
+        </div>
+
+        <button class="login-btn" id="ag-generate-btn" style="width:100%;font-size:9px;letter-spacing:.1em" onclick="generatePitch()">
+          ⚡ GENERATE PITCH EMAIL
+        </button>
+        <div style="font-size:8px;color:var(--muted3);text-align:center" id="ag-status"></div>
+
+        <!-- Generated pitch -->
+        <div id="ag-pitch-output" style="display:none;flex-direction:column;gap:8px">
+          <div style="background:var(--bg3);border:1px solid var(--green3);border-radius:2px;padding:10px 12px">
+            <div style="font-size:7px;color:var(--green3);letter-spacing:.1em;margin-bottom:4px">SUBJECT LINE</div>
+            <div style="font-size:10px;font-weight:700;color:var(--text)" id="ag-pitch-subject">—</div>
           </div>
-
-          <button class="login-btn" style="width:100%" onclick="generateSinglePitch()" id="ag-gen-btn">⚡ Generate Pitch Email</button>
-
-          <!-- Generated pitch -->
-          <div id="ag-pitch-output" style="display:none">
-            <div class="pitch-subject" id="ag-pitch-subject"></div>
-            <div class="pitch-box" id="ag-pitch-body"></div>
-            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-              <button class="gmail-btn" onclick="openGmailDraft()" id="ag-gmail-btn">
-                <span>✉</span> Open in Gmail
-              </button>
-              <button class="copy-btn" onclick="copyPitch()">Copy Email</button>
-              <button class="copy-btn" onclick="saveToBooking()" style="border-color:var(--green3);color:var(--green3)">+ Save to Booking CRM</button>
-            </div>
+          <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px">
+            <div style="padding:8px 12px;border-bottom:1px solid var(--border2);font-size:7px;color:var(--muted);letter-spacing:.1em">EMAIL BODY</div>
+            <div class="agent-pitch-output" id="ag-pitch-body"></div>
           </div>
-
-          <div id="ag-gen-status" style="font-size:8px;color:var(--muted3);min-height:16px"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px">
+            <button class="login-btn" style="font-size:8px" onclick="openPitchInGmail()">✉ Open in Gmail</button>
+            <button class="btn-sm" style="padding:8px" onclick="copyPitch()">📋 Copy</button>
+            <button class="btn-sm" style="padding:8px" onclick="document.getElementById('ag-pitch-output').style.display='none'">✕</button>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- ── BATCH MODE ── -->
-    <div id="agent-batch-mode" style="display:none">
-      <div style="background:rgba(255,60,30,.05);border:1px solid rgba(255,60,30,.2);border-radius:2px;padding:10px 14px;margin-bottom:12px;font-size:9px;color:var(--text);line-height:1.6">
-        <strong style="color:var(--accent)">Campaign mode:</strong> Select up to 10 venues from the grid below. The agent will write a personalised pitch for each one simultaneously. You review all emails, then send from your Gmail.
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 280px;gap:12px">
-        <div>
-          <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:8px">SELECT UP TO 10 VENUES — <span id="batch-selected-count" style="color:var(--accent)">0 selected</span></div>
-          <div id="agent-batch-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:6px;max-height:360px;overflow-y:auto;padding:2px"></div>
+    <div id="agent-batch-mode" style="display:none;flex:1;display:grid;grid-template-columns:1fr 380px;gap:12px;min-height:0">
+      <div style="display:flex;flex-direction:column;gap:8px;min-height:0">
+        <div style="flex-shrink:0;background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:10px 12px;font-size:8px;color:var(--muted2)">
+          Select up to 10 venues. Claude writes a unique personalised pitch for each one simultaneously.
         </div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div>
-            <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">LANGUAGE</div>
-            <select id="ag-batch-lang" class="login-input" style="width:100%">
-              <option value="portuguese">🇵🇹 Portuguese</option>
-              <option value="english">🇬🇧 English</option>
-            </select>
-          </div>
-          <div>
-            <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">TONE</div>
-            <select id="ag-batch-tone" class="login-input" style="width:100%">
-              <option value="professional">Professional</option>
-              <option value="casual">Casual / Friendly</option>
-              <option value="energetic">Energetic</option>
-            </select>
-          </div>
-          <div>
-            <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">PROPOSED MONTH</div>
-            <input id="ag-batch-month" class="login-input" placeholder="e.g. Summer 2026">
-          </div>
-          <button class="login-btn" style="width:100%" onclick="generateBatchPitches()" id="ag-batch-btn">⚡ Generate Campaign</button>
-          <div id="ag-batch-status" style="font-size:8px;color:var(--muted3)"></div>
-        </div>
+        <div id="agent-batch-venue-grid" style="flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px;overflow-y:auto;padding:2px;align-content:start"></div>
       </div>
-      <div id="ag-batch-results" style="margin-top:12px"></div>
+      <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto">
+        <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:10px 12px">
+          <div style="font-size:7px;color:var(--muted);letter-spacing:.1em;margin-bottom:8px">BATCH CAMPAIGN SETTINGS</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div>
+              <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">LANGUAGE</div>
+              <select id="ag-batch-lang" class="login-input" style="width:100%">
+                <option value="pt">Português</option><option value="en">English</option><option value="es">Español</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">TONE</div>
+              <select id="ag-batch-tone" class="login-input" style="width:100%">
+                <option value="professional">Professional</option><option value="friendly">Friendly</option>
+                <option value="bold">Bold / Direct</option><option value="humble">Humble / Local</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">PROPOSED MONTH</div>
+              <input id="ag-batch-month" class="login-input" style="width:100%" placeholder="e.g. July–August 2026">
+            </div>
+          </div>
+        </div>
+        <div style="background:var(--bg4);border-radius:2px;padding:10px 12px;font-size:8px;color:var(--muted2)">
+          <div style="color:var(--amber2);font-weight:700;margin-bottom:4px">Selected: <span id="ag-batch-count">0</span> / 10 venues</div>
+          Each pitch is uniquely written — Claude adapts the language to the venue type, region, and your history with them.
+        </div>
+        <button class="login-btn" id="ag-batch-btn" style="width:100%;font-size:9px;letter-spacing:.1em" onclick="generateBatchPitches()">
+          ⚡ GENERATE ALL PITCHES
+        </button>
+        <div style="font-size:8px;color:var(--muted3);text-align:center" id="ag-batch-status"></div>
+        <div id="ag-batch-results" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
     </div>
 
     <!-- ── FOLLOW-UP MODE ── -->
-    <div id="agent-followup-mode" style="display:none">
-      <div style="display:grid;grid-template-columns:1fr 360px;gap:12px">
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px">SELECT CONTACT FROM BOOKING CRM</div>
-          <div id="ag-followup-contacts" style="max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:4px">
-            <div style="font-size:9px;color:var(--muted3);padding:12px">Load your Booking CRM first — go to the Booking tab and add contacts, then return here.</div>
-          </div>
+    <div id="agent-followup-mode" style="display:none;flex:1;display:grid;grid-template-columns:1fr 380px;gap:12px;min-height:0">
+      <div style="display:flex;flex-direction:column;gap:8px;min-height:0">
+        <div style="flex-shrink:0;background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:10px 12px;font-size:8px;color:var(--muted2)">
+          Select a venue you already pitched. Claude writes a warm, non-pushy follow-up in your voice.
         </div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div>
-            <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">FOLLOW-UP NUMBER</div>
-            <select id="ag-followup-num" class="login-input" style="width:100%">
-              <option value="1">1st Follow-up (7 days)</option>
-              <option value="2">2nd Follow-up (14 days)</option>
-              <option value="3">Final Follow-up (last attempt)</option>
-            </select>
-          </div>
-          <div>
-            <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">LANGUAGE</div>
-            <select id="ag-followup-lang" class="login-input" style="width:100%">
-              <option value="portuguese">🇵🇹 Portuguese</option>
-              <option value="english">🇬🇧 English</option>
-            </select>
-          </div>
-          <button class="login-btn" style="width:100%" onclick="generateFollowup()" id="ag-followup-btn" disabled>⚡ Generate Follow-Up</button>
-
-          <div id="ag-followup-output" style="display:none">
-            <div class="pitch-subject" id="ag-fu-subject"></div>
-            <div class="pitch-box" id="ag-fu-body"></div>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button class="gmail-btn" onclick="openGmailFollowup()">✉ Open in Gmail</button>
-              <button class="copy-btn" onclick="copyFollowup()">Copy</button>
+        <div id="agent-followup-grid" style="flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px;overflow-y:auto;padding:2px;align-content:start"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto">
+        <div id="ag-followup-venue-info" style="display:none;background:var(--bg3);border:1px solid var(--blue2);border-radius:2px;padding:12px">
+          <div style="font-size:7px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px">FOLLOWING UP ON</div>
+          <div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--text)" id="ag-fu-name">—</div>
+          <div style="font-size:8px;color:var(--muted3);margin-top:2px" id="ag-fu-meta">—</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:10px 12px">
+          <div style="font-size:7px;color:var(--muted);letter-spacing:.1em;margin-bottom:8px">FOLLOW-UP DETAILS</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div>
+              <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">ORIGINAL PITCH DATE</div>
+              <input id="ag-fu-original-date" class="login-input" style="width:100%" type="date">
+            </div>
+            <div>
+              <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">LANGUAGE</div>
+              <select id="ag-fu-lang" class="login-input" style="width:100%">
+                <option value="pt">Português</option><option value="en">English</option><option value="es">Español</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">WHAT'S NEW (optional)</div>
+              <input id="ag-fu-news" class="login-input" style="width:100%" placeholder="e.g. Just released new single, played FMM last month">
             </div>
           </div>
-          <div id="ag-followup-status" style="font-size:8px;color:var(--muted3)"></div>
+        </div>
+        <button class="login-btn" id="ag-fu-btn" style="width:100%;font-size:9px;letter-spacing:.1em" onclick="generateFollowUp()">
+          🔁 GENERATE FOLLOW-UP
+        </button>
+        <div style="font-size:8px;color:var(--muted3);text-align:center" id="ag-fu-status"></div>
+        <div id="ag-followup-output" style="display:none;flex-direction:column;gap:8px">
+          <div style="background:var(--bg3);border:1px solid var(--blue2);border-radius:2px;padding:10px 12px">
+            <div style="font-size:7px;color:var(--blue2);letter-spacing:.1em;margin-bottom:4px">SUBJECT LINE</div>
+            <div style="font-size:10px;font-weight:700;color:var(--text)" id="ag-fu-subject">—</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px">
+            <div style="padding:8px 12px;border-bottom:1px solid var(--border2);font-size:7px;color:var(--muted);letter-spacing:.1em">EMAIL BODY</div>
+            <div class="agent-pitch-output" id="ag-fu-body"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px">
+            <button class="login-btn" style="font-size:8px" onclick="openFollowUpInGmail()">✉ Open in Gmail</button>
+            <button class="btn-sm" style="padding:8px" onclick="copyFollowUp()">📋 Copy</button>
+            <button class="btn-sm" style="padding:8px" onclick="document.getElementById('ag-followup-output').style.display='none'">✕</button>
+          </div>
         </div>
       </div>
     </div>
 
   </div>
 </div>
+
 
 <script>
 // ══════════════════════════════════════════════════════════
@@ -2953,7 +2988,7 @@ function selectAgentVenue(id) {
   }
   // Clear old pitch
   document.getElementById('ag-pitch-output').style.display = 'none';
-  document.getElementById('ag-gen-status').textContent = '';
+  document.getElementById('ag-status').textContent = '';
 }
 
 function toggleBatchVenue(id) {
@@ -2994,16 +3029,18 @@ function filterAgentType(el, type) {
 
 function setAgentMode(mode) {
   ['single','batch','followup'].forEach(m => {
-    document.getElementById('agent-'+m+'-mode').style.display = m === mode ? '' : 'none';
+    const el = document.getElementById('agent-'+m+'-mode');
+    if (el) el.style.display = m === mode ? 'grid' : 'none';
     document.getElementById('mode-btn-'+m).classList.toggle('active-mode', m === mode);
   });
   if (mode === 'followup') loadFollowupContacts();
 }
 
+async function generatePitch() { return generateSinglePitch(); }
 async function generateSinglePitch() {
   if (!AGENT_SELECTED_VENUE) { showToast('Select a venue first', 'warn'); return; }
-  const btn = document.getElementById('ag-gen-btn');
-  const status = document.getElementById('ag-gen-status');
+  const btn = document.getElementById('ag-generate-btn');
+  const status = document.getElementById('ag-status');
   btn.textContent = ''; btn.disabled = true;
   btn.innerHTML = '<span class="loading-pulse">⚡ Generating personalised pitch...</span>';
   status.textContent = '';
@@ -3020,7 +3057,7 @@ async function generateSinglePitch() {
     AGENT_CURRENT_PITCH = result;
     document.getElementById('ag-pitch-subject').textContent = '✉ ' + result.subject;
     document.getElementById('ag-pitch-body').textContent = result.body;
-    document.getElementById('ag-pitch-output').style.display = 'block';
+    document.getElementById('ag-pitch-output').style.display = 'flex';
     AGENT_PITCHES_GENERATED++;
     document.getElementById('ag-pitches-gen').textContent = AGENT_PITCHES_GENERATED;
     status.textContent = '✓ Pitch ready — review and send from your email';
@@ -3119,6 +3156,21 @@ function openGmailDraft() {
   window.open(url, '_blank');
 }
 
+function openPitchInGmail() {
+  if (!AGENT_CURRENT_PITCH) return;
+  const subject = encodeURIComponent(AGENT_CURRENT_PITCH.subject || '');
+  const body    = encodeURIComponent(AGENT_CURRENT_PITCH.body || '');
+  const to      = encodeURIComponent(AGENT_SELECTED_VENUE?.contact_email || '');
+  window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`, '_blank');
+}
+function openFollowUpInGmail() {
+  const subj = document.getElementById('ag-fu-subject')?.textContent || '';
+  const body = document.getElementById('ag-fu-body')?.textContent || '';
+  const subject = encodeURIComponent(subj);
+  const bod     = encodeURIComponent(body);
+  window.open(`https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${bod}`, '_blank');
+}
+
 function copyPitch() {
   if (!AGENT_CURRENT_PITCH) return;
   const { subject, body } = AGENT_CURRENT_PITCH;
@@ -3187,7 +3239,7 @@ async function generateFollowup() {
     AGENT_FOLLOWUP_PITCH = result;
     document.getElementById('ag-fu-subject').textContent = '✉ ' + result.subject;
     document.getElementById('ag-fu-body').textContent = result.body;
-    document.getElementById('ag-followup-output').style.display = 'block';
+    document.getElementById('ag-followup-output').style.display = 'flex';
     AGENT_PITCHES_GENERATED++;
     document.getElementById('ag-pitches-gen').textContent = AGENT_PITCHES_GENERATED;
     status.textContent = '✓ Follow-up ready';
