@@ -414,7 +414,7 @@ body::before{
 .panel-body::-webkit-scrollbar{width:3px}
 
 /* ─── VIEW PAGES ─────────────────────────────────── */
-.view{display:none}
+.view{display:none;flex-direction:column}
 .view.active{display:contents}
 
 /* ─── BAR CHARTS ─────────────────────────────────── */
@@ -6720,7 +6720,13 @@ function switchView(view, tab){
   document.querySelectorAll('.view').forEach(v=>{v.classList.remove('active');v.style.display='none'});
   document.querySelectorAll('.tb-tab').forEach(t=>t.classList.remove('active'));
   const el=document.getElementById('view-'+view);
-  if(el){el.classList.add('active');el.style.display='flex'}
+  if(el){
+    el.classList.add('active');
+    // Preserve flex-direction from inline style, default to column for new views
+    const dir = el.style.flexDirection || 'column';
+    el.style.display='flex';
+    el.style.flexDirection=dir;
+  }
   if(tab) tab.classList.add('active');
   if(view==='streaming') initStreamChart();
   if(view==='audit'){ renderAuditLog(); showEmailTemplate('invite',document.querySelector('.email-tab')); }
