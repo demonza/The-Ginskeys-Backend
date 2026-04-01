@@ -1627,7 +1627,8 @@ tr:hover .edit-btn{display:inline}
 <header class="topbar">
   <div class="tb-logo">THE GINSKEYS<span>//</span>MANAGEMENT TERMINAL</div>
   <nav class="tb-nav">
-    <div class="tb-tab active" data-view="dashboard" onclick="switchView('dashboard',this)">Dashboard</div>
+    <div class="tb-tab active" data-view="mgmt" onclick="switchView('mgmt',this)">◉ Overview</div>
+    <div class="tb-tab" data-view="dashboard" onclick="switchView('dashboard',this)">Financials</div>
     <div class="tb-tab" data-view="ledger" onclick="switchView('ledger',this)">Ledger</div>
     <div class="tb-tab" data-view="tours" onclick="switchView('tours',this)">Tours</div>
     <div class="tb-tab" data-view="streaming" onclick="switchView('streaming',this)">Streaming</div>
@@ -1723,8 +1724,148 @@ tr:hover .edit-btn{display:inline}
 <!-- ══ CONTENT AREA ══════════════════════════════════ -->
 <div id="content-wrap" style="flex:1;display:flex;flex-direction:column;min-height:0">
 
+<!-- ─ MANAGEMENT OVERVIEW ────────────────────────── -->
+<div id="view-mgmt" class="view new-view active">
+<div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:10px;min-height:0;overflow-y:auto">
+
+  <!-- Band identity banner -->
+  <div style="flex-shrink:0;background:linear-gradient(90deg,rgba(255,92,26,.08) 0%,rgba(170,0,255,.04) 60%,transparent 100%);border-left:3px solid var(--accent);padding:14px 20px;border-radius:0 3px 3px 0;display:grid;grid-template-columns:1fr repeat(5,auto);gap:20px;align-items:center">
+    <div>
+      <div style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--accent);letter-spacing:.1em">THE GINSKEYS</div>
+      <div style="font-size:8px;color:var(--muted2);margin-top:3px;letter-spacing:.06em">Hard Rock · 4 members · Sines, Portugal · Est. 2022</div>
+    </div>
+    <div style="text-align:center;padding:0 16px;border-left:1px solid var(--border2)">
+      <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--green3)" id="mgmt-balance">€—</div>
+      <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">BAND FUND</div>
+    </div>
+    <div style="text-align:center;padding:0 16px;border-left:1px solid var(--border2)">
+      <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--accent)" id="mgmt-next-show">—</div>
+      <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">NEXT SHOW</div>
+    </div>
+    <div style="text-align:center;padding:0 16px;border-left:1px solid var(--border2)">
+      <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--purple2)" id="mgmt-releases-active">—</div>
+      <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">ACTIVE RELEASES</div>
+    </div>
+    <div style="text-align:center;padding:0 16px;border-left:1px solid var(--border2)">
+      <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--blue2)" id="mgmt-bookings-open">—</div>
+      <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">OPEN BOOKINGS</div>
+    </div>
+    <div style="text-align:center;padding:0 16px;border-left:1px solid var(--border2)">
+      <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--amber2)" id="mgmt-press-active">—</div>
+      <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">PRESS ACTIVE</div>
+    </div>
+  </div>
+
+  <!-- Row 1: 3 columns -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;flex-shrink:0">
+
+    <!-- Priority Actions -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Priority Actions</div>
+        <span id="mgmt-actions-count" style="font-size:7px;color:var(--muted3)">0 items</span>
+      </div>
+      <div class="panel-body" id="mgmt-priority-list" style="padding:0;display:flex;flex-direction:column;gap:0"></div>
+    </div>
+
+    <!-- Release pipeline -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Release Pipeline</div>
+        <button class="btn-sm" onclick="switchView('releases',document.querySelector('[data-view=releases]'))">→</button>
+      </div>
+      <div class="panel-body" id="mgmt-releases-list" style="padding:0;display:flex;flex-direction:column;gap:0"></div>
+    </div>
+
+    <!-- Booking pipeline -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Booking Pipeline</div>
+        <button class="btn-sm" onclick="switchView('booking',document.querySelector('[data-view=booking]'))">→</button>
+      </div>
+      <div class="panel-body" id="mgmt-booking-list" style="padding:0;display:flex;flex-direction:column;gap:0"></div>
+    </div>
+
+  </div>
+
+  <!-- Row 2: wider grid -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;flex-shrink:0">
+
+    <!-- Show schedule -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Show Schedule</div>
+        <button class="btn-sm" onclick="switchView('production',document.querySelector('[data-view=production]'))">→</button>
+      </div>
+      <div class="panel-body" id="mgmt-shows-list" style="padding:0;font-size:9px"></div>
+    </div>
+
+    <!-- Setlists -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Setlists</div>
+        <button class="btn-sm" onclick="switchView('production',document.querySelector('[data-view=production]'));setTimeout(()=>document.querySelector('[onclick*=setlist]')?.click(),200)">→</button>
+      </div>
+      <div class="panel-body" id="mgmt-setlists-list" style="padding:0;font-size:9px"></div>
+    </div>
+
+    <!-- Press & sync -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Press & Sync</div>
+        <button class="btn-sm" onclick="switchView('press',document.querySelector('[data-view=press]'))">→</button>
+      </div>
+      <div class="panel-body" id="mgmt-press-list" style="padding:0;font-size:9px"></div>
+    </div>
+
+    <!-- Splits summary -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div>Splits Fund</div>
+        <button class="btn-sm" onclick="switchView('splits',document.querySelector('[data-view=splits]'))">→</button>
+      </div>
+      <div class="panel-body" id="mgmt-splits-summary" style="font-size:9px"></div>
+    </div>
+
+  </div>
+
+  <!-- Row 3: Timeline + streaming health + member focus -->
+  <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;flex-shrink:0">
+
+    <!-- 12-month activity timeline -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>12-Month Activity Timeline</div>
+        <span style="font-size:7px;color:var(--muted3)" id="mgmt-timeline-range">—</span>
+      </div>
+      <div style="padding:10px 12px" id="mgmt-timeline"></div>
+    </div>
+
+    <!-- Streaming health -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Streaming Health</div>
+        <button class="btn-sm" onclick="switchView('streaming',document.querySelector('[data-view=streaming]'))">→</button>
+      </div>
+      <div class="panel-body" id="mgmt-streaming-summary" style="font-size:9px"></div>
+    </div>
+
+    <!-- Band health score -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Band Health Score</div>
+        <div id="mgmt-score-badge" style="font-size:9px;font-weight:700;color:var(--text)">—/100</div>
+      </div>
+      <div class="panel-body" id="mgmt-health-score" style="font-size:9px"></div>
+    </div>
+
+  </div>
+
+</div>
+</div><!-- /mgmt view -->
+
 <!-- ─ DASHBOARD VIEW ─────────────────────────────── -->
-<div id="view-dashboard" class="view active" style="display:contents">
+<div id="view-dashboard" class="view" style="display:none">
 <div class="main-grid">
 
   <!-- Revenue by source -->
@@ -6010,7 +6151,8 @@ function renderFullAlerts(){
 
 // ─── COMMAND PALETTE ──────────────────────────────────
 const CMDS=[
-  {group:'Navigate',icon:'◈',label:'Dashboard',sub:'Main overview',key:'F1',fn:()=>document.querySelector('[data-view=dashboard]').click()},
+  {group:'Navigate',icon:'◈',label:'Overview',sub:'Band management hub',key:'F1',fn:()=>document.querySelector('[data-view=mgmt]').click()},
+  {group:'Navigate',icon:'◈',label:'Financials',sub:'P&L, KPIs, valuation',key:'—',fn:()=>document.querySelector('[data-view=dashboard]').click()},
   {group:'Navigate',icon:'◈',label:'Ledger',sub:'All transactions',key:'F2',fn:()=>document.querySelector('[data-view=ledger]').click()},
   {group:'Navigate',icon:'◈',label:'Tours',sub:'Tour P&L',key:'F3',fn:()=>document.querySelector('[data-view=tours]').click()},
   {group:'Navigate',icon:'◈',label:'Streaming',sub:'Platform breakdown',key:'F4',fn:()=>document.querySelector('[data-view=streaming]').click()},
@@ -6140,6 +6282,7 @@ function setCcy(btn, ccy) {
   btn.classList.add('active');
   // Re-render everything that shows money
   updateFinancialKpis();
+  renderMgmtDashboard();
   renderLedgerRows(LEDGER_DATA.slice(0, 8), 'dash-ledger-body', false);
   renderLedgerRows(LEDGER_DATA, 'full-ledger-body', true);
   renderRevSource();
@@ -6171,7 +6314,8 @@ function setLang(lang) {
 const TRANSLATIONS = {
   en: {
     // Tabs
-    tab_dashboard:   'Dashboard',
+    tab_mgmt:        '◉ Overview',
+    tab_dashboard:   'Financials',
     tab_ledger:      'Ledger',
     tab_tours:       'Tours',
     tab_streaming:   'Streaming',
@@ -6278,7 +6422,8 @@ const TRANSLATIONS = {
   },
   pt: {
     // Tabs
-    tab_dashboard:   'Painel',
+    tab_mgmt:        '◉ Visão Geral',
+    tab_dashboard:   'Finanças',
     tab_ledger:      'Livro',
     tab_tours:       'Digressões',
     tab_streaming:   'Streaming',
@@ -6406,7 +6551,7 @@ const TRANSLATE_MAP = [
 function applyTranslations() {
   // ── Tabs ─────────────────────────────────────────────
   const tabMap = {
-    dashboard: 'tab_dashboard', ledger: 'tab_ledger', tours: 'tab_tours',
+    mgmt: 'tab_mgmt', dashboard: 'tab_dashboard', ledger: 'tab_ledger', tours: 'tab_tours',
     streaming: 'tab_streaming', access: 'tab_access', audit: 'tab_audit',
     alerts: 'tab_alerts', settings: 'tab_settings', booking: 'tab_booking',
     releases: 'tab_releases', press: 'tab_press', splits: 'tab_splits',
@@ -7311,7 +7456,7 @@ async function submitTxn(){
 
 // ─── SWITCH VIEW (with permission check) ─────────────
 function switchView(view, tab){
-  const permMap={dashboard:'viewDashboard',ledger:'viewLedger',tours:'viewTours',streaming:'viewStreaming',access:'viewAccess',audit:'viewAudit',alerts:'viewAlerts',settings:'viewSettings'};
+  const permMap={mgmt:'viewDashboard',dashboard:'viewDashboard',ledger:'viewLedger',tours:'viewTours',streaming:'viewStreaming',access:'viewAccess',audit:'viewAudit',alerts:'viewAlerts',settings:'viewSettings'};
   const perm=permMap[view];
   if(SESSION && perm && !can(perm)){
     alert('Your role ('+SESSION.role+') does not have permission to view this section.');
@@ -7349,7 +7494,7 @@ document.addEventListener('keydown',e=>{
   if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openPalette();return;}
   if(e.key==='Escape'){closePalette();closeModal();closeInvite();return;}
   if(inInput) return;
-  if(e.key==='F1'){e.preventDefault();document.querySelector('[data-view=dashboard]')?.click();}
+  if(e.key==='F1'){e.preventDefault();document.querySelector('[data-view=mgmt]')?.click();}
   if(e.key==='F2'){e.preventDefault();document.querySelector('[data-view=ledger]')?.click();}
   if(e.key==='F3'){e.preventDefault();document.querySelector('[data-view=tours]')?.click();}
   if(e.key==='F4'){e.preventDefault();document.querySelector('[data-view=streaming]')?.click();}
@@ -9418,6 +9563,514 @@ async function toggleCheckItem(id, done) {
     renderChecklist();
   } catch(e) { showToast('Failed to update: '+e.message,'err'); }
 }
+// ══════════════════════════════════════════════════════════════════════════════
+// MANAGEMENT DASHBOARD ENGINE
+// ══════════════════════════════════════════════════════════════════════════════
+
+const RELEASE_STAGE_ORDER = ['idea','recorded','mixed','mastered','artwork','submitted','scheduled','released'];
+const BOOKING_STAGE_ORDER = ['cold','contacted','negotiating','confirmed','completed','rejected'];
+
+function renderMgmtDashboard() {
+  mgmtBanner();
+  mgmtPriorityActions();
+  mgmtReleasesPipeline();
+  mgmtBookingPipeline();
+  mgmtShowSchedule();
+  mgmtSetlists();
+  mgmtPress();
+  mgmtSplits();
+  mgmtTimeline();
+  mgmtStreamingHealth();
+  mgmtBandHealthScore();
+}
+
+// ── Banner stats ──────────────────────────────────────────────────────────────
+function mgmtBanner() {
+  const entries = [...LEDGER_DATA].sort((a,b) => new Date(a.date)-new Date(b.date));
+  const balance = entries.length ? entries[entries.length-1].balance : 0;
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+
+  set('mgmt-balance', fmtMoney(balance));
+
+  // Next show
+  const upcoming = [...PROD_SHOWS]
+    .filter(s => new Date(s.show_date) >= new Date())
+    .sort((a,b) => new Date(a.show_date)-new Date(b.show_date));
+  if (upcoming.length) {
+    const s = upcoming[0];
+    const d = new Date(s.show_date);
+    const daysOut = Math.ceil((d - new Date()) / 86400000);
+    set('mgmt-next-show', daysOut <= 0 ? 'TODAY' : daysOut === 1 ? 'TOMORROW' : `${daysOut}d`);
+  } else {
+    set('mgmt-next-show', 'TBC');
+  }
+
+  // Active releases (not yet released)
+  const activeRel = RELEASES_DATA.filter(r => r.stage !== 'released').length;
+  set('mgmt-releases-active', activeRel);
+
+  // Open bookings (not completed/rejected)
+  const openBook = BOOKING_DATA.filter(b => !['completed','rejected'].includes(b.stage)).length;
+  set('mgmt-bookings-open', openBook);
+
+  // Press active
+  const pressActive = PRESS_DATA.filter(p => !['published','rejected','passed'].includes(p.stage)).length;
+  set('mgmt-press-active', pressActive);
+}
+
+// ── Priority action list ──────────────────────────────────────────────────────
+function mgmtPriorityActions() {
+  const el = document.getElementById('mgmt-priority-list');
+  if (!el) return;
+
+  const actions = [];
+  const now = new Date();
+
+  // Overdue booking follow-ups
+  BOOKING_DATA.filter(b => b.follow_up_date && new Date(b.follow_up_date) < now && !['completed','rejected'].includes(b.stage))
+    .forEach(b => actions.push({
+      urgency: 'danger', icon: '📞',
+      label: `Follow up: ${b.name}`,
+      detail: `${b.stage.toUpperCase()} since ${b.follow_up_date}`,
+      action: () => switchView('booking', document.querySelector('[data-view=booking]'))
+    }));
+
+  // Releases with 0/4 checklist items that are past "mixed" stage
+  RELEASES_DATA.filter(r => {
+    const idx = RELEASE_STAGE_ORDER.indexOf(r.stage);
+    return idx >= 3 && !r.artwork_done && !r.press_pitched;
+  }).forEach(r => actions.push({
+    urgency: 'warn', icon: '🎵',
+    label: `${r.title}: checklist incomplete`,
+    detail: `Stage: ${r.stage} · artwork/press/spotify not checked`,
+    action: () => switchView('releases', document.querySelector('[data-view=releases]'))
+  }));
+
+  // Releases scheduled with pitch deadline passed
+  RELEASES_DATA.filter(r => {
+    if (!r.release_date || r.stage === 'released') return false;
+    const pitchDeadline = new Date(r.release_date);
+    pitchDeadline.setDate(pitchDeadline.getDate() - 42);
+    return pitchDeadline < now && !r.press_pitched;
+  }).forEach(r => actions.push({
+    urgency: 'danger', icon: '⚠',
+    label: `${r.title}: pitch window passed`,
+    detail: `Release ${r.release_date} — send EPK to Spotify NOW`,
+    action: () => switchView('releases', document.querySelector('[data-view=releases]'))
+  }));
+
+  // No shows in next 60 days
+  const upcoming60 = PROD_SHOWS.filter(s => {
+    const d = new Date(s.show_date);
+    return d >= now && d <= new Date(now.getTime() + 60*86400000);
+  });
+  if (upcoming60.length === 0) {
+    actions.push({
+      urgency: 'warn', icon: '🎤',
+      label: 'No shows booked in next 60 days',
+      detail: 'Contact venues or follow up on open bookings',
+      action: () => switchView('booking', document.querySelector('[data-view=booking]'))
+    });
+  }
+
+  // Streaming: no new release in 90 days
+  const lastRelease = RELEASES_DATA.filter(r => r.stage === 'released' && r.release_date)
+    .sort((a,b) => new Date(b.release_date)-new Date(a.release_date))[0];
+  if (!lastRelease || (now - new Date(lastRelease.release_date)) > 90*86400000) {
+    actions.push({
+      urgency: 'warn', icon: '♪',
+      label: 'No release in 90+ days',
+      detail: 'Spotify algorithm deprioritises dormant artists',
+      action: () => switchView('releases', document.querySelector('[data-view=releases]'))
+    });
+  }
+
+  // Band fund low (< €300)
+  const entries = [...LEDGER_DATA].sort((a,b) => new Date(a.date)-new Date(b.date));
+  const balance = entries.length ? entries[entries.length-1].balance : 0;
+  if (balance < 300) {
+    actions.push({
+      urgency: 'danger', icon: '€',
+      label: `Band fund low: ${fmtMoney(balance)}`,
+      detail: 'Below minimum operating buffer (€300)',
+      action: () => switchView('dashboard', document.querySelector('[data-view=dashboard]'))
+    });
+  }
+
+  // Press: contacts with no follow-up in 21 days
+  PRESS_DATA.filter(p => p.stage === 'pitched' && p.updated_at && (now - new Date(p.updated_at)) > 21*86400000)
+    .forEach(p => actions.push({
+      urgency: 'neutral', icon: '📰',
+      label: `Press follow-up: ${p.name || p.outlet}`,
+      detail: 'No response in 21+ days — follow up or close',
+      action: () => switchView('press', document.querySelector('[data-view=press]'))
+    }));
+
+  if (!actions.length) {
+    el.innerHTML = '<div style="padding:14px 12px;font-size:9px;color:var(--green3)">✓ No pending actions. You\'re on top of it.</div>';
+    const cnt = document.getElementById('mgmt-actions-count');
+    if (cnt) cnt.textContent = '0 items';
+    return;
+  }
+
+  const urgencyOrder = { danger: 0, warn: 1, neutral: 2 };
+  actions.sort((a,b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency]);
+
+  const urgencyColor = { danger: 'var(--red3)', warn: 'var(--amber2)', neutral: 'var(--muted2)' };
+  const urgencyBg    = { danger: 'rgba(239,68,68,.06)', warn: 'rgba(255,160,0,.06)', neutral: 'rgba(255,255,255,.02)' };
+
+  el.innerHTML = actions.map((a,i) => `
+    <div onclick="${a.action.toString().replace(/"/g,"'")}"
+      style="display:grid;grid-template-columns:20px 1fr;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border1);
+             background:${urgencyBg[a.urgency]};cursor:pointer;border-left:2px solid ${urgencyColor[a.urgency]};
+             transition:background .1s"
+      onmouseover="this.style.background='${urgencyBg[a.urgency].replace(',.06',',0.12')}'"
+      onmouseout="this.style.background='${urgencyBg[a.urgency]}'">
+      <span style="font-size:12px;line-height:1.4">${a.icon}</span>
+      <div>
+        <div style="font-size:8px;font-weight:700;color:${urgencyColor[a.urgency]}">${a.label}</div>
+        <div style="font-size:7px;color:var(--muted3);margin-top:2px">${a.detail}</div>
+      </div>
+    </div>`).join('');
+
+  const cnt = document.getElementById('mgmt-actions-count');
+  if (cnt) cnt.textContent = `${actions.length} item${actions.length!==1?'s':''}`;
+}
+
+// ── Releases pipeline ─────────────────────────────────────────────────────────
+function mgmtReleasesPipeline() {
+  const el = document.getElementById('mgmt-releases-list');
+  if (!el) return;
+  if (!RELEASES_DATA.length) {
+    el.innerHTML = '<div style="padding:12px;font-size:9px;color:var(--muted3)">No releases yet.</div>';
+    return;
+  }
+  const sorted = [...RELEASES_DATA].sort((a,b) =>
+    RELEASE_STAGE_ORDER.indexOf(b.stage) - RELEASE_STAGE_ORDER.indexOf(a.stage)
+  ).slice(0, 6);
+
+  const stageColor = { idea:'var(--muted3)',recorded:'var(--blue2)',mixed:'var(--blue2)',mastered:'var(--purple2)',artwork:'var(--amber2)',submitted:'var(--amber2)',scheduled:'var(--green3)',released:'var(--green3)' };
+  const stageBar = (stage) => {
+    const idx = RELEASE_STAGE_ORDER.indexOf(stage);
+    const pct = Math.round((idx+1) / RELEASE_STAGE_ORDER.length * 100);
+    return `<div style="height:3px;background:var(--bg4);border-radius:1px;margin-top:4px"><div style="height:100%;width:${pct}%;background:${stageColor[stage]||'var(--muted)'};border-radius:1px;transition:width .3s"></div></div>`;
+  };
+
+  el.innerHTML = sorted.map(r => `
+    <div style="padding:8px 12px;border-bottom:1px solid var(--border1)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:9px;font-weight:700;color:var(--text)">${r.title} <span style="font-weight:400;color:var(--muted3);font-size:8px">${r.type}</span></div>
+        <span style="font-size:7px;font-weight:700;color:${stageColor[r.stage]||'var(--muted)'};text-transform:uppercase">${r.stage}</span>
+      </div>
+      ${stageBar(r.stage)}
+      <div style="display:flex;gap:5px;margin-top:5px">
+        ${[{l:'Art',d:r.artwork_done},{l:'Vid',d:r.video_done},{l:'Press',d:r.press_pitched},{l:'Spot',d:r.spotify_pitched}].map(c=>`<span style="font-size:7px;padding:1px 5px;border-radius:1px;background:${c.d?'rgba(0,230,118,.12)':'rgba(255,255,255,.04)'};color:${c.d?'var(--green3)':'var(--muted3)'}">${c.l}</span>`).join('')}
+        ${r.release_date?`<span style="font-size:7px;color:var(--muted3);margin-left:auto">${r.release_date}</span>`:''}
+      </div>
+    </div>`).join('');
+}
+
+// ── Booking pipeline ──────────────────────────────────────────────────────────
+function mgmtBookingPipeline() {
+  const el = document.getElementById('mgmt-booking-list');
+  if (!el) return;
+  if (!BOOKING_DATA.length) {
+    el.innerHTML = '<div style="padding:12px;font-size:9px;color:var(--muted3)">No booking contacts yet.</div>';
+    return;
+  }
+  const active = [...BOOKING_DATA]
+    .filter(b => !['rejected'].includes(b.stage))
+    .sort((a,b) => BOOKING_STAGE_ORDER.indexOf(b.stage) - BOOKING_STAGE_ORDER.indexOf(a.stage))
+    .slice(0, 6);
+
+  const stageColor = { cold:'var(--muted3)',contacted:'var(--blue2)',negotiating:'var(--amber2)',confirmed:'var(--green3)',completed:'var(--green3)',rejected:'var(--red3)' };
+
+  el.innerHTML = active.map(b => {
+    const isOverdue = b.follow_up_date && new Date(b.follow_up_date) < new Date() && !['completed','rejected'].includes(b.stage);
+    return `
+    <div style="padding:8px 12px;border-bottom:1px solid var(--border1);${isOverdue?'background:rgba(255,160,0,.04)':''}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:9px;font-weight:700;color:var(--text)">${b.name||b.venue||'—'}</div>
+        <span style="font-size:7px;font-weight:700;color:${stageColor[b.stage]};text-transform:uppercase">${b.stage}</span>
+      </div>
+      <div style="font-size:7px;color:var(--muted3);margin-top:2px;display:flex;gap:8px">
+        ${b.location?`<span>${b.location}</span>`:''}
+        ${b.fee_eur?`<span style="color:var(--amber2)">€${b.fee_eur}</span>`:''}
+        ${isOverdue?`<span style="color:var(--amber2)">⚠ follow-up overdue</span>`:''}
+        ${b.follow_up_date&&!isOverdue?`<span>follow-up: ${b.follow_up_date}</span>`:''}
+      </div>
+    </div>`; }).join('');
+}
+
+// ── Show schedule ─────────────────────────────────────────────────────────────
+function mgmtShowSchedule() {
+  const el = document.getElementById('mgmt-shows-list');
+  if (!el) return;
+  if (!PROD_SHOWS.length) {
+    el.innerHTML = '<div style="padding:10px;color:var(--muted3)">No shows logged.</div>';
+    return;
+  }
+  const now = new Date();
+  const sorted = [...PROD_SHOWS].sort((a,b) => new Date(a.show_date)-new Date(b.show_date));
+  el.innerHTML = sorted.map(s => {
+    const d = new Date(s.show_date);
+    const isPast = d < now;
+    const daysOut = Math.ceil((d - now) / 86400000);
+    return `
+    <div style="display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:6px 12px;border-bottom:1px solid var(--border1)">
+      <div style="font-size:8px;font-weight:700;color:${isPast?'var(--muted3)':'var(--accent)'}">
+        ${isPast?'✓':daysOut<=7?`${daysOut}d`:d.toLocaleDateString('pt-PT',{day:'2-digit',month:'short'})}
+      </div>
+      <div>
+        <div style="font-size:9px;font-weight:700;color:${isPast?'var(--muted2)':'var(--text)'}">${s.venue_name||'Show'}</div>
+        <div style="font-size:7px;color:var(--muted3)">${s.show_time||''} ${s.set_length_min?'· '+s.set_length_min+'min':''}</div>
+      </div>
+      <div style="font-size:7px;color:var(--muted3)">${s.show_date}</div>
+    </div>`; }).join('');
+}
+
+// ── Setlists ──────────────────────────────────────────────────────────────────
+function mgmtSetlists() {
+  const el = document.getElementById('mgmt-setlists-list');
+  if (!el) return;
+  if (!PROD_SETLISTS.length) {
+    el.innerHTML = '<div style="padding:10px;color:var(--muted3)">No setlists saved.</div>';
+    return;
+  }
+  el.innerHTML = PROD_SETLISTS.map(sl => {
+    const songs = Array.isArray(sl.songs) ? sl.songs.filter(s=>s&&s.title) : [];
+    const totalSec = songs.reduce((s,sg)=>s+(parseInt(sg.duration_sec)||0),0);
+    const totalMin = Math.floor(totalSec/60);
+    return `
+    <div style="padding:7px 12px;border-bottom:1px solid var(--border1);display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:9px;font-weight:700;color:var(--text)">${sl.name}</div>
+        <div style="font-size:7px;color:var(--muted3)">${songs.length} songs${totalMin?' · '+totalMin+' min':''}</div>
+      </div>
+      <button class="btn-sm" onclick="printSetlist(${JSON.stringify(sl).split('"').join('&quot;')})">⎙</button>
+    </div>`; }).join('');
+}
+
+// ── Press & sync ──────────────────────────────────────────────────────────────
+function mgmtPress() {
+  const el = document.getElementById('mgmt-press-list');
+  if (!el) return;
+  if (!PRESS_DATA.length) {
+    el.innerHTML = '<div style="padding:10px;color:var(--muted3)">No press contacts yet.</div>';
+    return;
+  }
+  const stageColor = { pitched:'var(--amber2)',following_up:'var(--amber2)',responded:'var(--blue2)',published:'var(--green3)',rejected:'var(--red3)',passed:'var(--muted3)' };
+  const active = [...PRESS_DATA].filter(p=>p.stage!=='passed').slice(0,6);
+  el.innerHTML = active.map(p => `
+    <div style="padding:7px 12px;border-bottom:1px solid var(--border1);display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center">
+      <div>
+        <div style="font-size:9px;font-weight:700;color:var(--text)">${p.outlet||p.name||'—'}</div>
+        <div style="font-size:7px;color:var(--muted3)">${p.type||''} ${p.pitched_release?'· '+p.pitched_release:''}</div>
+      </div>
+      <span style="font-size:7px;font-weight:700;color:${stageColor[p.stage]||'var(--muted3)'};text-transform:uppercase">${p.stage}</span>
+    </div>`).join('');
+}
+
+// ── Splits summary ─────────────────────────────────────────────────────────────
+function mgmtSplits() {
+  const el = document.getElementById('mgmt-splits-summary');
+  if (!el) return;
+  if (!SPLITS_DATA.length) {
+    el.innerHTML = '<div style="padding:10px;color:var(--muted3)">No splits recorded.</div>';
+    return;
+  }
+  const totalGross = SPLITS_DATA.reduce((s,sp)=>s+parseFloat(sp.gross_eur||0),0);
+  const totalFund  = SPLITS_DATA.reduce((s,sp)=>s+parseFloat(sp.band_fund_eur||0),0);
+  el.innerHTML = `
+    <div style="padding:10px 12px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:8px;color:var(--muted3)">Total earned (gross)</span>
+        <span style="font-size:9px;font-weight:700;color:var(--green3)">${fmtMoney(totalGross)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:8px;color:var(--muted3)">Band fund accumulated</span>
+        <span style="font-size:9px;font-weight:700;color:var(--accent)">${fmtMoney(totalFund)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding-top:4px;border-top:1px solid var(--border1)">
+        <span style="font-size:8px;color:var(--muted3)">${SPLITS_DATA.length} gig${SPLITS_DATA.length!==1?'s':''} recorded</span>
+        <span style="font-size:8px;color:var(--muted3)">avg ${fmtMoney(totalFund/SPLITS_DATA.length)}/gig to fund</span>
+      </div>
+    </div>`;
+}
+
+// ── 12-month activity timeline ─────────────────────────────────────────────────
+function mgmtTimeline() {
+  const el = document.getElementById('mgmt-timeline');
+  const rangeEl = document.getElementById('mgmt-timeline-range');
+  if (!el) return;
+
+  const now = new Date();
+  const months = [];
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ key: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`, label: d.toLocaleDateString('en-GB',{month:'short'}), year: d.getFullYear() });
+  }
+
+  if (rangeEl) {
+    rangeEl.textContent = `${months[0].label} ${months[0].year} → ${months[11].label} ${months[11].year}`;
+  }
+
+  // Count events per month
+  const getMonth = dateStr => dateStr ? dateStr.slice(0,7) : null;
+  const eventsByMonth = {};
+  months.forEach(m => { eventsByMonth[m.key] = { gigs:0, releases:0, shows:0, revenue:0 }; });
+
+  LEDGER_DATA.filter(e => e.cat==='Espetáculo' && e.amount>0).forEach(e => {
+    const mk = getMonth(e.date); if (eventsByMonth[mk]) { eventsByMonth[mk].gigs++; eventsByMonth[mk].revenue += e.amount; }
+  });
+  RELEASES_DATA.filter(r => r.release_date && r.stage==='released').forEach(r => {
+    const mk = getMonth(r.release_date); if (eventsByMonth[mk]) eventsByMonth[mk].releases++;
+  });
+  PROD_SHOWS.forEach(s => {
+    const mk = getMonth(s.show_date); if (eventsByMonth[mk]) eventsByMonth[mk].shows++;
+  });
+
+  const maxRev = Math.max(...Object.values(eventsByMonth).map(m=>m.revenue), 1);
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:4px;align-items:end">
+      ${months.map(m => {
+        const ev = eventsByMonth[m.key];
+        const barH = Math.max(4, Math.round(ev.revenue / maxRev * 48));
+        const isNow = m.key === `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+        return `
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+          ${ev.releases > 0 ? `<div title="${ev.releases} release(s)" style="width:6px;height:6px;border-radius:50%;background:var(--purple2)"></div>` : '<div style="width:6px;height:6px"></div>'}
+          ${ev.gigs > 0 || ev.shows > 0 ? `<div title="${ev.gigs} gig(s) · ${ev.shows} shows" style="width:6px;height:6px;background:var(--accent);border-radius:1px"></div>` : '<div style="width:6px;height:6px"></div>'}
+          <div title="${fmtMoney(ev.revenue)}" style="width:100%;background:${ev.revenue>0?'rgba(255,92,26,.5)':'rgba(255,255,255,.06)'};height:${barH}px;border-radius:1px 1px 0 0;transition:height .3s;${isNow?'outline:1px solid var(--accent);':''}" ></div>
+          <div style="font-size:6px;color:${isNow?'var(--accent)':'var(--muted3)'};text-align:center;letter-spacing:.02em">${m.label}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="display:flex;gap:12px;margin-top:8px">
+      <div style="display:flex;align-items:center;gap:4px;font-size:7px;color:var(--muted3)"><span style="width:8px;height:8px;background:rgba(255,92,26,.5);border-radius:1px;display:inline-block"></span>Revenue</div>
+      <div style="display:flex;align-items:center;gap:4px;font-size:7px;color:var(--muted3)"><span style="width:6px;height:6px;background:var(--accent);border-radius:1px;display:inline-block"></span>Gigs/Shows</div>
+      <div style="display:flex;align-items:center;gap:4px;font-size:7px;color:var(--muted3)"><span style="width:6px;height:6px;background:var(--purple2);border-radius:50%;display:inline-block"></span>Releases</div>
+    </div>`;
+}
+
+// ── Streaming health ───────────────────────────────────────────────────────────
+function mgmtStreamingHealth() {
+  const el = document.getElementById('mgmt-streaming-summary');
+  if (!el) return;
+  const totalStreams = PLATFORM_DATA.reduce((s,p)=>s+p.streams,0);
+  const totalRev = PLATFORM_DATA.reduce((s,p)=>s+p.rev,0);
+  const activePlatforms = PLATFORM_DATA.filter(p=>p.streams>0||p.rev>0);
+
+  el.innerHTML = `
+    <div style="padding:10px 12px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:8px;color:var(--muted3)">Total streams</span>
+        <span style="font-size:9px;font-weight:700;color:var(--purple2)">${totalStreams.toLocaleString()}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:8px;color:var(--muted3)">Monthly revenue</span>
+        <span style="font-size:9px;font-weight:700;color:${totalRev>1?'var(--green3)':'var(--red3)'}">${fmtMoney(totalRev)}</span>
+      </div>
+      ${activePlatforms.map(p=>`
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:8px;font-weight:700;color:${p.color}">${p.name}</span>
+        <div style="flex:1;height:3px;background:var(--bg4);border-radius:1px"><div style="height:100%;width:${Math.min(100,p.streams/Math.max(1,totalStreams)*100)}%;background:${p.color};border-radius:1px"></div></div>
+        <span style="font-size:7px;color:var(--muted3)">${p.streams.toLocaleString()}</span>
+      </div>`).join('')}
+      <div style="padding:6px 8px;background:${totalRev<1?'rgba(239,68,68,.06)':'rgba(0,230,118,.06)'};border-radius:2px;font-size:7px;color:var(--muted3);margin-top:2px">
+        ${totalRev<1?'⚠ Streaming critically underdeveloped. Release cadence is the lever.':'▲ Streaming revenue building.'}
+      </div>
+    </div>`;
+}
+
+// ── Band health score ──────────────────────────────────────────────────────────
+function mgmtBandHealthScore() {
+  const el = document.getElementById('mgmt-health-score');
+  const badge = document.getElementById('mgmt-score-badge');
+  if (!el) return;
+
+  const now = new Date();
+  const scores = [];
+
+  // 1. Financial health (0-20): positive net position + runway
+  const entries = [...LEDGER_DATA].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const balance = entries.length ? entries[entries.length-1].balance : 0;
+  const fi = getFinancialIntelligence();
+  let finScore = 0;
+  if (fi.netPosition > 0) finScore += 8;
+  if (fi.runwayMonths > 12) finScore += 7;
+  else if (fi.runwayMonths > 6) finScore += 4;
+  if (balance > 500) finScore += 5;
+  else if (balance > 200) finScore += 2;
+  scores.push({ label: 'Financial', score: finScore, max: 20, color: 'var(--green3)' });
+
+  // 2. Activity (0-20): gigs in last 12 months
+  const t12 = new Date(now); t12.setFullYear(t12.getFullYear()-1);
+  const recentGigs = LEDGER_DATA.filter(e=>e.cat==='Espetáculo'&&e.amount>0&&new Date(e.date)>=t12).length;
+  const actScore = Math.min(20, recentGigs * 5);
+  scores.push({ label: 'Live Activity', score: actScore, max: 20, color: 'var(--accent)' });
+
+  // 3. Release velocity (0-20): releases in last 6 months
+  const t6 = new Date(now); t6.setMonth(t6.getMonth()-6);
+  const recentRel = RELEASES_DATA.filter(r=>r.stage==='released'&&r.release_date&&new Date(r.release_date)>=t6).length;
+  const relScore = Math.min(20, recentRel * 10);
+  scores.push({ label: 'Release Velocity', score: relScore, max: 20, color: 'var(--purple2)' });
+
+  // 4. Booking pipeline (0-20): active contacts
+  const pipeScore = Math.min(20, BOOKING_DATA.filter(b=>!['rejected'].includes(b.stage)).length * 4);
+  scores.push({ label: 'Booking Pipeline', score: pipeScore, max: 20, color: 'var(--blue2)' });
+
+  // 5. Revenue diversification (0-20)
+  const streamRev = PLATFORM_DATA.reduce((s,p)=>s+p.rev,0);
+  const totalRev  = fi.totalRevenue;
+  const liveShare = totalRev > 0 ? (fi.gigRevenue / totalRev) : 1;
+  let divScore = 0;
+  if (liveShare < 1) divScore += 10;
+  if (streamRev > 5) divScore += 5;
+  if (streamRev > 50) divScore += 5;
+  scores.push({ label: 'Rev. Diversification', score: divScore, max: 20, color: 'var(--amber2)' });
+
+  const total = scores.reduce((s,sc)=>s+sc.score,0);
+
+  if (badge) {
+    badge.textContent = `${total}/100`;
+    badge.style.color = total>=70?'var(--green3)':total>=40?'var(--amber2)':'var(--red3)';
+  }
+
+  const grade = total>=80?'A':total>=65?'B':total>=50?'C':total>=35?'D':'F';
+  const gradeColor = total>=70?'var(--green3)':total>=40?'var(--amber2)':'var(--red3)';
+
+  el.innerHTML = `
+    <div style="padding:10px 12px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <div style="font-family:var(--display);font-size:32px;font-weight:700;color:${gradeColor}">${grade}</div>
+        <div>
+          <div style="font-size:8px;font-weight:700;color:var(--text)">${total}/100</div>
+          <div style="font-size:7px;color:var(--muted3)">${total>=70?'Healthy':total>=40?'Developing':'Needs attention'}</div>
+        </div>
+      </div>
+      ${scores.map(sc=>`
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+          <span style="font-size:7px;color:var(--muted3)">${sc.label}</span>
+          <span style="font-size:7px;font-weight:700;color:${sc.color}">${sc.score}/${sc.max}</span>
+        </div>
+        <div style="height:3px;background:var(--bg4);border-radius:1px">
+          <div style="height:100%;width:${Math.round(sc.score/sc.max*100)}%;background:${sc.color};border-radius:1px;transition:width .4s"></div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+}
+
+// Wire into switchView
+const _origSwitchView = switchView;
+function switchView(view, tab) {
+  _origSwitchView(view, tab);
+  if (view === 'mgmt') renderMgmtDashboard();
+}
+
+
 // ── WIRE INTO INIT ─────────────────────────────────────
 function initAll() {
   if (API_BASE && SESSION?.token) {
