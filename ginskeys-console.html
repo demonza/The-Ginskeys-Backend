@@ -3079,9 +3079,48 @@ function renderReleasesList() {
           ${['idea','recorded','mixed','mastered','artwork','submitted','scheduled','released'].map(s=>`<option value="${s}"${s===r.stage?' selected':''}>${s}</option>`).join('')}
         </select>
         ${r.spotify_url?`<a href="${r.spotify_url}" target="_blank" style="font-size:8px;color:var(--green3)">▶ Spotify</a>`:''}
+        <button onclick="deleteRelease('${r.id}','${r.title.replace(/'/g,"\\'")}')" style="background:transparent;border:1px solid var(--border2);color:var(--muted3);font-size:9px;padding:2px 6px;cursor:pointer;border-radius:1px" title="Delete release">✕</button>
       </div>
     </div>`;
   }).join('');
+
+  // Populate checklist picker
+  const picker = document.getElementById('rel-checklist-picker');
+  if (picker) {
+    const current = picker.value;
+    picker.innerHTML = '<option value="">— select release —</option>' +
+      RELEASES_DATA.map(r=>`<option value="${r.id}"${r.id===current?' selected':''}>${r.title}</option>`).join('');
+    if (current) renderReleaseChecklist();
+  }
+
+  // Populate release calendar
+  const cal = document.getElementById('rel-calendar');
+  if (cal) {
+    const scheduled = RELEASES_DATA.filter(r=>r.release_date).sort((a,b)=>new Date(a.release_date)-new Date(b.release_date));
+    if (!scheduled.length) {
+      cal.innerHTML='<div style="color:var(--muted3)">No releases scheduled yet.</div>';
+    } else {
+      const today = new Date(); today.setHours(0,0,0,0);
+      cal.innerHTML = scheduled.map(r => {
+        const d = new Date(r.release_date);
+        const daysOut = Math.ceil((d - today) / 86400000);
+        const isPast = daysOut < 0;
+        const pitchDeadline = new Date(d); pitchDeadline.setDate(pitchDeadline.getDate() - 42);
+        const pitchDaysOut = Math.ceil((pitchDeadline - today) / 86400000);
+        const color = isPast ? 'var(--muted3)' : daysOut <= 14 ? 'var(--amber2)' : 'var(--green3)';
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:var(--bg4);border-radius:2px;border-left:2px solid ${color}">
+          <div>
+            <div style="font-size:9px;font-weight:700;color:var(--text)">${r.title} <span style="font-weight:400;color:var(--muted3);text-transform:uppercase;font-size:7px">${r.type}</span></div>
+            <div style="font-size:7px;color:var(--muted3);margin-top:2px">${isPast?'Released':'Pitch deadline: '}${isPast?r.release_date:pitchDaysOut>0?pitchDeadline.toISOString().slice(0,10):'<span style="color:var(--amber2)">pitch window passed</span>'}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:9px;font-weight:700;color:${color}">${isPast?'Live':'In '+daysOut+'d'}</div>
+            <div style="font-size:7px;color:var(--muted3)">${r.release_date}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
 }
 
 async function addRelease() {
@@ -3112,7 +3151,55 @@ async function updateReleaseStage(id, stage) {
   catch(e) { showToast('Failed: '+e.message,'err'); }
 }
 
-function renderReleaseChecklist() {}  // placeholder
+function renderReleaseChecklist() {
+  const id = document.getElementById('rel-checklist-picker')?.value;
+  const panel = document.getElementById('rel-checklist-panel');
+  if (!panel) return;
+  if (!id) { panel.innerHTML='<div style="color:var(--muted3)">Select a release to see its checklist status.</div>'; return; }
+  const r = RELEASES_DATA.find(x=>x.id===id);
+  if (!r) { panel.innerHTML='<div style="color:var(--muted3)">Release not found.</div>'; return; }
+
+  const STAGES_ORDER = ['idea','recorded','mixed','mastered','artwork','submitted','scheduled','released'];
+  const stageIdx = STAGES_ORDER.indexOf(r.stage);
+
+  const items = [
+    { label:'Recording complete',       done: stageIdx >= STAGES_ORDER.indexOf('recorded') },
+    { label:'Mixed & mastered',         done: stageIdx >= STAGES_ORDER.indexOf('mastered') },
+    { label:'Artwork ready',            done: !!r.artwork_done },
+    { label:'Music video ready',        done: !!r.video_done },
+    { label:'Submitted to distributor', done: stageIdx >= STAGES_ORDER.indexOf('submitted') },
+    { label:'Press pitched',            done: !!r.press_pitched },
+    { label:'Spotify editorial pitched',done: !!r.spotify_pitched },
+    { label:'Release scheduled',        done: stageIdx >= STAGES_ORDER.indexOf('scheduled') },
+    { label:'Live on DSPs',             done: r.stage === 'released' },
+  ];
+
+  const done = items.filter(i=>i.done).length;
+  panel.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div style="font-size:9px;font-weight:700;color:var(--text)">${r.title}</div>
+      <div style="font-size:8px;color:var(--muted3)">${done}/${items.length} done</div>
+    </div>
+    <div style="height:3px;background:var(--bg4);border-radius:2px;margin-bottom:8px">
+      <div style="height:100%;width:${Math.round(done/items.length*100)}%;background:var(--green3);border-radius:2px;transition:width .3s"></div>
+    </div>
+    ${items.map(item=>`
+      <div style="display:flex;align-items:center;gap:7px;padding:3px 0">
+        <div style="width:12px;height:12px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;background:${item.done?'rgba(0,230,118,.2)':'rgba(255,255,255,.05)'};color:${item.done?'var(--green3)':'var(--muted3)'}">
+          ${item.done?'✓':'○'}
+        </div>
+        <span style="font-size:8px;color:${item.done?'var(--text)':'var(--muted3)'}">${item.label}</span>
+      </div>`).join('')}`;
+}
+
+async function deleteRelease(id, title) {
+  if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+  try {
+    await _apiFetch('DELETE','/releases/'+id);
+    await loadReleases();
+    showToast('Release deleted','ok');
+  } catch(e) { showToast('Delete failed: '+e.message,'err'); }
+}
 
 // ── PRESS & SYNC ───────────────────────────────────────────────────────────
 async function loadPress() {
@@ -3762,9 +3849,18 @@ function renderReleaseCalendar() {
 function renderReleaseChecklist() {
   const id = document.getElementById('rel-checklist-picker')?.value;
   const el = document.getElementById('rel-checklist-panel');
+
+  // Always keep picker in sync with current data
+  const picker = document.getElementById('rel-checklist-picker');
+  if (picker) {
+    const current = picker.value;
+    picker.innerHTML = '<option value="">— select release —</option>' +
+      RELEASES_DATA.map(rel=>`<option value="${rel.id}"${rel.id===current?' selected':''}>${rel.title}</option>`).join('');
+  }
+
   if (!el) return;
-  const r = id ? RELEASES_DATA.find(x=>x.id===id) : RELEASES_DATA[0];
-  if (!r) { el.innerHTML='<div style="color:var(--muted3);font-size:8px">No release found.</div>'; return; }
+  const r = id ? RELEASES_DATA.find(x=>x.id===id) : null;
+  if (!r) { el.innerHTML='<div style="color:var(--muted3);font-size:8px">Select a release to see its checklist status.</div>'; return; }
 
   const checks = [
     {label:'Recording complete',  done: ['recorded','mixed','mastered','artwork','submitted','scheduled','released'].includes(r.stage)},
@@ -3786,16 +3882,6 @@ function renderReleaseChecklist() {
       <div style="width:12px;height:12px;border-radius:2px;background:${c.done?'var(--green3)':'var(--bg4)'};border:1px solid ${c.done?'var(--green3)':'var(--border2)'};display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0">${c.done?'✓':''}</div>
       <div style="color:${c.done?'var(--muted2)':'var(--text)'};${c.done?'text-decoration:line-through':''}">${c.label}</div>
     </div>`).join('')}`;
-
-  // Populate picker
-  const picker = document.getElementById('rel-checklist-picker');
-  if (picker && !picker.options.length) {
-    RELEASES_DATA.forEach(rel => {
-      const opt = document.createElement('option');
-      opt.value=rel.id; opt.textContent=rel.title;
-      picker.appendChild(opt);
-    });
-  }
 }
 
 function updateSplitsMiddle() {
