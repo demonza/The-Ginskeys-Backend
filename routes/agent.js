@@ -13,11 +13,13 @@ async function callAI(prompt, maxTokens = 1200) {
   // Try Gemini first (free tier — 1,500 calls/day)
   if (process.env.GEMINI_API_KEY) {
     // Try models in order until one works
-    const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-pro'];
+    const models = ['gemini-2.5-flash-preview-05-20', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest'];
     let lastErr = 'No model worked';
     for (const model of models) {
       try {
-        const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+        // gemini-2.5 models are only available on v1beta
+        const apiVer = model.startsWith('gemini-2.5') ? 'v1beta' : 'v1';
+        const url = `https://generativelanguage.googleapis.com/${apiVer}/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
