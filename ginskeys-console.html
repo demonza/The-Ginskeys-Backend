@@ -1049,7 +1049,7 @@ tr:hover .edit-btn{display:inline}
 /* ─── PRODUCTION VIEW ────────────────────────────────── */
 .prod-tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border2);margin-bottom:14px;flex-shrink:0}
 .prod-tab{
-  padding:8px 16px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  padding:8px 18px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;
   color:var(--muted2);cursor:pointer;border-bottom:2px solid transparent;
   transition:all .15s;font-family:var(--mono);
 }
@@ -1057,45 +1057,96 @@ tr:hover .edit-btn{display:inline}
 .prod-tab.pt-active{color:var(--accent);border-bottom-color:var(--accent)}
 .prod-sub{display:none}
 .prod-sub.ps-active{display:block}
-.phase-block{margin-bottom:16px}
-.phase-title{
-  font-size:8px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;
-  margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:space-between;
+/* ── SHOW ADVANCE ── */
+.show-card{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:3px;
+  padding:14px 16px;border-left:3px solid var(--accent);
+  transition:border-color .15s;
 }
-.check-item{
-  display:grid;grid-template-columns:22px 1fr auto auto;
-  gap:10px;padding:7px 10px;align-items:center;
-  border-radius:2px;transition:background .1s;font-size:9px;
+.show-card:hover{border-left-color:var(--green3)}
+.show-card-past{border-left-color:var(--muted)!important}
+.time-kpi{background:var(--bg4);border-radius:2px;padding:10px 14px;display:flex;flex-direction:column;gap:2px;text-align:center}
+.time-kpi-val{font-family:var(--display);font-size:18px;font-weight:700;color:var(--accent)}
+.time-kpi-lbl{font-size:7px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.advance-field{display:flex;flex-direction:column;gap:4px}
+.advance-label{font-size:7px;color:var(--muted3);letter-spacing:.1em;text-transform:uppercase}
+/* ── TECH RIDER ── */
+.rider-section{background:var(--bg3);border:1px solid var(--border2);border-radius:2px;margin-bottom:10px;overflow:hidden}
+.rider-section-hdr{
+  padding:10px 14px;font-size:9px;font-weight:700;color:var(--text);
+  letter-spacing:.06em;border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+  background:var(--bg4);user-select:none;
 }
-.check-item:hover{background:var(--bg4)}
-.check-item.done-item{opacity:.5}
-.check-cb{width:16px;height:16px;cursor:pointer;accent-color:var(--accent)}
-.check-owner{font-size:7px;padding:2px 7px;border-radius:1px;background:var(--bg4);color:var(--muted2);letter-spacing:.08em}
-.check-done-at{font-size:7px;color:var(--muted);white-space:nowrap}
+.rider-section-hdr:hover{background:var(--bg3)}
+.rider-section-body{padding:12px 14px;font-size:9px;line-height:1.8;color:var(--text)}
+.rider-editable{
+  outline:none;border-radius:1px;padding:1px 3px;transition:background .1s;
+  min-width:40px;display:inline-block;
+}
+.rider-editable:hover{background:rgba(255,92,26,.08)}
+.rider-editable:focus{background:rgba(255,92,26,.14);box-shadow:0 0 0 1px var(--accent)}
+.input-row{
+  display:grid;grid-template-columns:30px 40px 1fr 110px 60px 70px;
+  gap:8px;padding:5px 8px;font-size:9px;border-bottom:1px solid var(--border1);align-items:center;
+}
+.input-row.hdr-row{color:var(--muted);font-size:8px;letter-spacing:.08em;background:var(--bg4)}
+/* ── SETLIST ── */
 .song-row{
-  display:grid;grid-template-columns:32px 1fr 60px 50px 60px 80px auto;
+  display:grid;grid-template-columns:32px 1fr 60px 52px 62px 80px 1fr;
   gap:8px;padding:6px 10px;align-items:center;font-size:9px;
   border-bottom:1px solid var(--border1);
 }
-.rider-section{background:var(--bg3);border:1px solid var(--border2);border-radius:2px;margin-bottom:10px}
-.rider-section-hdr{
-  padding:9px 14px;font-size:9px;font-weight:700;color:var(--text);
-  letter-spacing:.06em;border-bottom:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+/* ── CHECKLIST ── */
+.phase-block{margin-bottom:16px}
+.phase-title{
+  font-size:8px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;
+  margin-bottom:8px;padding:6px 10px;border-left:3px solid;
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg4);
 }
-.rider-section-body{padding:12px 14px;font-size:9px;line-height:1.8;color:var(--text)}
-.input-row{
-  display:grid;grid-template-columns:30px 40px 1fr 100px 60px 60px;
-  gap:8px;padding:5px 8px;font-size:9px;border-bottom:1px solid var(--border1);align-items:center;
+.check-item{
+  display:grid;grid-template-columns:22px 1fr 90px 60px;
+  gap:10px;padding:7px 12px;align-items:center;
+  border-radius:2px;transition:background .1s;font-size:9px;
 }
-.input-row.hdr-row{color:var(--muted);font-size:8px;letter-spacing:.08em}
-.advance-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.advance-field{display:flex;flex-direction:column;gap:4px}
-.advance-label{font-size:7px;color:var(--muted3);letter-spacing:.1em;text-transform:uppercase}
-.time-kpi{background:var(--bg4);border-radius:2px;padding:10px 14px;display:flex;flex-direction:column;gap:2px}
-.time-kpi-val{font-family:var(--display);font-size:20px;font-weight:700;color:var(--accent)}
-.time-kpi-lbl{font-size:7px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.check-item:hover{background:var(--bg4)}
+.check-item.done-item{opacity:.45}
+.check-cb{width:15px;height:15px;cursor:pointer;accent-color:var(--accent)}
+.check-owner{font-size:7px;padding:2px 8px;border-radius:1px;background:var(--bg3);color:var(--muted2);letter-spacing:.08em;text-align:center}
+.check-done-at{font-size:7px;color:var(--muted);white-space:nowrap;text-align:right}
+/* ── STAGE PLOT ── */
+.splot-canvas-wrap{
+  position:relative;background:var(--bg4);border:1px solid var(--border2);
+  border-radius:3px;overflow:hidden;
+}
+.splot-canvas{display:block;cursor:default}
+.splot-toolbar{
+  display:flex;gap:6px;align-items:center;padding:8px 12px;
+  background:var(--bg3);border-bottom:1px solid var(--border2);flex-wrap:wrap;
+}
+.splot-btn{
+  font-family:var(--mono);font-size:8px;letter-spacing:.06em;padding:4px 10px;
+  background:var(--bg4);border:1px solid var(--border2);color:var(--muted2);
+  cursor:pointer;border-radius:1px;transition:all .1s;text-transform:uppercase;
+}
+.splot-btn:hover{border-color:var(--accent);color:var(--accent)}
+.splot-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.splot-legend{
+  display:flex;gap:12px;padding:8px 12px;flex-wrap:wrap;
+  background:var(--bg3);border-top:1px solid var(--border2);
+}
+.splot-legend-item{display:flex;align-items:center;gap:5px;font-size:8px;color:var(--muted2)}
+/* ── PRINT STYLES ── */
+@media print{
+  body{background:#fff!important;color:#000!important}
+  .prod-tab-bar,.splot-toolbar,.splot-legend,.btn-sm,.login-btn{display:none!important}
+  .rider-section{border:1px solid #ccc!important;background:#fff!important;break-inside:avoid}
+  .rider-section-hdr{background:#f5f5f5!important;color:#000!important}
+  .rider-section-body{color:#222!important}
+  .input-row{border-bottom:1px solid #ddd!important}
+  #prod-stageplot .splot-canvas-wrap{border:1px solid #ccc!important}
+}
 </style>
 </head>
 <body>
@@ -4162,7 +4213,7 @@ function _initAll_old_1() {
     <div style="flex-shrink:0;background:linear-gradient(90deg,rgba(0,230,118,.06) 0%,transparent 100%);border-left:3px solid var(--green3);padding:12px 16px;border-radius:0 2px 2px 0;display:grid;grid-template-columns:1fr repeat(4,auto);gap:16px;align-items:center">
       <div>
         <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--green3);letter-spacing:.08em">LIVE PRODUCTION</div>
-        <div style="font-size:8px;color:var(--muted2);margin-top:2px">Show Advance · Tech Rider · Setlist · Show Checklist</div>
+        <div style="font-size:8px;color:var(--muted2);margin-top:2px">Show Advance · Tech Rider · Stage Plot · Setlist · Show Checklist</div>
       </div>
       <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
         <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--text)" id="prod-banner-shows">0</div>
@@ -4186,6 +4237,7 @@ function _initAll_old_1() {
     <div class="prod-tab-bar" style="flex-shrink:0">
       <div class="prod-tab pt-active" onclick="switchProdTab('advance',this)">Show Advance</div>
       <div class="prod-tab" onclick="switchProdTab('rider',this)">Tech Rider</div>
+      <div class="prod-tab" onclick="switchProdTab('stageplot',this)">Stage Plot</div>
       <div class="prod-tab" onclick="switchProdTab('setlist',this)">Setlist</div>
       <div class="prod-tab" onclick="switchProdTab('checklist',this)">Show Checklist</div>
     </div>
@@ -4222,7 +4274,7 @@ function _initAll_old_1() {
         </div>
         <div>
           <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">UPCOMING SHOWS</div>
-          <div id="shows-list" style="display:flex;flex-direction:column;gap:8px">
+          <div id="shows-list" style="display:flex;flex-direction:column;gap:10px">
             <div style="font-size:9px;color:var(--muted3);padding:12px">No shows yet. Create your first show advance.</div>
           </div>
         </div>
@@ -4231,228 +4283,244 @@ function _initAll_old_1() {
 
     <!-- ── TECH RIDER ── -->
     <div class="prod-sub" id="prod-rider" style="flex:1;overflow-y:auto">
-
-      <!-- Header bar -->
       <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--accent)">
         <div>
           <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--text);letter-spacing:.12em">THE GINSKEYS</div>
-          <div style="font-size:9px;color:var(--muted2);letter-spacing:.1em;margin-top:2px">TECHNICAL RIDER · HARD ROCK · 4 PIECE · SINES, PORTUGAL · v2.0 MAR 2026</div>
+          <div style="font-size:9px;color:var(--muted2);letter-spacing:.1em;margin-top:2px">TECHNICAL RIDER · HARD ROCK · 4 PIECE · SINES, PORTUGAL · v2.0 2026</div>
         </div>
-        <div style="display:flex;gap:8px">
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="font-size:8px;color:var(--green3);padding:3px 8px;background:rgba(0,230,118,.08);border-radius:1px">✎ Click any field to edit</div>
           <button class="btn-sm" onclick="printRider()">⎙ Print / PDF</button>
           <button class="btn-sm" onclick="copyRiderText()">Copy Text</button>
         </div>
       </div>
-
-      <!-- Two-column layout: technical left, production right -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-
         <!-- LEFT COLUMN -->
         <div style="display:flex;flex-direction:column;gap:10px">
-
           <!-- 01 Band Lineup -->
           <div class="rider-section">
             <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-              <span style="color:var(--accent)">01</span>&nbsp;&nbsp;BAND LINEUP<span>▼</span>
+              <span><span style="color:var(--accent)">01</span>&nbsp;&nbsp;BAND LINEUP</span><span>▼</span>
             </div>
-            <div class="rider-section-body">
+            <div class="rider-section-body" style="padding:0">
               <table style="width:100%;border-collapse:collapse">
                 <tr style="border-bottom:1px solid var(--border2)">
-                  <th style="text-align:left;padding:5px 8px;font-size:7px;color:var(--muted);letter-spacing:.12em;font-weight:400">MEMBER</th>
-                  <th style="text-align:left;padding:5px 8px;font-size:7px;color:var(--muted);letter-spacing:.12em;font-weight:400">ROLE</th>
-                  <th style="text-align:left;padding:5px 8px;font-size:7px;color:var(--muted);letter-spacing:.12em;font-weight:400">POSITION</th>
+                  <th style="text-align:left;padding:5px 10px;font-size:7px;color:var(--muted);letter-spacing:.12em;font-weight:400">MEMBER</th>
+                  <th style="text-align:left;padding:5px 10px;font-size:7px;color:var(--muted);letter-spacing:.12em;font-weight:400">ROLE</th>
+                  <th style="text-align:left;padding:5px 10px;font-size:7px;color:var(--muted);letter-spacing:.12em;font-weight:400">POSITION</th>
                 </tr>
                 <tr style="border-bottom:1px solid var(--border1)">
-                  <td style="padding:7px 8px;font-weight:700;color:var(--accent)">FÁBIO</td>
-                  <td style="padding:7px 8px">Lead Guitar + Lead Vocals</td>
-                  <td style="padding:7px 8px;color:var(--muted3)">Centre / Stage Right</td>
+                  <td style="padding:8px 10px;font-weight:700;color:var(--accent)">FÁBIO</td>
+                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true">Lead Guitar + Lead Vocals</span></td>
+                  <td style="padding:8px 10px;color:var(--muted3)"><span class="rider-editable" contenteditable="true">Centre / Stage Right</span></td>
                 </tr>
                 <tr style="border-bottom:1px solid var(--border1)">
-                  <td style="padding:7px 8px;font-weight:700;color:var(--accent)">PEDRO</td>
-                  <td style="padding:7px 8px">Bass</td>
-                  <td style="padding:7px 8px;color:var(--muted3)">Stage Left</td>
+                  <td style="padding:8px 10px;font-weight:700;color:var(--accent)">PEDRO</td>
+                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true">Bass</span></td>
+                  <td style="padding:8px 10px;color:var(--muted3)"><span class="rider-editable" contenteditable="true">Stage Left</span></td>
                 </tr>
                 <tr style="border-bottom:1px solid var(--border1)">
-                  <td style="padding:7px 8px;font-weight:700;color:var(--accent)">MANUEL</td>
-                  <td style="padding:7px 8px">Drums</td>
-                  <td style="padding:7px 8px;color:var(--muted3)">Centre Rear</td>
+                  <td style="padding:8px 10px;font-weight:700;color:var(--accent)">MANUEL</td>
+                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true">Drums</span></td>
+                  <td style="padding:8px 10px;color:var(--muted3)"><span class="rider-editable" contenteditable="true">Centre Rear</span></td>
                 </tr>
                 <tr>
-                  <td style="padding:7px 8px;font-weight:700;color:var(--accent)">TIAGO</td>
-                  <td style="padding:7px 8px">Rhythm Guitar + BG Vocals</td>
-                  <td style="padding:7px 8px;color:var(--muted3)">Stage Right</td>
+                  <td style="padding:8px 10px;font-weight:700;color:var(--accent)">TIAGO</td>
+                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true">Rhythm Guitar + BG Vocals</span></td>
+                  <td style="padding:8px 10px;color:var(--muted3)"><span class="rider-editable" contenteditable="true">Stage Right</span></td>
                 </tr>
               </table>
             </div>
           </div>
-
           <!-- 02 Input List -->
           <div class="rider-section">
             <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-              <span style="color:var(--accent)">02</span>&nbsp;&nbsp;INPUT LIST / PATCH (15 CH)<span>▼</span>
+              <span><span style="color:var(--accent)">02</span>&nbsp;&nbsp;INPUT LIST / PATCH (<span class="rider-editable" contenteditable="true" onclick="event.stopPropagation()">15</span> CH)</span><span>▼</span>
             </div>
             <div class="rider-section-body" style="padding:0">
-              <div class="input-row hdr-row" style="background:var(--bg4)">
-                <div>CH</div><div>TYPE</div><div>SOURCE</div><div>MIC / DI</div><div>STAND</div><div>NOTES</div>
-              </div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">1</div><div style="color:var(--muted2)">MIC</div><div>Kick Drum</div><div style="color:var(--purple2)">Beta 91A / D112</div><div style="color:var(--muted3)">None</div><div style="color:var(--muted3)">Gate req.</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">2</div><div style="color:var(--muted2)">MIC</div><div>Snare Top</div><div style="color:var(--purple2)">SM57</div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">3</div><div style="color:var(--muted2)">MIC</div><div>Snare Bottom</div><div style="color:var(--purple2)">SM57</div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">Phase flip</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">4</div><div style="color:var(--muted2)">MIC</div><div>Hi-Hat</div><div style="color:var(--purple2)">SM81 / C451</div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">5</div><div style="color:var(--muted2)">MIC</div><div>Tom 1</div><div style="color:var(--purple2)">E904 clip</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">6</div><div style="color:var(--muted2)">MIC</div><div>Tom 2</div><div style="color:var(--purple2)">E904 clip</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">7</div><div style="color:var(--muted2)">MIC</div><div>Tom 3 (floor)</div><div style="color:var(--purple2)">E904 clip</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">8</div><div style="color:var(--muted2)">MIC</div><div>OH Left</div><div style="color:var(--purple2)">SM81 / C451</div><div style="color:var(--muted3)">Tall</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">9</div><div style="color:var(--muted2)">MIC</div><div>OH Right</div><div style="color:var(--purple2)">SM81 / C451</div><div style="color:var(--muted3)">Tall</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row" style="background:rgba(170,0,255,.04)"><div style="color:var(--accent);font-weight:700">10</div><div style="color:var(--muted2)">DI</div><div>Bass (direct)</div><div style="color:var(--purple2)">Radial J48</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">Pre-amp out</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">11</div><div style="color:var(--muted2)">MIC</div><div>Bass Amp</div><div style="color:var(--purple2)">SM57 / β52</div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">Optional</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">12</div><div style="color:var(--muted2)">MIC</div><div>Guitar 1 Amp</div><div style="color:var(--purple2)">SM57</div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">Off-axis</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">13</div><div style="color:var(--muted2)">MIC</div><div>Guitar 2 Amp</div><div style="color:var(--purple2)">SM57</div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">Off-axis</div></div>
-              <div class="input-row" style="background:rgba(255,92,26,.04)"><div style="color:var(--accent);font-weight:700">14</div><div style="color:var(--muted2)">MIC</div><div>Vocal 1 (lead)</div><div style="color:var(--purple2)">SM58</div><div style="color:var(--muted3)">Tall</div><div style="color:var(--green3);font-weight:700">PRIORITY</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">15</div><div style="color:var(--muted2)">MIC</div><div>Vocal 2 (BG)</div><div style="color:var(--purple2)">SM58</div><div style="color:var(--muted3)">Tall</div><div style="color:var(--muted3)">Rhythm gtr</div></div>
+              <div class="input-row hdr-row"><div>CH</div><div>TYPE</div><div>SOURCE</div><div>MIC / DI</div><div>STAND</div><div>NOTES</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">1</div><div style="color:var(--muted2)">MIC</div><div>Kick Drum</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true">Beta 91A / D112</span></div><div style="color:var(--muted3)">None</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true">Gate req.</span></div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">2</div><div style="color:var(--muted2)">MIC</div><div>Snare Top</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true">SM57</span></div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">3</div><div style="color:var(--muted2)">MIC</div><div>Snare Bottom</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true">SM57</span></div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true">Phase flip</span></div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">4</div><div style="color:var(--muted2)">MIC</div><div>Hi-Hat</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true">SM81 / C451</span></div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">5</div><div style="color:var(--muted2)">MIC</div><div>Tom 1</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true">E904 clip</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">6</div><div style="color:var(--muted2)">MIC</div><div>Tom 2</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true">E904 clip</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">7</div><div style="color:var(--muted2)">MIC</div><div>Tom 3 (floor)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true">E904 clip</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">8</div><div style="color:var(--muted2)">MIC</div><div>OH Left</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true">SM81 / C451</span></div><div style="color:var(--muted3)">Tall</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">9</div><div style="color:var(--muted2)">MIC</div><div>OH Right</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true">SM81 / C451</span></div><div style="color:var(--muted3)">Tall</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row" style="background:rgba(170,0,255,.04)"><div style="color:var(--accent);font-weight:700">10</div><div style="color:var(--muted2)">DI</div><div>Bass (direct)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true">Radial J48</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true">Pre-amp out</span></div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">11</div><div style="color:var(--muted2)">MIC</div><div>Bass Amp</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true">SM57 / β52</span></div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true">Optional</span></div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">12</div><div style="color:var(--muted2)">MIC</div><div>Guitar 1 Amp</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true">SM57</span></div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true">Off-axis</span></div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">13</div><div style="color:var(--muted2)">MIC</div><div>Guitar 2 Amp</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true">SM57</span></div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true">Off-axis</span></div></div>
+              <div class="input-row" style="background:rgba(255,92,26,.04)"><div style="color:var(--accent);font-weight:700">14</div><div style="color:var(--muted2)">MIC</div><div>Vocal 1 (lead)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true">SM58</span></div><div style="color:var(--muted3)">Tall</div><div style="color:var(--green3);font-weight:700">PRIORITY</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">15</div><div style="color:var(--muted2)">MIC</div><div>Vocal 2 (BG)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true">SM58</span></div><div style="color:var(--muted3)">Tall</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true">Rhythm gtr</span></div></div>
             </div>
           </div>
-
           <!-- 03 FOH Mix Notes -->
           <div class="rider-section">
             <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-              <span style="color:var(--accent)">03</span>&nbsp;&nbsp;FOH MIX NOTES<span>▼</span>
+              <span><span style="color:var(--accent)">03</span>&nbsp;&nbsp;FOH MIX NOTES</span><span>▼</span>
             </div>
             <div class="rider-section-body">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:9px;color:var(--muted2);line-height:1.9">
                 <div>
                   <div style="font-size:7px;color:var(--accent);letter-spacing:.1em;margin-bottom:6px">GENERAL</div>
-                  ▸ Hard rock — guitars prominent, kick punchy<br>
-                  ▸ Vocals clear above guitars at all times<br>
-                  ▸ No click track · No tracks / playback<br>
-                  ▸ Mono-compatible mix essential
+                  <div class="rider-editable" contenteditable="true" style="display:block;line-height:1.9">▸ Hard rock — guitars prominent, kick punchy<br>▸ Vocals clear above guitars at all times<br>▸ No click track · No tracks / playback<br>▸ Mono-compatible mix essential</div>
                 </div>
                 <div>
                   <div style="font-size:7px;color:var(--accent);letter-spacing:.1em;margin-bottom:6px">PER INSTRUMENT</div>
-                  ▸ Kick: tight low-mid, gate, transient shaper<br>
-                  ▸ Guitar: +3dB @ 3–5kHz, cut @ 300Hz<br>
-                  ▸ Bass: DI + amp blend, LP @ 5kHz<br>
-                  ▸ Vocals: plate reverb 1.2s, chorus delay only
+                  <div class="rider-editable" contenteditable="true" style="display:block;line-height:1.9">▸ Kick: tight low-mid, gate, transient shaper<br>▸ Guitar: +3dB @ 3–5kHz, cut @ 300Hz<br>▸ Bass: DI + amp blend, LP @ 5kHz<br>▸ Vocals: plate reverb 1.2s, chorus delay only</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
         <!-- RIGHT COLUMN -->
         <div style="display:flex;flex-direction:column;gap:10px">
-
           <!-- 04 Monitor Requirements -->
           <div class="rider-section">
             <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-              <span style="color:var(--accent)">04</span>&nbsp;&nbsp;MONITOR REQUIREMENTS (4 MIXES)<span>▼</span>
+              <span><span style="color:var(--accent)">04</span>&nbsp;&nbsp;MONITOR REQUIREMENTS (<span class="rider-editable" contenteditable="true" onclick="event.stopPropagation()">4</span> MIXES)</span><span>▼</span>
             </div>
             <div class="rider-section-body">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                 <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--accent)">
                   <div style="font-size:8px;font-weight:700;color:var(--text);margin-bottom:4px">MIX 1 — FÁBIO (Lead Vocal)</div>
-                  <div style="font-size:7px;color:var(--muted3);line-height:1.7">Vocal (self, loud) · Guitar (self, low)<br>Kick · Snare · Bass (low)</div>
+                  <div class="rider-editable" contenteditable="true" style="font-size:7px;color:var(--muted3);line-height:1.7;display:block">Vocal (self, loud) · Guitar (self, low)<br>Kick · Snare · Bass (low)</div>
                 </div>
                 <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--blue2)">
                   <div style="font-size:8px;font-weight:700;color:var(--text);margin-bottom:4px">MIX 2 — PEDRO (Bass)</div>
-                  <div style="font-size:7px;color:var(--muted3);line-height:1.7">Kick · Snare · Guitar 1<br>Vocal 1 · Bass (self, med)</div>
+                  <div class="rider-editable" contenteditable="true" style="font-size:7px;color:var(--muted3);line-height:1.7;display:block">Kick · Snare · Guitar 1<br>Vocal 1 · Bass (self, med)</div>
                 </div>
                 <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--green3)">
                   <div style="font-size:8px;font-weight:700;color:var(--text);margin-bottom:4px">MIX 3 — MANUEL (Drums)</div>
-                  <div style="font-size:7px;color:var(--muted3);line-height:1.7">Vocal 1 · Guitar 1 · Bass<br>Click track (optional)</div>
+                  <div class="rider-editable" contenteditable="true" style="font-size:7px;color:var(--muted3);line-height:1.7;display:block">Vocal 1 · Guitar 1 · Bass<br>Click track (optional)</div>
                 </div>
                 <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--amber2)">
                   <div style="font-size:8px;font-weight:700;color:var(--text);margin-bottom:4px">MIX 4 — TIAGO (BG Vocal)</div>
-                  <div style="font-size:7px;color:var(--muted3);line-height:1.7">Vocal 1 · Vocal 2 (self)<br>Guitar 1 · Kick · Bass (low)</div>
+                  <div class="rider-editable" contenteditable="true" style="font-size:7px;color:var(--muted3);line-height:1.7;display:block">Vocal 1 · Vocal 2 (self)<br>Guitar 1 · Kick · Bass (low)</div>
                 </div>
               </div>
               <div style="margin-top:8px;font-size:8px;color:var(--muted2);padding:8px;background:var(--bg4);border-radius:2px">
-                <span style="color:var(--amber2)">Min:</span> 4× wedge monitors · Preferred: coax or QSC KW · IEM acceptable if provided
+                <span style="color:var(--amber2)">Min:</span> <span class="rider-editable" contenteditable="true">4× wedge monitors · Preferred: coax or QSC KW · IEM acceptable if provided</span>
               </div>
             </div>
           </div>
-
           <!-- 05 Backline -->
           <div class="rider-section">
             <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-              <span style="color:var(--accent)">05</span>&nbsp;&nbsp;BACKLINE &amp; EQUIPMENT<span>▼</span>
+              <span><span style="color:var(--accent)">05</span>&nbsp;&nbsp;BACKLINE &amp; EQUIPMENT</span><span>▼</span>
             </div>
             <div class="rider-section-body">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                 <div>
                   <div style="font-size:7px;color:var(--green3);letter-spacing:.12em;margin-bottom:8px;font-weight:700">BAND PROVIDES</div>
-                  <div style="font-size:8px;color:var(--muted2);line-height:1.9">
-                    ▸ All guitars and bass<br>
-                    ▸ Amp heads (Marshall / Mesa)<br>
-                    ▸ All instrument cables<br>
-                    ▸ All pedalboards + PSUs<br>
-                    ▸ Vocal mics SM58 ×2 (if preferred)<br>
-                    ▸ Gaffer, spare strings, 9V
-                  </div>
+                  <div class="rider-editable" contenteditable="true" style="font-size:8px;color:var(--muted2);line-height:1.9;display:block">▸ All guitars and bass<br>▸ Amp heads (Marshall / Mesa)<br>▸ All instrument cables<br>▸ All pedalboards + PSUs<br>▸ Vocal mics SM58 ×2 (if preferred)<br>▸ Gaffer, spare strings, 9V</div>
                 </div>
                 <div>
                   <div style="font-size:7px;color:var(--accent);letter-spacing:.12em;margin-bottom:8px;font-weight:700">VENUE PROVIDES</div>
-                  <div style="font-size:8px;color:var(--muted2);line-height:1.9">
-                    ▸ Guitar cab 4×12 (Marshall 1960)<br>
-                    ▸ Bass cab 4×10 or 2×15<br>
-                    ▸ Full drum kit + hardware + throne + rug<br>
-                    ▸ All mic stands per input list<br>
-                    ▸ All XLR cables · DI boxes ×2 (Radial)<br>
-                    ▸ Power strips ×4 · Water ×6 on stage
-                  </div>
+                  <div class="rider-editable" contenteditable="true" style="font-size:8px;color:var(--muted2);line-height:1.9;display:block">▸ Guitar cab 4×12 (Marshall 1960)<br>▸ Bass cab 4×10 or 2×15<br>▸ Full drum kit + hardware + throne + rug<br>▸ All mic stands per input list<br>▸ All XLR cables · DI boxes ×2 (Radial)<br>▸ Power strips ×4 · Water ×6 on stage</div>
                 </div>
               </div>
             </div>
           </div>
-
           <!-- 06 Hospitality -->
           <div class="rider-section">
             <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-              <span style="color:var(--accent)">06</span>&nbsp;&nbsp;HOSPITALITY RIDER<span>▼</span>
+              <span><span style="color:var(--accent)">06</span>&nbsp;&nbsp;HOSPITALITY RIDER</span><span>▼</span>
             </div>
             <div class="rider-section-body">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                 <div>
                   <div style="font-size:7px;color:var(--blue2);letter-spacing:.12em;margin-bottom:8px;font-weight:700">DRESSING ROOM</div>
-                  <div style="font-size:8px;color:var(--muted2);line-height:1.9">
-                    ▸ Access from load-in<br>
-                    ▸ 12× water bottles<br>
-                    ▸ 4× towels<br>
-                    ▸ Mirror + adequate lighting<br>
-                    ▸ Power outlets ×4<br>
-                    ▸ WiFi access
-                  </div>
+                  <div class="rider-editable" contenteditable="true" style="font-size:8px;color:var(--muted2);line-height:1.9;display:block">▸ Access from load-in<br>▸ 12× water bottles<br>▸ 4× towels<br>▸ Mirror + adequate lighting<br>▸ Power outlets ×4<br>▸ WiFi access</div>
                 </div>
                 <div>
                   <div style="font-size:7px;color:var(--amber2);letter-spacing:.12em;margin-bottom:8px;font-weight:700">CATERING</div>
-                  <div style="font-size:8px;color:var(--muted2);line-height:1.9">
-                    ▸ Light meal or buy-out €15/person (×4)<br>
-                    ▸ 6× water on stage<br>
-                    ▸ 6× beer post-show (local brand fine)<br>
-                    ▸ Coffee / tea available<br>
-                    ▸ Parking: 1 van backstage<br>
-                    ▸ <span style="color:var(--muted3)">Easy to work with — not a diva rider</span>
-                  </div>
+                  <div class="rider-editable" contenteditable="true" style="font-size:8px;color:var(--muted2);line-height:1.9;display:block">▸ Light meal or buy-out €15/person (×4)<br>▸ 6× water on stage<br>▸ 6× beer post-show<br>▸ Parking for 1 van (transit size)</div>
                 </div>
               </div>
             </div>
           </div>
-
-          <!-- Contact footer -->
-          <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:12px 14px">
-            <div style="font-size:7px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px">TECHNICAL CONTACT</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:8px;color:var(--muted2)">
-              <div>
-                <div style="font-weight:700;color:var(--text);margin-bottom:2px">Tiago M. — Stage Manager</div>
-                <div>tiago@ginskeys.com</div>
-              </div>
-              <div>
-                <div style="color:var(--muted3);font-size:7px;margin-bottom:2px">CREDENTIALS</div>
-                <div>FMM Sines · L-Acoustics · Allen &amp; Heath Avantis · Avolites Titan Quartz</div>
+          <!-- 07 Contact -->
+          <div class="rider-section">
+            <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
+              <span><span style="color:var(--accent)">07</span>&nbsp;&nbsp;TECHNICAL CONTACT</span><span>▼</span>
+            </div>
+            <div class="rider-section-body">
+              <div style="font-size:9px;color:var(--muted2);line-height:2">
+                <div>Name: <span class="rider-editable" contenteditable="true" style="color:var(--text)">Tiago M.</span></div>
+                <div>Role: <span class="rider-editable" contenteditable="true" style="color:var(--text)">Stage Manager / Backline Tech</span></div>
+                <div>Email: <span class="rider-editable" contenteditable="true" style="color:var(--accent)">tiago@ginskeys.com</span></div>
+                <div>Phone: <span class="rider-editable" contenteditable="true" style="color:var(--text)">+351 — — —</span></div>
+                <div style="margin-top:8px;padding:8px;background:var(--bg4);border-radius:2px;font-size:8px">
+                  <span class="rider-editable" contenteditable="true" style="display:block">Full EPK, stage plot, and production photos available on request. All requirements are negotiable for smaller venues — please get in touch before the show.</span>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
 
+    <!-- ── STAGE PLOT ── -->
+    <div class="prod-sub" id="prod-stageplot" style="flex:1;overflow-y:auto">
+      <div style="display:grid;grid-template-columns:1fr 260px;gap:14px;align-items:start">
+        <div>
+          <div class="splot-toolbar">
+            <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-right:4px">ADD:</div>
+            <button class="splot-btn" onclick="splotAddElement('vocal')">🎤 Vocal</button>
+            <button class="splot-btn" onclick="splotAddElement('guitar')">🎸 Guitar</button>
+            <button class="splot-btn" onclick="splotAddElement('bass')">🎸 Bass</button>
+            <button class="splot-btn" onclick="splotAddElement('drums')">🥁 Drums</button>
+            <button class="splot-btn" onclick="splotAddElement('amp')">🔊 Amp</button>
+            <button class="splot-btn" onclick="splotAddElement('monitor')">📢 Monitor</button>
+            <button class="splot-btn" onclick="splotAddElement('di')">DI</button>
+            <button class="splot-btn" onclick="splotAddElement('riser')">▭ Riser</button>
+            <div style="flex:1"></div>
+            <button class="splot-btn" onclick="splotReset()">↺ Reset</button>
+            <button class="splot-btn" onclick="splotLoadDefault()">⚡ Load Default</button>
+            <button class="splot-btn" onclick="printStagePlot()">⎙ Print PDF</button>
+          </div>
+          <div class="splot-canvas-wrap">
+            <canvas id="splot-canvas" class="splot-canvas" width="700" height="500"
+              onmousedown="splotMouseDown(event)"
+              onmousemove="splotMouseMove(event)"
+              onmouseup="splotMouseUp(event)"
+              ondblclick="splotDblClick(event)"
+              oncontextmenu="event.preventDefault();splotMouseDown(event)">
+            </canvas>
+          </div>
+          <div class="splot-legend">
+            <div class="splot-legend-item"><span style="width:12px;height:12px;background:#ff3c1e;border-radius:50%;display:inline-block"></span>Vocals</div>
+            <div class="splot-legend-item"><span style="width:12px;height:12px;background:#aa00ff;border-radius:2px;display:inline-block"></span>Guitar</div>
+            <div class="splot-legend-item"><span style="width:12px;height:12px;background:#2979ff;border-radius:2px;display:inline-block"></span>Bass</div>
+            <div class="splot-legend-item"><span style="width:12px;height:12px;background:#ff8f00;border-radius:2px;display:inline-block"></span>Drums</div>
+            <div class="splot-legend-item"><span style="width:12px;height:12px;background:#546e7a;border-radius:2px;display:inline-block"></span>Amp</div>
+            <div class="splot-legend-item"><span style="width:12px;height:12px;background:#00e676;border-radius:2px;display:inline-block"></span>Monitor</div>
+            <div class="splot-legend-item"><span style="width:12px;height:4px;background:#ccc;display:inline-block"></span>Audience</div>
+            <div style="flex:1"></div>
+            <div style="font-size:8px;color:var(--muted3)">Drag to move · Double-click to rename · Right-click to delete</div>
+          </div>
+        </div>
+        <!-- Side panel: selected element + input list -->
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="panel" id="splot-info-panel">
+            <div class="panel-header">
+              <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Selected Element</div>
+            </div>
+            <div class="panel-body" id="splot-info-body" style="font-size:9px;color:var(--muted3)">
+              Click any element on the stage plot to see its details and edit its label.
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Channel Assignment</div>
+            </div>
+            <div class="panel-body" style="font-size:8px;color:var(--muted2);line-height:1.9" id="splot-ch-list">
+              Load default layout or add elements to see channel assignments.
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -7582,6 +7650,24 @@ async function loadStreamingFromApi() {
 
 
 // ══════════════════════════════════════════════════════════
+// ── Canvas roundRect polyfill (Safari < 15.4) ────────
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r) {
+    r = Math.min(r, w/2, h/2);
+    this.beginPath();
+    this.moveTo(x+r, y);
+    this.lineTo(x+w-r, y);
+    this.quadraticCurveTo(x+w, y, x+w, y+r);
+    this.lineTo(x+w, y+h-r);
+    this.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+    this.lineTo(x+r, y+h);
+    this.quadraticCurveTo(x, y+h, x, y+h-r);
+    this.lineTo(x, y+r);
+    this.quadraticCurveTo(x, y, x+r, y);
+    this.closePath();
+  };
+}
+
 // LIVE PRODUCTION ENGINE
 // ══════════════════════════════════════════════════════════
 
@@ -7611,6 +7697,7 @@ function switchProdTab(tab, el) {
   document.getElementById('prod-'+tab).classList.add('ps-active');
   if (tab === 'checklist') populateChecklistShowPicker();
   if (tab === 'setlist') loadSetlists();
+  if (tab === 'stageplot') { setTimeout(splotDraw, 50); }
 }
 
 // ── SHOWS ─────────────────────────────────────────────
@@ -7634,22 +7721,26 @@ function renderShowsList() {
     const d = new Date(s.show_date);
     const isPast = d < new Date();
     return `
-    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:12px 14px;border-left:3px solid ${isPast?'var(--muted)':'var(--accent)'}">
+    <div class="show-card ${isPast?'show-card-past':''}">
       <div style="display:flex;justify-content:space-between;align-items:start">
         <div>
-          <div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--text)">${s.venue_name||'Show'}</div>
-          <div style="font-size:8px;color:var(--muted3);margin-top:2px">${s.show_date} ${s.venue_address?'· '+s.venue_address:''}</div>
+          <div style="font-family:var(--display);font-size:15px;font-weight:700;color:var(--text)">${s.venue_name||'Show'}</div>
+          <div style="font-size:8px;color:var(--muted3);margin-top:2px">${s.show_date}${s.venue_address?' · '+s.venue_address:''}</div>
         </div>
-        <span style="font-size:7px;padding:2px 8px;border-radius:1px;background:${isPast?'var(--bg4)':'rgba(255,60,30,.1)'};color:${isPast?'var(--muted)':'var(--accent)'}">${isPast?'PAST':'UPCOMING'}</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:7px;padding:2px 8px;border-radius:1px;background:${isPast?'var(--bg4)':'rgba(255,60,30,.1)'};color:${isPast?'var(--muted)':'var(--accent)'}">${isPast?'PAST':'UPCOMING'}</span>
+          <button onclick="deleteShow('${s.id}','${(s.venue_name||'Show').replace(/'/g,"\\'")}' )" style="background:transparent;border:1px solid var(--border2);color:var(--muted3);font-size:9px;padding:2px 6px;cursor:pointer;border-radius:1px">✕</button>
+        </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px">
-        <div class="time-kpi"><div class="time-kpi-val" style="font-size:14px">${s.load_in_time||'—'}</div><div class="time-kpi-lbl">Load-in</div></div>
-        <div class="time-kpi"><div class="time-kpi-val" style="font-size:14px">${s.soundcheck_time||'—'}</div><div class="time-kpi-lbl">Soundcheck</div></div>
-        <div class="time-kpi"><div class="time-kpi-val" style="font-size:14px">${s.doors_time||'—'}</div><div class="time-kpi-lbl">Doors</div></div>
-        <div class="time-kpi"><div class="time-kpi-val" style="font-size:14px">${s.show_time||'—'}</div><div class="time-kpi-lbl">Show</div></div>
+        <div class="time-kpi"><div class="time-kpi-val">${s.load_in_time||'—'}</div><div class="time-kpi-lbl">Load-in</div></div>
+        <div class="time-kpi"><div class="time-kpi-val">${s.soundcheck_time||'—'}</div><div class="time-kpi-lbl">Soundcheck</div></div>
+        <div class="time-kpi"><div class="time-kpi-val">${s.doors_time||'—'}</div><div class="time-kpi-lbl">Doors</div></div>
+        <div class="time-kpi"><div class="time-kpi-val">${s.show_time||'—'}</div><div class="time-kpi-lbl">Show</div></div>
       </div>
-      ${s.pa_system||s.console_foh?`<div style="font-size:8px;color:var(--muted2);margin-top:8px">PA: ${s.pa_system||'TBC'} · FOH: ${s.console_foh||'TBC'} · Stage: ${s.stage_width_m||'?'}×${s.stage_depth_m||'?'}m</div>`:''}
-      ${s.set_length_min?`<div style="font-size:8px;color:var(--amber2);margin-top:4px">Set: ${s.set_length_min} min</div>`:''}
+      ${s.pa_system||s.console_foh?`<div style="font-size:8px;color:var(--muted2);margin-top:8px;padding:6px 8px;background:var(--bg4);border-radius:2px">PA: ${s.pa_system||'TBC'} · FOH: ${s.console_foh||'TBC'} · Stage: ${s.stage_width_m||'?'}×${s.stage_depth_m||'?'}m</div>`:''}
+      ${s.set_length_min?`<div style="font-size:8px;color:var(--amber2);margin-top:6px">Set: ${s.set_length_min} min</div>`:''}
+      ${s.notes?`<div style="font-size:8px;color:var(--muted3);margin-top:4px;font-style:italic">${s.notes}</div>`:''}
     </div>`;
   }).join('');
 }
@@ -7683,6 +7774,15 @@ async function createShow() {
   } catch(e) { statusEl.textContent = '✗ ' + e.message; }
 }
 
+async function deleteShow(id, name) {
+  if (!confirm(`Delete show "${name}"? This cannot be undone.`)) return;
+  try {
+    await _apiFetch('DELETE', '/production/shows/' + id);
+    await loadShows();
+    showToast('Show deleted', 'ok');
+  } catch(e) { showToast('Delete failed: ' + e.message, 'err'); }
+}
+
 // ── TECH RIDER ────────────────────────────────────────
 function toggleRiderSection(el) {
   const body = el.nextElementSibling;
@@ -7693,17 +7793,67 @@ function toggleRiderSection(el) {
 }
 
 function printRider() {
-  const el = document.getElementById('prod-rider');
-  const w = window.open('','_blank');
-  w.document.write(`<html><head><title>The Ginskeys — Tech Rider</title>
-    <style>body{font-family:monospace;font-size:11px;padding:20px;color:#000}
-    table{width:100%;border-collapse:collapse}td,th{padding:4px 8px;border:1px solid #ccc}
-    h1{font-size:16px}h2{font-size:12px;margin-top:16px;border-bottom:1px solid #000}</style></head><body>
-    <h1>THE GINSKEYS — TECHNICAL RIDER</h1>
-    <p>Hard Rock · 4 piece · Sines, Portugal · ${new Date().toLocaleDateString('pt-PT')}</p>
-    ${el.innerHTML}</body></html>`);
+  const riderEl = document.getElementById('prod-rider');
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>The Ginskeys — Tech Rider</title>
+  <style>
+    *{box-sizing:border-box}
+    body{font-family:'Courier New',monospace;font-size:10px;padding:24px 32px;color:#111;background:#fff;max-width:900px;margin:0 auto}
+    h1{font-size:22px;font-weight:900;letter-spacing:.1em;margin:0 0 4px}
+    .sub{font-size:9px;color:#555;letter-spacing:.08em;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #111}
+    .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .section{border:1px solid #ccc;margin-bottom:12px;break-inside:avoid}
+    .section-hdr{background:#f5f5f5;padding:8px 12px;font-size:9px;font-weight:700;letter-spacing:.06em;border-bottom:1px solid #ccc}
+    .section-body{padding:10px 12px;font-size:9px;line-height:1.8}
+    table{width:100%;border-collapse:collapse}
+    td,th{padding:5px 8px;border:1px solid #ddd;font-size:9px;text-align:left}
+    th{background:#f5f5f5;font-weight:700;letter-spacing:.08em}
+    .input-grid{display:grid;grid-template-columns:28px 36px 1fr 100px 55px 65px;gap:6px;padding:4px 8px;border-bottom:1px solid #eee;font-size:9px}
+    .input-hdr{background:#f5f5f5;font-weight:700;letter-spacing:.06em}
+    .mix-box{padding:8px;border:1px solid #ddd;margin-bottom:6px;font-size:9px}
+    .mix-box-hdr{font-weight:700;margin-bottom:4px}
+    @page{margin:15mm}
+  </style></head><body>
+  <h1>THE GINSKEYS</h1>
+  <div class="sub">TECHNICAL RIDER · HARD ROCK · 4 PIECE · SINES, PORTUGAL · ${new Date().toLocaleDateString('pt-PT')}</div>
+  <div class="cols">
+    <div>
+      <div class="section">
+        <div class="section-hdr">01 &nbsp; BAND LINEUP</div>
+        <div class="section-body">
+          <table><tr><th>MEMBER</th><th>ROLE</th><th>POSITION</th></tr>
+          ${['FÁBIO','PEDRO','MANUEL','TIAGO'].map((n,i) => {
+            const rows = riderEl.querySelectorAll('tr');
+            const row = Array.from(rows).find(r => r.querySelector('td') && r.querySelector('td').textContent.trim() === n);
+            if (!row) return '';
+            const cells = row.querySelectorAll('td');
+            return `<tr><td><strong>${n}</strong></td><td>${cells[1]?.innerText||''}</td><td>${cells[2]?.innerText||''}</td></tr>`;
+          }).join('')}
+          </table>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-hdr">02 &nbsp; INPUT LIST</div>
+        <div class="section-body" style="padding:0">
+          ${Array.from(riderEl.querySelectorAll('.input-row')).map(row => {
+            const divs = row.querySelectorAll('div');
+            const cls = row.classList.contains('hdr-row') ? 'input-hdr' : '';
+            return `<div class="input-grid ${cls}">${Array.from(divs).map(d=>`<div>${d.innerText}</div>`).join('')}</div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+    <div>
+      ${Array.from(riderEl.querySelectorAll('.rider-section')).slice(2).map(sec => {
+        const hdr = sec.querySelector('.rider-section-hdr')?.innerText?.replace('▼','').replace('▶','').trim() || '';
+        const body = sec.querySelector('.rider-section-body')?.innerHTML || '';
+        return `<div class="section"><div class="section-hdr">${hdr}</div><div class="section-body">${body}</div></div>`;
+      }).join('')}
+    </div>
+  </div>
+  </body></html>`);
   w.document.close();
-  setTimeout(()=>w.print(), 500);
+  setTimeout(() => w.print(), 600);
 }
 
 function copyRiderText() {
@@ -7712,10 +7862,10 @@ function copyRiderText() {
     'Hard Rock · 4 piece · Sines, Portugal',
     '',
     'BAND LINEUP:',
-    'Fábio — Lead Guitar + Lead Vocals (Centre/SR) · Guitar amp mic SM57 + vocal SM58',
-    'Pedro — Bass (Stage Left) · Bass DI + amp or DI only',
-    'Manuel — Drums (Centre Rear) · Full kit: kick/snare T+B/HH/3 toms/2 OH',
-    'Tiago — Rhythm Guitar + BG Vocals (SR) · Guitar amp mic SM57 + vocal SM58',
+    'Fábio — Lead Guitar + Lead Vocals (Centre/SR)',
+    'Pedro — Bass (Stage Left)',
+    'Manuel — Drums (Centre Rear)',
+    'Tiago — Rhythm Guitar + BG Vocals (SR)',
     '',
     'TOTAL INPUTS: 15 channels (see input list)',
     'MONITORS: 4 separate mixes required',
@@ -7727,7 +7877,451 @@ function copyRiderText() {
     '',
     'Technical contact: Tiago M. · tiago@ginskeys.com',
   ];
-  navigator.clipboard.writeText(lines.join('\n')).then(()=>showToast('Rider copied to clipboard','ok'));
+  navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('Rider copied to clipboard', 'ok'));
+}
+
+// ── STAGE PLOT ENGINE ──────────────────────────────────
+const SPLOT_COLORS = {
+  vocal:'#ff3c1e', guitar:'#aa00ff', bass:'#2979ff',
+  drums:'#ff8f00', amp:'#546e7a', monitor:'#00e676',
+  di:'#00bcd4', riser:'#37474f', label:'#ffffff'
+};
+const SPLOT_SHAPES = {
+  vocal:'circle', guitar:'rect', bass:'rect',
+  drums:'drum', amp:'rect', monitor:'wedge',
+  di:'rect', riser:'rect'
+};
+const SPLOT_DEFAULTS = {
+  vocal: {w:36,h:36}, guitar:{w:44,h:44}, bass:{w:44,h:44},
+  drums:{w:80,h:70}, amp:{w:50,h:40}, monitor:{w:44,h:28},
+  di:{w:28,h:20}, riser:{w:120,h:60}
+};
+
+let SPLOT_ELEMENTS = [];
+let splotDragging = null;
+let splotDragOffX = 0, splotDragOffY = 0;
+let splotSelected = null;
+let splotCtx = null;
+
+function splotGetCanvas() {
+  const c = document.getElementById('splot-canvas');
+  if (!splotCtx && c) splotCtx = c.getContext('2d');
+  return c;
+}
+
+function splotLoadDefault() {
+  SPLOT_ELEMENTS = [
+    // Risers
+    {id:'r1',type:'riser',label:'DRUM RISER',x:270,y:60,w:160,h:80,color:'#37474f'},
+    // Drum kit
+    {id:'d1',type:'drums',label:'MANUEL\nDrums',x:310,y:75,w:80,h:65,color:'#ff8f00'},
+    // Amps
+    {id:'a1',type:'amp',label:'GTR AMP 1\n(Fábio)',x:120,y:80,w:54,h:44,color:'#546e7a'},
+    {id:'a2',type:'amp',label:'GTR AMP 2\n(Tiago)',x:520,y:80,w:54,h:44,color:'#546e7a'},
+    {id:'a3',type:'amp',label:'BASS AMP\n(Pedro)',x:430,y:80,w:54,h:44,color:'#546e7a'},
+    // DI boxes
+    {id:'di1',type:'di',label:'BASS DI',x:440,y:145,w:30,h:20,color:'#00bcd4'},
+    // Guitar players
+    {id:'g1',type:'guitar',label:'FÁBIO\nLd.Gtr+Vox',x:130,y:165,w:50,h:50,color:'#aa00ff'},
+    {id:'g2',type:'guitar',label:'TIAGO\nRhm.Gtr+Vox',x:510,y:165,w:50,h:50,color:'#aa00ff'},
+    // Bass
+    {id:'b1',type:'bass',label:'PEDRO\nBass',x:420,y:165,w:50,h:50,color:'#2979ff'},
+    // Monitors
+    {id:'m1',type:'monitor',label:'MON 1\nFábio',x:110,y:230,w:46,h:30,color:'#00e676'},
+    {id:'m2',type:'monitor',label:'MON 2\nPedro',x:395,y:230,w:46,h:30,color:'#00e676'},
+    {id:'m3',type:'monitor',label:'MON 3\nManuel',x:305,y:155,w:46,h:30,color:'#00e676'},
+    {id:'m4',type:'monitor',label:'MON 4\nTiago',x:490,y:230,w:46,h:30,color:'#00e676'},
+    // Vocals
+    {id:'v1',type:'vocal',label:'VOC 1\nFábio',x:155,y:210,w:34,h:34,color:'#ff3c1e'},
+    {id:'v2',type:'vocal',label:'VOC 2\nTiago',x:535,y:210,w:34,h:34,color:'#ff3c1e'},
+  ];
+  splotSelected = null;
+  splotDraw();
+  updateSplotChannelList();
+  showToast('Default stage plot loaded', 'ok');
+}
+
+function splotReset() {
+  if (!confirm('Clear the stage plot?')) return;
+  SPLOT_ELEMENTS = [];
+  splotSelected = null;
+  splotDraw();
+  updateSplotChannelList();
+}
+
+function splotAddElement(type) {
+  const defaults = SPLOT_DEFAULTS[type] || {w:40,h:40};
+  const id = type + '_' + Date.now();
+  const labels = {
+    vocal:'Vocal', guitar:'Guitar', bass:'Bass', drums:'Drums',
+    amp:'Amp', monitor:'Monitor', di:'DI Box', riser:'Riser'
+  };
+  SPLOT_ELEMENTS.push({
+    id, type,
+    label: labels[type] || type,
+    x: 100 + Math.random()*400,
+    y: 100 + Math.random()*200,
+    w: defaults.w,
+    h: defaults.h,
+    color: SPLOT_COLORS[type] || '#888'
+  });
+  splotDraw();
+  updateSplotChannelList();
+}
+
+function splotDraw() {
+  const canvas = splotGetCanvas();
+  if (!canvas) return;
+  const ctx = splotCtx;
+  const W = canvas.width, H = canvas.height;
+
+  // Background
+  ctx.fillStyle = '#0d0d0d';
+  ctx.fillRect(0, 0, W, H);
+
+  // Stage area
+  ctx.fillStyle = '#141414';
+  ctx.strokeStyle = '#333';
+  ctx.lineWidth = 1;
+  ctx.fillRect(60, 30, W-120, H-120);
+  ctx.strokeRect(60, 30, W-120, H-120);
+
+  // Stage edge (front)
+  ctx.strokeStyle = '#ff3c1e';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(60, H-90);
+  ctx.lineTo(W-60, H-90);
+  ctx.stroke();
+
+  // Audience label
+  ctx.fillStyle = '#333';
+  ctx.font = '10px monospace';
+  ctx.letterSpacing = '4px';
+  ctx.textAlign = 'center';
+  ctx.fillText('◀ ◀ ◀  AUDIENCE  ▶ ▶ ▶', W/2, H-60);
+
+  // Stage label
+  ctx.fillStyle = '#222';
+  ctx.font = 'bold 9px monospace';
+  ctx.letterSpacing = '3px';
+  ctx.fillText('S  T  A  G  E', W/2, H-100);
+
+  // SR / SL labels
+  ctx.fillStyle = '#333';
+  ctx.font = '8px monospace';
+  ctx.letterSpacing = '1px';
+  ctx.textAlign = 'left';
+  ctx.fillText('SR', 65, H-95);
+  ctx.textAlign = 'right';
+  ctx.fillText('SL', W-65, H-95);
+
+  // FOH position
+  ctx.fillStyle = '#1a1a1a';
+  ctx.strokeStyle = '#333';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(W/2, H-30, 14, 0, Math.PI*2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#444';
+  ctx.font = '7px monospace';
+  ctx.letterSpacing = '0px';
+  ctx.textAlign = 'center';
+  ctx.fillText('FOH', W/2, H-27);
+
+  // Draw elements
+  for (const el of SPLOT_ELEMENTS) {
+    const isSelected = splotSelected && splotSelected.id === el.id;
+    ctx.save();
+
+    // Shadow for selected
+    if (isSelected) {
+      ctx.shadowColor = el.color;
+      ctx.shadowBlur = 12;
+    }
+
+    // Draw shape
+    if (SPLOT_SHAPES[el.type] === 'circle') {
+      const r = Math.min(el.w, el.h) / 2;
+      ctx.fillStyle = el.color + '33';
+      ctx.strokeStyle = el.color;
+      ctx.lineWidth = isSelected ? 2.5 : 1.5;
+      ctx.beginPath();
+      ctx.arc(el.x + el.w/2, el.y + el.h/2, r, 0, Math.PI*2);
+      ctx.fill(); ctx.stroke();
+      // Mic stand dot
+      ctx.fillStyle = el.color;
+      ctx.beginPath();
+      ctx.arc(el.x + el.w/2, el.y + el.h/2, 5, 0, Math.PI*2);
+      ctx.fill();
+    } else if (el.type === 'monitor') {
+      // Wedge shape
+      ctx.fillStyle = el.color + '33';
+      ctx.strokeStyle = el.color;
+      ctx.lineWidth = isSelected ? 2.5 : 1.5;
+      ctx.beginPath();
+      ctx.moveTo(el.x, el.y + el.h);
+      ctx.lineTo(el.x + el.w, el.y + el.h);
+      ctx.lineTo(el.x + el.w * 0.8, el.y);
+      ctx.lineTo(el.x + el.w * 0.2, el.y);
+      ctx.closePath();
+      ctx.fill(); ctx.stroke();
+    } else if (el.type === 'drums') {
+      // Drum kit shape
+      ctx.fillStyle = el.color + '22';
+      ctx.strokeStyle = el.color;
+      ctx.lineWidth = isSelected ? 2.5 : 1.5;
+      ctx.beginPath();
+      ctx.roundRect(el.x, el.y, el.w, el.h, 4);
+      ctx.fill(); ctx.stroke();
+      // Kick
+      ctx.fillStyle = el.color + '66';
+      ctx.beginPath();
+      ctx.ellipse(el.x + el.w/2, el.y + el.h*0.65, el.w*0.2, el.h*0.18, 0, 0, Math.PI*2);
+      ctx.fill();
+      // Snare
+      ctx.beginPath();
+      ctx.ellipse(el.x + el.w*0.3, el.y + el.h*0.42, el.w*0.12, el.h*0.12, 0, 0, Math.PI*2);
+      ctx.fill();
+      // Hi-hat
+      ctx.beginPath();
+      ctx.arc(el.x + el.w*0.2, el.y + el.h*0.25, 7, 0, Math.PI*2);
+      ctx.stroke();
+    } else {
+      // Generic rect
+      ctx.fillStyle = el.color + '22';
+      ctx.strokeStyle = el.color;
+      ctx.lineWidth = isSelected ? 2.5 : 1.5;
+      ctx.beginPath();
+      ctx.roundRect(el.x, el.y, el.w, el.h, 3);
+      ctx.fill(); ctx.stroke();
+    }
+
+    ctx.shadowBlur = 0;
+
+    // Label
+    ctx.fillStyle = '#fff';
+    ctx.font = '7.5px monospace';
+    ctx.textAlign = 'center';
+    ctx.letterSpacing = '0px';
+    const lines = el.label.split('\n');
+    const lineH = 9;
+    const totalH = lines.length * lineH;
+    const startY = el.y + el.h/2 - totalH/2 + lineH/2;
+    lines.forEach((line, i) => {
+      if (i === 0) {
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 7.5px monospace';
+      } else {
+        ctx.fillStyle = el.color;
+        ctx.font = '7px monospace';
+      }
+      ctx.fillText(line, el.x + el.w/2, startY + i*lineH);
+    });
+
+    // Selected outline
+    if (isSelected) {
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3,3]);
+      ctx.strokeRect(el.x - 3, el.y - 3, el.w + 6, el.h + 6);
+      ctx.setLineDash([]);
+    }
+
+    ctx.restore();
+  }
+}
+
+function splotGetElement(x, y) {
+  // Iterate reversed so top elements get picked first
+  for (let i = SPLOT_ELEMENTS.length - 1; i >= 0; i--) {
+    const el = SPLOT_ELEMENTS[i];
+    if (x >= el.x && x <= el.x + el.w && y >= el.y && y <= el.y + el.h) return el;
+  }
+  return null;
+}
+
+function splotMouseDown(e) {
+  const canvas = splotGetCanvas();
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+
+  if (e.button === 2) {
+    // Right-click: delete
+    e.preventDefault();
+    const el = splotGetElement(x, y);
+    if (el && confirm(`Delete "${el.label.split('\n')[0]}"?`)) {
+      SPLOT_ELEMENTS = SPLOT_ELEMENTS.filter(e => e.id !== el.id);
+      if (splotSelected?.id === el.id) splotSelected = null;
+      splotDraw();
+      updateSplotChannelList();
+    }
+    return;
+  }
+
+  const el = splotGetElement(x, y);
+  if (el) {
+    splotDragging = el;
+    splotDragOffX = x - el.x;
+    splotDragOffY = y - el.y;
+    splotSelected = el;
+    splotDraw();
+    updateSplotInfoPanel(el);
+  } else {
+    splotSelected = null;
+    splotDraw();
+    updateSplotInfoPanel(null);
+  }
+}
+
+function splotMouseMove(e) {
+  if (!splotDragging) return;
+  const canvas = splotGetCanvas();
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+  splotDragging.x = Math.max(0, Math.min(canvas.width - splotDragging.w, x - splotDragOffX));
+  splotDragging.y = Math.max(0, Math.min(canvas.height - splotDragging.h, y - splotDragOffY));
+  splotDraw();
+}
+
+function splotMouseUp() { splotDragging = null; }
+
+function splotDblClick(e) {
+  const canvas = splotGetCanvas();
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+  const el = splotGetElement(x, y);
+  if (!el) return;
+  const newLabel = prompt('Rename element:', el.label.replace('\n', ' / '));
+  if (newLabel !== null) {
+    el.label = newLabel.replace(' / ', '\n');
+    splotDraw();
+    updateSplotInfoPanel(el);
+  }
+}
+
+function updateSplotInfoPanel(el) {
+  const body = document.getElementById('splot-info-body');
+  if (!body) return;
+  if (!el) {
+    body.innerHTML = '<span style="color:var(--muted3)">Click any element to select it.</span>';
+    return;
+  }
+  body.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:12px;height:12px;background:${el.color};border-radius:${el.type==='vocal'?'50%':'2px'};flex-shrink:0"></div>
+        <div style="font-weight:700;font-size:10px;color:var(--text)">${el.label.replace('\n',' ')}</div>
+      </div>
+      <div style="font-size:8px;color:var(--muted3)">Type: ${el.type.toUpperCase()} · Position: ${Math.round(el.x)}, ${Math.round(el.y)}</div>
+      <div>
+        <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:4px">LABEL</div>
+        <input class="login-input" style="width:100%;font-size:9px" value="${el.label.replace('\n',' / ')}"
+          oninput="const parts=this.value.split(' / ');const sel=SPLOT_ELEMENTS.find(e=>e.id==='${el.id}');if(sel){sel.label=parts.length>1?parts[0]+'\\n'+parts.slice(1).join(' / '):this.value;splotDraw();}"
+        >
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div>
+          <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:4px">WIDTH (px)</div>
+          <input class="login-input" style="font-size:9px" type="number" value="${el.w}" min="20" max="300"
+            oninput="const s=SPLOT_ELEMENTS.find(e=>e.id==='${el.id}');if(s){s.w=+this.value;splotDraw();}">
+        </div>
+        <div>
+          <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:4px">HEIGHT (px)</div>
+          <input class="login-input" style="font-size:9px" type="number" value="${el.h}" min="20" max="300"
+            oninput="const s=SPLOT_ELEMENTS.find(e=>e.id==='${el.id}');if(s){s.h=+this.value;splotDraw();}">
+        </div>
+      </div>
+      <button class="btn-sm" style="color:var(--red3);border-color:var(--red2);font-size:8px"
+        onclick="SPLOT_ELEMENTS=SPLOT_ELEMENTS.filter(e=>e.id!=='${el.id}');splotSelected=null;splotDraw();updateSplotChannelList();updateSplotInfoPanel(null)">
+        ✕ Delete Element
+      </button>
+    </div>`;
+}
+
+function updateSplotChannelList() {
+  const el = document.getElementById('splot-ch-list');
+  if (!el) return;
+  const inputs = SPLOT_ELEMENTS.filter(e => ['vocal','guitar','bass','drums'].includes(e.type));
+  const amps   = SPLOT_ELEMENTS.filter(e => e.type === 'amp');
+  const mons   = SPLOT_ELEMENTS.filter(e => e.type === 'monitor');
+  if (!inputs.length && !amps.length && !mons.length) {
+    el.innerHTML = '<span style="color:var(--muted3)">No elements yet.</span>';
+    return;
+  }
+  let ch = 1;
+  let rows = '';
+  SPLOT_ELEMENTS.forEach(e => {
+    const typeChMap = {
+      drums: ['Kick', 'Snare Top', 'Snare Bot', 'Hi-Hat', 'Tom 1', 'Tom 2', 'Floor Tom', 'OH L', 'OH R'],
+      bass:  ['Bass DI', 'Bass Amp'],
+      guitar:['Guitar Amp'],
+      vocal: ['Vocal'],
+      amp:   ['Amp Mic'],
+      di:    ['DI'],
+    };
+    const chs = typeChMap[e.type] || [e.type];
+    chs.forEach(src => {
+      rows += `<div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid var(--border1)">
+        <span style="color:var(--accent);font-weight:700;min-width:20px">${ch++}</span>
+        <span style="color:var(--muted3);min-width:70px">${src}</span>
+        <span style="color:var(--text)">${e.label.split('\n')[0]}</span>
+      </div>`;
+    });
+  });
+  el.innerHTML = rows;
+}
+
+function printStagePlot() {
+  const canvas = document.getElementById('splot-canvas');
+  if (!canvas) return;
+  splotDraw();
+  const imgData = canvas.toDataURL('image/png');
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>The Ginskeys — Stage Plot</title>
+  <style>
+    body{font-family:'Courier New',monospace;padding:20px;background:#fff;color:#000;text-align:center}
+    h1{font-size:20px;font-weight:900;letter-spacing:.1em;margin:0 0 4px;text-align:left}
+    .sub{font-size:9px;color:#555;letter-spacing:.08em;margin-bottom:16px;text-align:left;padding-bottom:10px;border-bottom:1px solid #ccc}
+    img{max-width:100%;border:1px solid #ccc;display:block;margin:0 auto}
+    .ch-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:9px;text-align:left}
+    .ch-table th{background:#f5f5f5;padding:5px 8px;border:1px solid #ccc;letter-spacing:.08em}
+    .ch-table td{padding:4px 8px;border:1px solid #ddd}
+    @page{margin:12mm;size:A4 landscape}
+  </style></head><body>
+  <h1>THE GINSKEYS — STAGE PLOT</h1>
+  <div class="sub">Hard Rock · 4 piece · Sines, Portugal · ${new Date().toLocaleDateString('pt-PT')} &nbsp;|&nbsp; SR = Stage Right (audience left) &nbsp;|&nbsp; SL = Stage Left (audience right)</div>
+  <img src="${imgData}" alt="Stage Plot">
+  <table class="ch-table">
+    <tr><th>CH</th><th>SOURCE</th><th>ELEMENT</th></tr>
+    ${(() => {
+      let ch = 1, rows = '';
+      SPLOT_ELEMENTS.forEach(e => {
+        const typeChMap = {
+          drums:['Kick','Snare Top','Snare Bot','Hi-Hat','Tom 1','Tom 2','Floor Tom','OH L','OH R'],
+          bass:['Bass DI','Bass Amp'],guitar:['Guitar Amp'],vocal:['Vocal'],amp:['Amp Mic'],di:['DI'],
+        };
+        const chs = typeChMap[e.type] || [e.type];
+        chs.forEach(src => {
+          rows += `<tr><td><strong>${ch++}</strong></td><td>${src}</td><td>${e.label.replace('\n',' — ')}</td></tr>`;
+        });
+      });
+      return rows;
+    })()}
+  </table>
+  </body></html>`);
+  w.document.close();
+  setTimeout(() => w.print(), 600);
 }
 
 // ── SETLIST ───────────────────────────────────────────
@@ -7751,12 +8345,9 @@ function renderPendingSetlist() {
   const el = document.getElementById('sl-pending-songs');
   if (!el) return;
   if (!SL_PENDING_SONGS.length) { el.innerHTML=''; return; }
-
-  // Calculate total duration
   const totalSec = SL_PENDING_SONGS.reduce((s,sg)=>s+(parseInt(sg.duration_sec)||0),0);
   const totalMin = Math.floor(totalSec/60);
   const totalS   = totalSec%60;
-
   el.innerHTML = `
     <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px">
       ${SL_PENDING_SONGS.length} SONGS · ${totalMin}:${String(totalS).padStart(2,'0')} total
@@ -7829,16 +8420,16 @@ function renderSetlistDisplay() {
       </div>
       <div>
         <div class="song-row" style="font-size:8px;color:var(--muted);letter-spacing:.08em;background:var(--bg4)">
-          <div>#</div><div>TITLE</div><div>KEY</div><div>BPM</div><div>TIME</div><div>TUNING</div><div></div>
+          <div>#</div><div>TITLE</div><div>KEY</div><div>BPM</div><div>TIME</div><div>TUNING</div><div>NOTES</div>
         </div>
         ${songs.map((s,i)=>`
         <div class="song-row">
-          <div class="song-pos">${s.position||i+1}</div>
-          <div class="song-title">${s.title}</div>
-          <div class="song-key">${s.key||'—'}</div>
-          <div class="song-bpm">${s.bpm||'—'}</div>
-          <div class="song-dur">${s.duration_sec?Math.floor(s.duration_sec/60)+':'+String(s.duration_sec%60).padStart(2,'0'):'—'}</div>
-          <div class="song-tuning">${s.tuning||'Std'}</div>
+          <div class="song-pos" style="color:var(--muted)">${s.position||i+1}</div>
+          <div style="font-weight:700;color:var(--text)">${s.title}</div>
+          <div style="color:var(--purple2)">${s.key||'—'}</div>
+          <div style="color:var(--amber2)">${s.bpm||'—'}</div>
+          <div style="color:var(--muted3)">${s.duration_sec?Math.floor(s.duration_sec/60)+':'+String(s.duration_sec%60).padStart(2,'0'):'—'}</div>
+          <div style="color:var(--muted2)">${s.tuning||'Std'}</div>
           <div style="font-size:8px;color:var(--muted3)">${s.notes||''}</div>
         </div>`).join('')}
       </div>
@@ -7849,18 +8440,22 @@ function renderSetlistDisplay() {
 function printSetlist(sl) {
   const songs = Array.isArray(sl.songs) ? sl.songs.filter(s=>s&&s.title) : [];
   const w = window.open('','_blank');
-  w.document.write(`<html><head><title>${sl.name}</title>
-    <style>body{font-family:monospace;font-size:12px;padding:20px}
-    h1{font-size:16px;margin-bottom:4px}
-    table{width:100%;border-collapse:collapse;margin-top:12px}
-    td,th{padding:6px 10px;border:1px solid #ccc;text-align:left}
-    tr:nth-child(even){background:#f9f9f9}</style></head><body>
+  w.document.write(`<!DOCTYPE html><html><head><title>${sl.name}</title>
+    <style>
+      body{font-family:'Courier New',monospace;font-size:11px;padding:24px;color:#111}
+      h1{font-size:18px;font-weight:900;letter-spacing:.1em;margin:0 0 4px}
+      .sub{font-size:9px;color:#666;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid #ccc}
+      table{width:100%;border-collapse:collapse;margin-top:4px}
+      th{background:#f5f5f5;padding:6px 10px;border:1px solid #ccc;font-size:9px;letter-spacing:.08em;text-align:left}
+      td{padding:7px 10px;border:1px solid #ddd;text-align:left}
+      tr:nth-child(even){background:#fafafa}
+    </style></head><body>
     <h1>THE GINSKEYS</h1>
-    <p>${sl.name} · ${new Date().toLocaleDateString('pt-PT')}</p>
+    <div class="sub">${sl.name} · ${new Date().toLocaleDateString('pt-PT')}</div>
     <table>
       <tr><th>#</th><th>Title</th><th>Key</th><th>BPM</th><th>Duration</th><th>Tuning</th><th>Notes</th></tr>
       ${songs.map((s,i)=>`<tr>
-        <td>${s.position||i+1}</td>
+        <td><strong>${s.position||i+1}</strong></td>
         <td><strong>${s.title}</strong></td>
         <td>${s.key||''}</td>
         <td>${s.bpm||''}</td>
@@ -7913,15 +8508,12 @@ function renderChecklist() {
     document.getElementById('cl-progress-wrap').style.display='none';
     return;
   }
-
-  // Progress
   const done = PROD_CHECKLIST.filter(i=>i.done).length;
   const total = PROD_CHECKLIST.length;
   document.getElementById('cl-progress-wrap').style.display='block';
   document.getElementById('cl-progress-bar').style.width = (done/total*100)+'%';
   document.getElementById('cl-progress-text').textContent = `${done} / ${total} done`;
 
-  // Group by phase
   const phases = ['pre_show','load_in','soundcheck','show_day','post_show'];
   el.innerHTML = phases.map(phase => {
     const items = PROD_CHECKLIST.filter(i=>i.phase===phase);
@@ -7929,14 +8521,14 @@ function renderChecklist() {
     const phaseDone = items.filter(i=>i.done).length;
     return `
     <div class="phase-block">
-      <div class="phase-title">
+      <div class="phase-title" style="border-left-color:${PHASE_COLORS[phase]}">
         <span style="color:${PHASE_COLORS[phase]}">${PHASE_LABELS[phase]}</span>
-        <span style="font-size:8px;color:var(--muted2)">${phaseDone}/${items.length} done</span>
+        <span style="font-size:8px;color:var(--muted2)">${phaseDone}/${items.length}</span>
       </div>
       ${items.map(item=>`
       <div class="check-item ${item.done?'done-item':''}" id="chi-${item.id}">
         <input type="checkbox" class="check-cb" ${item.done?'checked':''} onchange="toggleCheckItem('${item.id}',this.checked)">
-        <div class="check-task" style="${item.done?'text-decoration:line-through;color:var(--muted)':''}">${item.task}</div>
+        <div style="${item.done?'text-decoration:line-through;color:var(--muted)':''}">${item.task}</div>
         <div class="check-owner">${item.owner||'—'}</div>
         <div class="check-done-at">${item.done_at?new Date(item.done_at).toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'}):''}</div>
       </div>`).join('')}
@@ -7947,13 +8539,11 @@ function renderChecklist() {
 async function toggleCheckItem(id, done) {
   try {
     await _apiFetch('PATCH','/production/checklist/'+id,{done});
-    // Update local state
     const item = PROD_CHECKLIST.find(i=>i.id===id);
     if (item) { item.done=done; item.done_at=done?new Date().toISOString():null; }
     renderChecklist();
   } catch(e) { showToast('Failed to update: '+e.message,'err'); }
 }
-
 // ── WIRE INTO INIT ─────────────────────────────────────
 function initAll() {
   if (API_BASE && SESSION?.token) {
