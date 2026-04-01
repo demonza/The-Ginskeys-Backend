@@ -1756,8 +1756,20 @@ tr:hover .edit-btn{display:inline}
     </div>
   </div>
 
-  <!-- Row 1: 3 columns -->
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;flex-shrink:0">
+  <!-- HERO ROW: Band Health Score (dominant) + Priority Actions -->
+  <div style="display:grid;grid-template-columns:420px 1fr;gap:10px;flex-shrink:0">
+
+    <!-- ══ BAND HEALTH SCORE — HERO ══ -->
+    <div class="panel" style="background:linear-gradient(135deg,rgba(255,92,26,.04) 0%,var(--bg3) 40%,rgba(0,230,118,.03) 100%);border-color:rgba(255,255,255,.08)">
+      <div class="panel-header" style="border-bottom:1px solid rgba(255,255,255,.06)">
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Band Health Score</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div id="mgmt-score-trend" style="font-size:7px;color:var(--muted3)">live · updates with data</div>
+          <div id="mgmt-score-badge" style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--text)">—/100</div>
+        </div>
+      </div>
+      <div id="mgmt-health-score" style="padding:0"></div>
+    </div>
 
     <!-- Priority Actions -->
     <div class="panel">
@@ -1765,74 +1777,30 @@ tr:hover .edit-btn{display:inline}
         <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Priority Actions</div>
         <span id="mgmt-actions-count" style="font-size:7px;color:var(--muted3)">0 items</span>
       </div>
-      <div class="panel-body" id="mgmt-priority-list" style="padding:0;display:flex;flex-direction:column;gap:0"></div>
+      <div id="mgmt-priority-list" style="padding:0;display:flex;flex-direction:column;gap:0;overflow-y:auto;max-height:320px"></div>
     </div>
 
-    <!-- Release pipeline -->
+  </div>
+
+  <!-- Row 2: Release pipeline + Booking pipeline + Timeline -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 2fr;gap:10px;flex-shrink:0">
+
     <div class="panel">
       <div class="panel-header">
         <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Release Pipeline</div>
         <button class="btn-sm" onclick="switchView('releases',document.querySelector('[data-view=releases]'))">→</button>
       </div>
-      <div class="panel-body" id="mgmt-releases-list" style="padding:0;display:flex;flex-direction:column;gap:0"></div>
+      <div id="mgmt-releases-list" style="padding:0;display:flex;flex-direction:column"></div>
     </div>
 
-    <!-- Booking pipeline -->
     <div class="panel">
       <div class="panel-header">
         <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Booking Pipeline</div>
         <button class="btn-sm" onclick="switchView('booking',document.querySelector('[data-view=booking]'))">→</button>
       </div>
-      <div class="panel-body" id="mgmt-booking-list" style="padding:0;display:flex;flex-direction:column;gap:0"></div>
+      <div id="mgmt-booking-list" style="padding:0;display:flex;flex-direction:column"></div>
     </div>
 
-  </div>
-
-  <!-- Row 2: wider grid -->
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;flex-shrink:0">
-
-    <!-- Show schedule -->
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Show Schedule</div>
-        <button class="btn-sm" onclick="switchView('production',document.querySelector('[data-view=production]'))">→</button>
-      </div>
-      <div class="panel-body" id="mgmt-shows-list" style="padding:0;font-size:9px"></div>
-    </div>
-
-    <!-- Setlists -->
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Setlists</div>
-        <button class="btn-sm" onclick="switchView('production',document.querySelector('[data-view=production]'));setTimeout(()=>document.querySelector('[onclick*=setlist]')?.click(),200)">→</button>
-      </div>
-      <div class="panel-body" id="mgmt-setlists-list" style="padding:0;font-size:9px"></div>
-    </div>
-
-    <!-- Press & sync -->
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Press & Sync</div>
-        <button class="btn-sm" onclick="switchView('press',document.querySelector('[data-view=press]'))">→</button>
-      </div>
-      <div class="panel-body" id="mgmt-press-list" style="padding:0;font-size:9px"></div>
-    </div>
-
-    <!-- Splits summary -->
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div>Splits Fund</div>
-        <button class="btn-sm" onclick="switchView('splits',document.querySelector('[data-view=splits]'))">→</button>
-      </div>
-      <div class="panel-body" id="mgmt-splits-summary" style="font-size:9px"></div>
-    </div>
-
-  </div>
-
-  <!-- Row 3: Timeline + streaming health + member focus -->
-  <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;flex-shrink:0">
-
-    <!-- 12-month activity timeline -->
     <div class="panel">
       <div class="panel-header">
         <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>12-Month Activity Timeline</div>
@@ -1841,22 +1809,49 @@ tr:hover .edit-btn{display:inline}
       <div style="padding:10px 12px" id="mgmt-timeline"></div>
     </div>
 
-    <!-- Streaming health -->
+  </div>
+
+  <!-- Row 3: Shows + Setlists + Press + Splits + Streaming -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:10px;flex-shrink:0">
+
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Streaming Health</div>
-        <button class="btn-sm" onclick="switchView('streaming',document.querySelector('[data-view=streaming]'))">→</button>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Show Schedule</div>
+        <button class="btn-sm" onclick="switchView('production',document.querySelector('[data-view=production]'))">→</button>
       </div>
-      <div class="panel-body" id="mgmt-streaming-summary" style="font-size:9px"></div>
+      <div id="mgmt-shows-list" style="padding:0;font-size:9px"></div>
     </div>
 
-    <!-- Band health score -->
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Band Health Score</div>
-        <div id="mgmt-score-badge" style="font-size:9px;font-weight:700;color:var(--text)">—/100</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Setlists</div>
+        <button class="btn-sm" onclick="switchView('production',document.querySelector('[data-view=production]'))">→</button>
       </div>
-      <div class="panel-body" id="mgmt-health-score" style="font-size:9px"></div>
+      <div id="mgmt-setlists-list" style="padding:0;font-size:9px"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Press & Sync</div>
+        <button class="btn-sm" onclick="switchView('press',document.querySelector('[data-view=press]'))">→</button>
+      </div>
+      <div id="mgmt-press-list" style="padding:0;font-size:9px"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div>Splits Fund</div>
+        <button class="btn-sm" onclick="switchView('splits',document.querySelector('[data-view=splits]'))">→</button>
+      </div>
+      <div id="mgmt-splits-summary" style="font-size:9px"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Streaming</div>
+        <button class="btn-sm" onclick="switchView('streaming',document.querySelector('[data-view=streaming]'))">→</button>
+      </div>
+      <div id="mgmt-streaming-summary" style="font-size:9px"></div>
     </div>
 
   </div>
@@ -9987,83 +9982,319 @@ function mgmtStreamingHealth() {
 
 // ── Band health score ──────────────────────────────────────────────────────────
 function mgmtBandHealthScore() {
-  const el = document.getElementById('mgmt-health-score');
+  const el    = document.getElementById('mgmt-health-score');
   const badge = document.getElementById('mgmt-score-badge');
   if (!el) return;
 
   const now = new Date();
-  const scores = [];
-
-  // 1. Financial health (0-20): positive net position + runway
-  const entries = [...LEDGER_DATA].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const fi  = getFinancialIntelligence();
+  const entries = [...LEDGER_DATA].sort((a,b) => new Date(a.date)-new Date(b.date));
   const balance = entries.length ? entries[entries.length-1].balance : 0;
-  const fi = getFinancialIntelligence();
-  let finScore = 0;
-  if (fi.netPosition > 0) finScore += 8;
-  if (fi.runwayMonths > 12) finScore += 7;
-  else if (fi.runwayMonths > 6) finScore += 4;
-  if (balance > 500) finScore += 5;
-  else if (balance > 200) finScore += 2;
-  scores.push({ label: 'Financial', score: finScore, max: 20, color: 'var(--green3)' });
 
-  // 2. Activity (0-20): gigs in last 12 months
+  // ─────────────────────────────────────────────────────────────────────────
+  // 8 DIMENSIONS — each scored 0–12.5 → total 0–100
+  // ─────────────────────────────────────────────────────────────────────────
+  const dims = [];
+
+  // 1. FINANCIAL HEALTH (0–12.5)
+  let fin = 0;
+  if (fi.netPosition > 0)    fin += 3;
+  if (balance > 1000)        fin += 3.5;
+  else if (balance > 400)    fin += 2;
+  else if (balance > 100)    fin += 0.5;
+  if (fi.runwayMonths > 18)  fin += 3;
+  else if (fi.runwayMonths > 9) fin += 2;
+  else if (fi.runwayMonths > 3) fin += 1;
+  if (fi.gigMargin && fi.gigMargin > 0.7) fin += 3;
+  else if (fi.gigMargin && fi.gigMargin > 0.4) fin += 1.5;
+  dims.push({
+    id: 'fin', label: 'Financial Health', score: Math.min(12.5, fin), max: 12.5,
+    color: 'var(--green3)', icon: '€',
+    metrics: [
+      { label: 'Net position', value: fmtMoney(fi.netPosition), ok: fi.netPosition > 0 },
+      { label: 'Band fund',    value: fmtMoney(balance),        ok: balance > 400 },
+      { label: 'Runway',       value: fi.runwayMonths === Infinity ? '∞' : fi.runwayMonths.toFixed(1)+'mo', ok: fi.runwayMonths > 9 },
+      { label: 'Gig margin',   value: fi.gigMargin !== null ? (fi.gigMargin*100).toFixed(0)+'%' : '—', ok: fi.gigMargin > 0.6 },
+    ],
+    advice: fin < 6 ? 'Raise booking fees. Reduce transport costs. Build 3-month reserve.' : fin < 10 ? 'On track. Maintain gig margin above 70%.' : 'Healthy. Consider reinvesting into studio/releases.',
+  });
+
+  // 2. LIVE ACTIVITY (0–12.5)
   const t12 = new Date(now); t12.setFullYear(t12.getFullYear()-1);
-  const recentGigs = LEDGER_DATA.filter(e=>e.cat==='Espetáculo'&&e.amount>0&&new Date(e.date)>=t12).length;
-  const actScore = Math.min(20, recentGigs * 5);
-  scores.push({ label: 'Live Activity', score: actScore, max: 20, color: 'var(--accent)' });
+  const recentGigs = LEDGER_DATA.filter(e => e.cat==='Espetáculo' && e.amount>0 && new Date(e.date)>=t12).length;
+  const totalGigRev12 = LEDGER_DATA.filter(e => e.cat==='Espetáculo' && e.amount>0 && new Date(e.date)>=t12).reduce((s,e)=>s+e.amount, 0);
+  const upcoming = PROD_SHOWS.filter(s => new Date(s.show_date) >= now).length;
+  let live = 0;
+  if (recentGigs >= 4)  live += 5;
+  else if (recentGigs >= 2) live += 3;
+  else if (recentGigs >= 1) live += 1.5;
+  if (upcoming >= 2)    live += 4;
+  else if (upcoming >= 1) live += 2.5;
+  if (fi.avgGigFee >= 1000) live += 3.5;
+  else if (fi.avgGigFee >= 500) live += 2;
+  else if (fi.avgGigFee >= 200) live += 1;
+  dims.push({
+    id: 'live', label: 'Live Activity', score: Math.min(12.5, live), max: 12.5,
+    color: 'var(--accent)', icon: '🎤',
+    metrics: [
+      { label: 'Gigs (12mo)',   value: String(recentGigs),            ok: recentGigs >= 3 },
+      { label: 'Revenue (12mo)',value: fmtMoney(totalGigRev12),       ok: totalGigRev12 > 1000 },
+      { label: 'Upcoming',      value: String(upcoming),              ok: upcoming >= 1 },
+      { label: 'Avg fee',       value: fmtMoney(fi.avgGigFee),        ok: fi.avgGigFee >= 800 },
+    ],
+    advice: live < 5 ? 'Target 4+ gigs/year minimum. Focus on summer festivals in Alentejo/Algarve.' : live < 9 ? 'Good momentum. Lock in advance bookings for next season now.' : 'Strong live presence. Leverage for press & streaming push.',
+  });
 
-  // 3. Release velocity (0-20): releases in last 6 months
-  const t6 = new Date(now); t6.setMonth(t6.getMonth()-6);
-  const recentRel = RELEASES_DATA.filter(r=>r.stage==='released'&&r.release_date&&new Date(r.release_date)>=t6).length;
-  const relScore = Math.min(20, recentRel * 10);
-  scores.push({ label: 'Release Velocity', score: relScore, max: 20, color: 'var(--purple2)' });
+  // 3. RELEASE VELOCITY (0–12.5)
+  const t6  = new Date(now); t6.setMonth(t6.getMonth()-6);
+  const t12r = new Date(now); t12r.setFullYear(t12r.getFullYear()-1);
+  const relLast6  = RELEASES_DATA.filter(r => r.stage==='released' && r.release_date && new Date(r.release_date)>=t6).length;
+  const relLast12 = RELEASES_DATA.filter(r => r.stage==='released' && r.release_date && new Date(r.release_date)>=t12r).length;
+  const relInProgress = RELEASES_DATA.filter(r => !['released','idea'].includes(r.stage)).length;
+  const hasDistribution = LEDGER_DATA.some(e => e.cat==='Distribuição');
+  let vel = 0;
+  if (relLast6 >= 2)       vel += 5;
+  else if (relLast6 >= 1)  vel += 3;
+  if (relLast12 >= 3)      vel += 3.5;
+  else if (relLast12 >= 1) vel += 2;
+  if (relInProgress >= 1)  vel += 2.5;
+  if (hasDistribution)     vel += 1.5;
+  dims.push({
+    id: 'vel', label: 'Release Velocity', score: Math.min(12.5, vel), max: 12.5,
+    color: 'var(--purple2)', icon: '♪',
+    metrics: [
+      { label: 'Released (6mo)',  value: String(relLast6),     ok: relLast6 >= 1 },
+      { label: 'Released (12mo)', value: String(relLast12),    ok: relLast12 >= 2 },
+      { label: 'In progress',     value: String(relInProgress),ok: relInProgress >= 1 },
+      { label: 'Distribution',    value: hasDistribution ? 'Active' : 'None', ok: hasDistribution },
+    ],
+    advice: vel < 4 ? 'Critical: no recent releases. Spotify deprioritises dormant artists. Release a single within 60 days.' : vel < 8 ? 'Release cadence building. Aim for 1 single every 8–10 weeks.' : 'Strong release engine. Feed it into press pitches.',
+  });
 
-  // 4. Booking pipeline (0-20): active contacts
-  const pipeScore = Math.min(20, BOOKING_DATA.filter(b=>!['rejected'].includes(b.stage)).length * 4);
-  scores.push({ label: 'Booking Pipeline', score: pipeScore, max: 20, color: 'var(--blue2)' });
+  // 4. BOOKING PIPELINE (0–12.5)
+  const bkActive    = BOOKING_DATA.filter(b => !['rejected','completed'].includes(b.stage)).length;
+  const bkNeg       = BOOKING_DATA.filter(b => b.stage==='negotiating').length;
+  const bkConfirmed = BOOKING_DATA.filter(b => b.stage==='confirmed').length;
+  const bkCompleted = BOOKING_DATA.filter(b => b.stage==='completed').length;
+  const bkValue     = BOOKING_DATA.filter(b => b.stage==='confirmed' && b.fee_eur).reduce((s,b)=>s+parseFloat(b.fee_eur||0), 0);
+  let pipe = 0;
+  if (bkActive >= 5)       pipe += 3;
+  else if (bkActive >= 2)  pipe += 2;
+  else if (bkActive >= 1)  pipe += 1;
+  if (bkNeg >= 1)          pipe += 3;
+  if (bkConfirmed >= 1)    pipe += 3.5;
+  if (bkCompleted >= 3)    pipe += 3;
+  else if (bkCompleted >= 1) pipe += 1.5;
+  dims.push({
+    id: 'pipe', label: 'Booking Pipeline', score: Math.min(12.5, pipe), max: 12.5,
+    color: 'var(--blue2)', icon: '📋',
+    metrics: [
+      { label: 'Active contacts', value: String(bkActive),    ok: bkActive >= 3 },
+      { label: 'Negotiating',     value: String(bkNeg),       ok: bkNeg >= 1 },
+      { label: 'Confirmed',       value: String(bkConfirmed), ok: bkConfirmed >= 1 },
+      { label: 'Confirmed value', value: bkValue > 0 ? fmtMoney(bkValue) : '—', ok: bkValue > 500 },
+    ],
+    advice: pipe < 4 ? 'Pipeline empty. Send 5+ cold outreach pitches this week via the Agent tab.' : pipe < 8 ? 'Pipeline developing. Follow up on open contacts within 7 days.' : 'Pipeline healthy. Prioritise closing negotiating contacts.',
+  });
 
-  // 5. Revenue diversification (0-20)
-  const streamRev = PLATFORM_DATA.reduce((s,p)=>s+p.rev,0);
-  const totalRev  = fi.totalRevenue;
-  const liveShare = totalRev > 0 ? (fi.gigRevenue / totalRev) : 1;
-  let divScore = 0;
-  if (liveShare < 1) divScore += 10;
-  if (streamRev > 5) divScore += 5;
-  if (streamRev > 50) divScore += 5;
-  scores.push({ label: 'Rev. Diversification', score: divScore, max: 20, color: 'var(--amber2)' });
+  // 5. PRESS & MEDIA (0–12.5)
+  const prActive    = PRESS_DATA.filter(p => !['passed','rejected'].includes(p.stage)).length;
+  const prPublished = PRESS_DATA.filter(p => p.stage==='published').length;
+  const prSync      = PRESS_DATA.filter(p => p.type==='sync').length;
+  const prResponded = PRESS_DATA.filter(p => p.stage==='responded').length;
+  let press = 0;
+  if (prPublished >= 2)     press += 5;
+  else if (prPublished >= 1) press += 3;
+  if (prActive >= 3)        press += 3;
+  else if (prActive >= 1)   press += 1.5;
+  if (prSync >= 1)          press += 3;
+  if (prResponded >= 1)     press += 1.5;
+  dims.push({
+    id: 'press', label: 'Press & Media', score: Math.min(12.5, press), max: 12.5,
+    color: 'var(--amber2)', icon: '📰',
+    metrics: [
+      { label: 'Published',  value: String(prPublished), ok: prPublished >= 1 },
+      { label: 'Active',     value: String(prActive),    ok: prActive >= 2 },
+      { label: 'Responded',  value: String(prResponded), ok: prResponded >= 1 },
+      { label: 'Sync deals', value: String(prSync),      ok: prSync >= 1 },
+    ],
+    advice: press < 4 ? 'No press presence. Target Portuguese rock blogs, Rádio Comercial, P3. One placement = 10× Spotify spike.' : press < 8 ? 'Building. Coordinate next press push with next release date.' : 'Strong media profile. Leverage for festival booking leverage.',
+  });
 
-  const total = scores.reduce((s,sc)=>s+sc.score,0);
+  // 6. STREAMING HEALTH (0–12.5)
+  const totalStreams  = PLATFORM_DATA.reduce((s,p)=>s+p.streams, 0);
+  const totalStrRev   = PLATFORM_DATA.reduce((s,p)=>s+p.rev, 0);
+  const spotifyActive = PLATFORM_DATA.find(p=>p.name==='Spotify' && p.streams>0);
+  const multiPlatform = PLATFORM_DATA.filter(p=>p.streams>0).length;
+  const lifetimeStreamRev = LEDGER_DATA.filter(e => e.tags && (e.tags.includes('spotify')||e.tags.includes('stream'))).reduce((s,e)=>s+Math.max(0,e.amount), 0);
+  let stream = 0;
+  if (totalStreams >= 10000)     stream += 5;
+  else if (totalStreams >= 2000) stream += 2.5;
+  else if (totalStreams >= 500)  stream += 1;
+  if (totalStrRev >= 50)         stream += 4;
+  else if (totalStrRev >= 5)     stream += 2;
+  else if (totalStrRev > 0)      stream += 0.5;
+  if (multiPlatform >= 3)        stream += 2;
+  else if (multiPlatform >= 1)   stream += 1;
+  if (spotifyActive)             stream += 1.5;
+  dims.push({
+    id: 'stream', label: 'Streaming Health', score: Math.min(12.5, stream), max: 12.5,
+    color: 'var(--green2)', icon: '▶',
+    metrics: [
+      { label: 'Total streams',    value: totalStreams.toLocaleString(), ok: totalStreams >= 2000 },
+      { label: 'Monthly rev',      value: fmtMoney(totalStrRev),        ok: totalStrRev >= 5 },
+      { label: 'Platforms active', value: String(multiPlatform),         ok: multiPlatform >= 2 },
+      { label: 'Lifetime rev',     value: fmtMoney(lifetimeStreamRev),  ok: lifetimeStreamRev >= 10 },
+    ],
+    advice: stream < 3 ? 'Streaming near zero. Every release needs a Spotify pitch. Register on SubmitHub. Aim for 10K streams on next single.' : stream < 7 ? 'Growing. Consistency is the lever — release every 8 weeks.' : 'Streaming working. Reinvest into promotion budget.',
+  });
+
+  // 7. REVENUE DIVERSIFICATION (0–12.5)
+  const liveShare  = fi.totalRevenue > 0 ? fi.gigRevenue / fi.totalRevenue : 1;
+  const hasStream  = totalStrRev > 0;
+  const hasMerch   = LEDGER_DATA.some(e => e.cat==='Merch' && e.amount > 0);
+  const hasSync    = PRESS_DATA.some(p => p.type==='sync' && p.stage==='published');
+  const hasSponsor = LEDGER_DATA.some(e => (e.desc||'').toLowerCase().includes('sponsor') && e.amount > 0);
+  const streamShare = fi.totalRevenue > 0 && totalStrRev > 0 ? totalStrRev*12 / fi.totalRevenue : 0;
+  let div = 0;
+  if (liveShare < 0.95) div += 3;
+  if (liveShare < 0.80) div += 2;
+  if (hasStream)        div += 2.5;
+  if (streamShare > 0.1) div += 2;
+  if (hasMerch)         div += 2;
+  if (hasSync)          div += 3;
+  if (hasSponsor)       div += 2;
+  dims.push({
+    id: 'div', label: 'Revenue Diversification', score: Math.min(12.5, div), max: 12.5,
+    color: 'var(--amber2)', icon: '◈',
+    metrics: [
+      { label: 'Live share',   value: (liveShare*100).toFixed(0)+'%', ok: liveShare < 0.85 },
+      { label: 'Has streaming',value: hasStream ? 'Yes' : 'No',       ok: hasStream },
+      { label: 'Has merch',    value: hasMerch  ? 'Yes' : 'No',       ok: hasMerch },
+      { label: 'Has sync',     value: hasSync   ? 'Yes' : 'No',       ok: hasSync },
+    ],
+    advice: div < 4 ? 'Revenue 100% live = existential risk. Add streaming + one merch item (stickers, picks, tee) within 90 days.' : div < 8 ? 'Diversifying. Next step: sync licensing via Musicbed/Artlist.' : 'Well diversified. Focus on growing each stream.',
+  });
+
+  // 8. STRATEGIC MOMENTUM (0–12.5)
+  // Are things getting better? Measures trajectory not just state.
+  const years = fi.years.filter(y => (fi.revByYear[y]||0) > 0);
+  const growthPositive = years.length >= 2 && fi.yoyGrowth !== null && fi.yoyGrowth > 0;
+  const recentActivity = LEDGER_DATA.filter(e => e.amount>0 && new Date(e.date) >= t12).length;
+  const feedingPipeline = bkActive >= 2 && relInProgress >= 1;
+  const hasEPK = PRESS_DATA.length > 0 || BOOKING_DATA.length > 0;
+  const hasMultipleMembers = true; // 4-piece confirmed
+  const gigFeeGrowth = fi.gigCount >= 2;
+  let momentum = 0;
+  if (growthPositive)        momentum += 4;
+  else if (years.length > 1) momentum += 1;
+  if (recentActivity >= 3)   momentum += 2.5;
+  if (feedingPipeline)       momentum += 2.5;
+  if (hasEPK)                momentum += 1.5;
+  if (gigFeeGrowth)          momentum += 2;
+  dims.push({
+    id: 'mom', label: 'Strategic Momentum', score: Math.min(12.5, momentum), max: 12.5,
+    color: 'var(--accent)', icon: '▲',
+    metrics: [
+      { label: 'Revenue growth YoY', value: fi.yoyGrowth !== null ? (fi.yoyGrowth*100).toFixed(0)+'%' : '—', ok: fi.yoyGrowth > 0 },
+      { label: 'Active transactions', value: String(recentActivity), ok: recentActivity >= 3 },
+      { label: 'Pipeline feeding',    value: feedingPipeline ? 'Yes' : 'No', ok: feedingPipeline },
+      { label: 'EPK / outreach',      value: hasEPK ? 'Active' : 'None', ok: hasEPK },
+    ],
+    advice: momentum < 4 ? 'Momentum stalled. Pick one area (bookings or releases) and execute aggressively for 30 days.' : momentum < 8 ? 'Building. Coordinate booking + release timing for compounding effect.' : 'High momentum. Document what\'s working and systematise it.',
+  });
+
+  // ── Totals ─────────────────────────────────────────────────────────────────
+  const total = Math.round(dims.reduce((s,d) => s+d.score, 0));
+  const grade = total>=88?'A+':total>=80?'A':total>=70?'B+':total>=60?'B':total>=50?'C':total>=35?'D':'F';
+  const gradeColor = total>=70?'var(--green3)':total>=45?'var(--amber2)':'var(--red3)';
+  const status = total>=80?'Excellent':total>=65?'Healthy':total>=45?'Developing':total>=25?'Struggling':'Critical';
 
   if (badge) {
     badge.textContent = `${total}/100`;
-    badge.style.color = total>=70?'var(--green3)':total>=40?'var(--amber2)':'var(--red3)';
+    badge.style.color = gradeColor;
   }
 
-  const grade = total>=80?'A':total>=65?'B':total>=50?'C':total>=35?'D':'F';
-  const gradeColor = total>=70?'var(--green3)':total>=40?'var(--amber2)':'var(--red3)';
+  // ── Render ─────────────────────────────────────────────────────────────────
+  // Weakest 2 dims for focused advice
+  const sorted = [...dims].sort((a,b) => (a.score/a.max)-(b.score/b.max));
+  const topPriority = sorted[0];
+  const secondPriority = sorted[1];
 
   el.innerHTML = `
-    <div style="padding:10px 12px;display:flex;flex-direction:column;gap:6px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-        <div style="font-family:var(--display);font-size:32px;font-weight:700;color:${gradeColor}">${grade}</div>
-        <div>
-          <div style="font-size:8px;font-weight:700;color:var(--text)">${total}/100</div>
-          <div style="font-size:7px;color:var(--muted3)">${total>=70?'Healthy':total>=40?'Developing':'Needs attention'}</div>
-        </div>
+    <!-- Grade + gauge + status -->
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:0;border-bottom:1px solid var(--border1)">
+
+      <!-- Grade circle -->
+      <div style="padding:16px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid var(--border1);min-width:100px;background:rgba(0,0,0,.15)">
+        <div style="font-family:var(--display);font-size:52px;font-weight:700;line-height:1;color:${gradeColor}">${grade}</div>
+        <div style="font-size:8px;color:var(--muted3);letter-spacing:.12em;margin-top:4px;text-transform:uppercase">${status}</div>
+        <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--muted2);margin-top:6px">${total}<span style="font-size:9px;color:var(--muted3)">/100</span></div>
       </div>
-      ${scores.map(sc=>`
-      <div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:2px">
-          <span style="font-size:7px;color:var(--muted3)">${sc.label}</span>
-          <span style="font-size:7px;font-weight:700;color:${sc.color}">${sc.score}/${sc.max}</span>
-        </div>
-        <div style="height:3px;background:var(--bg4);border-radius:1px">
-          <div style="height:100%;width:${Math.round(sc.score/sc.max*100)}%;background:${sc.color};border-radius:1px;transition:width .4s"></div>
+
+      <!-- Radar-style bar grid -->
+      <div style="padding:12px 14px;display:flex;flex-direction:column;gap:5px">
+        ${dims.map(d => {
+          const pct = Math.round(d.score / d.max * 100);
+          const filledSegs = Math.round(pct / 10);
+          return `
+          <div style="display:grid;grid-template-columns:130px 1fr 32px;gap:8px;align-items:center">
+            <div style="font-size:7px;color:var(--muted3);letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.icon} ${d.label.toUpperCase()}</div>
+            <div style="display:flex;gap:2px;align-items:center">
+              ${Array.from({length:10}).map((_,i) => `
+                <div style="flex:1;height:8px;border-radius:1px;background:${i<filledSegs ? d.color : 'rgba(255,255,255,.05)'};transition:background .3s;${i<filledSegs?'box-shadow:0 0 4px '+d.color+'44':''}"></div>
+              `).join('')}
+            </div>
+            <div style="font-size:8px;font-weight:700;color:${d.score/d.max >= 0.7 ? d.color : d.score/d.max >= 0.4 ? 'var(--amber2)' : 'var(--red3)'};text-align:right">${pct}%</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- Dimension detail on hover / always-visible metrics -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border1)">
+      ${dims.slice(0,4).map(d => `
+      <div style="padding:8px 12px;border-right:1px solid var(--border1);border-bottom:1px solid var(--border1)">
+        <div style="font-size:7px;font-weight:700;color:${d.color};letter-spacing:.08em;margin-bottom:5px">${d.icon} ${d.label.toUpperCase()}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 8px">
+          ${d.metrics.map(m=>`
+          <div style="display:flex;justify-content:space-between;gap:4px">
+            <span style="font-size:7px;color:var(--muted3)">${m.label}</span>
+            <span style="font-size:7px;font-weight:700;color:${m.ok?'var(--text)':'var(--red3)'}">${m.value}</span>
+          </div>`).join('')}
         </div>
       </div>`).join('')}
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+      ${dims.slice(4,8).map((d,i) => `
+      <div style="padding:8px 12px;${i%2===0?'border-right:1px solid var(--border1)':''}${i<2?';border-bottom:1px solid var(--border1)':''}">
+        <div style="font-size:7px;font-weight:700;color:${d.color};letter-spacing:.08em;margin-bottom:5px">${d.icon} ${d.label.toUpperCase()}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 8px">
+          ${d.metrics.map(m=>`
+          <div style="display:flex;justify-content:space-between;gap:4px">
+            <span style="font-size:7px;color:var(--muted3)">${m.label}</span>
+            <span style="font-size:7px;font-weight:700;color:${m.ok?'var(--text)':'var(--red3)'}">${m.value}</span>
+          </div>`).join('')}
+        </div>
+      </div>`).join('')}
+    </div>
+
+    <!-- Top 2 focus areas -->
+    <div style="padding:10px 14px;background:rgba(0,0,0,.15);border-top:1px solid var(--border1)">
+      <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:6px">▼ FOCUS AREAS — where to invest attention now</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="padding:8px 10px;background:rgba(255,92,26,.06);border-left:2px solid ${topPriority.color};border-radius:0 2px 2px 0">
+          <div style="font-size:7px;font-weight:700;color:${topPriority.color};margin-bottom:3px">#1 ${topPriority.icon} ${topPriority.label} — ${Math.round(topPriority.score/topPriority.max*100)}%</div>
+          <div style="font-size:7px;color:var(--muted3);line-height:1.6">${topPriority.advice}</div>
+        </div>
+        <div style="padding:8px 10px;background:rgba(255,92,26,.03);border-left:2px solid ${secondPriority.color};border-radius:0 2px 2px 0">
+          <div style="font-size:7px;font-weight:700;color:${secondPriority.color};margin-bottom:3px">#2 ${secondPriority.icon} ${secondPriority.label} — ${Math.round(secondPriority.score/secondPriority.max*100)}%</div>
+          <div style="font-size:7px;color:var(--muted3);line-height:1.6">${secondPriority.advice}</div>
+        </div>
+      </div>
     </div>`;
 }
-
 
 
 
