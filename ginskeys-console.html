@@ -1827,27 +1827,105 @@ tr:hover .edit-btn{display:inline}
   <!-- Valuation & Financial Health -->
   <div class="panel col-span-3" style="grid-row:4; grid-column:1 / span 3">
     <div class="panel-header">
-      <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Valuation & Financial Health</div>
-      <span class="panel-shortcut">F7</span>
+      <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Financial Intelligence — Valuation & Health</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="val-data-quality" style="font-size:7px;padding:2px 8px;border-radius:1px;background:rgba(0,230,118,.08);color:var(--green3)">● LIVE DATA</span>
+        <span class="panel-shortcut">F7</span>
+      </div>
     </div>
-    <div class="panel-body" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;justify-content:space-between">
-      <div style="flex:1;min-width:260px">
-        <div style="font-size:9px;color:var(--muted3);margin-bottom:6px">DCF valuation (projected cash flows)</div>
-        <div id="dcf-summary" style="font-size:10px;color:var(--muted3);margin-bottom:8px">Generating DCF…</div>
-        <div class="chart-canvas-wrap"><canvas id="dcfChart"></canvas></div>
+
+    <!-- Row 1: KPI scorecard -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border1);border-bottom:1px solid var(--border1)">
+      <div style="background:var(--bg3);padding:12px 14px">
+        <div style="font-size:7px;color:var(--muted3);letter-spacing:.12em;margin-bottom:5px">TOTAL CAPITAL RAISED</div>
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--text)" id="val-capital-raised">—</div>
+        <div style="font-size:7px;color:var(--muted3);margin-top:3px" id="val-capital-sub">since inception</div>
       </div>
-      <div style="flex:1;min-width:260px">
-        <div style="font-size:9px;color:var(--muted3);margin-bottom:6px">Profitability (Revenue / Net / Margin)</div>
-        <div class="chart-canvas-wrap"><canvas id="profitChart"></canvas></div>
+      <div style="background:var(--bg3);padding:12px 14px">
+        <div style="font-size:7px;color:var(--muted3);letter-spacing:.12em;margin-bottom:5px">TOTAL INVESTED</div>
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--red3)" id="val-total-invested">—</div>
+        <div style="font-size:7px;color:var(--muted3);margin-top:3px" id="val-invested-sub">total band spend</div>
       </div>
-      <div style="flex:1;min-width:260px">
-        <div style="font-size:9px;color:var(--muted3);margin-bottom:6px">Financial health (assets vs debt)</div>
-        <div id="health-summary" style="font-size:10px;color:var(--muted3);margin-bottom:8px">Analyzing assets & liabilities…</div>
-        <div class="chart-canvas-wrap"><canvas id="healthChart"></canvas></div>
+      <div style="background:var(--bg3);padding:12px 14px">
+        <div style="font-size:7px;color:var(--muted3);letter-spacing:.12em;margin-bottom:5px">NET POSITION</div>
+        <div style="font-family:var(--display);font-size:18px;font-weight:700" id="val-net-position" style="color:var(--text)">—</div>
+        <div style="font-size:7px;color:var(--muted3);margin-top:3px" id="val-net-sub">P&L since inception</div>
+      </div>
+      <div style="background:var(--bg3);padding:12px 14px">
+        <div style="font-size:7px;color:var(--muted3);letter-spacing:.12em;margin-bottom:5px">REVENUE / GIG</div>
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--amber2)" id="val-rev-per-gig">—</div>
+        <div style="font-size:7px;color:var(--muted3);margin-top:3px" id="val-rev-per-gig-sub">avg booking fee</div>
+      </div>
+      <div style="background:var(--bg3);padding:12px 14px">
+        <div style="font-size:7px;color:var(--muted3);letter-spacing:.12em;margin-bottom:5px">COST PER GIG</div>
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--muted2)" id="val-cost-per-gig">—</div>
+        <div style="font-size:7px;color:var(--muted3);margin-top:3px" id="val-cost-per-gig-sub">transport + misc</div>
+      </div>
+      <div style="background:var(--bg3);padding:12px 14px">
+        <div style="font-size:7px;color:var(--muted3);letter-spacing:.12em;margin-bottom:5px">GIG MARGIN</div>
+        <div style="font-family:var(--display);font-size:18px;font-weight:700" id="val-gig-margin">—</div>
+        <div style="font-size:7px;color:var(--muted3);margin-top:3px">net / gross revenue</div>
+      </div>
+    </div>
+
+    <!-- Row 2: Charts + analysis -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-bottom:1px solid var(--border1)">
+
+      <!-- DCF -->
+      <div style="padding:14px;border-right:1px solid var(--border1)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-size:8px;font-weight:700;color:var(--text);letter-spacing:.06em">DCF VALUATION</div>
+          <div style="font-size:7px;color:var(--muted3)">5yr horizon · 12% discount</div>
+        </div>
+        <div id="dcf-headline" style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--purple2);margin-bottom:2px">—</div>
+        <div id="dcf-context" style="font-size:8px;color:var(--muted3);margin-bottom:10px;line-height:1.6">—</div>
+        <div class="chart-canvas-wrap" style="height:100px"><canvas id="dcfChart"></canvas></div>
+        <div id="dcf-assumption-box" style="margin-top:8px;padding:8px;background:var(--bg4);border-radius:2px;font-size:7px;color:var(--muted3);line-height:1.7"></div>
+      </div>
+
+      <!-- Revenue composition + trend -->
+      <div style="padding:14px;border-right:1px solid var(--border1)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-size:8px;font-weight:700;color:var(--text);letter-spacing:.06em">REVENUE COMPOSITION</div>
+          <div style="font-size:7px;color:var(--muted3)" id="rev-comp-period">by year</div>
+        </div>
+        <div class="chart-canvas-wrap" style="height:120px"><canvas id="profitChart"></canvas></div>
+        <div id="rev-comp-insight" style="margin-top:8px;padding:8px;background:var(--bg4);border-radius:2px;font-size:7px;color:var(--muted3);line-height:1.7"></div>
+      </div>
+
+      <!-- Scenario modelling -->
+      <div style="padding:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-size:8px;font-weight:700;color:var(--text);letter-spacing:.06em">SCENARIO ANALYSIS</div>
+          <div style="font-size:7px;color:var(--amber2)">12-month forward</div>
+        </div>
+        <div id="scenario-grid" style="display:flex;flex-direction:column;gap:6px"></div>
+        <div style="margin-top:10px;padding:8px;background:rgba(255,92,26,.06);border-left:2px solid var(--accent);border-radius:0 2px 2px 0;font-size:7px;color:var(--muted2);line-height:1.7" id="scenario-insight"></div>
+      </div>
+    </div>
+
+    <!-- Row 3: Break-even + runway + investment waterfall -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0">
+
+      <!-- Break-even -->
+      <div style="padding:14px;border-right:1px solid var(--border1)">
+        <div style="font-size:8px;font-weight:700;color:var(--text);letter-spacing:.06em;margin-bottom:8px">BREAK-EVEN ANALYSIS</div>
+        <div id="breakeven-content" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+
+      <!-- Investment waterfall -->
+      <div style="padding:14px;border-right:1px solid var(--border1)">
+        <div style="font-size:8px;font-weight:700;color:var(--text);letter-spacing:.06em;margin-bottom:8px">SPEND BREAKDOWN</div>
+        <div class="chart-canvas-wrap" style="height:120px"><canvas id="healthChart"></canvas></div>
+      </div>
+
+      <!-- Strategic signals -->
+      <div style="padding:14px">
+        <div style="font-size:8px;font-weight:700;color:var(--text);letter-spacing:.06em;margin-bottom:8px">STRATEGIC SIGNALS</div>
+        <div id="strategic-signals" style="display:flex;flex-direction:column;gap:5px"></div>
       </div>
     </div>
   </div>
-
   <!-- Streaming mini -->
   <div class="panel col-span-3" style="grid-row:5; grid-column:1 / span 3">
     <div class="panel-header">
@@ -5079,208 +5157,529 @@ function getQuarterlyAggregates(){
   return {keys,rev,exp,net,margin};
 }
 
-function getQuarterEndBalances(){
-  const sorted=[...LEDGER_DATA].sort((a,b)=>new Date(a.date)-new Date(b.date));
-  const balances={};
-  const {keys} = getQuarterlyAggregates();
-  let idx=0;
+// ══════════════════════════════════════════════════════════════════════════════
+// FINANCIAL INTELLIGENCE ENGINE — Analyst-grade metrics from real ledger data
+// ══════════════════════════════════════════════════════════════════════════════
 
-  keys.forEach(k=>{
-    const [y,q]=k.split('-Q');
-    const year=+y;
-    const quarter=+q;
-    const end=new Date(year, quarter*3, 0, 23, 59, 59, 999);
-    while(idx<sorted.length && new Date(sorted[idx].date)<=end){
-      balances[k]=sorted[idx].balance;
-      idx++;
-    }
-    if(balances[k]===undefined){
-      balances[k]=idx>0?sorted[idx-1]?.balance||0:0;
-    }
+function getFinancialIntelligence() {
+  const entries = [...LEDGER_DATA].sort((a,b) => new Date(a.date) - new Date(b.date));
+  const now = new Date();
+  const currentYear = now.getFullYear();
+
+  // ── 1. Inception metrics ──────────────────────────────────────────────────
+  const totalRevenue  = entries.filter(e => e.amount > 0).reduce((s,e) => s + e.amount, 0);
+  const totalExpenses = entries.filter(e => e.amount < 0).reduce((s,e) => s + Math.abs(e.amount), 0);
+  const netPosition   = totalRevenue - totalExpenses;
+  const cashBalance   = entries.length ? entries[entries.length-1].balance : 0;
+
+  // ── 2. Revenue by year ────────────────────────────────────────────────────
+  const revByYear = {};
+  const expByYear = {};
+  entries.forEach(e => {
+    const y = new Date(e.date).getFullYear();
+    if (!revByYear[y]) { revByYear[y] = 0; expByYear[y] = 0; }
+    if (e.amount > 0) revByYear[y] += e.amount;
+    else expByYear[y] += Math.abs(e.amount);
   });
-  return balances;
-}
+  const years = Object.keys(revByYear).sort().map(Number);
 
-function getDcfSeries({years=5,discount=0.12,growth=0.03,terminalGrowth=0.02}={}){
-  const {income,net} = getCashFlowSeries();
-  const trailing=12;
-  const recentNet = net.slice(-trailing).map(n=>n.y);
-  const recentRev = income.slice(-trailing).map(i=>i.y);
-  const avgNet = recentNet.length ? recentNet.reduce((s,v)=>s+v,0)/recentNet.length : 0;
-  const trailingRev = recentRev.reduce((s,v)=>s+v,0);
+  // ── 3. Gig economics ─────────────────────────────────────────────────────
+  const gigEntries = entries.filter(e => e.cat === 'Espetáculo' && e.amount > 0);
+  const gigCount   = gigEntries.length;
+  const gigRevenue = gigEntries.reduce((s,e) => s + e.amount, 0);
+  const avgGigFee  = gigCount ? gigRevenue / gigCount : 0;
 
-  const startYear=new Date().getFullYear();
-  const labels=[];
-  const cashFlows=[];
-  const discounted=[];
-  let pvSum=0;
+  // Direct gig costs: transport + portagens + misc (not studio/equipment)
+  const DIRECT_GIG_CATS = ['Transporte', 'Outros'];
+  const directGigCosts  = entries.filter(e => e.amount < 0 && DIRECT_GIG_CATS.includes(e.cat))
+                                 .reduce((s,e) => s + Math.abs(e.amount), 0);
+  const costPerGig = gigCount ? directGigCosts / gigCount : 0;
+  const gigMargin  = avgGigFee ? (avgGigFee - costPerGig) / avgGigFee : null;
 
-  for(let i=1;i<=years;i++){
-    const cf = avgNet * Math.pow(1+growth,i-1);
-    const pv = cf / Math.pow(1+discount,i);
-    labels.push(`${startYear + i}`);
-    cashFlows.push(cf);
-    discounted.push(pv);
-    pvSum += pv;
+  // ── 4. Investment categories ──────────────────────────────────────────────
+  const spendByCat = {};
+  entries.filter(e => e.amount < 0).forEach(e => {
+    spendByCat[e.cat] = (spendByCat[e.cat] || 0) + Math.abs(e.amount);
+  });
+  const investmentTotal = entries.filter(e => e.amount < 0 && ['Estúdio','Artwork','Distribuição','Equipamento'].includes(e.cat))
+                                 .reduce((s,e) => s + Math.abs(e.amount), 0);
+
+  // ── 5. Burn rate & runway ─────────────────────────────────────────────────
+  // Use trailing 12 months of actual expense data
+  const t12 = new Date(now); t12.setFullYear(t12.getFullYear() - 1);
+  const trailing12Exp = entries.filter(e => e.amount < 0 && new Date(e.date) >= t12)
+                               .reduce((s,e) => s + Math.abs(e.amount), 0);
+  const monthlyBurn = trailing12Exp / 12;
+  // Normalised burn: only operational (not equipment capex)
+  const trailing12OpExp = entries.filter(e => e.amount < 0 && new Date(e.date) >= t12 && e.cat !== 'Equipamento')
+                                 .reduce((s,e) => s + Math.abs(e.amount), 0);
+  const opBurn = trailing12OpExp / 12;
+  const runwayMonths = opBurn > 0 ? cashBalance / opBurn : Infinity;
+
+  // ── 6. Revenue trend ─────────────────────────────────────────────────────
+  const activeYears = years.filter(y => revByYear[y] > 0);
+  let yoyGrowth = null;
+  if (activeYears.length >= 2) {
+    const last = activeYears[activeYears.length - 1];
+    const prev = activeYears[activeYears.length - 2];
+    if (revByYear[prev] > 0) yoyGrowth = (revByYear[last] - revByYear[prev]) / revByYear[prev];
   }
 
-  const terminal = cashFlows[cashFlows.length-1] * (1+terminalGrowth) / Math.max(0.0001, (discount-terminalGrowth));
-  const terminalPv = terminal / Math.pow(1+discount, years);
-  const dcfValue = pvSum + terminalPv;
+  // ── 7. DCF — honest, scenario-adjusted ────────────────────────────────────
+  // Base case: avg of last 2 active years with conservative 10% growth
+  const lastTwoActiveRev = activeYears.slice(-2).map(y => revByYear[y]);
+  const baseAnnualRev = lastTwoActiveRev.length
+    ? lastTwoActiveRev.reduce((s,v) => s + v, 0) / lastTwoActiveRev.length
+    : gigRevenue;
+  const baseAnnualCost = entries.filter(e => e.amount < 0).reduce((s,e) => s + Math.abs(e.amount), 0)
+    / Math.max(1, years[years.length-1] - years[0] + 1);
+  const baseAnnualNet = baseAnnualRev - baseAnnualCost;
 
-  return {labels,cashFlows,discounted,dcfValue,terminal,terminalPv,avgNet,trailingRev};
-}
-
-let dcfChartInst=null;
-function initDcfChart(){
-  const canvas=document.getElementById('dcfChart');
-  if(!canvas||dcfChartInst)return;
-  const rect=canvas.parentElement.getBoundingClientRect();
-  canvas.width=rect.width||500;canvas.height=rect.height||120;
-  const {labels,cashFlows,discounted,dcfValue,terminal,terminalPv,avgNet,trailingRev} = getDcfSeries();
-  const summary=document.getElementById('dcf-summary');
-  const revMultiple = trailingRev>0 ? dcfValue/trailingRev : null;
-  if(summary) summary.textContent = `DCF: ${fmtMoney(dcfValue)} | Rev multiple: ${revMultiple?revMultiple.toFixed(1)+'x':'—'} | Avg net: ${fmtMoney(avgNet)}`;
-
-  dcfChartInst=new Chart(canvas,{type:'line',data:{
-    labels,
-    datasets:[
-      {label:'Projected cash flow',data:cashFlows,backgroundColor:'rgba(45,123,255,0.16)',borderColor:'#2d7fff',borderWidth:2,fill:true,tension:.25,pointRadius:2},
-      {label:'Discounted value (PV)',data:discounted,backgroundColor:'rgba(168,85,247,0.12)',borderColor:'#a855f7',borderWidth:2,fill:false,tension:.25,pointRadius:2}
-    ]
-  },options:{
-    responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:true,labels:{color:'#b8ccd8',font:{family:'IBM Plex Mono',size:9},boxWidth:10}},
-      tooltip:{backgroundColor:'#0a1018',borderColor:'#243c54',borderWidth:1,titleColor:'#b8ccd8',bodyColor:'#5a7a92',
-        titleFont:{family:'IBM Plex Mono',size:9},bodyFont:{family:'IBM Plex Mono',size:9},
-        callbacks:{label:c=>`${fmtMoney(c.parsed.y)}`}
-      }
-    },
-    scales:{
-      x:{grid:{color:'rgba(28,46,66,.5)',lineWidth:.5},ticks:{color:'#3a5468',font:{family:'IBM Plex Mono',size:8}}},
-      y:{grid:{color:'rgba(28,46,66,.5)',lineWidth:.5},ticks:{color:'#3a5468',font:{family:'IBM Plex Mono',size:8},callback:v=>'€'+(v/1000).toFixed(0)+'K'}}
+  // 3 scenarios
+  const scenarios = {
+    bear:  { growth: -0.05, label: 'Bear',  color: '#ef4444', desc: '−5%/yr (fewer gigs)' },
+    base:  { growth: 0.15,  label: 'Base',  color: '#f59e0b', desc: '+15%/yr (1 release + 4 gigs/yr)' },
+    bull:  { growth: 0.40,  label: 'Bull',  color: '#22c55e', desc: '+40%/yr (album + festival circuit)' },
+  };
+  const discount = 0.12;
+  const terminalGrowth = 0.02;
+  const dcfYears = 5;
+  const dcfResults = {};
+  Object.entries(scenarios).forEach(([key, sc]) => {
+    let pv = 0;
+    const cfs = [];
+    for (let i = 1; i <= dcfYears; i++) {
+      const cf = baseAnnualNet * Math.pow(1 + sc.growth, i);
+      const pvCf = cf / Math.pow(1 + discount, i);
+      pv += pvCf;
+      cfs.push({ cf, pv: pvCf });
     }
-  }});
+    const terminalCf = cfs[cfs.length-1].cf * (1 + terminalGrowth);
+    const terminal = terminalCf / Math.max(0.0001, discount - terminalGrowth);
+    const terminalPv = terminal / Math.pow(1 + discount, dcfYears);
+    dcfResults[key] = { value: pv + terminalPv, cfs, terminal: terminalPv, ...sc };
+  });
+
+  // ── 8. Break-even ─────────────────────────────────────────────────────────
+  // Fixed annual costs (studio, artwork, distribution = investment overhead)
+  const fixedAnnual = (spendByCat['Estúdio'] || 0) + (spendByCat['Artwork'] || 0) + (spendByCat['Distribuição'] || 0);
+  const fixedPerYear = fixedAnnual / Math.max(1, activeYears.length);
+  const gigsToBreakEven = fixedPerYear > 0 && avgGigFee > costPerGig
+    ? Math.ceil(fixedPerYear / (avgGigFee - costPerGig))
+    : null;
+
+  // ── 9. Strategic signals ──────────────────────────────────────────────────
+  const signals = [];
+
+  // Signal: Gig fee trajectory
+  if (gigCount >= 2) {
+    const sorted = gigEntries.sort((a,b) => new Date(a.date) - new Date(b.date));
+    const firstFee = sorted[0].amount;
+    const lastFee  = sorted[sorted.length-1].amount;
+    const feeGrowth = (lastFee - firstFee) / firstFee * 100;
+    signals.push({
+      type: feeGrowth > 0 ? 'positive' : 'warning',
+      icon: feeGrowth > 0 ? '▲' : '▼',
+      label: 'Booking fee trajectory',
+      value: `${feeGrowth > 0 ? '+' : ''}${feeGrowth.toFixed(0)}%`,
+      detail: `${fmtMoney(firstFee)} → ${fmtMoney(lastFee)} (${gigCount} gigs total)`
+    });
+  }
+
+  // Signal: Investment efficiency (revenue generated per € invested)
+  const revPerEuroInvested = investmentTotal > 0 ? gigRevenue / investmentTotal : null;
+  if (revPerEuroInvested !== null) {
+    signals.push({
+      type: revPerEuroInvested > 1.5 ? 'positive' : revPerEuroInvested > 0.8 ? 'neutral' : 'warning',
+      icon: '◈',
+      label: 'Investment ROI (revenue / invested)',
+      value: `${revPerEuroInvested.toFixed(2)}x`,
+      detail: `€${investmentTotal.toFixed(0)} invested → €${gigRevenue.toFixed(0)} gig revenue`
+    });
+  }
+
+  // Signal: Streaming revenue gap
+  const streamingRev = entries.filter(e => e.tags.includes('spotify') || e.cat === 'Streaming').reduce((s,e) => s + Math.max(0, e.amount), 0);
+  signals.push({
+    type: streamingRev < 10 ? 'danger' : streamingRev < 100 ? 'warning' : 'positive',
+    icon: '♪',
+    label: 'Streaming revenue',
+    value: fmtMoney(streamingRev),
+    detail: streamingRev < 10
+      ? 'Critical gap — 2,200 streams = €0.14. Prioritise release cadence.'
+      : 'Building. Target: €50/mo with consistent release cadence.'
+  });
+
+  // Signal: Revenue concentration risk
+  const liveShare = gigRevenue / Math.max(1, totalRevenue) * 100;
+  signals.push({
+    type: liveShare > 90 ? 'warning' : liveShare > 70 ? 'neutral' : 'positive',
+    icon: '⚠',
+    label: 'Revenue concentration (live)',
+    value: `${liveShare.toFixed(0)}%`,
+    detail: liveShare > 90
+      ? 'High concentration risk. No live = no revenue. Add streaming & sync.'
+      : 'Diversification improving.'
+  });
+
+  // Signal: Runway
+  signals.push({
+    type: runwayMonths > 18 ? 'positive' : runwayMonths > 6 ? 'neutral' : 'danger',
+    icon: '⏱',
+    label: 'Op. runway (at current burn)',
+    value: runwayMonths === Infinity ? '∞' : `${runwayMonths.toFixed(1)} mo`,
+    detail: `Op. burn €${opBurn.toFixed(0)}/mo · Balance ${fmtMoney(cashBalance)}`
+  });
+
+  return {
+    totalRevenue, totalExpenses, netPosition, cashBalance,
+    revByYear, expByYear, years, activeYears,
+    gigCount, gigRevenue, avgGigFee, costPerGig, gigMargin,
+    spendByCat, investmentTotal,
+    monthlyBurn, opBurn, runwayMonths,
+    yoyGrowth, baseAnnualRev, baseAnnualNet,
+    dcfResults, scenarios,
+    fixedPerYear, gigsToBreakEven,
+    signals, streamingRev, liveShare
+  };
 }
-function refreshDcfChart(){
-  if(!dcfChartInst) return initDcfChart();
-  const {labels,cashFlows,discounted,dcfValue,avgNet,trailingRev} = getDcfSeries();
-  const revMultiple = trailingRev>0 ? dcfValue/trailingRev : null;
-  const summary=document.getElementById('dcf-summary');
-  if(summary) summary.textContent = `DCF: ${fmtMoney(dcfValue)} | Rev multiple: ${revMultiple?revMultiple.toFixed(1)+'x':'—'} | Avg net: ${fmtMoney(avgNet)}`;
-  dcfChartInst.data.labels = labels;
-  dcfChartInst.data.datasets[0].data = cashFlows;
-  dcfChartInst.data.datasets[1].data = discounted;
+
+// ── Render scorecard KPIs ─────────────────────────────────────────────────────
+function renderValuationScorecard(fi) {
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setColor = (id, col) => { const el = document.getElementById(id); if (el) el.style.color = col; };
+
+  set('val-capital-raised', fmtMoney(fi.totalRevenue));
+  set('val-capital-sub', `${fi.activeYears.length} active years · ${fi.gigCount} gigs`);
+
+  set('val-total-invested', fmtMoney(fi.totalExpenses));
+  set('val-invested-sub', `${Object.keys(fi.spendByCat).length} categories`);
+
+  set('val-net-position', fmtMoney(fi.netPosition));
+  setColor('val-net-position', fi.netPosition >= 0 ? 'var(--green3)' : 'var(--red3)');
+  set('val-net-sub', `${fi.netPosition >= 0 ? 'Profitable' : 'Deficit'} · Cash: ${fmtMoney(fi.cashBalance)}`);
+
+  set('val-rev-per-gig', fmtMoney(fi.avgGigFee));
+  set('val-rev-per-gig-sub', `${fi.gigCount} gigs confirmed`);
+
+  set('val-cost-per-gig', fmtMoney(fi.costPerGig));
+  set('val-cost-per-gig-sub', 'transport + misc avg');
+
+  if (fi.gigMargin !== null) {
+    const pct = (fi.gigMargin * 100).toFixed(1);
+    set('val-gig-margin', `${pct}%`);
+    setColor('val-gig-margin', fi.gigMargin > 0.7 ? 'var(--green3)' : fi.gigMargin > 0.4 ? 'var(--amber2)' : 'var(--red3)');
+  }
+}
+
+// ── DCF chart & headline ──────────────────────────────────────────────────────
+let dcfChartInst = null;
+function initDcfChart() {
+  const canvas = document.getElementById('dcfChart');
+  if (!canvas || dcfChartInst) return;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width || 340; canvas.height = 100;
+
+  const fi = getFinancialIntelligence();
+  renderDcfHeadline(fi);
+
+  const labels = [];
+  const y = new Date().getFullYear();
+  for (let i = 1; i <= 5; i++) labels.push(String(y + i));
+
+  dcfChartInst = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Bear', data: fi.dcfResults.bear.cfs.map(c => c.cf), borderColor: '#ef4444', borderWidth: 1.5, fill: false, tension: .3, pointRadius: 2 },
+        { label: 'Base', data: fi.dcfResults.base.cfs.map(c => c.cf), borderColor: '#f59e0b', borderWidth: 2, fill: false, tension: .3, pointRadius: 2 },
+        { label: 'Bull', data: fi.dcfResults.bull.cfs.map(c => c.cf), borderColor: '#22c55e', borderWidth: 1.5, fill: false, tension: .3, pointRadius: 2 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, labels: { color: '#5a7a92', font: { family: 'IBM Plex Mono', size: 8 }, boxWidth: 10 } },
+        tooltip: {
+          backgroundColor: '#0a1018', borderColor: '#243c54', borderWidth: 1,
+          titleColor: '#b8ccd8', bodyColor: '#5a7a92',
+          titleFont: { family: 'IBM Plex Mono', size: 8 }, bodyFont: { family: 'IBM Plex Mono', size: 8 },
+          callbacks: { label: c => `${c.dataset.label}: ${fmtMoney(c.parsed.y)}` }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(28,46,66,.5)', lineWidth: .5 }, ticks: { color: '#3a5468', font: { family: 'IBM Plex Mono', size: 8 } } },
+        y: { grid: { color: 'rgba(28,46,66,.5)', lineWidth: .5 }, ticks: { color: '#3a5468', font: { family: 'IBM Plex Mono', size: 8 }, callback: v => fmtMoney(v) } }
+      }
+    }
+  });
+}
+
+function renderDcfHeadline(fi) {
+  const base = fi.dcfResults.base;
+  const bear = fi.dcfResults.bear;
+  const bull = fi.dcfResults.bull;
+  const headEl = document.getElementById('dcf-headline');
+  const ctxEl  = document.getElementById('dcf-context');
+  const asmEl  = document.getElementById('dcf-assumption-box');
+  if (headEl) {
+    headEl.textContent = fmtMoney(base.value);
+    headEl.style.color = base.value > 0 ? 'var(--purple2)' : 'var(--red3)';
+  }
+  if (ctxEl) ctxEl.innerHTML = `
+    <span style="color:#ef4444">Bear: ${fmtMoney(bear.value)}</span> &nbsp;·&nbsp;
+    <span style="color:#f59e0b">Base: ${fmtMoney(base.value)}</span> &nbsp;·&nbsp;
+    <span style="color:#22c55e">Bull: ${fmtMoney(bull.value)}</span>`;
+  if (asmEl) asmEl.innerHTML = `
+    <span style="color:var(--muted2)">Assumptions:</span> Base annual net <strong style="color:var(--text)">${fmtMoney(fi.baseAnnualNet)}</strong> ·
+    Discount rate 12% · Terminal growth 2% · 5-year horizon.<br>
+    <span style="color:var(--amber2)">Note:</span> DCF reflects intrinsic earning power. At current scale, band value = booking power × release catalogue × audience size.`;
+}
+
+function refreshDcfChart() {
+  const fi = getFinancialIntelligence();
+  renderDcfHeadline(fi);
+  if (!dcfChartInst) return initDcfChart();
+  dcfChartInst.data.datasets[0].data = fi.dcfResults.bear.cfs.map(c => c.cf);
+  dcfChartInst.data.datasets[1].data = fi.dcfResults.base.cfs.map(c => c.cf);
+  dcfChartInst.data.datasets[2].data = fi.dcfResults.bull.cfs.map(c => c.cf);
   dcfChartInst.update();
 }
 
-function getProfitabilitySeries(){
-  const {keys,rev,net,margin} = getQuarterlyAggregates();
-  const labels = keys.map(getQuarterLabel);
-  return {labels,rev,net,margin};
-}
+// ── Revenue composition chart ─────────────────────────────────────────────────
+let profitChartInst = null;
+function initProfitChart() {
+  const canvas = document.getElementById('profitChart');
+  if (!canvas || profitChartInst) return;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width || 340; canvas.height = 120;
 
-let profitChartInst=null;
-function initProfitChart(){
-  const canvas=document.getElementById('profitChart');
-  if(!canvas||profitChartInst)return;
-  const rect=canvas.parentElement.getBoundingClientRect();
-  canvas.width=rect.width||500;canvas.height=rect.height||120;
-  const {labels,rev,net,margin} = getProfitabilitySeries();
+  const fi = getFinancialIntelligence();
+  const labels = fi.years.map(String);
+  const rev = fi.years.map(y => fi.revByYear[y] || 0);
+  const exp = fi.years.map(y => fi.expByYear[y] || 0);
+  const net = fi.years.map((y,i) => rev[i] - exp[i]);
 
-  profitChartInst=new Chart(canvas,{type:'bar',data:{
-    labels,
-    datasets:[
-      {label:'Revenue',type:'bar',data:rev,backgroundColor:'rgba(34,197,94,0.5)',borderColor:'#22c55e',borderWidth:1},
-      {label:'Net',type:'bar',data:net,backgroundColor:'rgba(239,68,68,0.5)',borderColor:'#ef4444',borderWidth:1},
-      {label:'Margin %',type:'line',data:margin.map(m=>m*100),borderColor:'#2d7fff',borderWidth:2,fill:false,tension:.25,pointRadius:2,yAxisID:'y1'}
-    ]
-  },options:{
-    responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:true,labels:{color:'#b8ccd8',font:{family:'IBM Plex Mono',size:9},boxWidth:10}},
-      tooltip:{backgroundColor:'#0a1018',borderColor:'#243c54',borderWidth:1,titleColor:'#b8ccd8',bodyColor:'#5a7a92',titleFont:{family:'IBM Plex Mono',size:9},bodyFont:{family:'IBM Plex Mono',size:9},
-        callbacks:{label:c=>c.dataset.label==='Margin %'?`${c.parsed.y.toFixed(1)}%`:`${fmtMoney(c.parsed.y)}`}
-      }
+  document.getElementById('rev-comp-period').textContent = `${fi.years[0]}–${fi.years[fi.years.length-1]}`;
+
+  profitChartInst = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Revenue', data: rev, backgroundColor: 'rgba(255,92,26,.35)', borderColor: 'var(--accent)', borderWidth: 1 },
+        { label: 'Expenses', data: exp, backgroundColor: 'rgba(239,68,68,.25)', borderColor: '#ef4444', borderWidth: 1 },
+        { label: 'Net', type: 'line', data: net, borderColor: '#22c55e', borderWidth: 2, fill: false, tension: .3, pointRadius: 3, yAxisID: 'y' },
+      ]
     },
-    scales:{
-      x:{grid:{color:'rgba(28,46,66,.5)',lineWidth:.5},ticks:{color:'#3a5468',font:{family:'IBM Plex Mono',size:8}}},
-      y:{grid:{color:'rgba(28,46,66,.5)',lineWidth:.5},ticks:{color:'#3a5468',font:{family:'IBM Plex Mono',size:8},callback:v=>'€'+(v/1000).toFixed(0)+'K'}},
-      y1:{position:'right',grid:{display:false},ticks:{color:'#3a5468',font:{family:'IBM Plex Mono',size:8},callback:v=>v+'%'}}
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, labels: { color: '#5a7a92', font: { family: 'IBM Plex Mono', size: 8 }, boxWidth: 10 } },
+        tooltip: {
+          backgroundColor: '#0a1018', borderColor: '#243c54', borderWidth: 1,
+          titleColor: '#b8ccd8', bodyColor: '#5a7a92',
+          titleFont: { family: 'IBM Plex Mono', size: 8 }, bodyFont: { family: 'IBM Plex Mono', size: 8 },
+          callbacks: { label: c => `${c.dataset.label}: ${fmtMoney(c.parsed.y)}` }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(28,46,66,.4)', lineWidth: .5 }, ticks: { color: '#3a5468', font: { family: 'IBM Plex Mono', size: 8 } } },
+        y: { grid: { color: 'rgba(28,46,66,.4)', lineWidth: .5 }, ticks: { color: '#3a5468', font: { family: 'IBM Plex Mono', size: 8 }, callback: v => fmtMoney(v) } }
+      }
     }
-  }});
+  });
+
+  // Revenue composition insight
+  const fi2 = fi;
+  const insightEl = document.getElementById('rev-comp-insight');
+  if (insightEl) {
+    const trend = fi2.yoyGrowth !== null
+      ? `YoY revenue ${fi2.yoyGrowth >= 0 ? '▲ +' : '▼ '}${(fi2.yoyGrowth*100).toFixed(0)}%.`
+      : 'Limited YoY data.';
+    insightEl.innerHTML = `${trend} Live = ${fi2.liveShare.toFixed(0)}% of total revenue. Streaming critically underdeveloped at ${fmtMoney(fi2.streamingRev)} lifetime.`;
+  }
 }
-function refreshProfitChart(){
-  if(!profitChartInst) return initProfitChart();
-  const {labels,rev,net,margin} = getProfitabilitySeries();
-  profitChartInst.data.labels=labels;
-  profitChartInst.data.datasets[0].data=rev;
-  profitChartInst.data.datasets[1].data=net;
-  profitChartInst.data.datasets[2].data=margin.map(m=>m*100);
+
+function refreshProfitChart() {
+  if (!profitChartInst) return initProfitChart();
+  const fi = getFinancialIntelligence();
+  const rev = fi.years.map(y => fi.revByYear[y] || 0);
+  const exp = fi.years.map(y => fi.expByYear[y] || 0);
+  profitChartInst.data.labels = fi.years.map(String);
+  profitChartInst.data.datasets[0].data = rev;
+  profitChartInst.data.datasets[1].data = exp;
+  profitChartInst.data.datasets[2].data = fi.years.map((y,i) => rev[i] - exp[i]);
   profitChartInst.update();
 }
 
-function getFinancialHealthSeries(){
-  const now=new Date();
-  const cutoff=new Date(now.getFullYear()-1, now.getMonth(), now.getDate());
-  let shortAssets=0, longAssets=0, shortDebt=0, longDebt=0;
-  LEDGER_DATA.forEach(e=>{
-    const d=new Date(e.date);
-    if(e.amount>0){
-      if(d>=cutoff) shortAssets += e.amount;
-      else longAssets += e.amount;
-    } else {
-      if(d>=cutoff) shortDebt += Math.abs(e.amount);
-      else longDebt += Math.abs(e.amount);
+// ── Spend breakdown chart ─────────────────────────────────────────────────────
+let healthChartInst = null;
+function initHealthChart() {
+  const canvas = document.getElementById('healthChart');
+  if (!canvas || healthChartInst) return;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width || 340; canvas.height = 120;
+
+  const fi = getFinancialIntelligence();
+  const cats = Object.entries(fi.spendByCat).sort((a,b) => b[1]-a[1]);
+  const labels = cats.map(([k]) => k);
+  const vals   = cats.map(([,v]) => v);
+  const colors = ['#ff3c1e','#aa00ff','#2979ff','#ff8f00','#00e676','#546e7a','#00bcd4','#f59e0b','#e91e63','#4caf50'];
+
+  healthChartInst = new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{ data: vals, backgroundColor: colors.slice(0, vals.length), borderWidth: 0, borderRadius: 2 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: { display: true, position: 'right', labels: { color: '#5a7a92', font: { family: 'IBM Plex Mono', size: 7 }, boxWidth: 8, padding: 6 } },
+        tooltip: {
+          backgroundColor: '#0a1018', borderColor: '#243c54', borderWidth: 1,
+          titleColor: '#b8ccd8', bodyColor: '#5a7a92',
+          titleFont: { family: 'IBM Plex Mono', size: 8 }, bodyFont: { family: 'IBM Plex Mono', size: 8 },
+          callbacks: {
+            label: c => {
+              const total = c.dataset.data.reduce((s,v) => s+v, 0);
+              return `${c.label}: ${fmtMoney(c.raw)} (${(c.raw/total*100).toFixed(1)}%)`;
+            }
+          }
+        }
+      }
     }
   });
-  const currentRatio = shortDebt>0 ? (shortAssets/shortDebt) : null;
-  return {shortAssets,longAssets,shortDebt,longDebt,currentRatio};
 }
 
-let healthChartInst=null;
-function initHealthChart(){
-  const canvas=document.getElementById('healthChart');
-  if(!canvas||healthChartInst)return;
-  const rect=canvas.parentElement.getBoundingClientRect();
-  canvas.width=rect.width||500;canvas.height=rect.height||120;
-  const {shortAssets,longAssets,shortDebt,longDebt,currentRatio} = getFinancialHealthSeries();
-  const summary=document.getElementById('health-summary');
-  if(summary) summary.textContent = `Current ratio: ${currentRatio?currentRatio.toFixed(2):'—'} (short assets vs debt)`;
-
-  const labels=['Short-term','Long-term'];
-  const assets=[shortAssets,longAssets];
-  const debt=[-shortDebt,-longDebt];
-
-  healthChartInst=new Chart(canvas,{type:'bar',data:{
-    labels,
-    datasets:[
-      {label:'Assets',data:assets,backgroundColor:'rgba(34,197,94,0.5)',borderColor:'#22c55e',borderWidth:1},
-      {label:'Debt',data:debt,backgroundColor:'rgba(239,68,68,0.5)',borderColor:'#ef4444',borderWidth:1}
-    ]
-  },options:{
-    responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:true,labels:{color:'#b8ccd8',font:{family:'IBM Plex Mono',size:9},boxWidth:10}},
-      tooltip:{backgroundColor:'#0a1018',borderColor:'#243c54',borderWidth:1,titleColor:'#b8ccd8',bodyColor:'#5a7a92',titleFont:{family:'IBM Plex Mono',size:9},bodyFont:{family:'IBM Plex Mono',size:9},
-        callbacks:{label:c=>`${c.dataset.label}: ${fmtMoney(Math.abs(c.parsed.y))}`}
-      }
-    },
-    scales:{
-      x:{grid:{color:'rgba(28,46,66,.5)',lineWidth:.5},ticks:{color:'#3a5468',font:{family:'IBM Plex Mono',size:8}}},
-      y:{grid:{color:'rgba(28,46,66,.5)',lineWidth:.5},ticks:{color:'#3a5468',font:{family:'IBM Plex Mono',size:8},callback:v=>'€'+(Math.abs(v)/1000).toFixed(0)+'K'}}
-    }
-  }});
-}
-function refreshHealthChart(){
-  if(!healthChartInst) return initHealthChart();
-  const {shortAssets,longAssets,shortDebt,longDebt,currentRatio} = getFinancialHealthSeries();
-  const summary=document.getElementById('health-summary');
-  if(summary) summary.textContent = `Current ratio: ${currentRatio?currentRatio.toFixed(2):'—'} (short assets vs debt)`;
-  healthChartInst.data.datasets[0].data=[shortAssets,longAssets];
-  healthChartInst.data.datasets[1].data=[-shortDebt,-longDebt];
+function refreshHealthChart() {
+  if (!healthChartInst) return initHealthChart();
+  const fi = getFinancialIntelligence();
+  const cats = Object.entries(fi.spendByCat).sort((a,b) => b[1]-a[1]);
+  healthChartInst.data.labels = cats.map(([k]) => k);
+  healthChartInst.data.datasets[0].data = cats.map(([,v]) => v);
   healthChartInst.update();
 }
 
-function refreshAllFinanceCharts(){
+// ── Scenario grid ─────────────────────────────────────────────────────────────
+function renderScenarioGrid() {
+  const fi = getFinancialIntelligence();
+  const el = document.getElementById('scenario-grid');
+  if (!el) return;
+
+  const SCENARIO_DEFS = [
+    { key: 'current',  label: 'Status quo',       color: '#546e7a', gigs: fi.gigCount / Math.max(1, fi.activeYears.length), releases: 0 },
+    { key: 'minimal',  label: '4 gigs/yr',         color: '#f59e0b', gigs: 4,  releases: 0 },
+    { key: 'moderate', label: '4 gigs + 2 singles',color: '#2979ff', gigs: 4,  releases: 2 },
+    { key: 'active',   label: '8 gigs + album',     color: '#22c55e', gigs: 8,  releases: 1, album: true },
+    { key: 'touring',  label: 'Regional tour (12)', color: '#ff3c1e', gigs: 12, releases: 1, album: true },
+  ];
+
+  // Estimate streaming income: ~€0.004/stream avg, 500 streams/release/month
+  const streamingPerRelease = 500 * 0.004 * 12; // ~€24/yr per release
+
+  el.innerHTML = SCENARIO_DEFS.map(s => {
+    const gigIncome   = s.gigs * fi.avgGigFee;
+    const gigCosts    = s.gigs * fi.costPerGig;
+    const streamIncome = (s.releases || 0) * streamingPerRelease * (s.album ? 4 : 1);
+    const studioCost  = s.album ? 800 : (s.releases || 0) * 0;
+    const net12       = gigIncome + streamIncome - gigCosts - studioCost - fi.fixedPerYear;
+    const isPositive  = net12 > 0;
+    return `
+      <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border1)">
+        <div>
+          <div style="font-size:8px;font-weight:700;color:var(--text)">${s.label}</div>
+          <div style="font-size:7px;color:var(--muted3)">${s.gigs} gigs · ${(s.releases||0)+(s.album?1:0)} releases</div>
+        </div>
+        <div style="font-size:9px;font-weight:700;color:${s.color}">${fmtMoney(gigIncome + streamIncome)}</div>
+        <div style="font-size:9px;font-weight:700;color:${isPositive?'var(--green3)':'var(--red3)'}">${isPositive?'+':''}${fmtMoney(net12)}</div>
+      </div>`;
+  }).join('');
+
+  const insEl = document.getElementById('scenario-insight');
+  if (insEl) {
+    const minGigsNeeded = fi.fixedPerYear > 0 && fi.avgGigFee > fi.costPerGig
+      ? Math.ceil(fi.fixedPerYear / (fi.avgGigFee - fi.costPerGig)) : '—';
+    insEl.innerHTML = `Break-even: <strong style="color:var(--accent)">${minGigsNeeded} gigs/yr</strong> covers fixed overhead (${fmtMoney(fi.fixedPerYear)}/yr).
+      At avg fee ${fmtMoney(fi.avgGigFee)} with ${fmtMoney(fi.costPerGig)} cost/gig = <strong style="color:var(--green3)">${fmtMoney(fi.avgGigFee - fi.costPerGig)}</strong> contribution margin per show.`;
+  }
+}
+
+// ── Break-even panel ──────────────────────────────────────────────────────────
+function renderBreakevenPanel() {
+  const fi = getFinancialIntelligence();
+  const el = document.getElementById('breakeven-content');
+  if (!el) return;
+
+  const contributionMargin = fi.avgGigFee - fi.costPerGig;
+  const fixedLabel = `Studio + artwork + distribution (avg ${fmtMoney(fi.fixedPerYear)}/yr)`;
+
+  el.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:5px;font-size:8px">
+      <div style="display:grid;grid-template-columns:1fr auto;gap:8px;padding:4px 0;border-bottom:1px solid var(--border1)">
+        <span style="color:var(--muted3)">Avg booking fee</span>
+        <span style="color:var(--green3);font-weight:700">${fmtMoney(fi.avgGigFee)}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:8px;padding:4px 0;border-bottom:1px solid var(--border1)">
+        <span style="color:var(--muted3)">Variable cost/gig</span>
+        <span style="color:var(--red3)">−${fmtMoney(fi.costPerGig)}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:8px;padding:4px 0;border-bottom:1px solid var(--border1)">
+        <span style="color:var(--muted2);font-weight:700">Contribution margin</span>
+        <span style="color:var(--accent);font-weight:700">${fmtMoney(contributionMargin)}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:8px;padding:4px 0;border-bottom:1px solid var(--border1)">
+        <span style="color:var(--muted3)">Fixed overhead/yr</span>
+        <span style="color:var(--muted2)">−${fmtMoney(fi.fixedPerYear)}</span>
+      </div>
+      <div style="margin-top:4px;padding:8px;background:rgba(255,92,26,.08);border-left:2px solid var(--accent);font-size:7px;color:var(--muted2);line-height:1.8">
+        Break-even: <strong style="color:var(--accent);font-size:11px">${fi.gigsToBreakEven ?? '—'} gigs/yr</strong><br>
+        Each gig beyond that = <strong style="color:var(--green3)">${fmtMoney(contributionMargin)}</strong> straight to band fund.
+      </div>
+      <div style="margin-top:4px;padding:8px;background:var(--bg4);border-radius:2px;font-size:7px;color:var(--muted3);line-height:1.7">
+        <span style="color:var(--muted2)">Revenue target for profitability:</span><br>
+        ${fi.gigsToBreakEven !== null ? `Book ≥${fi.gigsToBreakEven} gigs/yr (currently avg ${(fi.gigCount/Math.max(1,fi.activeYears.length)).toFixed(1)}/yr).` : 'Insufficient data.'}<br>
+        At current pace: <span style="${fi.gigCount/Math.max(1,fi.activeYears.length) >= (fi.gigsToBreakEven||999) ? 'color:var(--green3)' : 'color:var(--amber2)'}">${fi.gigCount/Math.max(1,fi.activeYears.length) >= (fi.gigsToBreakEven||999) ? '✓ Break-even achieved' : '↑ Below break-even'}</span>
+      </div>
+    </div>`;
+}
+
+// ── Strategic signals panel ───────────────────────────────────────────────────
+function renderStrategicSignals() {
+  const fi = getFinancialIntelligence();
+  const el = document.getElementById('strategic-signals');
+  if (!el) return;
+
+  const COLOR = {
+    positive: 'var(--green3)', warning: 'var(--amber2)',
+    neutral: 'var(--muted2)', danger: 'var(--red3)'
+  };
+  const BG = {
+    positive: 'rgba(0,230,118,.06)', warning: 'rgba(255,160,0,.06)',
+    neutral: 'rgba(255,255,255,.02)', danger: 'rgba(239,68,68,.08)'
+  };
+
+  el.innerHTML = fi.signals.map(s => `
+    <div style="display:grid;grid-template-columns:14px 1fr auto;gap:6px;align-items:start;padding:6px 8px;background:${BG[s.type]};border-radius:2px;border-left:2px solid ${COLOR[s.type]}">
+      <span style="color:${COLOR[s.type]};font-size:9px;padding-top:1px">${s.icon}</span>
+      <div>
+        <div style="font-size:7px;color:var(--muted3);letter-spacing:.06em">${s.label}</div>
+        <div style="font-size:7px;color:var(--muted3);margin-top:2px;line-height:1.5">${s.detail}</div>
+      </div>
+      <div style="font-size:9px;font-weight:700;color:${COLOR[s.type]};white-space:nowrap">${s.value}</div>
+    </div>`).join('');
+}
+
+// ── Master render ─────────────────────────────────────────────────────────────
+function refreshAllFinanceCharts() {
+  const fi = getFinancialIntelligence();
+  renderValuationScorecard(fi);
+  renderScenarioGrid();
+  renderBreakevenPanel();
+  renderStrategicSignals();
   refreshDcfChart();
   refreshProfitChart();
   refreshHealthChart();
@@ -5288,15 +5687,15 @@ function refreshAllFinanceCharts(){
 
 function updateFinancialKpis(){
   const entries=[...LEDGER_DATA].sort((a,b)=>new Date(a.date)-new Date(b.date));
-  const sortedByDate=[...entries];
-  const latest=sortedByDate[sortedByDate.length-1];
-  const prev=sortedByDate[sortedByDate.length-2];
+  const latest=entries[entries.length-1];
+  const prev=entries[entries.length-2];
   const balanceEl=document.getElementById('kpi-total-balance');
   const balanceChangeEl=document.getElementById('kpi-balance-change');
-  if(balanceEl) balanceEl.textContent = fmtMoney(latest.balance);
-  if(balanceChangeEl&&prev){
+  if(balanceEl) balanceEl.textContent = fmtMoney(latest?.balance||0);
+  if(balanceChangeEl&&prev&&latest){
     const diff=latest.balance-prev.balance;
     balanceChangeEl.textContent=`${diff>=0?'+':''}${fmtMoney(diff)} ${t('vs_last_txn')}`;
+    balanceChangeEl.className='kpi-sub '+(diff>=0?'up':'down');
   }
 
   const now=new Date();
@@ -5310,26 +5709,26 @@ function updateFinancialKpis(){
   const ytdExpEl=document.getElementById('kpi-ytd-exp');
   const ytdRevChEl=document.getElementById('kpi-ytd-rev-change');
   const ytdExpChEl=document.getElementById('kpi-ytd-exp-change');
-  if(ytdRevEl) ytdRevEl.textContent = fmtMoney(ytdRev);
-  if(ytdExpEl) ytdExpEl.textContent = fmtMoney(ytdExp);
+  if(ytdRevEl) ytdRevEl.textContent=fmtMoney(ytdRev);
+  if(ytdExpEl) ytdExpEl.textContent=fmtMoney(ytdExp);
   if(ytdRevChEl){
     if(ytdRevLastYear>0){const pct=((ytdRev-ytdRevLastYear)/ytdRevLastYear*100);ytdRevChEl.textContent=(pct>=0?'▲ +':'▼ ')+pct.toFixed(1)+'% vs '+lastYear;ytdRevChEl.className='kpi-sub '+(pct>=0?'up':'down');}
-    else ytdRevChEl.textContent=t('no_data')+' '+lastYear;
+    else ytdRevChEl.textContent=`First active year`;
   }
   if(ytdExpChEl){
     if(ytdExpLastYear>0){const pct=((ytdExp-ytdExpLastYear)/ytdExpLastYear*100);ytdExpChEl.textContent=(pct>=0?'▲ +':'▼ ')+pct.toFixed(1)+'% vs '+lastYear;ytdExpChEl.className='kpi-sub '+(pct>=0?'down':'up');}
-    else ytdExpChEl.textContent=t('no_data')+' '+lastYear;
+    else ytdExpChEl.textContent=`First active year`;
   }
 
   const COGS_CATS=['Distribuição','Estúdio','Artwork'];
-  const ytdCogs = entries.filter(e=>new Date(e.date).getFullYear()===year && e.amount<0 && COGS_CATS.includes(e.cat)).reduce((s,e)=>s+Math.abs(e.amount),0);
-  const grossMargin = ytdRev? (ytdRev - ytdCogs)/ytdRev : null;
+  const ytdCogs=entries.filter(e=>new Date(e.date).getFullYear()===year&&e.amount<0&&COGS_CATS.includes(e.cat)).reduce((s,e)=>s+Math.abs(e.amount),0);
+  const grossMargin=ytdRev?(ytdRev-ytdCogs)/ytdRev:null;
   const grossMarginEl=document.getElementById('kpi-gross-margin');
   const grossMarginSubEl=document.getElementById('kpi-gross-margin-sub');
-  if(grossMarginEl) grossMarginEl.textContent = grossMargin!==null ? `${(grossMargin*100).toFixed(1)}%` : '—';
-  if(grossMarginSubEl) grossMarginSubEl.textContent = `COGS: ${fmtMoney(ytdCogs)}`;
+  if(grossMarginEl) grossMarginEl.textContent=grossMargin!==null?`${(grossMargin*100).toFixed(1)}%`:'—';
+  if(grossMarginSubEl) grossMarginSubEl.textContent=`COGS: ${fmtMoney(ytdCogs)}`;
 
-  const {months,marginRate,mom,yoy} = getMarginGrowthSeries();
+  const {months,marginRate,mom,yoy}=getMarginGrowthSeries();
   const lastIdx=months.length-1;
   const netMarginEl=document.getElementById('kpi-net-margin');
   const netMarginSubEl=document.getElementById('kpi-net-margin-sub');
@@ -5341,64 +5740,37 @@ function updateFinancialKpis(){
     netMarginSubEl.textContent=`MoM ${momPct==null?'—':(momPct*100).toFixed(1)+'%'} | YoY ${yoyPct==null?'—':(yoyPct*100).toFixed(1)+'%'}`;
   }
 
-  const trailing=12;
-  const groupedByMonth={};
-  entries.forEach(e=>{
-    const m=`${new Date(e.date).getFullYear()}-${String(new Date(e.date).getMonth()+1).padStart(2,'0')}`;
-    groupedByMonth[m]=groupedByMonth[m]||{rev:0,net:0};
-    if(e.amount>0) groupedByMonth[m].rev += e.amount;
-    else groupedByMonth[m].net += e.amount;
-  });
-  const monthKeys=Object.keys(groupedByMonth).sort();
-  const trailingMonths=monthKeys.slice(-trailing);
-
-  let trailingRev=0, trailingNet=0;
-  let burnSum=0;
-  trailingMonths.forEach(m=>{
-    const net=groupedByMonth[m].net;
-    trailingRev += groupedByMonth[m].rev;
-    trailingNet += net;
-    burnSum += Math.max(0, -net);
-  });
-
-  const avgBurn = trailingMonths.length ? (burnSum / trailingMonths.length) : 0;
-  const runwayMonths = avgBurn > 0 ? (latest.balance / avgBurn) : Infinity;
-  const runwayLabel = runwayMonths===Infinity ? '∞' : `${runwayMonths.toFixed(1)} mo`;
+  // Burn / runway from FI engine
+  const fi=getFinancialIntelligence();
   const runwayEl=document.getElementById('kpi-runway');
   const runwaySubEl=document.getElementById('kpi-runway-sub');
-  if(runwayEl) runwayEl.textContent = runwayLabel;
-  if(runwaySubEl) runwaySubEl.textContent = `${t('runway_based')} ${trailingMonths.length} ${t('runway_mo_burn')} (${fmtMoney(avgBurn)}/mo)`;
+  const runwayLabel=fi.runwayMonths===Infinity?'∞':`${fi.runwayMonths.toFixed(1)} mo`;
+  if(runwayEl) runwayEl.textContent=runwayLabel;
+  if(runwaySubEl) runwaySubEl.textContent=`Op. burn ${fmtMoney(fi.opBurn)}/mo`;
 
   const tickerRunwayEl=document.getElementById('ticker-runway');
-  if(tickerRunwayEl) tickerRunwayEl.textContent=`⚠ Cash runway: ${runwayLabel} ${t('runway_sub')}`;
+  if(tickerRunwayEl) tickerRunwayEl.textContent=`⚠ Cash runway: ${runwayLabel} at op. burn`;
 
   const alertRunwayBody=document.getElementById('alert-runway-body');
-  if(alertRunwayBody) alertRunwayBody.textContent = `${t('runway_based')} (${fmtMoney(avgBurn)}/mo), runway is ${runwayLabel}.`;
+  if(alertRunwayBody) alertRunwayBody.textContent=`Op. burn ${fmtMoney(fi.opBurn)}/mo → runway ${runwayLabel}.`;
 
+  // EBITDA + FCF
+  const trailing12Start=new Date(now);trailing12Start.setFullYear(trailing12Start.getFullYear()-1);
+  const trailing12=entries.filter(e=>new Date(e.date)>=trailing12Start);
+  const trailingNet=trailing12.reduce((s,e)=>s+e.amount,0);
+  const capex=entries.filter(e=>e.cat==='Equipamento'&&e.amount<0).reduce((s,e)=>s+Math.abs(e.amount),0);
+  const fcf=trailingNet-capex;
   const ebitdaEl=document.getElementById('kpi-ebitda');
   const fcfEl=document.getElementById('kpi-fcf');
   const fcfSubEl=document.getElementById('kpi-fcf-sub');
-  if(ebitdaEl) ebitdaEl.textContent = fmtMoney(trailingNet);
-
-  const capex=entries.filter(e=>e.cat==='Equipamento'&&e.amount<0).reduce((s,e)=>s+Math.abs(e.amount),0);
-  const fcf=trailingNet - capex;
-  if(fcfEl) fcfEl.textContent = fmtMoney(fcf);
-
-  const q1Start=new Date(year,0,1);
-  const q1End=new Date(year,2,31);
-  const q1Entries=entries.filter(e=>{const d=new Date(e.date);return d>=q1Start&&d<=q1End;});
-  const q1Net=q1Entries.reduce((s,e)=>s+e.amount,0);
-  const q1Capex=q1Entries.filter(e=>e.cat==='Equipamento'&&e.amount<0).reduce((s,e)=>s+Math.abs(e.amount),0);
-  const q1Fcf=q1Net - q1Capex;
+  if(ebitdaEl) ebitdaEl.textContent=fmtMoney(trailingNet);
+  if(fcfEl) fcfEl.textContent=fmtMoney(fcf);
 
   const ytdEntries=entries.filter(e=>new Date(e.date).getFullYear()===year);
   const ytdNet=ytdEntries.reduce((s,e)=>s+e.amount,0);
   const ytdCapex=ytdEntries.filter(e=>e.cat==='Equipamento'&&e.amount<0).reduce((s,e)=>s+Math.abs(e.amount),0);
-  const ytdFcf=ytdNet - ytdCapex;
-
-  if(fcfSubEl) fcfSubEl.textContent=`Q1: ${fmtMoney(q1Fcf)} | YTD: ${fmtMoney(ytdFcf)}`;
+  if(fcfSubEl) fcfSubEl.textContent=`YTD net: ${fmtMoney(ytdNet-ytdCapex)}`;
 }
-
 // ─── RENDER: STREAMING CHART ──────────────────────────
 let streamChartInst=null;
 function initStreamChart(){
@@ -6212,6 +6584,7 @@ function initChartsDelayed(){
     initDcfChart();
     initProfitChart();
     initHealthChart();
+    refreshAllFinanceCharts();
   },100);
 }
 
