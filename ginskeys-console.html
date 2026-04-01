@@ -6282,7 +6282,6 @@ function setCcy(btn, ccy) {
   btn.classList.add('active');
   // Re-render everything that shows money
   updateFinancialKpis();
-  renderMgmtDashboard();
   renderLedgerRows(LEDGER_DATA.slice(0, 8), 'dash-ledger-body', false);
   renderLedgerRows(LEDGER_DATA, 'full-ledger-body', true);
   renderRevSource();
@@ -6692,6 +6691,7 @@ function _renderAll() {
   renderToursList();
   renderLedgerRows(LEDGER_DATA.slice(0,8),'dash-ledger-body',false);
   renderLedgerRows(LEDGER_DATA,'full-ledger-body',true);
+  setTimeout(renderMgmtDashboard, 150);
   renderUsers();
   renderFullAlerts();
   renderTourLedger();
@@ -7484,6 +7484,7 @@ function switchView(view, tab){
   if(tab) tab.classList.add('active');
   if(view==='streaming') initStreamChart();
   if(view==='audit'){ renderAuditLog(); showEmailTemplate('invite',document.querySelector('.email-tab')); }
+  if(view==='mgmt') setTimeout(renderMgmtDashboard, 0);
 }
 
 // ─── KEYBOARD: add I for invite ───────────────────────
@@ -10063,12 +10064,7 @@ function mgmtBandHealthScore() {
     </div>`;
 }
 
-// Wire into switchView
-const _origSwitchView = switchView;
-function switchView(view, tab) {
-  _origSwitchView(view, tab);
-  if (view === 'mgmt') renderMgmtDashboard();
-}
+
 
 
 // ── WIRE INTO INIT ─────────────────────────────────────
