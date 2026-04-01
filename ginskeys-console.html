@@ -1506,6 +1506,70 @@ tr:hover .edit-btn{display:inline}
   </div>
 </div>
 
+<!-- ══ EDIT RELEASE MODAL ═══════════════════════════ -->
+<div class="overlay-bg" id="edit-release-modal" onclick="if(event.target===this)closeEditRelease()">
+  <div class="overlay-box" style="width:520px">
+    <div class="overlay-hdr">
+      <span class="overlay-title">✎ Edit Release</span>
+      <button class="overlay-close" onclick="closeEditRelease()">✕</button>
+    </div>
+    <div class="overlay-body">
+      <input type="hidden" id="edit-rel-id">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-field" style="grid-column:span 2">
+          <label>Title *</label>
+          <input class="form-input" id="edit-rel-title" type="text" placeholder="All I See">
+        </div>
+        <div class="form-field">
+          <label>Type</label>
+          <select class="form-select" id="edit-rel-type">
+            <option value="single">Single</option><option value="ep">EP</option>
+            <option value="album">Album</option><option value="live">Live</option><option value="remix">Remix</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Stage</label>
+          <select class="form-select" id="edit-rel-stage">
+            <option value="idea">Idea</option><option value="recorded">Recorded</option>
+            <option value="mixed">Mixed</option><option value="mastered">Mastered</option>
+            <option value="artwork">Artwork</option><option value="submitted">Submitted</option>
+            <option value="scheduled">Scheduled</option><option value="released">Released</option>
+          </select>
+        </div>
+        <div class="form-field" style="grid-column:span 2">
+          <label>Release Date</label>
+          <input class="form-input" id="edit-rel-date" type="date">
+        </div>
+        <div class="form-field" style="grid-column:span 2">
+          <label>Spotify URL</label>
+          <input class="form-input" id="edit-rel-spotify" type="text" placeholder="https://open.spotify.com/...">
+        </div>
+        <div class="form-field" style="grid-column:span 2">
+          <label style="margin-bottom:6px;display:block">Checklist</label>
+          <div style="display:flex;flex-wrap:wrap;gap:14px">
+            <label style="font-size:8px;color:var(--muted3);display:flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" id="edit-rel-artwork"> Artwork done</label>
+            <label style="font-size:8px;color:var(--muted3);display:flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" id="edit-rel-video"> Video done</label>
+            <label style="font-size:8px;color:var(--muted3);display:flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" id="edit-rel-press"> Press pitched</label>
+            <label style="font-size:8px;color:var(--muted3);display:flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" id="edit-rel-spotify-pitched"> Spotify pitched</label>
+          </div>
+        </div>
+        <div class="form-field" style="grid-column:span 2">
+          <label>Notes</label>
+          <input class="form-input" id="edit-rel-notes" type="text" placeholder="e.g. Lead single. Video filmed at Praia de Sines.">
+        </div>
+      </div>
+      <div class="login-err" id="edit-rel-err" style="display:none"></div>
+    </div>
+    <div class="overlay-hdr" style="justify-content:space-between;border-top:1px solid var(--border);border-bottom:none">
+      <button class="btn-sm ghost" style="color:var(--red3);border-color:var(--red2)" onclick="deleteCurrentRelease()">Delete</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-sm ghost" onclick="closeEditRelease()">Cancel</button>
+        <button class="btn-sm primary" onclick="saveEditRelease()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="terminal">
 
 <!-- ══ TOP BAR ══════════════════════════════════════ -->
@@ -3079,6 +3143,7 @@ function renderReleasesList() {
           ${['idea','recorded','mixed','mastered','artwork','submitted','scheduled','released'].map(s=>`<option value="${s}"${s===r.stage?' selected':''}>${s}</option>`).join('')}
         </select>
         ${r.spotify_url?`<a href="${r.spotify_url}" target="_blank" style="font-size:8px;color:var(--green3)">▶ Spotify</a>`:''}
+        <button onclick="openEditRelease('${r.id}')" style="background:transparent;border:1px solid var(--border2);color:var(--muted3);font-size:9px;padding:2px 6px;cursor:pointer;border-radius:1px" title="Edit release">✎</button>
         <button onclick="deleteRelease('${r.id}','${r.title.replace(/'/g,"\\'")}')" style="background:transparent;border:1px solid var(--border2);color:var(--muted3);font-size:9px;padding:2px 6px;cursor:pointer;border-radius:1px" title="Delete release">✕</button>
       </div>
     </div>`;
@@ -3196,6 +3261,66 @@ async function deleteRelease(id, title) {
   if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
   try {
     await _apiFetch('DELETE','/releases/'+id);
+    await loadReleases();
+    showToast('Release deleted','ok');
+  } catch(e) { showToast('Delete failed: '+e.message,'err'); }
+}
+
+function openEditRelease(id) {
+  const r = RELEASES_DATA.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('edit-rel-id').value          = r.id;
+  document.getElementById('edit-rel-title').value        = r.title || '';
+  document.getElementById('edit-rel-type').value         = r.type || 'single';
+  document.getElementById('edit-rel-stage').value        = r.stage || 'idea';
+  document.getElementById('edit-rel-date').value         = r.release_date ? r.release_date.slice(0,10) : '';
+  document.getElementById('edit-rel-spotify').value      = r.spotify_url || '';
+  document.getElementById('edit-rel-artwork').checked    = !!r.artwork_done;
+  document.getElementById('edit-rel-video').checked      = !!r.video_done;
+  document.getElementById('edit-rel-press').checked      = !!r.press_pitched;
+  document.getElementById('edit-rel-spotify-pitched').checked = !!r.spotify_pitched;
+  document.getElementById('edit-rel-notes').value        = r.notes || '';
+  const errEl = document.getElementById('edit-rel-err');
+  if (errEl) { errEl.style.display='none'; errEl.textContent=''; }
+  document.getElementById('edit-release-modal').classList.add('open');
+}
+
+function closeEditRelease() {
+  document.getElementById('edit-release-modal').classList.remove('open');
+}
+
+async function saveEditRelease() {
+  const id    = document.getElementById('edit-rel-id').value;
+  const title = document.getElementById('edit-rel-title').value.trim();
+  const errEl = document.getElementById('edit-rel-err');
+  if (!title) { errEl.textContent='Title is required'; errEl.style.display='block'; return; }
+  errEl.style.display = 'none';
+  try {
+    await _apiFetch('PUT', '/releases/' + id, {
+      title,
+      type:             document.getElementById('edit-rel-type').value,
+      stage:            document.getElementById('edit-rel-stage').value,
+      release_date:     document.getElementById('edit-rel-date').value || null,
+      spotify_url:      document.getElementById('edit-rel-spotify').value || null,
+      artwork_done:     document.getElementById('edit-rel-artwork').checked,
+      video_done:       document.getElementById('edit-rel-video').checked,
+      press_pitched:    document.getElementById('edit-rel-press').checked,
+      spotify_pitched:  document.getElementById('edit-rel-spotify-pitched').checked,
+      notes:            document.getElementById('edit-rel-notes').value || null,
+    });
+    closeEditRelease();
+    await loadReleases();
+    showToast('Release updated','ok');
+  } catch(e) { errEl.textContent = '✗ ' + e.message; errEl.style.display='block'; }
+}
+
+async function deleteCurrentRelease() {
+  const id = document.getElementById('edit-rel-id').value;
+  const title = document.getElementById('edit-rel-title').value;
+  if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+  try {
+    await _apiFetch('DELETE', '/releases/' + id);
+    closeEditRelease();
     await loadReleases();
     showToast('Release deleted','ok');
   } catch(e) { showToast('Delete failed: '+e.message,'err'); }
@@ -6780,7 +6905,7 @@ document.addEventListener('keydown',e=>{
 // Close any open overlay with Escape (patch the existing handler)
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    ['import-modal','edit-txn-modal','tour-modal','edit-user-modal','alert-rule-modal']
+    ['import-modal','edit-txn-modal','tour-modal','edit-user-modal','alert-rule-modal','edit-release-modal']
       .forEach(id=>document.getElementById(id)?.classList.remove('open'));
   }
 },true);
