@@ -6955,7 +6955,8 @@ function switchView(view, tab){
 // ─── KEYBOARD: add I for invite ───────────────────────
 document.addEventListener('keydown',e=>{
   const tag=document.activeElement.tagName.toLowerCase();
-  const inInput=['input','textarea','select'].includes(tag);
+  const inInput=['input','textarea','select'].includes(tag)
+    || document.activeElement.isContentEditable;
   if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openPalette();return;}
   if(e.key==='Escape'){closePalette();closeModal();closeInvite();return;}
   if(inInput) return;
