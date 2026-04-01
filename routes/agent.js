@@ -9,15 +9,46 @@ const { requireAuth, requirePerm } = require('../middleware/auth');
 const { writeAudit } = require('../middleware/audit');
 
 // ── AI HELPER — Gemini (free tier) ──────────────────
+// Cached list of available models for this key (populated on first call)
+let _geminiModels = null;
+
+async function getGeminiModels(apiKey) {
+  if (_geminiModels) return _geminiModels;
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}&pageSize=50`
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    // Filter to models that support generateContent, prefer flash/pro text models
+    const supported = (data.models || [])
+      .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
+      .map(m => m.name.replace('models/', ''))
+      .filter(name => /gemini-(2|1\.5)/.test(name) && !name.includes('image') && !name.includes('vision'));
+    // Prefer flash (fast, free) over pro; prefer newer versions
+    supported.sort((a, b) => {
+      const score = n =>
+        n.includes('2.0-flash') ? 0 :
+        n.includes('2.5-flash') ? 1 :
+        n.includes('1.5-flash') ? 2 :
+        n.includes('1.5-pro')   ? 3 : 4;
+      return score(a) - score(b);
+    });
+    _geminiModels = supported.slice(0, 3); // top 3 candidates
+    return _geminiModels;
+  } catch(e) { return null; }
+}
+
 async function callAI(prompt, maxTokens = 1200) {
   // Try Gemini first (free tier — 1,500 calls/day)
-  // All models use v1beta — it supports every current Gemini model
   if (process.env.GEMINI_API_KEY) {
-    const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+    const key = process.env.GEMINI_API_KEY;
+    // Discover available models for this key dynamically
+    const models = await getGeminiModels(key) || ['gemini-2.0-flash', 'gemini-1.5-flash-001'];
     let lastErr = 'No model worked';
     for (const model of models) {
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -36,8 +67,9 @@ async function callAI(prompt, maxTokens = 1200) {
         const errBody = await res.text().catch(() => '');
         lastErr = `Gemini ${model} ${res.status}: ${errBody.slice(0, 200)}`;
         // 400 = bad request, 403 = bad/expired key — no point trying other models
-        if (res.status === 400 || res.status === 403) break;
-        // 404 on this model — try next
+        if (res.status === 400 || res.status === 403) { _geminiModels = null; break; }
+        // 404 on this model — try next, and invalidate cache so we rediscover
+        _geminiModels = null;
       } catch(e) { lastErr = e.message; }
     }
     throw new Error(lastErr);
