@@ -1781,28 +1781,67 @@ tr:hover .edit-btn{display:inline}
     </div>
   </div>
 
-  <!-- HERO ROW: Band Health Score (dominant) + Priority Actions -->
-  <div style="display:grid;grid-template-columns:420px 1fr;gap:10px;flex-shrink:0">
+  <!-- HERO ROW: Band Health Score centred + Priority Actions full width -->
+  <div style="display:grid;grid-template-columns:3fr 2fr;gap:10px;flex-shrink:0;align-items:start">
 
-    <!-- ══ BAND HEALTH SCORE — HERO ══ -->
-    <div class="panel" style="background:linear-gradient(135deg,rgba(255,92,26,.04) 0%,var(--bg3) 40%,rgba(0,230,118,.03) 100%);border-color:rgba(255,255,255,.08)">
-      <div class="panel-header" style="border-bottom:1px solid rgba(255,255,255,.06)">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Band Health Score</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div id="mgmt-score-trend" style="font-size:7px;color:var(--muted3)">live · updates with data</div>
-          <div id="mgmt-score-badge" style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--text)">—/100</div>
+    <!-- ══ BAND HEALTH SCORE — HERO (full width left) ══ -->
+    <div class="panel" style="background:linear-gradient(160deg,rgba(232,86,26,.05) 0%,var(--bg2) 50%,rgba(0,200,100,.03) 100%);border-color:var(--border2)">
+      <div class="panel-header" style="background:var(--bg0);border-bottom:2px solid var(--border2)">
+        <div class="panel-title" style="gap:8px">
+          <div class="panel-title-dot" style="background:var(--green3);width:7px;height:7px"></div>
+          <span style="font-family:var(--display);font-size:11px;letter-spacing:.14em">BAND HEALTH SCORE</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:7px;color:var(--muted3);letter-spacing:.06em">live · recalculates from ledger data</div>
+          <div id="mgmt-score-badge" style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--text);letter-spacing:.05em">—/100</div>
         </div>
       </div>
       <div id="mgmt-health-score" style="padding:0"></div>
     </div>
 
-    <!-- Priority Actions -->
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Priority Actions</div>
-        <span id="mgmt-actions-count" style="font-size:7px;color:var(--muted3)">0 items</span>
+    <!-- Priority Actions + quick-nav -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Priority Actions</div>
+          <span id="mgmt-actions-count" style="font-size:7px;color:var(--muted3)">0 items</span>
+        </div>
+        <div id="mgmt-priority-list" style="padding:0;display:flex;flex-direction:column;gap:0;overflow-y:auto;max-height:260px"></div>
       </div>
-      <div id="mgmt-priority-list" style="padding:0;display:flex;flex-direction:column;gap:0;overflow-y:auto;max-height:320px"></div>
+
+      <!-- Quick-nav tiles -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+        <div onclick="switchView('releases',document.querySelector('[data-view=releases]'))" style="background:var(--bg2);border:1px solid var(--border2);padding:10px;cursor:pointer;transition:border-color .12s" onmouseover="this.style.borderColor='var(--purple2)'" onmouseout="this.style.borderColor='var(--border2)'">
+          <div style="font-size:16px;margin-bottom:4px">◈</div>
+          <div style="font-size:7px;font-weight:700;color:var(--text3);letter-spacing:.1em">RELEASES</div>
+          <div id="qnav-releases" style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--purple2)">—</div>
+        </div>
+        <div onclick="switchView('booking',document.querySelector('[data-view=booking]'))" style="background:var(--bg2);border:1px solid var(--border2);padding:10px;cursor:pointer;transition:border-color .12s" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border2)'">
+          <div style="font-size:16px;margin-bottom:4px">◎</div>
+          <div style="font-size:7px;font-weight:700;color:var(--text3);letter-spacing:.1em">BOOKINGS</div>
+          <div id="qnav-bookings" style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--blue2)">—</div>
+        </div>
+        <div onclick="switchView('production',document.querySelector('[data-view=production]'))" style="background:var(--bg2);border:1px solid var(--border2);padding:10px;cursor:pointer;transition:border-color .12s" onmouseover="this.style.borderColor='var(--green3)'" onmouseout="this.style.borderColor='var(--border2)'">
+          <div style="font-size:16px;margin-bottom:4px">🎚</div>
+          <div style="font-size:7px;font-weight:700;color:var(--text3);letter-spacing:.1em">SHOWS</div>
+          <div id="qnav-shows" style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green3)">—</div>
+        </div>
+        <div onclick="switchView('press',document.querySelector('[data-view=press]'))" style="background:var(--bg2);border:1px solid var(--border2);padding:10px;cursor:pointer;transition:border-color .12s" onmouseover="this.style.borderColor='var(--amber2)'" onmouseout="this.style.borderColor='var(--border2)'">
+          <div style="font-size:16px;margin-bottom:4px">✉</div>
+          <div style="font-size:7px;font-weight:700;color:var(--text3);letter-spacing:.1em">PRESS</div>
+          <div id="qnav-press" style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--amber2)">—</div>
+        </div>
+        <div onclick="switchView('streaming',document.querySelector('[data-view=streaming]'))" style="background:var(--bg2);border:1px solid var(--border2);padding:10px;cursor:pointer;transition:border-color .12s" onmouseover="this.style.borderColor='var(--purple2)'" onmouseout="this.style.borderColor='var(--border2)'">
+          <div style="font-size:16px;margin-bottom:4px">▶</div>
+          <div style="font-size:7px;font-weight:700;color:var(--text3);letter-spacing:.1em">STREAMS</div>
+          <div id="qnav-streams" style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green2)">—</div>
+        </div>
+        <div onclick="switchView('dashboard',document.querySelector('[data-view=dashboard]'))" style="background:var(--bg2);border:1px solid var(--border2);padding:10px;cursor:pointer;transition:border-color .12s" onmouseover="this.style.borderColor='var(--green3)'" onmouseout="this.style.borderColor='var(--border2)'">
+          <div style="font-size:16px;margin-bottom:4px">$</div>
+          <div style="font-size:7px;font-weight:700;color:var(--text3);letter-spacing:.1em">FUND</div>
+          <div id="qnav-fund" style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green3)">—</div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -2131,38 +2170,119 @@ tr:hover .edit-btn{display:inline}
 </div>
 
 <!-- ─ TOURS VIEW ──────────────────────────────────── -->
-<div id="view-tours" class="view">
-  <div class="main-grid" style="grid-template-columns:280px 1fr">
+<div id="view-tours" class="view new-view">
+<div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:10px;min-height:0;overflow-y:auto">
 
-    <div class="panel" style="overflow-y:auto">
+  <!-- Tours banner KPIs -->
+  <div style="flex-shrink:0;display:grid;grid-template-columns:1fr repeat(5,auto);gap:0;background:var(--bg0);border:1px solid var(--border2);border-left:3px solid var(--amber2)">
+    <div style="padding:12px 16px">
+      <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--amber2);letter-spacing:.1em">↗ TOURS & LIVE P&L</div>
+      <div style="font-size:8px;color:var(--muted2);margin-top:2px">All shows · P&L · Expenses · Ledger</div>
+    </div>
+    <div style="padding:12px 16px;border-left:1px solid var(--border2);text-align:center">
+      <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--text)" id="tour-kpi-count">—</div>
+      <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">TOTAL SHOWS</div>
+    </div>
+    <div style="padding:12px 16px;border-left:1px solid var(--border2);text-align:center">
+      <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--green3)" id="tour-kpi-rev">—</div>
+      <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">TOTAL REVENUE</div>
+    </div>
+    <div style="padding:12px 16px;border-left:1px solid var(--border2);text-align:center">
+      <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--red3)" id="tour-kpi-costs">—</div>
+      <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">TOTAL COSTS</div>
+    </div>
+    <div style="padding:12px 16px;border-left:1px solid var(--border2);text-align:center">
+      <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--amber2)" id="tour-kpi-net">—</div>
+      <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">NET PROFIT</div>
+    </div>
+    <div style="padding:12px 16px;border-left:1px solid var(--border2);text-align:center">
+      <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--accent)" id="tour-kpi-margin">—</div>
+      <div style="font-size:7px;color:var(--muted);letter-spacing:.1em">AVG MARGIN</div>
+    </div>
+  </div>
+
+  <!-- Main 3-column layout -->
+  <div style="flex:1;display:grid;grid-template-columns:300px 1fr 280px;gap:10px;min-height:0">
+
+    <!-- LEFT: Tour list -->
+    <div class="panel" style="display:flex;flex-direction:column">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>All Tours</div>
-        <button class="btn-sm primary" id="btn-add-tour" onclick="openTourModal()">+ Tour</button>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>All Shows</div>
+        <button class="btn-sm primary" id="btn-add-tour" onclick="openTourModal()">+ Show</button>
       </div>
-      <div class="panel-body" id="tours-list-panel"></div>
+      <div id="tours-list-panel" style="flex:1;overflow-y:auto"></div>
     </div>
 
-    <div class="panel" style="overflow-y:auto">
-      <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Tour Detail</div>
+    <!-- CENTRE: Tour detail (editable) -->
+    <div class="panel" style="display:flex;flex-direction:column">
+      <div class="panel-header" style="justify-content:space-between">
+        <div class="panel-title" id="tour-detail-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Select a show</div>
+        <div style="display:flex;gap:6px" id="tour-detail-actions" style="display:none">
+          <button class="btn-sm" id="tour-edit-btn" onclick="openTourModal(window._selectedTourIdx)" style="display:none">✎ Edit</button>
+          <button class="btn-sm" style="color:var(--red3);border-color:var(--red2)" id="tour-delete-btn" onclick="deleteTourSelected()" style="display:none">✕</button>
+        </div>
       </div>
-      <div class="panel-body">
-        <div id="tour-detail-kpis" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
-          <!-- populated by renderTourDetail() -->
+      <!-- KPI row -->
+      <div id="tour-detail-kpis" style="display:grid;grid-template-columns:repeat(6,1fr);gap:0;background:var(--border);flex-shrink:0">
+        <!-- populated by renderTourDetail() -->
+      </div>
+      <!-- Inline editable fields -->
+      <div id="tour-detail-edit" style="padding:12px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--border2);flex-shrink:0;display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">VENUE / EVENT</div>
+            <input id="te-name" class="login-input" style="font-size:9px" placeholder="Tasquinhas do Povo"></div>
+          <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">DATE</div>
+            <input id="te-start" class="login-input" type="date" style="font-size:9px"></div>
+          <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">CITY</div>
+            <input id="te-cities" class="login-input" style="font-size:9px" placeholder="Sines"></div>
+          <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">REVENUE (€)</div>
+            <input id="te-revenue" class="login-input" type="number" style="font-size:9px" placeholder="0"></div>
+          <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">COSTS (€)</div>
+            <input id="te-costs" class="login-input" type="number" style="font-size:9px" placeholder="0"></div>
+          <div><div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">STATUS</div>
+            <select id="te-status" class="login-input" style="font-size:9px">
+              <option value="planned">Planned</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
         </div>
-        <div class="section-head">Expense Breakdown</div>
-        <div id="tour-expense-chart"></div>
-        <div class="section-head" style="margin-top:12px">Tour Transactions</div>
-        <div class="ledger-wrap" style="max-height:260px">
-          <table class="ledger-table">
-            <thead><tr><th><span data-i18n="ledger_date">Date</span></th><th><span data-i18n="ledger_desc">Description</span></th><th><span data-i18n="ledger_type">Type</span></th><th style="text-align:right"><span data-i18n="ledger_amount">Amount</span></th></tr></thead>
-            <tbody id="tour-ledger-body"></tbody>
-          </table>
+        <div style="display:flex;gap:8px">
+          <button class="login-btn" style="width:auto;padding:0 20px;font-size:9px" onclick="saveInlineTourEdit()">Save Changes</button>
+          <button class="btn-sm" onclick="cancelInlineTourEdit()">Cancel</button>
+          <div id="te-status-msg" style="font-size:8px;color:var(--muted3);align-self:center"></div>
         </div>
+      </div>
+      <!-- Transactions -->
+      <div style="padding:8px 12px;font-size:7px;color:var(--muted3);letter-spacing:.1em;border-bottom:1px solid var(--border);background:var(--bg1);flex-shrink:0">SHOW TRANSACTIONS</div>
+      <div class="ledger-wrap" style="flex:1">
+        <table class="ledger-table">
+          <thead><tr>
+            <th>Date</th><th>Description</th><th>Type</th><th style="text-align:right">Amount</th>
+          </tr></thead>
+          <tbody id="tour-ledger-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RIGHT: Expense breakdown + P&L per show -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="panel" style="flex:1">
+        <div class="panel-header">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--red2)"></div>Expense Breakdown</div>
+        </div>
+        <div class="panel-body" id="tour-expense-chart"></div>
+      </div>
+      <div class="panel" style="flex:1">
+        <div class="panel-header">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div>P&L per Show</div>
+        </div>
+        <div class="panel-body" id="tour-pnl-chart" style="display:flex;flex-direction:column;gap:6px"></div>
       </div>
     </div>
 
   </div>
+</div>
 </div>
 
 <!-- ─ STREAMING VIEW ──────────────────────────────── -->
@@ -6044,29 +6164,47 @@ function refreshLedger(){
 
 // ─── RENDER: TOUR P&L (dashboard) ────────────────────
 function renderTourPnl(){
-  document.getElementById('tour-pnl-panel').innerHTML=TOUR_DATA.map(t=>{
-    const net=t.revenue-t.costs;
-    const budgetPct=Math.round(t.costs/t.budget*100);
-    const margin=Math.round(net/t.revenue*100);
-    const statusColors={completed:'var(--green2)',active:'var(--amber2)',planned:'var(--blue2)'};
-    return`<div class="tour-card ${t.status==='active'?'active-tour':''}">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-        <div class="tour-name">${t.name}</div>
-        <div class="tour-status">
-          <div class="tour-status-dot" style="background:${statusColors[t.status]}"></div>
-          <span style="color:${statusColors[t.status]};font-size:7px;letter-spacing:.1em">${t.status.toUpperCase()}</span>
+  // now handled by renderTourPnlChart
+  renderTourBannerKpis();
+  renderTourPnlChart();
+}
+
+function renderTourBannerKpis() {
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  const totalShows  = TOUR_DATA.length;
+  const totalRev    = TOUR_DATA.reduce((s,t)=>s+t.revenue,0);
+  const totalCosts  = TOUR_DATA.reduce((s,t)=>s+t.costs,0);
+  const totalNet    = totalRev - totalCosts;
+  const avgMargin   = totalRev > 0 ? ((totalNet/totalRev)*100).toFixed(0)+'%' : '—';
+  set('tour-kpi-count',  totalShows);
+  set('tour-kpi-rev',    fmtMoney(totalRev));
+  set('tour-kpi-costs',  fmtMoney(totalCosts));
+  set('tour-kpi-net',    (totalNet>=0?'+':'')+fmtMoney(totalNet));
+  set('tour-kpi-margin', avgMargin);
+}
+
+function renderTourPnlChart() {
+  const el = document.getElementById('tour-pnl-chart');
+  if (!el) return;
+  if (!TOUR_DATA.length) { el.innerHTML='<div style="font-size:9px;color:var(--muted3)">No shows yet.</div>'; return; }
+  const maxRev = Math.max(...TOUR_DATA.map(t=>t.revenue), 1);
+  el.innerHTML = [...TOUR_DATA].reverse().map(t => {
+    const net = t.revenue - t.costs;
+    const pct = Math.round(t.revenue / maxRev * 100);
+    const isPos = net >= 0;
+    return `
+    <div style="padding:5px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:8px;color:var(--text);font-weight:700">${t.name}</span>
+        <span style="font-size:8px;font-weight:700;color:${isPos?'var(--green3)':'var(--red3)'}">${isPos?'+':''}${fmtMoney(net)}</span>
+      </div>
+      <div style="display:flex;gap:4px;align-items:center">
+        <div style="flex:1;height:6px;background:var(--bg4);border-radius:1px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${isPos?'var(--green2)':'var(--red2)'};border-radius:1px"></div>
         </div>
+        <span style="font-size:7px;color:var(--muted3);min-width:44px;text-align:right">${fmtMoney(t.revenue)}</span>
       </div>
-      <div class="tour-meta-grid">
-        <div class="tour-meta-item"><div class="tour-meta-label">Shows</div><div class="tour-meta-val">${t.shows}</div></div>
-        <div class="tour-meta-item"><div class="tour-meta-label">Revenue</div><div class="tour-meta-val">${fmtMoney(t.revenue)}</div></div>
-        <div class="tour-meta-item"><div class="tour-meta-label">Costs</div><div class="tour-meta-val">${fmtMoney(t.costs)}</div></div>
-      </div>
-      <div class="tour-pnl ${net>0?'profit':net<0?'loss':'warn'}">${net>0?'+':''}${fmtMoney(net)} NET</div>
-      <div class="tour-progress-wrap">
-        <div class="tour-progress-label"><span>Budget usage</span><span>${budgetPct}%</span></div>
-        <div class="tour-progress-track"><div class="tour-progress-fill" style="width:${Math.min(budgetPct,100)}%;background:${budgetPct>85?'var(--amber2)':budgetPct>100?'var(--red2)':'var(--green2)'}"></div></div>
-      </div>
+      <div style="font-size:7px;color:var(--muted3);margin-top:2px">${t.start} · ${t.cities}</div>
     </div>`;
   }).join('');
 }
@@ -6076,20 +6214,24 @@ function renderToursList(){
   const el=document.getElementById('tours-list-panel');
   if(!el)return;
   const canEdit=can('editTour');
+  const statusColors={completed:'var(--green2)',active:'var(--amber2)',planned:'var(--blue2)'};
   el.innerHTML=TOUR_DATA.map((t,i)=>{
     const net=t.revenue-t.costs;
-    return`<div class="tour-card ${t.status==='active'?'active-tour':''}" style="cursor:pointer">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
-        <div onclick="renderTourDetail(TOUR_DATA[${i}])" style="flex:1">
-          <div class="tour-name">${t.name}</div>
-          <div style="font-size:8px;color:var(--muted3);margin-bottom:4px">${t.start} → ${t.end} · ${t.shows} show${t.shows!==1?'s':''}</div>
-          <div class="tour-pnl ${net>=0?'profit':'loss'}">${net>=0?'+':''}${fmtMoney(net)}</div>
+    const isSelected = window._selectedTourIdx === i;
+    return`<div class="tour-list-item ${isSelected?'tour-list-active':''}" onclick="renderTourDetail(TOUR_DATA[${i}], ${i})" style="padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;border-left:3px solid ${isSelected?statusColors[t.status]||'var(--accent)':'transparent'};transition:all .12s;background:${isSelected?'var(--bg3)':'transparent'}">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:9px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.name}</div>
+          <div style="font-size:7px;color:var(--muted3);margin-top:2px">${t.start} · ${t.shows} show${t.shows!==1?'s':''} · ${t.cities}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+            <span style="font-size:8px;font-weight:700;color:${net>=0?'var(--green3)':'var(--red3)'}">${net>=0?'+':''}${fmtMoney(net)}</span>
+            <span style="font-size:6px;padding:1px 5px;border-radius:1px;background:${t.status==='completed'?'rgba(0,200,80,.1)':t.status==='active'?'rgba(245,160,0,.1)':'rgba(74,160,255,.1)'};color:${statusColors[t.status]||'var(--muted3)'};letter-spacing:.08em;font-weight:700">${t.status.toUpperCase()}</span>
+          </div>
         </div>
-        ${canEdit?`<button class="edit-btn" style="display:inline;margin-top:2px" onclick="openTourModal(${i})">✎</button>`:''}
+        ${canEdit?`<button class="btn-sm" style="flex-shrink:0" onclick="event.stopPropagation();openTourModal(${i})">✎</button>`:''}
       </div>
     </div>`;
-  }).join('');
-  // Show add-tour button only for admins/managers
+  }).join('') || '<div style="padding:16px;font-size:9px;color:var(--muted3)">No shows yet. Click + Show to add.</div>';
   const btn=document.getElementById('btn-add-tour');
   if(btn) btn.style.display=canEdit?'inline-flex':'none';
 }
@@ -6113,7 +6255,6 @@ function renderTourLedger(){
 function renderTourExpenseChart(){
   const el=document.getElementById('tour-expense-chart');
   if(!el)return;
-  // Dynamically aggregate expenses from LEDGER_DATA
   const expensesByCat={};
   LEDGER_DATA.filter(r=>r.amount<0).forEach(r=>{
     expensesByCat[r.cat]=(expensesByCat[r.cat]||0)+Math.abs(r.amount);
@@ -6123,13 +6264,141 @@ function renderTourExpenseChart(){
     .sort((a,b)=>b.v-a.v)
     .slice(0,10);
   const max=Math.max(...cats.map(c=>c.v),1);
-  el.innerHTML=`<div class="bar-chart">${cats.map(c=>`
+  const COLORS=['var(--red2)','var(--amber2)','var(--purple2)','var(--blue2)','var(--green2)','var(--accent)'];
+  el.innerHTML=`<div class="bar-chart">${cats.map((c,i)=>`
     <div class="bar-row">
       <div class="bar-label">${c.l}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${(c.v/max*100).toFixed(0)}%;background:var(--red2);opacity:.75"></div></div>
-      <div class="bar-num">${fmtMoney(c.v>=1000?(c.v/1000).toFixed(1)+'K':c.v.toFixed(2))}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(c.v/max*100).toFixed(0)}%;background:${COLORS[i%COLORS.length]};opacity:.8"></div></div>
+      <div class="bar-num">${fmtMoney(c.v)}</div>
     </div>
   `).join('')}</div>`;
+}
+
+// ─── INLINE EDIT ─────────────────────────────────────
+window._selectedTourIdx = null;
+
+function renderTourDetail(t, idx){
+  window._selectedTourIdx = idx;
+  const net=t.revenue-t.costs;
+  const margin=t.revenue>0?((net/t.revenue)*100).toFixed(1):'—';
+  const statusColors={completed:'var(--green2)',active:'var(--amber2)',planned:'var(--blue2)'};
+
+  // Update title
+  const titleEl = document.getElementById('tour-detail-title');
+  if(titleEl) titleEl.innerHTML=`<div class="panel-title-dot" style="background:${statusColors[t.status]||'var(--blue2)'}"></div><span style="color:var(--text)">${t.name}</span> <span style="font-size:7px;color:${statusColors[t.status]};margin-left:4px">${t.status.toUpperCase()}</span>`;
+
+  // Show edit/delete buttons
+  const editBtn = document.getElementById('tour-edit-btn');
+  const delBtn  = document.getElementById('tour-delete-btn');
+  if(editBtn && can('editTour')) { editBtn.style.display='inline-flex'; editBtn.onclick=()=>openInlineTourEdit(idx); }
+  if(delBtn  && can('editTour')) { delBtn.style.display='inline-flex'; }
+
+  // KPI row
+  const kpisEl=document.getElementById('tour-detail-kpis');
+  if(kpisEl) kpisEl.innerHTML=`
+    <div style="background:var(--bg1);padding:10px 14px;border-right:1px solid var(--border2);text-align:center">
+      <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">NET PROFIT</div>
+      <div style="font-family:var(--display);font-size:18px;font-weight:700;color:${net>=0?'var(--green3)':'var(--red3)'}">${net>=0?'+':''}${fmtMoney(net)}</div>
+    </div>
+    <div style="background:var(--bg1);padding:10px 14px;border-right:1px solid var(--border2);text-align:center">
+      <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">REVENUE</div>
+      <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green2)">${fmtMoney(t.revenue)}</div>
+    </div>
+    <div style="background:var(--bg1);padding:10px 14px;border-right:1px solid var(--border2);text-align:center">
+      <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">COSTS</div>
+      <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--red3)">${fmtMoney(t.costs)}</div>
+    </div>
+    <div style="background:var(--bg1);padding:10px 14px;border-right:1px solid var(--border2);text-align:center">
+      <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">MARGIN</div>
+      <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--amber3)">${margin}%</div>
+    </div>
+    <div style="background:var(--bg1);padding:10px 14px;border-right:1px solid var(--border2);text-align:center">
+      <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">SHOWS</div>
+      <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--text)">${t.shows}</div>
+    </div>
+    <div style="background:var(--bg1);padding:10px 14px;text-align:center">
+      <div style="font-size:7px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">DATE</div>
+      <div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--text2)">${t.start}</div>
+    </div>`;
+
+  // Transactions
+  const tbody=document.getElementById('tour-ledger-body');
+  if(tbody){
+    const data=LEDGER_DATA.filter(r=>r.tags.includes('tour')||r.desc.toLowerCase().includes((t.cities||'').split(',')[0].trim().toLowerCase()));
+    tbody.innerHTML=data.length?data.map(r=>`
+      <tr>
+        <td class="date-cell">${r.date}</td>
+        <td class="desc-cell" style="max-width:200px">${r.desc}</td>
+        <td><span class="badge ${r.type}">${r.type.toUpperCase()}</span></td>
+        <td style="text-align:right"><span class="amount ${r.amount>0?'pos':'neg'}">${r.amount>0?'+':''}${fmtMoney(Math.abs(r.amount))}</span></td>
+      </tr>`).join(''):'<tr><td colspan="4" style="color:var(--muted3);padding:12px 8px;font-size:8px">No transactions for this show.</td></tr>';
+  }
+  // Re-highlight list
+  renderToursList();
+}
+
+function openInlineTourEdit(idx) {
+  const t = TOUR_DATA[idx];
+  if (!t) return;
+  const setV = (id, v) => { const e=document.getElementById(id); if(e) e.value=v||''; };
+  setV('te-name',    t.name);
+  setV('te-start',   t.start);
+  setV('te-cities',  t.cities);
+  setV('te-revenue', t.revenue);
+  setV('te-costs',   t.costs);
+  setV('te-status',  t.status);
+  const editPanel = document.getElementById('tour-detail-edit');
+  if (editPanel) editPanel.style.display = 'flex';
+  const msg = document.getElementById('te-status-msg');
+  if (msg) msg.textContent = '';
+}
+
+function cancelInlineTourEdit() {
+  const editPanel = document.getElementById('tour-detail-edit');
+  if (editPanel) editPanel.style.display = 'none';
+}
+
+function saveInlineTourEdit() {
+  const idx = window._selectedTourIdx;
+  if (idx === null || idx === undefined) return;
+  const msg = document.getElementById('te-status-msg');
+  const get = id => document.getElementById(id)?.value || '';
+  TOUR_DATA[idx] = {
+    ...TOUR_DATA[idx],
+    name:    get('te-name'),
+    start:   get('te-start'),
+    end:     get('te-start'),
+    cities:  get('te-cities'),
+    revenue: parseFloat(get('te-revenue')) || 0,
+    costs:   parseFloat(get('te-costs'))   || 0,
+    status:  get('te-status'),
+  };
+  if (msg) msg.textContent = '✓ Saved';
+  cancelInlineTourEdit();
+  renderToursList();
+  renderTourBannerKpis();
+  renderTourPnlChart();
+  renderTourDetail(TOUR_DATA[idx], idx);
+  showToast('Show updated', 'ok');
+}
+
+function deleteTourSelected() {
+  const idx = window._selectedTourIdx;
+  if (idx === null || !TOUR_DATA[idx]) return;
+  if (!confirm('Delete show: ' + TOUR_DATA[idx].name + '?')) return;
+  TOUR_DATA.splice(idx, 1);
+  window._selectedTourIdx = null;
+  renderToursList();
+  renderTourBannerKpis();
+  renderTourPnlChart();
+  // Clear detail panel
+  const titleEl = document.getElementById('tour-detail-title');
+  if(titleEl) titleEl.innerHTML='<div class="panel-title-dot" style="background:var(--blue2)"></div>Select a show';
+  const kpisEl = document.getElementById('tour-detail-kpis');
+  if(kpisEl) kpisEl.innerHTML='';
+  const tbody = document.getElementById('tour-ledger-body');
+  if(tbody) tbody.innerHTML='';
+  showToast('Show deleted', 'ok');
 }
 
 // ─── RENDER: HEATMAP ──────────────────────────────────
@@ -6709,6 +6978,8 @@ function _renderAll() {
   renderPlatforms('stream-platform-full');
   renderTourPnl();
   renderToursList();
+  renderTourBannerKpis();
+  renderTourPnlChart();
   renderLedgerRows(LEDGER_DATA.slice(0,8),'dash-ledger-body',false);
   renderLedgerRows(LEDGER_DATA,'full-ledger-body',true);
   setTimeout(renderMgmtDashboard, 150);
@@ -7364,7 +7635,7 @@ function renderTourDetail(t){
 }
 // Render detail for most recent tour on load
 if(typeof TOUR_DATA!=='undefined' && TOUR_DATA.length){
-  document.addEventListener('DOMContentLoaded',()=>renderTourDetail(TOUR_DATA[TOUR_DATA.length-1]));
+  document.addEventListener('DOMContentLoaded',()=>renderTourDetail(TOUR_DATA[0], 0));
 }
 
 // ─── EMAIL TEMPLATES ──────────────────────────────────
