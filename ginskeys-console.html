@@ -227,19 +227,21 @@ body::after{
   display:flex;
   flex-direction:column-reverse;
   align-items:center;
-  gap:0;
+  gap:1px;
   font-family:var(--mono);
   font-weight:700;
   font-size:9px;
-  letter-spacing:.05em;
-  color:var(--muted3);
-  line-height:1.1;
+  letter-spacing:0;
+  color:var(--muted2);
+  line-height:1;
   text-transform:uppercase;
-  margin-right:2px;
+  margin-right:4px;
+  border-right:1px solid var(--border2);
+  padding-right:6px;
 }
 .tb-logo .logo-the span{
   display:block;
-  line-height:1.1;
+  line-height:1;
 }
 .tb-logo .logo-main{
   display:flex;
@@ -250,20 +252,22 @@ body::after{
 .tb-logo .logo-band{
   color:var(--white);
   font-size:19px;
-  letter-spacing:.12em;
-  text-shadow:0 0 30px rgba(255,85,0,.35);
+  letter-spacing:.1em;
+  text-shadow:0 0 30px rgba(255,85,0,.3);
   line-height:1;
   display:block;
+  font-family:'Black Han Sans','Oswald',sans-serif;
+  text-transform:uppercase;
 }
 .tb-logo .logo-console{
-  color:var(--muted2);
+  color:var(--muted3);
   font-size:8px;
-  letter-spacing:.22em;
+  letter-spacing:.18em;
   font-family:var(--mono);
   font-weight:400;
   text-transform:uppercase;
   display:block;
-  margin-top:3px;
+  margin-top:2px;
 }
 .tb-logo .logo-slash{
   color:var(--accent);
@@ -3447,6 +3451,7 @@ tr:hover .edit-btn{display:inline}
 // ══════════════════════════════════════════════════════════
 
 let BOOKING_DATA = [], RELEASES_DATA = [], PRESS_DATA = [], SPLITS_DATA = [];
+let PROD_SHOWS = [], PROD_SETLISTS = [];
 let SP_EXPENSES = [], SP_MEMBERS = [];
 
 const STAGE_COLORS = {
@@ -8666,8 +8671,6 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
 // LIVE PRODUCTION ENGINE
 // ══════════════════════════════════════════════════════════
 
-let PROD_SHOWS = [];
-let PROD_SETLISTS = [];
 let PROD_CHECKLIST = [];
 let SL_PENDING_SONGS = [];
 let CURRENT_SHOW_ID = null;
