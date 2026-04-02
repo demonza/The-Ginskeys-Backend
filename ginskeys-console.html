@@ -213,9 +213,6 @@ body::after{
 .tb-logo{
   font-family:'Black Han Sans','Oswald',sans-serif;
   font-weight:400;
-  font-size:17px;
-  color:var(--accent);
-  letter-spacing:.16em;
   padding:0 20px;
   display:flex;
   align-items:center;
@@ -223,40 +220,31 @@ body::after{
   border-right:2px solid var(--border2);
   white-space:nowrap;
   text-transform:uppercase;
-  text-shadow:0 0 24px rgba(232,86,26,.4);
   position:relative;
+}
+.tb-logo .logo-the{
+  color:var(--muted3);
+  font-size:9px;
+  letter-spacing:.28em;
+  font-family:var(--mono);
+  font-weight:400;
+  margin-right:7px;
+  text-transform:uppercase;
 }
 .tb-logo .logo-band{
   color:var(--white);
-  font-size:17px;
-  letter-spacing:.14em;
+  font-size:20px;
+  letter-spacing:.12em;
+  text-shadow:0 0 30px rgba(255,85,0,.35);
+  line-height:1;
 }
-.tb-logo .logo-sep{
+.tb-logo .logo-slash{
   color:var(--accent);
-  margin:0 2px;
-  font-size:13px;
-  opacity:.7;
-}
-.tb-logo .logo-sub{
-  color:var(--muted2);
-  font-size:10px;
-  letter-spacing:.22em;
-  font-family:var(--mono);
-  font-weight:400;
-  margin-left:6px;
-  text-transform:uppercase;
-}
-.logo-tag{
-  font-family:var(--mono);
-  font-size:10px;
-  letter-spacing:.22em;
-  color:var(--muted3);
-  font-weight:400;
-  padding:2px 6px;
-  border:1px solid var(--border3);
-  text-transform:uppercase;
-  align-self:center;
-  margin-left:4px;
+  font-size:20px;
+  margin:0 6px;
+  font-weight:700;
+  line-height:1;
+  text-shadow:0 0 16px rgba(255,85,0,.6);
 }
 .tb-nav{
   display:flex;
@@ -1675,7 +1663,7 @@ tr:hover .edit-btn{display:inline}
 
 <!-- ══ TOP BAR ══════════════════════════════════════ -->
 <header class="topbar">
-  <div class="tb-logo"><span class="logo-band">The Ginskeys</span><span class="logo-sep">&nbsp;/&nbsp;</span><span class="logo-tag">MGT</span></div>
+  <div class="tb-logo"><span class="logo-the">The</span><span class="logo-band">Ginskeys</span><span class="logo-slash">/</span></div>
   <nav class="tb-nav">
     <!-- COMMAND -->
     <div class="tb-tab active" data-view="mgmt" onclick="switchView('mgmt',this)">◉ Overview</div>
