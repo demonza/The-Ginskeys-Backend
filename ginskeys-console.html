@@ -1216,6 +1216,67 @@ tr:hover .edit-btn{display:inline}
   .input-row{border-bottom:1px solid #ddd!important}
   #prod-stageplot .splot-canvas-wrap{border:1px solid #ccc!important}
 }
+
+/* ─── UNIVERSAL DETAIL DRAWER ────────────────────────── */
+.drawer-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);
+  z-index:7000;opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{
+  position:fixed;top:0;right:0;bottom:0;width:420px;max-width:95vw;
+  background:var(--bg1);border-left:2px solid var(--border2);
+  z-index:7001;transform:translateX(100%);transition:transform .22s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.drawer.open{transform:translateX(0)}
+.drawer-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;background:var(--bg0);border-bottom:2px solid var(--border2);
+  flex-shrink:0;
+}
+.drawer-title{
+  font-family:var(--display);font-size:14px;font-weight:700;
+  color:var(--text);letter-spacing:.06em;text-transform:uppercase;
+}
+.drawer-close{
+  background:none;border:none;color:var(--muted3);font-size:18px;
+  cursor:pointer;padding:0 4px;line-height:1;transition:color .1s;
+}
+.drawer-close:hover{color:var(--red3)}
+.drawer-body{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.drawer-section{margin-bottom:4px}
+.drawer-section-label{
+  font-size:9px;color:var(--muted3);letter-spacing:.14em;text-transform:uppercase;
+  margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);
+}
+.drawer-field{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
+.drawer-field label{font-size:9px;color:var(--muted3);letter-spacing:.1em;text-transform:uppercase}
+.drawer-field input,.drawer-field select,.drawer-field textarea{
+  background:var(--bg2);border:1px solid var(--border2);color:var(--text);
+  font-family:var(--mono);font-size:11px;padding:7px 10px;outline:none;
+  transition:border-color .12s;width:100%;resize:vertical;
+}
+.drawer-field input:focus,.drawer-field select:focus,.drawer-field textarea:focus{border-color:var(--accent)}
+.drawer-field select option{background:var(--bg2)}
+.drawer-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 18px;background:var(--bg0);border-top:1px solid var(--border2);
+  flex-shrink:0;gap:8px;
+}
+.drawer-stat{
+  display:flex;flex-direction:column;gap:2px;
+  padding:10px 14px;background:var(--bg2);border-radius:2px;border:1px solid var(--border2);
+}
+.drawer-stat-val{font-family:var(--display);font-size:18px;font-weight:700;color:var(--text)}
+.drawer-stat-lbl{font-size:9px;color:var(--muted3);letter-spacing:.1em;text-transform:uppercase}
+.drawer-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.drawer-info-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:10px}
+.drawer-info-row span:first-child{color:var(--muted3)}
+.drawer-info-row span:last-child{color:var(--text);font-weight:600}
+.drawer-note{padding:10px 12px;background:var(--bg3);border-left:3px solid var(--border3);font-size:10px;color:var(--muted2);line-height:1.6}
+.drawer-tag{display:inline-block;font-size:9px;padding:2px 8px;border-radius:1px;border:1px solid;margin-right:4px;margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+
 </style>
 </head>
 <body>
@@ -3524,7 +3585,7 @@ function renderBookingList() {
       <tbody>
         ${data.map(b => {
           const overdue = b.follow_up_date && new Date(b.follow_up_date) < new Date() && !['completed','rejected'].includes(b.stage);
-          return `<tr style="border-bottom:1px solid var(--border1)" class="ledger-row">
+          return `<tr style="border-bottom:1px solid var(--border1);cursor:pointer;transition:background .1s" class="ledger-row" onclick="openBookingDrawer('${b.id}')" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
             <td style="padding:7px 10px">
               <div style="font-weight:700;color:var(--text)">${b.name}</div>
               <div style="font-size:9px;color:var(--muted3)">${b.type}${b.contact_name?' · '+b.contact_name:''}</div>
@@ -3533,10 +3594,13 @@ function renderBookingList() {
             <td style="padding:7px 10px"><span style="color:${STAGE_COLORS[b.stage]||'var(--muted2)'};font-weight:700;font-size:9px;text-transform:uppercase">${b.stage}</span></td>
             <td style="padding:7px 10px;text-align:right;color:var(--green3)">${b.fee_eur?'€'+parseFloat(b.fee_eur).toLocaleString('pt-PT'):'—'}</td>
             <td style="padding:7px 10px;color:${overdue?'var(--red3)':'var(--muted3)'}">${b.follow_up_date||'-'}${overdue?' ⚠':''}</td>
-            <td style="padding:7px 10px">
-              <select style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:2px 4px" onchange="updateBookingStage('${b.id}',this.value)">
-                ${['cold','contacted','negotiating','confirmed','completed','rejected'].map(s=>`<option value="${s}"${s===b.stage?' selected':''}>${s}</option>`).join('')}
-              </select>
+            <td style="padding:7px 10px" onclick="event.stopPropagation()">
+              <div style="display:flex;gap:4px;align-items:center">
+                <select style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:2px 4px" onchange="updateBookingStage('${b.id}',this.value)">
+                  ${['cold','contacted','negotiating','confirmed','completed','rejected'].map(s=>`<option value="${s}"${s===b.stage?' selected':''}>${s}</option>`).join('')}
+                </select>
+                <button onclick="event.stopPropagation();openBookingDrawer('${b.id}')" style="background:transparent;border:1px solid var(--border2);color:var(--muted3);font-size:10px;padding:2px 6px;cursor:pointer" title="Edit">✎</button>
+              </div>
             </td>
           </tr>`;
         }).join('')}
@@ -10131,6 +10195,8 @@ function mgmtPriorityActions() {
       urgency: 'warn', icon: '🎤',
       label: 'No shows booked in next 60 days',
       detail: 'Contact venues or follow up on open bookings',
+      advice: 'Go to the Booking tab and send 3+ new cold pitches via the Agent. Or follow up on any contacts in Negotiating stage.',
+      navFn: "switchView('booking',document.querySelector('[data-view=booking]'))", navLabel: 'Booking',
       action: () => switchView('booking', document.querySelector('[data-view=booking]'))
     });
   }
@@ -10143,6 +10209,8 @@ function mgmtPriorityActions() {
       urgency: 'warn', icon: '♪',
       label: 'No release in 90+ days',
       detail: 'Spotify algorithm deprioritises dormant artists',
+      advice: 'Even a short single resets the Spotify algorithm clock. Check what is in Mastered or Artwork stage in Releases and push it over the line.',
+      navFn: "switchView('releases',document.querySelector('[data-view=releases]'))", navLabel: 'Releases',
       action: () => switchView('releases', document.querySelector('[data-view=releases]'))
     });
   }
@@ -10181,8 +10249,9 @@ function mgmtPriorityActions() {
   const urgencyColor = { danger: 'var(--red3)', warn: 'var(--amber2)', neutral: 'var(--muted2)' };
   const urgencyBg    = { danger: 'rgba(239,68,68,.06)', warn: 'rgba(255,160,0,.06)', neutral: 'rgba(255,255,255,.02)' };
 
+  window._mgmtActions = actions;
   el.innerHTML = actions.map((a,i) => `
-    <div onclick="${a.action.toString().replace(/"/g,"'")}"
+    <div onclick="openActionDrawer(window._mgmtActions[${i}])"
       style="display:grid;grid-template-columns:20px 1fr;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border1);
              background:${urgencyBg[a.urgency]};cursor:pointer;border-left:2px solid ${urgencyColor[a.urgency]};
              transition:background .1s"
@@ -10798,7 +10867,356 @@ function initAll() {
   nav.addEventListener('click', e => {
     if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; }
   }, true);
-})();</script>
+})();
+
+// ══════════════════════════════════════════════════════════════════════════════
+// UNIVERSAL DETAIL DRAWER SYSTEM
+// ══════════════════════════════════════════════════════════════════════════════
+
+function openDrawer(title, bodyHtml, footerHtml = '') {
+  document.getElementById('drawer-title').textContent = title;
+  document.getElementById('drawer-body').innerHTML = bodyHtml;
+  const footer = document.getElementById('drawer-footer');
+  if (footerHtml) { footer.innerHTML = footerHtml; footer.style.display = 'flex'; }
+  else { footer.style.display = 'none'; }
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.getElementById('drawer-panel').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.getElementById('drawer-panel').classList.remove('open');
+}
+
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeDrawer();
+});
+
+// ── BOOKING CONTACT DRAWER ────────────────────────────────────────────────────
+function openBookingDrawer(id) {
+  const b = BOOKING_DATA.find(x => x.id === id);
+  if (!b) return;
+
+  const stageColor = STAGE_COLORS[b.stage] || 'var(--muted2)';
+  const overdue = b.follow_up_date && new Date(b.follow_up_date) < new Date() && !['completed','rejected'].includes(b.stage);
+  const net = parseFloat(b.fee_eur || 0);
+
+  const body = `
+    <div class="drawer-stats-row">
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:${stageColor}">${b.stage.toUpperCase()}</div>
+        <div class="drawer-stat-lbl">Stage</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:var(--green3)">${net > 0 ? '€'+net.toLocaleString('pt-PT') : '—'}</div>
+        <div class="drawer-stat-lbl">Fee</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:${overdue?'var(--red3)':'var(--muted2)'}">${b.follow_up_date || '—'}</div>
+        <div class="drawer-stat-lbl">${overdue ? '⚠ Overdue' : 'Follow-up'}</div>
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-label">Contact Info</div>
+      <div class="drawer-info-row"><span>Venue / Event</span><span>${b.name}</span></div>
+      <div class="drawer-info-row"><span>Type</span><span>${b.type || '—'}</span></div>
+      <div class="drawer-info-row"><span>Location</span><span>${b.location || '—'}</span></div>
+      <div class="drawer-info-row"><span>Contact</span><span>${b.contact_name || '—'}</span></div>
+      <div class="drawer-info-row"><span>Email</span><span style="color:var(--blue2)">${b.contact_email ? `<a href="mailto:${b.contact_email}" style="color:var(--blue2);text-decoration:none">${b.contact_email}</a>` : '—'}</span></div>
+      <div class="drawer-info-row"><span>Gig Date</span><span>${b.date || '—'}</span></div>
+    </div>
+
+    ${b.notes ? `<div class="drawer-note">${b.notes}</div>` : ''}
+
+    <div class="drawer-section">
+      <div class="drawer-section-label">Update Stage</div>
+      <div class="drawer-field">
+        <select id="drawer-bk-stage" onchange="updateBookingStageDrawer('${b.id}',this.value)" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:7px 10px;width:100%;outline:none">
+          ${['cold','contacted','negotiating','confirmed','completed','rejected'].map(s=>`<option value="${s}"${s===b.stage?' selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-label">Edit Details</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="drawer-field"><label>Contact Name</label><input id="dbk-contact" value="${(b.contact_name||'').replace(/"/g,'&quot;')}"></div>
+        <div class="drawer-field"><label>Email</label><input id="dbk-email" value="${(b.contact_email||'').replace(/"/g,'&quot;')}"></div>
+        <div class="drawer-field"><label>Fee (€)</label><input id="dbk-fee" type="number" value="${b.fee_eur||''}"></div>
+        <div class="drawer-field"><label>Follow-up Date</label><input id="dbk-followup" type="date" value="${b.follow_up_date||''}"></div>
+      </div>
+      <div class="drawer-field"><label>Notes</label><textarea id="dbk-notes" rows="3">${b.notes||''}</textarea></div>
+    </div>`;
+
+  const footer = `
+    <button class="btn-sm" style="color:var(--red3);border-color:var(--red2)" onclick="deleteBookingContact('${b.id}','${b.name.replace(/'/g,"\\'")}')">✕ Delete</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn-sm" onclick="closeDrawer()">Cancel</button>
+      <button class="login-btn" style="width:auto;padding:0 20px;font-size:10px" onclick="saveBookingDrawer('${b.id}')">Save Changes</button>
+    </div>`;
+
+  openDrawer('◎ ' + b.name, body, footer);
+}
+
+async function updateBookingStageDrawer(id, stage) {
+  try {
+    await _apiFetch('PUT', '/booking/'+id, { stage });
+    await loadBooking();
+    showToast('Stage → '+stage, 'ok');
+    // Refresh drawer content
+    openBookingDrawer(id);
+  } catch(e) { showToast('Failed: '+e.message, 'err'); }
+}
+
+async function saveBookingDrawer(id) {
+  try {
+    await _apiFetch('PUT', '/booking/'+id, {
+      contact_name:  document.getElementById('dbk-contact')?.value,
+      contact_email: document.getElementById('dbk-email')?.value,
+      fee_eur:       document.getElementById('dbk-fee')?.value || null,
+      follow_up_date:document.getElementById('dbk-followup')?.value || null,
+      notes:         document.getElementById('dbk-notes')?.value,
+    });
+    await loadBooking();
+    showToast('Contact updated', 'ok');
+    closeDrawer();
+  } catch(e) { showToast('Save failed: '+e.message, 'err'); }
+}
+
+async function deleteBookingContact(id, name) {
+  if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+  try {
+    await _apiFetch('DELETE', '/booking/'+id);
+    await loadBooking();
+    showToast('Contact deleted', 'ok');
+    closeDrawer();
+  } catch(e) { showToast('Delete failed: '+e.message, 'err'); }
+}
+
+// ── RELEASE DRAWER ────────────────────────────────────────────────────────────
+function openReleaseDrawer(id) {
+  const r = RELEASES_DATA.find(x => x.id === id);
+  if (!r) return;
+
+  const stageColors = {idea:'var(--muted3)',recorded:'var(--blue2)',mixed:'var(--blue2)',mastered:'var(--purple2)',artwork:'var(--amber2)',submitted:'var(--amber2)',scheduled:'var(--green3)',released:'var(--green3)'};
+  const sc = stageColors[r.stage] || 'var(--muted2)';
+  const checks = [{l:'Artwork',d:r.artwork_done},{l:'Video',d:r.video_done},{l:'Press pitched',d:r.press_pitched},{l:'Spotify pitched',d:r.spotify_pitched}];
+  const done = checks.filter(c=>c.d).length;
+
+  const body = `
+    <div class="drawer-stats-row">
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:${sc};text-transform:uppercase">${r.stage}</div>
+        <div class="drawer-stat-lbl">Stage</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:var(--muted2)">${r.type.toUpperCase()}</div>
+        <div class="drawer-stat-lbl">Type</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:${done===4?'var(--green3)':'var(--amber2)'}">${done}/4</div>
+        <div class="drawer-stat-lbl">Tasks done</div>
+      </div>
+    </div>
+
+    <div style="margin:4px 0">
+      ${checks.map(c=>`<span class="drawer-tag" style="color:${c.d?'var(--green3)':'var(--muted3)'};border-color:${c.d?'var(--green3)':'var(--border3)'};background:${c.d?'rgba(0,230,118,.08)':'transparent'}">${c.l}</span>`).join('')}
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-label">Details</div>
+      <div class="drawer-info-row"><span>Title</span><span>${r.title}</span></div>
+      <div class="drawer-info-row"><span>Release Date</span><span>${r.release_date || '—'}</span></div>
+      ${r.spotify_url ? `<div class="drawer-info-row"><span>Spotify</span><span><a href="${r.spotify_url}" target="_blank" style="color:var(--green3);text-decoration:none">▶ Open</a></span></div>` : ''}
+      ${r.notes ? `<div class="drawer-note" style="margin-top:8px">${r.notes}</div>` : ''}
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-label">Update Stage</div>
+      <div class="drawer-field">
+        <select onchange="updateReleaseStage('${r.id}',this.value);setTimeout(()=>openReleaseDrawer('${r.id}'),400)" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:7px 10px;width:100%;outline:none">
+          ${['idea','recorded','mixed','mastered','artwork','submitted','scheduled','released'].map(s=>`<option value="${s}"${s===r.stage?' selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+        </select>
+      </div>
+    </div>`;
+
+  const footer = `
+    <button class="btn-sm" style="color:var(--red3);border-color:var(--red2)" onclick="deleteRelease('${r.id}','${r.title.replace(/'/g,"\\'")}');closeDrawer()">✕ Delete</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn-sm" onclick="closeDrawer()">Close</button>
+      <button class="login-btn" style="width:auto;padding:0 20px;font-size:10px" onclick="openEditRelease('${r.id}');closeDrawer()">✎ Edit</button>
+    </div>`;
+
+  openDrawer('◈ ' + r.title, body, footer);
+}
+
+// ── PRIORITY ACTION DRAWER ────────────────────────────────────────────────────
+function openActionDrawer(action) {
+  const urgencyColor = { danger:'var(--red3)', warn:'var(--amber2)', neutral:'var(--muted2)' };
+  const urgencyBg    = { danger:'rgba(238,68,68,.08)', warn:'rgba(245,158,11,.08)', neutral:'rgba(255,255,255,.03)' };
+  const col = urgencyColor[action.urgency] || 'var(--muted2)';
+
+  const body = `
+    <div style="padding:14px;background:${urgencyBg[action.urgency]};border-left:3px solid ${col};border-radius:0 2px 2px 0;margin-bottom:12px">
+      <div style="font-size:18px;margin-bottom:6px">${action.icon}</div>
+      <div style="font-size:13px;font-weight:700;color:${col};margin-bottom:6px">${action.label}</div>
+      <div style="font-size:11px;color:var(--muted2);line-height:1.6">${action.detail}</div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-label">What to do now</div>
+      <div class="drawer-note" style="border-left-color:${col}">${action.advice || action.detail}</div>
+    </div>
+
+    ${action.context ? `
+    <div class="drawer-section">
+      <div class="drawer-section-label">Context</div>
+      ${action.context}
+    </div>` : ''}`;
+
+  const footer = `
+    <button class="btn-sm" onclick="closeDrawer()">Dismiss</button>
+    <button class="login-btn" style="width:auto;padding:0 20px;font-size:10px" onclick="closeDrawer();${action.navFn||''}">Go to ${action.navLabel||'section'} →</button>`;
+
+  openDrawer(action.label, body, footer);
+}
+
+// ── TRANSACTION DRAWER ────────────────────────────────────────────────────────
+function openTxnDrawer(idx) {
+  const t = LEDGER_DATA[idx];
+  if (!t) return;
+  const isIncome = t.amount > 0;
+  const col = isIncome ? 'var(--green3)' : 'var(--red3)';
+
+  const body = `
+    <div class="drawer-stats-row">
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:${col}">${isIncome?'+':''}${fmtMoney(t.amount)}</div>
+        <div class="drawer-stat-lbl">Amount</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:var(--muted2)">${fmtMoney(t.balance)}</div>
+        <div class="drawer-stat-lbl">Balance after</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:${isIncome?'var(--green2)':'var(--red2)'};font-size:13px">${t.type.toUpperCase()}</div>
+        <div class="drawer-stat-lbl">Type</div>
+      </div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-label">Transaction Details</div>
+      <div class="drawer-info-row"><span>ID</span><span style="color:var(--muted3)">${t.id}</span></div>
+      <div class="drawer-info-row"><span>Date</span><span>${t.date}</span></div>
+      <div class="drawer-info-row"><span>Description</span><span>${t.desc}</span></div>
+      <div class="drawer-info-row"><span>Category</span><span>${t.cat}</span></div>
+      <div class="drawer-info-row"><span>Tags</span><span>${(t.tags||[]).join(', ') || '—'}</span></div>
+      <div class="drawer-info-row"><span>Reconciled</span><span style="color:${t.reconciled?'var(--green3)':'var(--amber2)'}">${t.reconciled ? '✓ Yes' : '⏳ Pending'}</span></div>
+    </div>`;
+
+  const footer = `
+    <div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-sm" onclick="closeDrawer()">Close</button>
+      ${can('editTransaction') ? `<button class="login-btn" style="width:auto;padding:0 20px;font-size:10px" onclick="closeDrawer();openEditTxn(${idx})">✎ Edit</button>` : ''}
+    </div>`;
+
+  openDrawer('Transaction — ' + t.desc, body, footer);
+}
+
+// ── TOUR DRAWER ───────────────────────────────────────────────────────────────
+function openTourDrawer(idx) {
+  const t = TOUR_DATA[idx];
+  if (!t) return;
+  const net = t.revenue - t.costs;
+  const margin = t.revenue > 0 ? ((net/t.revenue)*100).toFixed(1) : 0;
+  const statusColors = {completed:'var(--green2)',active:'var(--amber2)',planned:'var(--blue2)'};
+  const sc = statusColors[t.status] || 'var(--muted2)';
+
+  const body = `
+    <div class="drawer-stats-row">
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:${net>=0?'var(--green3)':'var(--red3)'}">${net>=0?'+':''}${fmtMoney(net)}</div>
+        <div class="drawer-stat-lbl">Net Profit</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:var(--amber2)">${margin}%</div>
+        <div class="drawer-stat-lbl">Margin</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:${sc}">${t.status.toUpperCase()}</div>
+        <div class="drawer-stat-lbl">Status</div>
+      </div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-label">Show Details</div>
+      <div class="drawer-info-row"><span>Name</span><span>${t.name}</span></div>
+      <div class="drawer-info-row"><span>Date</span><span>${t.start}</span></div>
+      <div class="drawer-info-row"><span>City</span><span>${t.cities}</span></div>
+      <div class="drawer-info-row"><span>Shows</span><span>${t.shows}</span></div>
+      <div class="drawer-info-row"><span>Revenue</span><span style="color:var(--green3)">${fmtMoney(t.revenue)}</span></div>
+      <div class="drawer-info-row"><span>Costs</span><span style="color:var(--red3)">${fmtMoney(t.costs)}</span></div>
+      <div class="drawer-info-row"><span>Budget</span><span>${fmtMoney(t.budget)}</span></div>
+    </div>`;
+
+  const footer = `
+    <div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-sm" onclick="closeDrawer()">Close</button>
+      ${can('editTour') ? `<button class="login-btn" style="width:auto;padding:0 20px;font-size:10px" onclick="closeDrawer();renderTourDetail(TOUR_DATA[${idx}],${idx});switchView('tours',document.querySelector('[data-view=tours]'))">↗ Open in Tours</button>` : ''}
+    </div>`;
+
+  openDrawer('↗ ' + t.name, body, footer);
+}
+
+// ── PRESS CONTACT DRAWER ──────────────────────────────────────────────────────
+function openPressDrawer(id) {
+  const p = PRESS_DATA.find(x => x.id === id);
+  if (!p) return;
+  const stageColors = {pitched:'var(--amber2)',following_up:'var(--amber2)',responded:'var(--blue2)',published:'var(--green3)',rejected:'var(--red3)',passed:'var(--muted3)'};
+  const sc = stageColors[p.stage] || 'var(--muted2)';
+
+  const body = `
+    <div class="drawer-stats-row">
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:${sc};text-transform:uppercase;font-size:13px">${p.stage}</div>
+        <div class="drawer-stat-lbl">Stage</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:var(--purple2)">${(p.type||'press').toUpperCase()}</div>
+        <div class="drawer-stat-lbl">Type</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:var(--muted2)">${p.pitched_release||'—'}</div>
+        <div class="drawer-stat-lbl">Release</div>
+      </div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-label">Contact Details</div>
+      <div class="drawer-info-row"><span>Outlet / Name</span><span>${p.outlet||p.name||'—'}</span></div>
+      <div class="drawer-info-row"><span>Contact</span><span>${p.contact_name||'—'}</span></div>
+      <div class="drawer-info-row"><span>Email</span><span>${p.contact_email ? `<a href="mailto:${p.contact_email}" style="color:var(--blue2);text-decoration:none">${p.contact_email}</a>` : '—'}</span></div>
+      <div class="drawer-info-row"><span>Location</span><span>${p.location||'—'}</span></div>
+    </div>
+    ${p.notes ? `<div class="drawer-note">${p.notes}</div>` : ''}`;
+
+  openDrawer('✉ ' + (p.outlet||p.name||'Press Contact'), body,
+    `<div></div><button class="btn-sm" onclick="closeDrawer()">Close</button>`);
+}
+
+</script>
+
+<!-- ══ UNIVERSAL DETAIL DRAWER ══════════════════════════ -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer-panel">
+  <div class="drawer-hdr">
+    <div class="drawer-title" id="drawer-title">Detail</div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+  <div class="drawer-footer" id="drawer-footer" style="display:none"></div>
+</div>
 
 </body>
 </html>
