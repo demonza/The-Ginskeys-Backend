@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>THE GINSKEYS - Console</title>
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADzElEQVR4nO2WS09bRxTHf+NrG9tYrgteGCyKCEhESCzSRkipcL1IgRWLhofKApDIB2gU0hVdELEEwQdgRUpTIkTDAnAlCoHSesW+AoQRogRkLLB5XGPD3OmCxMGQtBQWqBVHGl3NmXvO+c95jgAU10im6zR+A+AGwA2AKwEQQiCEuDIAwRUbkclkQimFUpdTc2kP5Obm4na7MQzj0sYBzKc3Qgg0TUvvDcPIODMMA03TMAyDgoICSkpKWF1dJRwOs729jaZpKKUQQqCUQkqJEAKT6d09pZTnQKjLLqfTqQKBgHK73e89F0L8ow7x5keUUvh8Ph49+ga73Y7NZufFiyGE0MjKsuLz+RgdHaW2tpZwOEx5eTk2m43Z2Vncbjdzc3PU1dWRSqUoKipia2uL/v5+LBYLgUAAj8eDEIKRkRFSqVTaS2Y4SSQpJbduFfHkybcsLPyBplmYnp7i/v0v2dnZoa6ujs3NTerr64nHY9y79znBYJDFxUUaGxtpaGggFotRU1PDyMgIpaWldHZ2kkolefy4nZWVFV6+/AkpJSaTKSO8StM0Bajq6mr1+vWfGS4aGvpRtbe3q6WlRdXd3a0GBwfV8PCw6unpVoDy+XxqY2NDDQ0NKUCFQqG07Pz8vOrp6VbPn/+gHjz4SgHKYrFk6M+oAovFgmEYuN1umpqauH27lETiEJvNxt7ePnfvfobH4yESidDW9pBwOMzTp514vV4mJycByMnJYWZmBq/XS+j33wiFQsTjcZ49+5719XX8fj9AOtkzAJhMJ80lFovR1PQ1ra2txONxXC4Xy8vL6LqO3++nt7eXgoJPmJiY4M6dT1lYWKClpQWr1Yqu6wwODhKLxXA6neTkfExHx3eUlZWxtLRIfn5eRgVkAEgkErhcH9HQUI/FYkVKid1ux+FwYLVamZ6axm63oes6gcAXFBYWomkaU1O/sLa2RkdHB9FolGAwSDKZJCsrC2Uo9vb2KCwsJDs7O12S6e9pAPH4LlIaDAwMUFVVRTQaRdd1dnZ22N7eZvrVK4LBn6msrKSvr4/i4mLm5n5lf/+Arq4uKioqMJs1xsbGaGtrI3F4yGEySXNzM+Pj4+Tl5ROJRE4S703zymjFZrMZl8uFYRhYrVYODg5QSmEYBkdHR+kMFkJkNBSHw4Gu65jNZhwOB06nk93dXRwOB8lkEiklx8fHSCmRUmY2uNMArkJv6/rfkvks40MTLu2y9xh6y7vIdDwnyzU/y8954CydvvFF5//fheOsPvNFlF7W8Ifk3vHF9Yfgv/smvAHwvwHwF3mYz315wlP+AAAAAElFTkSuQmCC">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Barlow+Condensed:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -237,6 +238,7 @@ body::before{
 }
 .tb-tab:hover{color:var(--text);background:var(--bg2)}
 .tb-tab.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--bg2)}
+.tb-nav-sep{width:1px;background:var(--border2);margin:6px 4px;flex-shrink:0}
 .tb-tab .tab-badge{
   background:var(--red);
   color:#fff;
@@ -1627,21 +1629,30 @@ tr:hover .edit-btn{display:inline}
 <header class="topbar">
   <div class="tb-logo">THE GINSKEYS<span>//</span>MANAGEMENT TERMINAL</div>
   <nav class="tb-nav">
+    <!-- COMMAND -->
     <div class="tb-tab active" data-view="mgmt" onclick="switchView('mgmt',this)">◉ Overview</div>
+    <div class="tb-tab" data-view="alerts" onclick="switchView('alerts',this)">Alerts <span class="tab-badge">3</span></div>
+    <div class="tb-tab" data-view="agent" onclick="switchView('agent',this)" id="tab-agent" style="color:var(--accent)">⚡ Agent</div>
+    <div class="tb-nav-sep"></div>
+    <!-- MONEY -->
     <div class="tb-tab" data-view="dashboard" onclick="switchView('dashboard',this)">Financials</div>
     <div class="tb-tab" data-view="ledger" onclick="switchView('ledger',this)">Ledger</div>
-    <div class="tb-tab" data-view="tours" onclick="switchView('tours',this)">Tours</div>
-    <div class="tb-tab" data-view="streaming" onclick="switchView('streaming',this)">Streaming</div>
-    <div class="tb-tab" data-view="access" onclick="switchView('access',this)" id="tab-access">Access</div>
-    <div class="tb-tab" data-view="audit" onclick="switchView('audit',this)" id="tab-audit">Audit Log</div>
-    <div class="tb-tab" data-view="alerts" onclick="switchView('alerts',this)">Alerts <span class="tab-badge">3</span></div>
-    <div class="tb-tab" data-view="settings" onclick="switchView('settings',this)">Settings</div>
+    <div class="tb-tab" data-view="splits" onclick="switchView('splits',this)" id="tab-splits">Splits</div>
+    <div class="tb-nav-sep"></div>
+    <!-- LIVE -->
     <div class="tb-tab" data-view="booking" onclick="switchView('booking',this)" id="tab-booking">Booking <span class="tab-badge" id="booking-badge" style="display:none">0</span></div>
+    <div class="tb-tab" data-view="tours" onclick="switchView('tours',this)">Tours</div>
+    <div class="tb-tab" data-view="production" onclick="switchView('production',this)" id="tab-production">🎚 Production</div>
+    <div class="tb-nav-sep"></div>
+    <!-- CONTENT -->
     <div class="tb-tab" data-view="releases" onclick="switchView('releases',this)" id="tab-releases">Releases</div>
     <div class="tb-tab" data-view="press" onclick="switchView('press',this)" id="tab-press">Press & Sync</div>
-    <div class="tb-tab" data-view="splits" onclick="switchView('splits',this)" id="tab-splits">Splits</div>
-    <div class="tb-tab" data-view="agent" onclick="switchView('agent',this)" id="tab-agent" style="color:var(--accent)">⚡ Agent</div>
-    <div class="tb-tab" data-view="production" onclick="switchView('production',this)" id="tab-production">🎚 Production</div>
+    <div class="tb-tab" data-view="streaming" onclick="switchView('streaming',this)">Streaming</div>
+    <div class="tb-nav-sep"></div>
+    <!-- ADMIN -->
+    <div class="tb-tab" data-view="access" onclick="switchView('access',this)" id="tab-access">Access</div>
+    <div class="tb-tab" data-view="audit" onclick="switchView('audit',this)" id="tab-audit">Audit Log</div>
+    <div class="tb-tab" data-view="settings" onclick="switchView('settings',this)">Settings</div>
   </nav>
   <div class="tb-right">
     <div class="tb-live"><div class="tb-live-dot"></div>LIVE</div>
