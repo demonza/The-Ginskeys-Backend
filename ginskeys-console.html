@@ -12285,6 +12285,12 @@ function printFinancialsReport() {
   const entries = [...LEDGER_DATA].sort((a,b)=>new Date(a.date)-new Date(b.date));
   const balance = entries.length ? entries[entries.length-1].balance : 0;
 
+  // Compute YTD values (not in fi object — computed here)
+  const thisYear = new Date().getFullYear();
+  const ytdEntries = LEDGER_DATA.filter(e => new Date(e.date).getFullYear() === thisYear);
+  const ytdRevenue  = ytdEntries.filter(e=>e.amount>0).reduce((s,e)=>s+e.amount, 0);
+  const ytdExpenses = ytdEntries.filter(e=>e.amount<0).reduce((s,e)=>s+Math.abs(e.amount), 0);
+
   let html = _reportHead('Financial Overview','');
   html += `<div class="page">
   <div class="doc-header">
@@ -12295,9 +12301,9 @@ function printFinancialsReport() {
   <div class="kpi-row">
     <div class="kpi"><div class="kpi-val g">€${balance.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Band Fund</div></div>
     <div class="kpi"><div class="kpi-val b">€${fi.totalRevenue.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Total Revenue</div></div>
-    <div class="kpi"><div class="kpi-val a">€${fi.ytdRevenue.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">YTD Revenue</div></div>
-    <div class="kpi"><div class="kpi-val r">€${fi.ytdExpenses.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">YTD Expenses</div></div>
-    <div class="kpi"><div class="kpi-val ${fi.netPosition>=0?'g':'r'}">€${fi.netPosition.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Net Position</div></div>
+    <div class="kpi"><div class="kpi-val a">€${ytdRevenue.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">YTD Revenue</div></div>
+    <div class="kpi"><div class="kpi-val r">€${ytdExpenses.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">YTD Expenses</div></div>
+    <div class="kpi"><div class="kpi-val ${(fi.netPosition>=0)?'g':'r'}">€${fi.netPosition.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Net Position</div></div>
     <div class="kpi"><div class="kpi-val">${fi.runwayMonths===Infinity?'∞':fi.runwayMonths.toFixed(1)+' mo'}</div><div class="kpi-lbl">Cash Runway</div></div>
   </div>
 
