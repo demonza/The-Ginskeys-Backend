@@ -3452,6 +3452,8 @@ tr:hover .edit-btn{display:inline}
 
 let BOOKING_DATA = [], RELEASES_DATA = [], PRESS_DATA = [], SPLITS_DATA = [];
 let PROD_SHOWS = [], PROD_SETLISTS = [];
+let PROD_CHECKLIST = [], SL_PENDING_SONGS = [];
+let CURRENT_SHOW_ID = null;
 let SP_EXPENSES = [], SP_MEMBERS = [];
 
 const STAGE_COLORS = {
@@ -8671,9 +8673,6 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
 // LIVE PRODUCTION ENGINE
 // ══════════════════════════════════════════════════════════
 
-let PROD_CHECKLIST = [];
-let SL_PENDING_SONGS = [];
-let CURRENT_SHOW_ID = null;
 
 const PHASE_LABELS = {
   pre_show:'Pre-Show (1 week out)',
