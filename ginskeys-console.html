@@ -1824,6 +1824,9 @@ tr:hover .edit-btn{display:inline}
 </div>
 
 <!-- ══ KPI STRIP ═════════════════════════════════════ -->
+<div style="display:flex;justify-content:flex-end;padding:4px 10px;background:var(--bg0);border-bottom:1px solid var(--border);flex-shrink:0">
+  <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printFinancialsReport()">⎙ Export Financial Report</button>
+</div>
 <div class="kpi-strip" style="grid-template-columns:repeat(8,1fr)">
   <div class="kpi-card green">
     <div class="kpi-label" data-i18n="kpi_balance">Total Balance</div>
@@ -1914,6 +1917,7 @@ tr:hover .edit-btn{display:inline}
         </div>
         <div style="display:flex;align-items:center;gap:10px">
           <div style="font-size:8px;color:var(--muted3);letter-spacing:.06em">live · recalculates from ledger data</div>
+          <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printHealthReport()">⎙ PDF</button>
           <div id="mgmt-score-badge" style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--text);letter-spacing:.05em">—/100</div>
         </div>
       </div>
@@ -2052,7 +2056,7 @@ tr:hover .edit-btn{display:inline}
   <div class="panel" style="grid-row:1; grid-column:1">
     <div class="panel-header">
       <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div><span data-i18n="revenue_by_source">Revenue by Source</span></div>
-      <div style="display:flex;gap:6px;align-items:center"><button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printFinancialsReport()">⎙ PDF</button><span class="panel-shortcut">F2</span></div>
+      <span class="panel-shortcut">F2</span>
     </div>
     <div style="padding:10px 12px;flex:1;display:flex;flex-direction:column;gap:6px" id="rev-source-panel"></div>
   </div>
@@ -2376,8 +2380,8 @@ tr:hover .edit-btn{display:inline}
         <div style="display:flex;gap:8px;align-items:center">
           <select id="cdb-month" style="background:var(--bg2);color:var(--text);border:1px solid var(--border2);font-family:var(--mono);font-size:10px;padding:3px 6px;border-radius:2px"></select>
           <button class="btn-sm primary" onclick="saveCdbabyData()">Save to DB</button>
-          <button class="btn-sm" <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printStreamingReport()">⎙ PDF</button>
-          onclick="loadCdbabyData()">↺ Load from DB</button>
+          <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printStreamingReport()">⎙ PDF</button>
+          <button class="btn-sm" onclick="loadCdbabyData()">↺ Load from DB</button>
         </div>
       </div>
       <div style="overflow-x:auto">
@@ -3224,7 +3228,6 @@ tr:hover .edit-btn{display:inline}
       <div class="panel" style="display:flex;flex-direction:column">
         <div class="panel-header">
           <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_history">Split History</span></div>
-          <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printSplitsReport()">⎙ PDF</button>
           <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printSplitsReport()">⎙ PDF</button>
           <button class="btn-sm" onclick="loadSplits()">↺ Refresh</button>
         </div>
@@ -12323,6 +12326,364 @@ function printFinancialsReport() {
   _openReport(html);
 }
 
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// BAND HEALTH SCORE — PRINT / PDF
+// ══════════════════════════════════════════════════════════════════════════════
+
+function printHealthReport() {
+  const now = new Date();
+  const d   = now.toLocaleDateString('en-GB', {day:'2-digit', month:'long', year:'numeric'});
+  const fi  = getFinancialIntelligence();
+
+  // ── Re-run the full scoring (mirrors mgmtBandHealthScore logic) ────────────
+  const entries = [...LEDGER_DATA].sort((a,b) => new Date(a.date)-new Date(b.date));
+  const balance = entries.length ? entries[entries.length-1].balance : 0;
+  const t12  = new Date(now); t12.setFullYear(t12.getFullYear()-1);
+  const t6   = new Date(now); t6.setMonth(t6.getMonth()-6);
+
+  const dims = [];
+
+  // 1 — Financial Health
+  let fin = 0;
+  if (fi.netPosition > 0)       fin += 3;
+  if (balance > 1000)           fin += 3.5;
+  else if (balance > 400)       fin += 2;
+  else if (balance > 100)       fin += 0.5;
+  if (fi.runwayMonths > 18)     fin += 3;
+  else if (fi.runwayMonths > 9) fin += 2;
+  else if (fi.runwayMonths > 3) fin += 1;
+  if (fi.gigMargin && fi.gigMargin > 0.7) fin += 3;
+  else if (fi.gigMargin && fi.gigMargin > 0.4) fin += 1.5;
+  dims.push({ label:'Financial Health', score:Math.min(12.5,fin), max:12.5, color:'#166534',
+    metrics:[
+      { k:'Net position',  v:fmtMoney(fi.netPosition),  ok:fi.netPosition>0 },
+      { k:'Band fund',     v:fmtMoney(balance),          ok:balance>400 },
+      { k:'Runway',        v:fi.runwayMonths===Infinity?'∞':fi.runwayMonths.toFixed(1)+'mo', ok:fi.runwayMonths>9 },
+      { k:'Gig margin',    v:fi.gigMargin!==null?(fi.gigMargin*100).toFixed(0)+'%':'—', ok:fi.gigMargin>0.6 },
+    ],
+    advice: fin<6 ? 'Raise booking fees. Reduce transport costs. Build a 3-month operating reserve.' :
+            fin<10? 'On track. Maintain gig margin above 70%.' :
+                    'Healthy. Consider reinvesting into studio time and release marketing.' });
+
+  // 2 — Live Activity
+  const recentGigs = LEDGER_DATA.filter(e=>e.cat==='Espetáculo'&&e.amount>0&&new Date(e.date)>=t12).length;
+  const gigRev12   = LEDGER_DATA.filter(e=>e.cat==='Espetáculo'&&e.amount>0&&new Date(e.date)>=t12).reduce((s,e)=>s+e.amount,0);
+  const upcoming   = PROD_SHOWS.filter(s=>new Date(s.show_date)>=now).length;
+  let live = 0;
+  if (recentGigs>=4) live+=5; else if (recentGigs>=2) live+=3; else if (recentGigs>=1) live+=1.5;
+  if (upcoming>=2)   live+=4; else if (upcoming>=1) live+=2.5;
+  if (fi.avgGigFee>=1000) live+=3.5; else if (fi.avgGigFee>=500) live+=2; else if (fi.avgGigFee>=200) live+=1;
+  dims.push({ label:'Live Activity', score:Math.min(12.5,live), max:12.5, color:'#c2410c',
+    metrics:[
+      { k:'Gigs (12mo)',    v:String(recentGigs),      ok:recentGigs>=3 },
+      { k:'Revenue (12mo)', v:fmtMoney(gigRev12),      ok:gigRev12>1000 },
+      { k:'Upcoming shows', v:String(upcoming),        ok:upcoming>=1 },
+      { k:'Avg fee',        v:fmtMoney(fi.avgGigFee),  ok:fi.avgGigFee>=800 },
+    ],
+    advice: live<5 ? 'Target 4+ gigs/year. Focus on summer festivals in Alentejo/Algarve.' :
+            live<9 ? 'Good momentum. Lock in advance bookings for next season now.' :
+                     'Strong live presence. Leverage for press & streaming push.' });
+
+  // 3 — Release Velocity
+  const relLast6  = RELEASES_DATA.filter(r=>r.stage==='released'&&r.release_date&&new Date(r.release_date)>=t6).length;
+  const relLast12 = RELEASES_DATA.filter(r=>r.stage==='released'&&r.release_date&&new Date(r.release_date)>=t12).length;
+  const relInProg = RELEASES_DATA.filter(r=>!['released','idea'].includes(r.stage)).length;
+  const hasDist   = LEDGER_DATA.some(e=>e.cat==='Distribuição');
+  let vel = 0;
+  if (relLast6>=2) vel+=5; else if (relLast6>=1) vel+=3;
+  if (relLast12>=3) vel+=3.5; else if (relLast12>=1) vel+=2;
+  if (relInProg>=1) vel+=2.5;
+  if (hasDist) vel+=1.5;
+  dims.push({ label:'Release Velocity', score:Math.min(12.5,vel), max:12.5, color:'#6d28d9',
+    metrics:[
+      { k:'Released (6mo)',  v:String(relLast6),  ok:relLast6>=1 },
+      { k:'Released (12mo)', v:String(relLast12), ok:relLast12>=2 },
+      { k:'In progress',     v:String(relInProg), ok:relInProg>=1 },
+      { k:'Distribution',    v:hasDist?'Active':'None', ok:hasDist },
+    ],
+    advice: vel<4 ? 'Critical: release a single within 60 days. Spotify deprioritises dormant artists.' :
+            vel<8 ? 'Building. Aim for 1 single every 8–10 weeks.' :
+                    'Strong release engine. Feed it into press pitches.' });
+
+  // 4 — Booking Pipeline
+  const bkActive    = BOOKING_DATA.filter(b=>!['rejected','completed'].includes(b.stage)).length;
+  const bkNeg       = BOOKING_DATA.filter(b=>b.stage==='negotiating').length;
+  const bkConfirmed = BOOKING_DATA.filter(b=>b.stage==='confirmed').length;
+  const bkCompleted = BOOKING_DATA.filter(b=>b.stage==='completed').length;
+  const bkValue     = BOOKING_DATA.filter(b=>b.stage==='confirmed'&&b.fee_eur).reduce((s,b)=>s+parseFloat(b.fee_eur||0),0);
+  let pipe = 0;
+  if (bkActive>=5) pipe+=3; else if (bkActive>=2) pipe+=2; else if (bkActive>=1) pipe+=1;
+  if (bkNeg>=1) pipe+=3;
+  if (bkConfirmed>=1) pipe+=3.5;
+  if (bkCompleted>=3) pipe+=3; else if (bkCompleted>=1) pipe+=1.5;
+  dims.push({ label:'Booking Pipeline', score:Math.min(12.5,pipe), max:12.5, color:'#1d4ed8',
+    metrics:[
+      { k:'Active contacts', v:String(bkActive),    ok:bkActive>=3 },
+      { k:'Negotiating',     v:String(bkNeg),       ok:bkNeg>=1 },
+      { k:'Confirmed',       v:String(bkConfirmed), ok:bkConfirmed>=1 },
+      { k:'Confirmed value', v:bkValue>0?fmtMoney(bkValue):'—', ok:bkValue>500 },
+    ],
+    advice: pipe<4 ? 'Pipeline empty. Send 5+ cold pitches this week via the Agent tab.' :
+            pipe<8 ? 'Developing. Follow up on open contacts within 7 days.' :
+                     'Healthy. Prioritise closing contacts in Negotiating stage.' });
+
+  // 5 — Press & Media
+  const prPublished = PRESS_DATA.filter(p=>p.stage==='published').length;
+  const prActive    = PRESS_DATA.filter(p=>!['passed','rejected'].includes(p.stage)).length;
+  const prSync      = PRESS_DATA.filter(p=>p.type==='sync').length;
+  const prResponded = PRESS_DATA.filter(p=>p.stage==='responded').length;
+  let press = 0;
+  if (prPublished>=2) press+=5; else if (prPublished>=1) press+=3;
+  if (prActive>=3) press+=3; else if (prActive>=1) press+=1.5;
+  if (prSync>=1) press+=3;
+  if (prResponded>=1) press+=1.5;
+  dims.push({ label:'Press & Media', score:Math.min(12.5,press), max:12.5, color:'#92400e',
+    metrics:[
+      { k:'Published',  v:String(prPublished), ok:prPublished>=1 },
+      { k:'Active',     v:String(prActive),    ok:prActive>=2 },
+      { k:'Responded',  v:String(prResponded), ok:prResponded>=1 },
+      { k:'Sync deals', v:String(prSync),      ok:prSync>=1 },
+    ],
+    advice: press<4 ? 'No press presence. Target Portuguese rock blogs, P3, Rádio Comercial.' :
+            press<8 ? 'Building. Coordinate next press push with next release date.' :
+                      'Strong media profile. Leverage for festival booking.' });
+
+  // 6 — Streaming Health
+  const totalStreams = PLATFORM_DATA.reduce((s,p)=>s+p.streams,0);
+  const totalStrRev  = PLATFORM_DATA.reduce((s,p)=>s+p.rev,0);
+  const multiPlatform = PLATFORM_DATA.filter(p=>p.streams>0).length;
+  let stream = 0;
+  if (totalStreams>=10000) stream+=5; else if (totalStreams>=2000) stream+=2.5; else if (totalStreams>=500) stream+=1;
+  if (totalStrRev>=50) stream+=4; else if (totalStrRev>=5) stream+=2; else if (totalStrRev>0) stream+=0.5;
+  if (multiPlatform>=3) stream+=2; else if (multiPlatform>=1) stream+=1;
+  if (PLATFORM_DATA.find(p=>p.name==='Spotify'&&p.streams>0)) stream+=1.5;
+  dims.push({ label:'Streaming Health', score:Math.min(12.5,stream), max:12.5, color:'#065f46',
+    metrics:[
+      { k:'Total streams',    v:totalStreams.toLocaleString(), ok:totalStreams>=2000 },
+      { k:'Monthly revenue',  v:fmtMoney(totalStrRev),        ok:totalStrRev>=5 },
+      { k:'Platforms active', v:String(multiPlatform),         ok:multiPlatform>=2 },
+      { k:'Annual estimate',  v:fmtMoney(totalStrRev*12),     ok:totalStrRev*12>=50 },
+    ],
+    advice: stream<3 ? 'Streaming near zero. Pitch every release to Spotify editorial playlists.' :
+            stream<7 ? 'Growing. Consistency is the lever — release every 8 weeks.' :
+                       'Streaming working. Reinvest into promotion budget.' });
+
+  // 7 — Revenue Diversification
+  const liveShare  = fi.totalRevenue > 0 ? fi.gigRevenue / fi.totalRevenue : 1;
+  const hasMerch   = LEDGER_DATA.some(e=>e.cat==='Merch'&&e.amount>0);
+  const hasSync    = PRESS_DATA.some(p=>p.type==='sync'&&p.stage==='published');
+  let div = 0;
+  if (liveShare<0.95) div+=3; if (liveShare<0.80) div+=2;
+  if (totalStrRev>0) div+=2.5; if (totalStrRev*12/Math.max(fi.totalRevenue,1)>0.1) div+=2;
+  if (hasMerch) div+=2; if (hasSync) div+=3;
+  dims.push({ label:'Revenue Diversification', score:Math.min(12.5,div), max:12.5, color:'#b45309',
+    metrics:[
+      { k:'Live share',    v:(liveShare*100).toFixed(0)+'%', ok:liveShare<0.85 },
+      { k:'Has streaming', v:totalStrRev>0?'Yes':'No',       ok:totalStrRev>0 },
+      { k:'Has merch',     v:hasMerch?'Yes':'No',            ok:hasMerch },
+      { k:'Has sync',      v:hasSync?'Yes':'No',             ok:hasSync },
+    ],
+    advice: div<4 ? 'Revenue 100% live — existential risk. Add streaming + one merch item immediately.' :
+            div<8 ? 'Diversifying. Next: sync licensing via Musicbed or direct placement.' :
+                    'Well diversified. Focus on growing each revenue stream.' });
+
+  // 8 — Strategic Momentum
+  const growthPositive = fi.yoyGrowth !== null && fi.yoyGrowth > 0;
+  const recentActivity = LEDGER_DATA.filter(e=>e.amount>0&&new Date(e.date)>=t12).length;
+  const feedingPipeline = bkActive>=2 && relInProg>=1;
+  const hasEPK = PRESS_DATA.length>0 || BOOKING_DATA.length>0;
+  let momentum = 0;
+  if (growthPositive) momentum+=4; else if (fi.years&&fi.years.length>1) momentum+=1;
+  if (recentActivity>=3) momentum+=2.5;
+  if (feedingPipeline) momentum+=2.5;
+  if (hasEPK) momentum+=1.5;
+  if (fi.gigCount>=2) momentum+=2;
+  dims.push({ label:'Strategic Momentum', score:Math.min(12.5,momentum), max:12.5, color:'#c2410c',
+    metrics:[
+      { k:'Revenue YoY growth',    v:fi.yoyGrowth!==null?(fi.yoyGrowth*100).toFixed(0)+'%':'—', ok:fi.yoyGrowth>0 },
+      { k:'Active transactions',   v:String(recentActivity), ok:recentActivity>=3 },
+      { k:'Pipeline feeding',      v:feedingPipeline?'Yes':'No', ok:feedingPipeline },
+      { k:'EPK / outreach active', v:hasEPK?'Yes':'No',      ok:hasEPK },
+    ],
+    advice: momentum<4 ? 'Momentum stalled. Pick one area and execute aggressively for 30 days.' :
+            momentum<8 ? 'Building. Coordinate booking + release timing for compounding effect.' :
+                         'High momentum. Document what is working and systematise it.' });
+
+  const total = Math.round(dims.reduce((s,d)=>s+d.score, 0));
+  const grade = total>=88?'A+':total>=80?'A':total>=70?'B+':total>=60?'B':total>=50?'C':total>=35?'D':'F';
+  const gradeHex = total>=70?'#166534':total>=45?'#92400e':'#991b1b';
+  const status = total>=80?'Excellent':total>=65?'Healthy':total>=45?'Developing':total>=25?'Struggling':'Critical — Action Required';
+
+  // ── Top 2 weakest dims ────────────────────────────────────────────────────
+  const sorted = [...dims].sort((a,b)=>(a.score/a.max)-(b.score/b.max));
+
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<title>The Ginskeys — Band Health Score</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#111;background:#fff;line-height:1.5}
+.page{padding:40px 48px;min-height:100vh}
+.doc-header{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:14px;border-bottom:2px solid #111;margin-bottom:24px}
+.doc-band{font-family:'Oswald',sans-serif;font-size:24px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.doc-meta{text-align:right;font-size:9px;color:#666;letter-spacing:.1em;text-transform:uppercase;line-height:1.8}
+
+/* Grade hero */
+.grade-hero{display:grid;grid-template-columns:160px 1fr;gap:0;border:1px solid #ddd;margin-bottom:24px}
+.grade-box{background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:6px}
+.grade-letter{font-family:'Oswald',sans-serif;font-size:80px;font-weight:700;line-height:1;color:${gradeHex}}
+.grade-score{font-family:'Oswald',sans-serif;font-size:20px;color:#fff}
+.grade-status{font-size:9px;color:#888;letter-spacing:.14em;text-transform:uppercase}
+.grade-right{padding:20px 24px;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.grade-title{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#111;margin-bottom:4px}
+.grade-desc{font-size:9px;color:#555;line-height:1.7;max-width:480px}
+
+/* Dimension bars */
+.dims-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #ddd;margin-bottom:24px}
+.dim-cell{padding:12px 16px;border-right:1px solid #eee;border-bottom:1px solid #eee}
+.dim-cell:nth-child(2n){border-right:none}
+.dim-cell:nth-last-child(-n+2){border-bottom:none}
+.dim-label{font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.dim-bar-wrap{display:flex;gap:2px;margin-bottom:6px}
+.dim-bar-seg{height:8px;border-radius:1px;flex:1}
+.dim-metrics{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;margin-top:4px}
+.dim-metric{display:flex;justify-content:space-between;font-size:8px}
+.dim-metric span:first-child{color:#888}
+.dim-metric span:last-child{font-weight:600}
+.ok{color:#166534}.fail{color:#991b1b}
+
+/* Focus areas */
+.focus{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.focus-card{padding:14px;border-left:3px solid;background:#fafafa}
+.focus-rank{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+.focus-title{font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.focus-advice{font-size:9px;color:#555;line-height:1.7}
+
+.note{padding:10px 14px;background:#f9fafb;border-left:3px solid #374151;font-size:9px;color:#555;line-height:1.7;margin-bottom:20px}
+.footer{padding-top:12px;border-top:1px solid #ddd;display:flex;justify-content:space-between;font-size:8px;color:#aaa;letter-spacing:.1em;text-transform:uppercase}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th{background:#111;color:#fff;padding:6px 10px;font-size:8px;letter-spacing:.14em;text-transform:uppercase;text-align:left}
+td{padding:7px 10px;border-bottom:1px solid #eee;font-size:9px}
+tr:nth-child(even) td{background:#f9f9f9}
+@page{margin:14mm;size:A4}
+</style></head><body>
+<div class="page">
+
+  <div class="doc-header">
+    <div>
+      <div class="doc-band">The Ginskeys</div>
+      <div style="font-size:9px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:3px">Hard Rock · Sines, Portugal</div>
+    </div>
+    <div class="doc-meta">
+      <div style="font-family:'Oswald',sans-serif;font-size:14px;color:#111">Band Health Score</div>
+      <div>${d}</div>
+      <div>Confidential</div>
+    </div>
+  </div>
+
+  <!-- Grade hero -->
+  <div class="grade-hero">
+    <div class="grade-box">
+      <div class="grade-letter">${grade}</div>
+      <div class="grade-score">${total}/100</div>
+      <div class="grade-status">${status}</div>
+    </div>
+    <div class="grade-right">
+      <div>
+        <div class="grade-title">Overall Band Health — ${d}</div>
+        <div class="grade-desc">
+          This score measures the holistic health of The Ginskeys across 8 strategic dimensions.
+          Each dimension is scored 0–12.5 points. The overall score reflects the band's current
+          trajectory across financial stability, live activity, release cadence, booking pipeline,
+          press presence, streaming performance, revenue diversification, and strategic momentum.
+        </div>
+      </div>
+      <!-- Overall bar -->
+      <div>
+        <div style="display:flex;gap:2px">
+          ${Array.from({length:20}).map((_,i)=>`<div style="height:10px;flex:1;border-radius:1px;background:${i<Math.round(total/5)?gradeHex:'#f3f4f6'}"></div>`).join('')}
+        </div>
+        <div style="font-size:8px;color:#888;margin-top:4px;letter-spacing:.08em">
+          ${total} / 100 &nbsp;·&nbsp; Grade ${grade} &nbsp;·&nbsp; ${status}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8 dimension cells -->
+  <div class="dims-grid">
+    ${dims.map(dim => {
+      const pct = Math.round(dim.score / dim.max * 100);
+      const filled = Math.round(pct / 10);
+      return `<div class="dim-cell">
+        <div class="dim-label" style="color:${dim.color}">${dim.label} <span style="font-weight:400;color:#888;font-size:9px">${dim.score.toFixed(1)}/${dim.max}</span></div>
+        <div class="dim-bar-wrap">
+          ${Array.from({length:10}).map((_,i)=>`<div class="dim-bar-seg" style="background:${i<filled?dim.color:'#f3f4f6'}"></div>`).join('')}
+        </div>
+        <div class="dim-metrics">
+          ${dim.metrics.map(m=>`<div class="dim-metric"><span>${m.k}</span><span class="${m.ok?'ok':'fail'}">${m.v}</span></div>`).join('')}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+
+  <!-- Focus areas: 2 lowest-scoring dims -->
+  <div style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">
+    Priority Focus Areas
+  </div>
+  <div class="focus">
+    ${sorted.slice(0,2).map((dim,i)=>`
+    <div class="focus-card" style="border-color:${dim.color}">
+      <div class="focus-rank" style="color:${dim.color}">#${i+1} Weakest dimension — ${Math.round(dim.score/dim.max*100)}% score</div>
+      <div class="focus-title" style="color:${dim.color}">${dim.label}</div>
+      <div class="focus-advice">${dim.advice}</div>
+    </div>`).join('')}
+  </div>
+
+  <!-- All dimensions summary table -->
+  <div style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">
+    Dimension Summary
+  </div>
+  <table>
+    <thead><tr><th>Dimension</th><th style="text-align:right">Score</th><th style="text-align:right">Max</th><th style="text-align:right">%</th><th>Assessment</th></tr></thead>
+    <tbody>
+      ${[...dims].sort((a,b)=>b.score-a.score).map(dim=>{
+        const pct = Math.round(dim.score/dim.max*100);
+        const assessment = pct>=80?'Excellent':pct>=60?'Good':pct>=40?'Developing':pct>=20?'Weak':'Critical';
+        const aBg = pct>=80?'#f0fdf4':pct>=60?'#f0fdf4':pct>=40?'#fffbeb':pct>=20?'#fff7ed':'#fef2f2';
+        const aCol = pct>=80?'#166534':pct>=60?'#166534':pct>=40?'#92400e':pct>=20?'#c2410c':'#991b1b';
+        return `<tr>
+          <td style="font-weight:700;color:${dim.color}">${dim.label}</td>
+          <td style="text-align:right;font-weight:700">${dim.score.toFixed(1)}</td>
+          <td style="text-align:right;color:#888">${dim.max}</td>
+          <td style="text-align:right;font-weight:700;color:${aCol}">${pct}%</td>
+          <td><span style="padding:2px 8px;border-radius:2px;font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:${aBg};color:${aCol}">${assessment}</span></td>
+        </tr>`;
+      }).join('')}
+      <tr style="border-top:2px solid #111">
+        <td style="font-weight:700;font-family:'Oswald',sans-serif;font-size:12px">OVERALL</td>
+        <td style="text-align:right;font-weight:700;font-size:14px;color:${gradeHex}">${total}</td>
+        <td style="text-align:right;color:#888">100</td>
+        <td style="text-align:right;font-weight:700;font-size:14px;color:${gradeHex}">${total}%</td>
+        <td><span style="padding:3px 10px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:${gradeHex};color:#fff">Grade ${grade} — ${status}</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <div>The Ginskeys — Band Health Score Report</div>
+    <div>${d} · Confidential · Recalculates from live ledger data</div>
+  </div>
+</div>
+<script>window.onload=()=>window.print()<\/script>
+</body></html>`);
+  w.document.close();
+}
 </script>
 
 <!-- ══ UNIVERSAL DETAIL DRAWER ══════════════════════════ -->
