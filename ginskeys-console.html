@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>THE GINSKEYS - Mgmt. Console</title>
+<title>THE GINSKEYS - Console</title>
   <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADzElEQVR4nO2WS09bRxTHf+NrG9tYrgteGCyKCEhESCzSRkipcL1IgRWLhofKApDIB2gU0hVdELEEwQdgRUpTIkTDAnAlCoHSesW+AoQRogRkLLB5XGPD3OmCxMGQtBQWqBVHGl3NmXvO+c95jgAU10im6zR+A+AGwA2AKwEQQiCEuDIAwRUbkclkQimFUpdTc2kP5Obm4na7MQzj0sYBzKc3Qgg0TUvvDcPIODMMA03TMAyDgoICSkpKWF1dJRwOs729jaZpKKUQQqCUQkqJEAKT6d09pZTnQKjLLqfTqQKBgHK73e89F0L8ow7x5keUUvh8Ph49+ga73Y7NZufFiyGE0MjKsuLz+RgdHaW2tpZwOEx5eTk2m43Z2Vncbjdzc3PU1dWRSqUoKipia2uL/v5+LBYLgUAAj8eDEIKRkRFSqVTaS2Y4SSQpJbduFfHkybcsLPyBplmYnp7i/v0v2dnZoa6ujs3NTerr64nHY9y79znBYJDFxUUaGxtpaGggFotRU1PDyMgIpaWldHZ2kkolefy4nZWVFV6+/AkpJSaTKSO8StM0Bajq6mr1+vWfGS4aGvpRtbe3q6WlRdXd3a0GBwfV8PCw6unpVoDy+XxqY2NDDQ0NKUCFQqG07Pz8vOrp6VbPn/+gHjz4SgHKYrFk6M+oAovFgmEYuN1umpqauH27lETiEJvNxt7ePnfvfobH4yESidDW9pBwOMzTp514vV4mJycByMnJYWZmBq/XS+j33wiFQsTjcZ49+5719XX8fj9AOtkzAJhMJ80lFovR1PQ1ra2txONxXC4Xy8vL6LqO3++nt7eXgoJPmJiY4M6dT1lYWKClpQWr1Yqu6wwODhKLxXA6neTkfExHx3eUlZWxtLRIfn5eRgVkAEgkErhcH9HQUI/FYkVKid1ux+FwYLVamZ6axm63oes6gcAXFBYWomkaU1O/sLa2RkdHB9FolGAwSDKZJCsrC2Uo9vb2KCwsJDs7O12S6e9pAPH4LlIaDAwMUFVVRTQaRdd1dnZ22N7eZvrVK4LBn6msrKSvr4/i4mLm5n5lf/+Arq4uKioqMJs1xsbGaGtrI3F4yGEySXNzM+Pj4+Tl5ROJRE4S703zymjFZrMZl8uFYRhYrVYODg5QSmEYBkdHR+kMFkJkNBSHw4Gu65jNZhwOB06nk93dXRwOB8lkEiklx8fHSCmRUmY2uNMArkJv6/rfkvks40MTLu2y9xh6y7vIdDwnyzU/y8954CydvvFF5//fheOsPvNFlF7W8Ifk3vHF9Yfgv/smvAHwvwHwF3mYz315wlP+AAAAAElFTkSuQmCC">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1761,7 +1761,7 @@ tr:hover .edit-btn{display:inline}
     <span class="logo-band">Ginskeys</span>
     <span class="logo-console" data-i18n="logo_console">Management Console</span>
   </div>
-  <span class="logo-slash"></span>
+  <span class="logo-slash">/</span>
 </div>
   <nav class="tb-nav">
     <!-- COMMAND -->
@@ -2052,7 +2052,7 @@ tr:hover .edit-btn{display:inline}
   <div class="panel" style="grid-row:1; grid-column:1">
     <div class="panel-header">
       <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div><span data-i18n="revenue_by_source">Revenue by Source</span></div>
-      <span class="panel-shortcut">F2</span>
+      <div style="display:flex;gap:6px;align-items:center"><button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printFinancialsReport()">⎙ PDF</button><span class="panel-shortcut">F2</span></div>
     </div>
     <div style="padding:10px 12px;flex:1;display:flex;flex-direction:column;gap:6px" id="rev-source-panel"></div>
   </div>
@@ -2270,6 +2270,7 @@ tr:hover .edit-btn{display:inline}
     <input class="ledger-search" placeholder="/ Search transactions…" id="ledger-search" oninput="searchLedger(this.value)">
     <div class="ledger-spacer"></div>
     <span class="ledger-count" id="ledger-count">— transactions</span>
+    <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printLedgerReport()">⎙ PDF</button>
     <button class="btn-sm ghost" onclick="exportCSV()"><span data-i18n="btn_export_csv">Export CSV</span></button>
     <button class="btn-sm ghost" id="btn-import" onclick="openImport()"><span data-i18n="btn_import_csv">Import CSV</span></button>
     <button class="btn-sm primary" onclick="openModal()">+ New</button>
@@ -2336,6 +2337,7 @@ tr:hover .edit-btn{display:inline}
             <option value="active">Active</option>
             <option value="completed">Completed</option>
           </select>
+          <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printToursReport()">⎙ PDF</button>
           <button class="btn-sm primary" id="btn-add-tour" onclick="openTourDrawerNew()">+ Add Show</button>
         </div>
       </div>
@@ -2374,7 +2376,8 @@ tr:hover .edit-btn{display:inline}
         <div style="display:flex;gap:8px;align-items:center">
           <select id="cdb-month" style="background:var(--bg2);color:var(--text);border:1px solid var(--border2);font-family:var(--mono);font-size:10px;padding:3px 6px;border-radius:2px"></select>
           <button class="btn-sm primary" onclick="saveCdbabyData()">Save to DB</button>
-          <button class="btn-sm" onclick="loadCdbabyData()">↺ Load from DB</button>
+          <button class="btn-sm" <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printStreamingReport()">⎙ PDF</button>
+          onclick="loadCdbabyData()">↺ Load from DB</button>
         </div>
       </div>
       <div style="overflow-x:auto">
@@ -2743,6 +2746,7 @@ tr:hover .edit-btn{display:inline}
               <option value="completed">Completed</option><option value="rejected">Rejected</option>
             </select>
             <button class="btn-sm" onclick="loadBooking()">↺ Refresh</button>
+            <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printBookingReport()">⎙ Export PDF</button>
           </div>
         </div>
         <div id="booking-list-body" style="flex:1;overflow-y:auto;padding:4px"></div>
@@ -2874,6 +2878,7 @@ tr:hover .edit-btn{display:inline}
       <div class="panel" style="display:flex;flex-direction:column">
         <div class="panel-header">
           <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Release Pipeline</div>
+          <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printReleasesReport()">⎙ PDF</button>
           <button class="btn-sm" onclick="loadReleases()">↺ Refresh</button>
         </div>
         <div id="releases-list" style="flex:1;overflow-y:auto;padding:8px"></div>
@@ -3055,6 +3060,7 @@ tr:hover .edit-btn{display:inline}
               <option value="press">Press</option><option value="radio">Radio</option>
               <option value="sync">Sync</option><option value="playlist">Playlist</option>
             </select>
+            <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printPressReport()">⎙ PDF</button>
             <button class="btn-sm" onclick="loadPress()">↺ Refresh</button>
           </div>
         </div>
@@ -3218,6 +3224,8 @@ tr:hover .edit-btn{display:inline}
       <div class="panel" style="display:flex;flex-direction:column">
         <div class="panel-header">
           <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_history">Split History</span></div>
+          <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printSplitsReport()">⎙ PDF</button>
+          <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printSplitsReport()">⎙ PDF</button>
           <button class="btn-sm" onclick="loadSplits()">↺ Refresh</button>
         </div>
         <div id="splits-history" style="flex:1;overflow-y:auto;padding:8px"></div>
@@ -3509,19 +3517,7 @@ async function loadBooking() {
   } catch(e) { console.warn('loadBooking:', e.message); }
 }
 
-function updateBookingBanner() {
-  const el = document.getElementById('bk-banner-earned');
-  if (!el) return;
-  const earned = BOOKING_DATA.filter(b=>b.stage==='completed').reduce((s,b)=>s+parseFloat(b.fee_eur||0),0);
-  el.textContent = '€'+earned.toLocaleString('pt-PT',{minimumFractionDigits:0});
-  const contacts = document.getElementById('bk-banner-contacts');
-  if (contacts) contacts.textContent = BOOKING_DATA.length;
-  const conv = document.getElementById('bk-banner-conversion');
-  if (conv) {
-    const pct = BOOKING_DATA.length ? Math.round(BOOKING_DATA.filter(b=>['confirmed','completed'].includes(b.stage)).length/BOOKING_DATA.length*100) : 0;
-    conv.textContent = pct+'%';
-  }
-}
+
 
 function renderBookingList() {
   const el = document.getElementById('booking-list-body');
@@ -3601,16 +3597,7 @@ async function loadReleases() {
   catch(e) { console.warn('loadReleases:', e.message); }
 }
 
-function updateReleasesBanner() {
-  const total = document.getElementById('rel-banner-total');
-  if (total) total.textContent = RELEASES_DATA.length;
-  const released = document.getElementById('rel-banner-released');
-  if (released) released.textContent = RELEASES_DATA.filter(r=>r.stage==='released').length;
-  const ready = document.getElementById('rel-banner-ready');
-  if (ready) ready.textContent = RELEASES_DATA.filter(r=>r.stage==='scheduled'||r.stage==='submitted').length;
-  const wip = document.getElementById('rel-banner-wip');
-  if (wip) wip.textContent = RELEASES_DATA.filter(r=>!['released','scheduled','submitted'].includes(r.stage)).length;
-}
+
 
 function renderReleasesList() {
   const el = document.getElementById('releases-list');
@@ -3619,7 +3606,7 @@ function renderReleasesList() {
   el.innerHTML = RELEASES_DATA.map(r => {
     const checks = [{label:'Artwork',done:r.artwork_done},{label:'Video',done:r.video_done},{label:'Press',done:r.press_pitched},{label:'Spotify',done:r.spotify_pitched}];
     const doneCount = checks.filter(c=>c.done).length;
-    return `<div style="display:grid;grid-template-columns:8px 1fr auto;gap:12px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border1)">
+    return `<div onclick="openReleaseDrawer('${r.id}')" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" style="display:grid;grid-template-columns:8px 1fr auto;gap:12px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border1);cursor:pointer;transition:background .1s">
       <div style="width:8px;height:8px;border-radius:50%;background:${RELEASE_STAGE_COLORS[r.stage]||'var(--muted)'}"></div>
       <div>
         <div style="font-weight:700;color:var(--text);font-size:11px">${r.title} <span style="font-size:9px;color:var(--muted3);font-weight:400;text-transform:uppercase">${r.type}</span></div>
@@ -3710,46 +3697,7 @@ async function updateReleaseStage(id, stage) {
   catch(e) { showToast('Failed: '+e.message,'err'); }
 }
 
-function renderReleaseChecklist() {
-  const id = document.getElementById('rel-checklist-picker')?.value;
-  const panel = document.getElementById('rel-checklist-panel');
-  if (!panel) return;
-  if (!id) { panel.innerHTML='<div style="color:var(--muted3)">Select a release to see its checklist status.</div>'; return; }
-  const r = RELEASES_DATA.find(x=>x.id===id);
-  if (!r) { panel.innerHTML='<div style="color:var(--muted3)">Release not found.</div>'; return; }
 
-  const STAGES_ORDER = ['idea','recorded','mixed','mastered','artwork','submitted','scheduled','released'];
-  const stageIdx = STAGES_ORDER.indexOf(r.stage);
-
-  const items = [
-    { label:'Recording complete',       done: stageIdx >= STAGES_ORDER.indexOf('recorded') },
-    { label:'Mixed & mastered',         done: stageIdx >= STAGES_ORDER.indexOf('mastered') },
-    { label:'Artwork ready',            done: !!r.artwork_done },
-    { label:'Music video ready',        done: !!r.video_done },
-    { label:'Submitted to distributor', done: stageIdx >= STAGES_ORDER.indexOf('submitted') },
-    { label:'Press pitched',            done: !!r.press_pitched },
-    { label:'Spotify editorial pitched',done: !!r.spotify_pitched },
-    { label:'Release scheduled',        done: stageIdx >= STAGES_ORDER.indexOf('scheduled') },
-    { label:'Live on DSPs',             done: r.stage === 'released' },
-  ];
-
-  const done = items.filter(i=>i.done).length;
-  panel.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <div style="font-size:10px;font-weight:700;color:var(--text)">${r.title}</div>
-      <div style="font-size:9px;color:var(--muted3)">${done}/${items.length} done</div>
-    </div>
-    <div style="height:3px;background:var(--bg4);border-radius:2px;margin-bottom:8px">
-      <div style="height:100%;width:${Math.round(done/items.length*100)}%;background:var(--green3);border-radius:2px;transition:width .3s"></div>
-    </div>
-    ${items.map(item=>`
-      <div style="display:flex;align-items:center;gap:7px;padding:3px 0">
-        <div style="width:12px;height:12px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;background:${item.done?'rgba(0,230,118,.2)':'rgba(255,255,255,.05)'};color:${item.done?'var(--green3)':'var(--muted3)'}">
-          ${item.done?'✓':'○'}
-        </div>
-        <span style="font-size:9px;color:${item.done?'var(--text)':'var(--muted3)'}">${item.label}</span>
-      </div>`).join('')}`;
-}
 
 async function deleteRelease(id, title) {
   if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
@@ -3827,22 +3775,7 @@ async function loadPress() {
   catch(e) { console.warn('loadPress:', e.message); }
 }
 
-function updatePressBanner() {
-  const set = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
-  set('pr-banner-published', PRESS_DATA.filter(p=>p.stage==='published').length);
-  set('pr-banner-active',    PRESS_DATA.filter(p=>['pitched','following_up'].includes(p.stage)).length);
-  set('pr-banner-sync',      PRESS_DATA.filter(p=>p.type==='sync').length);
-  const pts = document.getElementById('pr-target');
-  if (pts) pts.textContent = PRESS_DATA.filter(p=>p.stage==='target').length;
-  const ppi = document.getElementById('pr-pitched');
-  if (ppi) ppi.textContent = PRESS_DATA.filter(p=>['pitched','following_up'].includes(p.stage)).length;
-  const pre = document.getElementById('pr-responded');
-  if (pre) pre.textContent = PRESS_DATA.filter(p=>p.stage==='responded').length;
-  const ppu = document.getElementById('pr-published');
-  if (ppu) ppu.textContent = PRESS_DATA.filter(p=>p.stage==='published').length;
-  const pv = document.getElementById('pr-value');
-  if (pv) pv.textContent = '€'+PRESS_DATA.reduce((s,p)=>s+parseFloat(p.estimated_value_eur||0),0).toLocaleString('pt-PT',{minimumFractionDigits:0});
-}
+
 
 function renderPressList() {
   const el = document.getElementById('press-list-body');
@@ -3860,16 +3793,19 @@ function renderPressList() {
       <th style="padding:6px 10px;font-weight:400"></th>
     </tr></thead>
     <tbody>
-      ${data.map(p=>`<tr style="border-bottom:1px solid var(--border1)" class="ledger-row">
+      ${data.map(p=>`<tr style="border-bottom:1px solid var(--border1);cursor:pointer;transition:background .1s" class="ledger-row" onclick="openPressDrawer('${p.id}')" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
         <td style="padding:7px 10px"><div style="font-weight:700;color:var(--text)">${p.outlet}</div><div style="font-size:9px;color:var(--muted3)">${p.contact_name||''}</div></td>
         <td style="padding:7px 10px;color:var(--muted3);text-transform:uppercase;font-size:9px">${p.type}</td>
         <td style="padding:7px 10px"><span style="color:${PRESS_STAGE_COLORS[p.stage]||'var(--muted2)'};font-weight:700;font-size:9px;text-transform:uppercase">${(p.stage||'').replace('_',' ')}</span></td>
         <td style="padding:7px 10px;color:var(--muted3);font-size:9px">${p.pitched_release||'—'}</td>
         <td style="padding:7px 10px;text-align:right;color:var(--green3)">${p.estimated_value_eur?'€'+parseFloat(p.estimated_value_eur).toLocaleString('pt-PT'):'—'}</td>
-        <td style="padding:7px 10px">
-          <select style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:2px 4px" onchange="updatePressStage('${p.id}',this.value)">
-            ${['target','pitched','following_up','responded','published','rejected'].map(s=>`<option value="${s}"${s===p.stage?' selected':''}>${s.replace('_',' ')}</option>`).join('')}
-          </select>
+        <td style="padding:7px 10px" onclick="event.stopPropagation()">
+          <div style="display:flex;gap:4px">
+            <select style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:2px 4px" onchange="updatePressStage('${p.id}',this.value)">
+              ${['target','pitched','following_up','responded','published','rejected'].map(s=>`<option value="${s}"${s===p.stage?' selected':''}>${s.replace('_',' ')}</option>`).join('')}
+            </select>
+            <button onclick="event.stopPropagation();openPressDrawer('${p.id}')" style="background:transparent;border:1px solid var(--border2);color:var(--muted3);font-size:9px;padding:2px 6px;cursor:pointer">✎</button>
+          </div>
         </td>
       </tr>`).join('')}
     </tbody></table>`;
@@ -3987,22 +3923,14 @@ async function loadSplits() {
   catch(e) { console.warn('loadSplits:', e.message); }
 }
 
-function updateSplitsBanner() {
-  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
-  set('sp-banner-total', SPLITS_DATA.length);
-  const earned=SPLITS_DATA.reduce((s,sp)=>s+parseFloat(sp.gross_eur||0),0);
-  set('sp-banner-earned','€'+earned.toLocaleString('pt-PT',{minimumFractionDigits:0}));
-  const fund=SPLITS_DATA.reduce((s,sp)=>s+parseFloat(sp.band_fund_eur||0),0);
-  set('sp-banner-fund','€'+fund.toLocaleString('pt-PT',{minimumFractionDigits:0}));
-  const fb=document.getElementById('sp-fund-total'); if(fb) fb.textContent='€'+fund.toLocaleString('pt-PT',{minimumFractionDigits:0});
-}
+
 
 function renderSplitHistory() {
   const el=document.getElementById('splits-history');
   if (!el) return;
   if (!SPLITS_DATA.length) { el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted3);font-size:10px">No splits saved yet.</div>'; return; }
-  el.innerHTML=SPLITS_DATA.map(s=>`
-    <div style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:12px;padding:9px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:10px">
+  el.innerHTML=SPLITS_DATA.map((s,i)=>`
+    <div onclick="openSplitsDrawer(${i})" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:12px;padding:9px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:10px;cursor:pointer;transition:background .1s">
       <div><div style="font-weight:700;color:var(--text)">${s.gig_name}</div><div style="font-size:9px;color:var(--muted3)">${s.gig_date||'—'} · ${s.member_count||'?'} members</div></div>
       <div style="text-align:right;color:var(--text)">€${parseFloat(s.gross_eur||0).toFixed(2)}</div>
       <div style="text-align:right;color:var(--red3)">-€${parseFloat(s.total_expenses_eur||0).toFixed(2)}</div>
@@ -4012,17 +3940,10 @@ function renderSplitHistory() {
 }
 
 // ── LOAD ALL GROWTH DATA ───────────────────────────────────────────────────
-async function loadAllGrowthData() {
-  await Promise.allSettled([
-    loadBooking(),
-    loadReleases(),
-    loadPress(),
-    loadSplits(),
-  ]);
-}
+async 
 
 // ── PRODUCTION HELPERS (stubs, real fns in production script) ──────────────
-function updateProductionBanner() {}
+
 </script>
 
 <script>
@@ -6167,7 +6088,7 @@ function initStreamChart(){
 function renderPlatforms(containerId){
   const maxR=Math.max(...PLATFORM_DATA.map(p=>p.rev));
   document.getElementById(containerId).innerHTML=PLATFORM_DATA.map(p=>`
-    <div class="platform-card">
+    <div class="platform-card" onclick="openStreamingDrawer('${p.name}')" style="cursor:pointer;transition:border-color .12s" onmouseover="this.style.outline='1px solid '+('${p.color}')" onmouseout="this.style.outline=''">
       <div class="platform-name" style="color:${p.color}">${p.name}</div>
       <div class="platform-rev">${fmtMoney(p.rev)}<span style="font-size:12px;font-weight:400;color:var(--muted3)">/mo</span></div>
       <div class="platform-streams">${p.streams.toLocaleString()} streams</div>
@@ -6200,7 +6121,7 @@ function renderLedgerRows(data,tbodyId,full=false){
         ${canEdit?`<button class="edit-btn" onclick="openEditTxn(${realIdx})">✎ Edit</button>`:''}
         ${canDel?`<button class="edit-btn del" onclick="confirmDeleteTxn(${realIdx})">✕</button>`:''}
       </td>`:'';
-    return`<tr>
+    return`<tr onclick="openTxnDrawer(${realIdx})" style="cursor:pointer" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
       <td class="date-cell">${r.date.slice(5)}</td>
       ${full?`<td class="date-cell" style="color:var(--muted);font-size:8px">${r.id}</td>`:''}
       <td class="desc-cell">${r.desc}</td>
@@ -7922,37 +7843,7 @@ function _renderUsersHtml(el, allUsers, rawInvites, roleColors, canManage){
 }
 
 // ─── RENDER: TOUR DETAIL (dynamic) ────────────────────
-function renderTourDetail(t){
-  const net=t.revenue-t.costs;
-  const margin=t.revenue>0?((net/t.revenue)*100).toFixed(1):'—';
-  const budgetPct=t.budget>0?Math.min(Math.round(t.costs/t.budget*100),999):0;
-  const statusColors={completed:'var(--green2)',active:'var(--amber2)',planned:'var(--blue2)'};
-  // Update panel header title
-  const hdr=document.querySelector('#view-tours .panel:last-child .panel-title');
-  if(hdr) hdr.innerHTML=`<div class="panel-title-dot" style="background:var(--blue2)"></div>Tour Detail — ${t.name}`;
-  const kpisEl=document.getElementById('tour-detail-kpis');
-  if(kpisEl) kpisEl.innerHTML=`
-    <div><div class="kpi-label">Net Profit</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:${net>=0?'var(--green3)':'var(--red3)'}">${net>=0?'+':''}${fmtMoney(net)}</div></div>
-    <div><div class="kpi-label">Revenue</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--white)">${fmtMoney(t.revenue)}</div></div>
-    <div><div class="kpi-label">Costs</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--red3)">${fmtMoney(t.costs)}</div></div>
-    <div><div class="kpi-label">Margin</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--amber3)">${margin}%</div></div>
-    <div><div class="kpi-label">Shows</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--text)">${t.shows}</div></div>
-    <div><div class="kpi-label">Budget Used</div><div style="font-family:var(--display);font-size:20px;font-weight:700;color:${budgetPct>85?'var(--amber3)':'var(--green3)'}">${budgetPct}%</div></div>
-  `;
-  // Re-render tour ledger filtered to this tour's tag/name
-  const tbody=document.getElementById('tour-ledger-body');
-  if(tbody){
-    const tname=t.name.toLowerCase();
-    const data=LEDGER_DATA.filter(r=>r.tags.includes('tour')||r.desc.toLowerCase().includes(t.cities?.split(',')[0]?.trim().toLowerCase()||'__none__'));
-    tbody.innerHTML=data.length?data.map(r=>`
-      <tr>
-        <td class="date-cell">${r.date}</td>
-        <td class="desc-cell">${r.desc}</td>
-        <td><span class="badge ${r.type}">${r.type.toUpperCase()}</span></td>
-        <td style="text-align:right"><span class="amount ${r.amount>0?'pos':'neg'}">${r.amount>0?'+':''}${fmtMoney(Math.abs(r.amount))}</span></td>
-      </tr>`).join(''):'<tr><td colspan="4" style="color:var(--muted3);padding:10px 8px;font-size:9px">No transactions tagged for this tour.</td></tr>';
-  }
-}
+
 // Render detail for most recent tour on load
 if(typeof TOUR_DATA!=='undefined' && TOUR_DATA.length){
   document.addEventListener('DOMContentLoaded',()=>renderTourDetail(TOUR_DATA[0], 0));
@@ -11207,83 +11098,1230 @@ function openTxnDrawer(idx) {
 }
 
 // ── TOUR DRAWER ───────────────────────────────────────────────────────────────
-function openTourDrawer(idx) {
-  const t = TOUR_DATA[idx];
-  if (!t) return;
-  const net = t.revenue - t.costs;
-  const margin = t.revenue > 0 ? ((net/t.revenue)*100).toFixed(1) : 0;
-  const statusColors = {completed:'var(--green2)',active:'var(--amber2)',planned:'var(--blue2)'};
-  const sc = statusColors[t.status] || 'var(--muted2)';
 
-  const body = `
-    <div class="drawer-stats-row">
-      <div class="drawer-stat">
-        <div class="drawer-stat-val" style="color:${net>=0?'var(--green3)':'var(--red3)'}">${net>=0?'+':''}${fmtMoney(net)}</div>
-        <div class="drawer-stat-lbl">Net Profit</div>
-      </div>
-      <div class="drawer-stat">
-        <div class="drawer-stat-val" style="color:var(--amber2)">${margin}%</div>
-        <div class="drawer-stat-lbl">Margin</div>
-      </div>
-      <div class="drawer-stat">
-        <div class="drawer-stat-val" style="color:${sc}">${t.status.toUpperCase()}</div>
-        <div class="drawer-stat-lbl">Status</div>
-      </div>
-    </div>
-    <div class="drawer-section">
-      <div class="drawer-section-label">Show Details</div>
-      <div class="drawer-info-row"><span>Name</span><span>${t.name}</span></div>
-      <div class="drawer-info-row"><span>Date</span><span>${t.start}</span></div>
-      <div class="drawer-info-row"><span>City</span><span>${t.cities}</span></div>
-      <div class="drawer-info-row"><span>Shows</span><span>${t.shows}</span></div>
-      <div class="drawer-info-row"><span>Revenue</span><span style="color:var(--green3)">${fmtMoney(t.revenue)}</span></div>
-      <div class="drawer-info-row"><span>Costs</span><span style="color:var(--red3)">${fmtMoney(t.costs)}</span></div>
-      <div class="drawer-info-row"><span>Budget</span><span>${fmtMoney(t.budget)}</span></div>
-    </div>`;
-
-  const footer = `
-    <div></div>
-    <div style="display:flex;gap:8px">
-      <button class="btn-sm" onclick="closeDrawer()">Close</button>
-      ${can('editTour') ? `<button class="login-btn" style="width:auto;padding:0 20px;font-size:10px" onclick="closeDrawer();renderTourDetail(TOUR_DATA[${idx}],${idx});switchView('tours',document.querySelector('[data-view=tours]'))">↗ Open in Tours</button>` : ''}
-    </div>`;
-
-  openDrawer('↗ ' + t.name, body, footer);
-}
 
 // ── PRESS CONTACT DRAWER ──────────────────────────────────────────────────────
+
+
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// BOOKING STATUS REPORT — PRINT / PDF
+// ══════════════════════════════════════════════════════════════════════════════
+
+function printBookingReport() {
+  const now      = new Date();
+  const dateStr  = now.toLocaleDateString('pt-PT', {day:'2-digit',month:'long',year:'numeric'});
+  const fi       = getFinancialIntelligence();
+
+  // Pipeline stats
+  const total      = BOOKING_DATA.length;
+  const active     = BOOKING_DATA.filter(b => !['rejected'].includes(b.stage));
+  const confirmed  = BOOKING_DATA.filter(b => b.stage === 'confirmed');
+  const negot      = BOOKING_DATA.filter(b => b.stage === 'negotiating');
+  const completed  = BOOKING_DATA.filter(b => b.stage === 'completed');
+  const pipeline€  = confirmed.reduce((s,b) => s + parseFloat(b.fee_eur||0), 0);
+  const earned€    = completed.reduce((s,b) => s + parseFloat(b.fee_eur||0), 0);
+  const avgFee     = completed.length ? (earned€ / completed.length) : 0;
+  const convRate   = total ? Math.round(confirmed.concat(completed).length / total * 100) : 0;
+
+  // Group by stage for sections
+  const stageOrder = ['confirmed','negotiating','contacted','cold','completed','rejected'];
+  const stageLabel = { confirmed:'CONFIRMED', negotiating:'IN NEGOTIATION', contacted:'CONTACTED', cold:'PROSPECTING', completed:'COMPLETED', rejected:'DECLINED' };
+  const stageDesc  = {
+    confirmed:   'These shows are confirmed and contracted. Advance documents should be sent immediately.',
+    negotiating: 'These venues are in active negotiation. Follow up within 7 days to close.',
+    contacted:   'Initial contact made. Awaiting response or follow-up required.',
+    cold:        'Prospective venues not yet contacted. Prioritise outreach.',
+    completed:   'Past shows successfully delivered.',
+    rejected:    'Venues that have declined or are no longer active.',
+  };
+
+  const grouped = {};
+  stageOrder.forEach(s => {
+    grouped[s] = BOOKING_DATA.filter(b => b.stage === s);
+  });
+
+  // Upcoming confirmed shows
+  const upcoming = confirmed
+    .filter(b => b.date && new Date(b.date) >= now)
+    .sort((a,b) => new Date(a.date)-new Date(b.date));
+
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Ginskeys — Booking Status Report</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: #111;
+    background: #fff;
+    line-height: 1.5;
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 60px 64px;
+    background: #0a0a0a;
+    color: #fff;
+    page-break-after: always;
+  }
+  .cover-band {
+    font-family: 'Oswald', sans-serif;
+    font-size: 64px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .cover-genre {
+    font-size: 11px;
+    letter-spacing: .3em;
+    color: #888;
+    text-transform: uppercase;
+    margin-bottom: 48px;
+  }
+  .cover-doc-type {
+    font-family: 'Oswald', sans-serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: #ff5500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    border-top: 2px solid #ff5500;
+    padding-top: 20px;
+    margin-bottom: 8px;
+  }
+  .cover-subtitle {
+    font-size: 10px;
+    color: #666;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    margin-bottom: 64px;
+  }
+  .cover-kpis {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: #222;
+    border: 1px solid #222;
+    margin-bottom: 48px;
+  }
+  .cover-kpi {
+    background: #111;
+    padding: 20px 18px;
+    text-align: center;
+  }
+  .cover-kpi-val {
+    font-family: 'Oswald', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 5px;
+  }
+  .cover-kpi-val.orange { color: #ff5500; }
+  .cover-kpi-val.green  { color: #22c55e; }
+  .cover-kpi-val.amber  { color: #f59e0b; }
+  .cover-kpi-lbl {
+    font-size: 8px;
+    color: #666;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+  }
+  .cover-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-top: 1px solid #333;
+    padding-top: 20px;
+    font-size: 9px;
+    color: #555;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .cover-footer-right {
+    text-align: right;
+    color: #444;
+  }
+  .cover-disclaimer {
+    font-size: 8px;
+    color: #444;
+    margin-top: 16px;
+    letter-spacing: .08em;
+    line-height: 1.6;
+    max-width: 480px;
+  }
+  .cover-pipeline-bar {
+    display: flex;
+    height: 8px;
+    width: 100%;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .cover-pipeline-bar div { height: 100%; }
+
+  /* ── CONTENT PAGES ── */
+  .page {
+    padding: 40px 48px;
+    min-height: 100vh;
+    position: relative;
+  }
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #111;
+  }
+  .page-band {
+    font-family: 'Oswald', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #111;
+  }
+  .page-doc {
+    font-size: 9px;
+    color: #888;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section-hdr {
+    margin: 28px 0 16px;
+    break-inside: avoid;
+  }
+  .section-stage {
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .stage-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .section-desc {
+    font-size: 9px;
+    color: #666;
+    letter-spacing: .06em;
+    max-width: 560px;
+    line-height: 1.6;
+  }
+  .section-count {
+    font-size: 9px;
+    color: #888;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-left: 8px;
+  }
+
+  /* ── BOOKING CARDS ── */
+  .booking-card {
+    border: 1px solid #ddd;
+    margin-bottom: 12px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .booking-card-hdr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    padding: 12px 16px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+    align-items: center;
+  }
+  .booking-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    color: #111;
+  }
+  .booking-type {
+    font-size: 8px;
+    color: #888;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .booking-status-badge {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .booking-card-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+  }
+  .booking-field {
+    padding: 10px 16px;
+    border-right: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+  }
+  .booking-field:last-child { border-right: none; }
+  .booking-field-lbl {
+    font-size: 8px;
+    color: #888;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .booking-field-val {
+    font-size: 11px;
+    font-weight: 600;
+    color: #111;
+  }
+  .booking-notes {
+    padding: 10px 16px;
+    font-size: 9px;
+    color: #555;
+    line-height: 1.7;
+    border-top: 1px solid #eee;
+    background: #fafafa;
+    grid-column: 1 / -1;
+  }
+  .booking-notes strong { color: #333; text-transform: uppercase; font-size: 8px; letter-spacing: .1em; }
+
+  /* ── UPCOMING SHOWS TABLE ── */
+  .upcoming-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    break-inside: avoid;
+  }
+  .upcoming-table th {
+    background: #111;
+    color: #fff;
+    padding: 8px 12px;
+    font-size: 8px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    text-align: left;
+    font-weight: 600;
+  }
+  .upcoming-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #eee;
+    font-size: 10px;
+    vertical-align: top;
+  }
+  .upcoming-table tr:nth-child(even) td { background: #f9f9f9; }
+  .upcoming-table .fee-cell { font-weight: 700; color: #166534; }
+  .upcoming-table .venue-cell { font-weight: 600; }
+
+  /* ── PIPELINE SUMMARY TABLE ── */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+  }
+  .summary-table th {
+    padding: 8px 12px;
+    font-size: 8px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    border-bottom: 2px solid #111;
+    text-align: left;
+    color: #111;
+  }
+  .summary-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    font-size: 10px;
+  }
+  .summary-table .stage-col { font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+
+  /* ── SIGNATURE BLOCK ── */
+  .sig-block {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #ccc;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+  }
+  .sig-line {
+    border-top: 1px solid #111;
+    padding-top: 6px;
+    font-size: 9px;
+    color: #666;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-top: 40px;
+  }
+
+  /* ── FOOTER ── */
+  .page-footer {
+    position: fixed;
+    bottom: 28px;
+    left: 48px;
+    right: 48px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 8px;
+    color: #aaa;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+  }
+
+  @page { margin: 14mm; size: A4; }
+  @media print {
+    .page { page-break-before: always; }
+    .page:first-child { page-break-before: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ COVER PAGE ══════════════════════════════════════ -->
+<div class="cover">
+  <div>
+    <div class="cover-band">The Ginskeys</div>
+    <div class="cover-genre">Hard Rock · Sines, Portugal · Est. 2022</div>
+  </div>
+
+  <div>
+    <div class="cover-doc-type">Booking Status Report</div>
+    <div class="cover-subtitle">Pipeline Overview &amp; Contact Status · Issued ${dateStr} · Confidential</div>
+  </div>
+
+  <!-- Pipeline colour bar -->
+  <div class="cover-pipeline-bar">
+    ${[
+      { s:'confirmed',   color:'#22c55e', pct: confirmed.length/Math.max(total,1)*100 },
+      { s:'negotiating', color:'#f59e0b', pct: negot.length/Math.max(total,1)*100 },
+      { s:'contacted',   color:'#3b82f6', pct: BOOKING_DATA.filter(b=>b.stage==='contacted').length/Math.max(total,1)*100 },
+      { s:'cold',        color:'#6b7280', pct: BOOKING_DATA.filter(b=>b.stage==='cold').length/Math.max(total,1)*100 },
+      { s:'completed',   color:'#a3e635', pct: completed.length/Math.max(total,1)*100 },
+    ].map(x => `<div style="width:${x.pct}%;background:${x.color}"></div>`).join('')}
+  </div>
+
+  <div class="cover-kpis">
+    <div class="cover-kpi">
+      <div class="cover-kpi-val">${total}</div>
+      <div class="cover-kpi-lbl">Total Contacts</div>
+    </div>
+    <div class="cover-kpi">
+      <div class="cover-kpi-val orange">${confirmed.length}</div>
+      <div class="cover-kpi-lbl">Confirmed Shows</div>
+    </div>
+    <div class="cover-kpi">
+      <div class="cover-kpi-val amber">${negot.length}</div>
+      <div class="cover-kpi-lbl">Negotiating</div>
+    </div>
+    <div class="cover-kpi">
+      <div class="cover-kpi-val green">€${pipeline€.toLocaleString('pt-PT')}</div>
+      <div class="cover-kpi-lbl">Confirmed Pipeline</div>
+    </div>
+    <div class="cover-kpi">
+      <div class="cover-kpi-val">${convRate}%</div>
+      <div class="cover-kpi-lbl">Conversion Rate</div>
+    </div>
+  </div>
+
+  <div class="cover-disclaimer">
+    This document is a confidential overview of The Ginskeys' active booking pipeline.
+    It details the current status of all venue contacts, confirmed engagements, ongoing negotiations,
+    and prospect venues. All financial figures are in euros (€). This document is prepared for
+    internal use and may be shared with booking agents, managers, and promoters under NDA.
+  </div>
+
+  <div class="cover-footer">
+    <div>
+      <div style="font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;color:#fff;letter-spacing:.1em;margin-bottom:4px">THE GINSKEYS</div>
+      <div>Hard Rock · 4 Piece · Sines, Portugal</div>
+    </div>
+    <div class="cover-footer-right">
+      <div>Booking Status Report</div>
+      <div>${dateStr}</div>
+      <div style="color:#555;margin-top:4px">Confidential · Do not distribute</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE 2: PIPELINE SUMMARY ════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-band">The Ginskeys</div>
+    <div class="page-doc">Booking Status Report · ${dateStr}</div>
+  </div>
+
+  <div style="font-family:'Oswald',sans-serif;font-size:22px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">
+    Pipeline Summary
+  </div>
+  <div style="font-size:10px;color:#555;margin-bottom:20px;max-width:520px;line-height:1.7">
+    Overview of all booking contacts by stage. Confirmed shows represent committed revenue.
+    Negotiating contacts are highest priority for immediate follow-up.
+  </div>
+
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>Stage</th>
+        <th>Count</th>
+        <th style="text-align:right">Total Fees</th>
+        <th>Key Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${stageOrder.map(s => {
+        const grp = grouped[s];
+        if (!grp.length) return '';
+        const fees = grp.reduce((sum,b) => sum + parseFloat(b.fee_eur||0), 0);
+        const actions = {
+          confirmed:   'Send advance documents & tech rider immediately',
+          negotiating: 'Follow up within 7 days — close or move to confirmed',
+          contacted:   'Check for responses; send follow-up if no reply in 14 days',
+          cold:        'Prioritise outreach — use AI Agent tab for batch pitching',
+          completed:   'Request review/testimonial; keep warm for future bookings',
+          rejected:    'Archive — revisit in 6 months with new material',
+        };
+        const stageColorMap = { confirmed:'#166534', negotiating:'#92400e', contacted:'#1e3a8a', cold:'#374151', completed:'#14532d', rejected:'#7f1d1d' };
+        const stageBgMap    = { confirmed:'#f0fdf4', negotiating:'#fffbeb', contacted:'#eff6ff', cold:'#f9fafb', completed:'#f7fee7', rejected:'#fef2f2' };
+        return `<tr>
+          <td><span class="stage-col" style="color:${stageColorMap[s]}">${stageLabel[s]}</span></td>
+          <td style="font-weight:700">${grp.length}</td>
+          <td style="text-align:right;font-weight:700;color:${fees>0?'#166534':'#666'}">${fees > 0 ? '€'+fees.toLocaleString('pt-PT') : '—'}</td>
+          <td style="font-size:9px;color:#555">${actions[s]}</td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table>
+
+  ${upcoming.length ? `
+  <div style="margin-top:36px">
+    <div style="font-family:'Oswald',sans-serif;font-size:18px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">
+      Upcoming Confirmed Shows
+    </div>
+    <table class="upcoming-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Venue / Event</th>
+          <th>Location</th>
+          <th>Contact</th>
+          <th style="text-align:right">Fee</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${upcoming.map(b => `
+        <tr>
+          <td style="white-space:nowrap">${b.date}</td>
+          <td class="venue-cell">${b.name}</td>
+          <td>${b.location||'—'}</td>
+          <td>${b.contact_name||'—'}${b.contact_email?'<br><span style="font-size:8px;color:#666">'+b.contact_email+'</span>':''}</td>
+          <td class="fee-cell" style="text-align:right">${b.fee_eur ? '€'+parseFloat(b.fee_eur).toLocaleString('pt-PT') : 'TBC'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+  ` : ''}
+</div>
+
+<!-- ══ PAGE 3+: CONTACT DETAILS BY STAGE ═══════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-band">The Ginskeys</div>
+    <div class="page-doc">Booking Status Report · ${dateStr}</div>
+  </div>
+
+  <div style="font-family:'Oswald',sans-serif;font-size:22px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">
+    Contact Details
+  </div>
+  <div style="font-size:10px;color:#555;margin-bottom:20px;line-height:1.7;max-width:520px">
+    Full contact information for all venues and promoters in the active pipeline.
+    Contacts are grouped by pipeline stage and sorted by priority.
+  </div>
+
+  ${stageOrder.filter(s => grouped[s].length > 0).map(s => {
+    const grp = grouped[s];
+    const stageColorMap = { confirmed:'#166534', negotiating:'#92400e', contacted:'#1e3a8a', cold:'#374151', completed:'#14532d', rejected:'#7f1d1d' };
+    const stageDotMap   = { confirmed:'#22c55e', negotiating:'#f59e0b', contacted:'#3b82f6', cold:'#9ca3af', completed:'#a3e635', rejected:'#f87171' };
+    const stageBadgeMap = { confirmed:'background:#f0fdf4;color:#166534;border:1px solid #bbf7d0', negotiating:'background:#fffbeb;color:#92400e;border:1px solid #fde68a', contacted:'background:#eff6ff;color:#1e3a8a;border:1px solid #bfdbfe', cold:'background:#f9fafb;color:#374151;border:1px solid #e5e7eb', completed:'background:#f7fee7;color:#14532d;border:1px solid #d9f99d', rejected:'background:#fef2f2;color:#991b1b;border:1px solid #fecaca' };
+    return `
+    <div class="section-hdr">
+      <div class="section-stage" style="color:${stageColorMap[s]}">
+        <span class="stage-dot" style="background:${stageDotMap[s]}"></span>
+        ${stageLabel[s]}
+        <span class="section-count">(${grp.length} contact${grp.length!==1?'s':''})</span>
+      </div>
+      <div class="section-desc">${stageDesc[s]}</div>
+    </div>
+    ${grp.map(b => {
+      const overdue = b.follow_up_date && new Date(b.follow_up_date) < new Date() && !['completed','rejected'].includes(b.stage);
+      return `
+      <div class="booking-card">
+        <div class="booking-card-hdr">
+          <div>
+            <div class="booking-name">${b.name}</div>
+            <div class="booking-type">${b.type||'Venue'}</div>
+          </div>
+          <div class="booking-status-badge" style="${stageBadgeMap[s]}">${stageLabel[s]}</div>
+        </div>
+        <div class="booking-card-body">
+          <div class="booking-field">
+            <div class="booking-field-lbl">Location</div>
+            <div class="booking-field-val">${b.location||'—'}</div>
+          </div>
+          <div class="booking-field">
+            <div class="booking-field-lbl">Contact Person</div>
+            <div class="booking-field-val">${b.contact_name||'—'}</div>
+          </div>
+          <div class="booking-field">
+            <div class="booking-field-lbl">Email</div>
+            <div class="booking-field-val" style="font-size:9px">${b.contact_email||'—'}</div>
+          </div>
+          <div class="booking-field">
+            <div class="booking-field-lbl">Proposed Fee</div>
+            <div class="booking-field-val" style="color:#166534;font-size:13px">${b.fee_eur ? '€'+parseFloat(b.fee_eur).toLocaleString('pt-PT') : 'TBC'}</div>
+          </div>
+          <div class="booking-field">
+            <div class="booking-field-lbl">Show Date</div>
+            <div class="booking-field-val">${b.date||'TBC'}</div>
+          </div>
+          <div class="booking-field">
+            <div class="booking-field-lbl">Follow-up</div>
+            <div class="booking-field-val" style="color:${overdue?'#dc2626':'#111'}">${b.follow_up_date||'—'}${overdue?' ⚠ OVERDUE':''}</div>
+          </div>
+          ${b.notes ? `<div class="booking-notes"><strong>Notes</strong><br>${b.notes}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('')}`;
+  }).join('')}
+
+  <!-- Signature block -->
+  <div class="sig-block">
+    <div>
+      <div class="sig-line">Artist Representative</div>
+    </div>
+    <div>
+      <div class="sig-line">Booking Manager / Agent</div>
+    </div>
+    <div>
+      <div class="sig-line">Venue / Promoter</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="page-footer">
+  <div>The Ginskeys — Booking Status Report</div>
+  <div>${dateStr} · Confidential</div>
+</div>
+
+<script>window.onload = () => { window.print(); }<\/script>
+</body></html>`);
+  w.document.close();
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PRESS DRAWER — FULL EDIT + DELETE
+// ══════════════════════════════════════════════════════════════════════════════
+
 function openPressDrawer(id) {
-  const p = PRESS_DATA.find(x => x.id === id);
+  const p = PRESS_DATA.find(x => String(x.id) === String(id));
   if (!p) return;
-  const stageColors = {pitched:'var(--amber2)',following_up:'var(--amber2)',responded:'var(--blue2)',published:'var(--green3)',rejected:'var(--red3)',passed:'var(--muted3)'};
-  const sc = stageColors[p.stage] || 'var(--muted2)';
+  const sc = PRESS_STAGE_COLORS[p.stage] || 'var(--muted2)';
+  const stageBadgeColors = { target:'#1e3a8a', pitched:'#92400e', following_up:'#92400e', responded:'#166534', published:'#14532d', rejected:'#7f1d1d' };
 
   const body = `
     <div class="drawer-stats-row">
       <div class="drawer-stat">
-        <div class="drawer-stat-val" style="color:${sc};text-transform:uppercase;font-size:13px">${p.stage}</div>
+        <div class="drawer-stat-val" style="color:${sc};font-size:12px;text-transform:uppercase">${(p.stage||'').replace('_',' ')}</div>
         <div class="drawer-stat-lbl">Stage</div>
       </div>
       <div class="drawer-stat">
-        <div class="drawer-stat-val" style="color:var(--purple2)">${(p.type||'press').toUpperCase()}</div>
+        <div class="drawer-stat-val" style="color:var(--purple2);font-size:12px">${(p.type||'press').toUpperCase()}</div>
         <div class="drawer-stat-lbl">Type</div>
       </div>
       <div class="drawer-stat">
-        <div class="drawer-stat-val" style="color:var(--muted2)">${p.pitched_release||'—'}</div>
-        <div class="drawer-stat-lbl">Release</div>
+        <div class="drawer-stat-val" style="color:${p.estimated_value_eur>0?'var(--green3)':'var(--muted2)'}">${p.estimated_value_eur ? '€'+parseFloat(p.estimated_value_eur).toLocaleString('pt-PT') : '—'}</div>
+        <div class="drawer-stat-lbl">Est. Value</div>
       </div>
     </div>
+
     <div class="drawer-section">
       <div class="drawer-section-label">Contact Details</div>
-      <div class="drawer-info-row"><span>Outlet / Name</span><span>${p.outlet||p.name||'—'}</span></div>
+      <div class="drawer-info-row"><span>Outlet</span><span style="font-weight:700">${p.outlet||'—'}</span></div>
       <div class="drawer-info-row"><span>Contact</span><span>${p.contact_name||'—'}</span></div>
       <div class="drawer-info-row"><span>Email</span><span>${p.contact_email ? `<a href="mailto:${p.contact_email}" style="color:var(--blue2);text-decoration:none">${p.contact_email}</a>` : '—'}</span></div>
       <div class="drawer-info-row"><span>Location</span><span>${p.location||'—'}</span></div>
+      <div class="drawer-info-row"><span>Release Pitched</span><span>${p.pitched_release||'—'}</span></div>
+      <div class="drawer-info-row"><span>Follow-up Date</span><span>${p.follow_up_date||'—'}</span></div>
     </div>
-    ${p.notes ? `<div class="drawer-note">${p.notes}</div>` : ''}`;
 
-  openDrawer('✉ ' + (p.outlet||p.name||'Press Contact'), body,
+    ${p.notes ? `<div class="drawer-note">${p.notes}</div>` : ''}
+
+    <div class="drawer-section">
+      <div class="drawer-section-label">Update Stage</div>
+      <div class="drawer-field">
+        <select onchange="updatePressStage('${p.id}',this.value);setTimeout(()=>openPressDrawer('${p.id}'),400)" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:7px 10px;width:100%;outline:none">
+          ${['target','pitched','following_up','responded','published','rejected'].map(s=>`<option value="${s}"${s===p.stage?' selected':''}>${s.replace('_',' ').replace(/\b\w/g,l=>l.toUpperCase())}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-label">Edit Details</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="drawer-field"><label>Contact Name</label><input id="dp-contact" value="${(p.contact_name||'').replace(/"/g,'&quot;')}"></div>
+        <div class="drawer-field"><label>Email</label><input id="dp-email" value="${(p.contact_email||'').replace(/"/g,'&quot;')}"></div>
+        <div class="drawer-field"><label>Release Pitched</label><input id="dp-release" value="${(p.pitched_release||'').replace(/"/g,'&quot;')}"></div>
+        <div class="drawer-field"><label>Follow-up Date</label><input id="dp-followup" type="date" value="${p.follow_up_date||''}"></div>
+        <div class="drawer-field"><label>Est. Value (€)</label><input id="dp-value" type="number" value="${p.estimated_value_eur||''}"></div>
+      </div>
+      <div class="drawer-field"><label>Notes</label><textarea id="dp-notes" rows="3">${p.notes||''}</textarea></div>
+    </div>`;
+
+  const footer = `
+    <button class="btn-sm" style="color:var(--red3);border-color:var(--red2)" onclick="deletePressContact('${p.id}')">✕ Delete</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn-sm" onclick="closeDrawer()">Cancel</button>
+      <button class="login-btn" style="width:auto;padding:0 20px;font-size:10px" onclick="savePressDrawer('${p.id}')">Save Changes</button>
+    </div>`;
+
+  openDrawer('✉ ' + (p.outlet||'Press Contact'), body, footer);
+}
+
+async function savePressDrawer(id) {
+  try {
+    await _apiFetch('PUT', '/press/'+id, {
+      contact_name:        document.getElementById('dp-contact')?.value,
+      contact_email:       document.getElementById('dp-email')?.value,
+      pitched_release:     document.getElementById('dp-release')?.value,
+      follow_up_date:      document.getElementById('dp-followup')?.value || null,
+      estimated_value_eur: parseFloat(document.getElementById('dp-value')?.value)||null,
+      notes:               document.getElementById('dp-notes')?.value,
+    });
+    await loadPress();
+    showToast('Contact updated', 'ok');
+    closeDrawer();
+  } catch(e) { showToast('Save failed: '+e.message, 'err'); }
+}
+
+async function deletePressContact(id) {
+  const p = PRESS_DATA.find(x => String(x.id) === String(id));
+  if (!confirm(`Delete "${p?.outlet||id}"?`)) return;
+  try {
+    await _apiFetch('DELETE', '/press/'+id);
+    await loadPress();
+    showToast('Contact deleted', 'ok');
+    closeDrawer();
+  } catch(e) { showToast('Delete failed: '+e.message, 'err'); }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SPLITS DRAWER
+// ══════════════════════════════════════════════════════════════════════════════
+
+function openSplitsDrawer(idOrIdx) {
+  const s = SPLITS_DATA.find(x => String(x.id) === String(idOrIdx)) || SPLITS_DATA[parseInt(idOrIdx)];
+  if (!s) return;
+  const net = parseFloat(s.gross_eur||0);
+  const title = s.gig_name || s.name || ('Gig #' + (SPLITS_DATA.indexOf(s)+1));
+  const fund = parseFloat(s.band_fund_eur||0);
+  const perMember = parseFloat(s.per_member_eur||0);
+  const members = s.members || [];
+
+  const body = `
+    <div class="drawer-stats-row">
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:var(--green3)">${fmtMoney(net)}</div>
+        <div class="drawer-stat-lbl">Gross Revenue</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:var(--accent)">${fmtMoney(fund)}</div>
+        <div class="drawer-stat-lbl">Band Fund</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:var(--amber2)">${fmtMoney(perMember)}</div>
+        <div class="drawer-stat-lbl">Per Member</div>
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-label">Gig Details</div>
+      <div class="drawer-info-row"><span>Event</span><span style="font-weight:700">${s.gig_name||s.name||s.id||'—'}</span></div>
+      <div class="drawer-info-row"><span>Date</span><span>${s.gig_date||s.date||'—'}</span></div>
+      <div class="drawer-info-row"><span>Gross</span><span style="color:var(--green3)">${fmtMoney(net)}</span></div>
+      <div class="drawer-info-row"><span>Band Fund (${net > 0 ? ((fund/net)*100).toFixed(0) : 0}%)</span><span style="color:var(--accent)">${fmtMoney(fund)}</span></div>
+      <div class="drawer-info-row"><span>Per Member (${members.length||4})</span><span style="color:var(--amber2)">${fmtMoney(perMember)}</span></div>
+    </div>
+
+    ${members.length ? `
+    <div class="drawer-section">
+      <div class="drawer-section-label">Member Breakdown</div>
+      ${members.map(m => `
+        <div class="drawer-info-row">
+          <span style="font-weight:700">${m.name||m}</span>
+          <span style="color:var(--green3);font-weight:700">${fmtMoney(m.amount||perMember)}</span>
+        </div>`).join('')}
+    </div>` : ''}`;
+
+  openDrawer('÷ ' + title, body,
     `<div></div><button class="btn-sm" onclick="closeDrawer()">Close</button>`);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// STREAMING DRAWER
+// ══════════════════════════════════════════════════════════════════════════════
+
+function openStreamingDrawer(platform) {
+  const p = PLATFORM_DATA.find(x => x.name === platform);
+  if (!p) return;
+  const totalStreams = PLATFORM_DATA.reduce((s,x) => s+x.streams, 0);
+  const share = totalStreams > 0 ? ((p.streams/totalStreams)*100).toFixed(1) : 0;
+  const annualRev = (p.rev * 12).toFixed(2);
+
+  const body = `
+    <div class="drawer-stats-row">
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:${p.color||'var(--purple2)'}">${p.streams.toLocaleString()}</div>
+        <div class="drawer-stat-lbl">Total Streams</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:${p.rev>0?'var(--green3)':'var(--muted3)'}">${fmtMoney(p.rev)}</div>
+        <div class="drawer-stat-lbl">Monthly Revenue</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-val" style="color:var(--amber2)">${share}%</div>
+        <div class="drawer-stat-lbl">Stream Share</div>
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-label">Platform Analytics</div>
+      <div class="drawer-info-row"><span>Platform</span><span style="font-weight:700;color:${p.color}">${p.name}</span></div>
+      <div class="drawer-info-row"><span>Total Streams</span><span>${p.streams.toLocaleString()}</span></div>
+      <div class="drawer-info-row"><span>Monthly Revenue</span><span style="color:var(--green3)">${fmtMoney(p.rev)}</span></div>
+      <div class="drawer-info-row"><span>Annual Revenue (est.)</span><span style="color:var(--green3)">${fmtMoney(parseFloat(annualRev))}</span></div>
+      <div class="drawer-info-row"><span>Share of Total Streams</span><span>${share}%</span></div>
+      <div class="drawer-info-row"><span>Per-stream Rate (est.)</span><span style="color:var(--muted3)">${p.streams > 0 ? '€'+(p.rev*12/p.streams*1000).toFixed(3)+'/1k' : '—'}</span></div>
+      ${p.change !== undefined ? `<div class="drawer-info-row"><span>MoM Change</span><span style="color:${p.change>=0?'var(--green3)':'var(--red3)'}">${p.change>=0?'+':''}${p.change}%</span></div>` : ''}
+    </div>
+
+    <div class="drawer-note">
+      ${p.streams < 1000 ? `⚠ ${p.name} is underperforming. Ensure all releases are properly distributed and metadata is complete.` :
+        p.streams < 5000 ? `▲ Growing on ${p.name}. Consistent releases every 6–8 weeks will compound this.` :
+        `✓ Strong presence on ${p.name}. Focus on playlist pitching to break the next threshold.`}
+    </div>`;
+
+  openDrawer('▶ ' + p.name, body, `<div></div><button class="btn-sm" onclick="closeDrawer()">Close</button>`);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PROFESSIONAL REPORTS
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Shared print utilities ────────────────────────────────────────────────────
+function _reportHead(title, subtitle) {
+  const d = new Date().toLocaleDateString('en-GB', {day:'2-digit',month:'long',year:'numeric'});
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<title>The Ginskeys — ${title}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#111;background:#fff;line-height:1.5}
+.page{padding:36px 48px;min-height:100vh}
+.page+.page{page-break-before:always}
+.doc-header{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:14px;border-bottom:2px solid #111;margin-bottom:24px}
+.doc-band{font-family:'Oswald',sans-serif;font-size:24px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.doc-meta{text-align:right;font-size:9px;color:#666;letter-spacing:.1em;text-transform:uppercase;line-height:1.8}
+.doc-title{font-family:'Oswald',sans-serif;font-size:18px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:#111}
+.doc-subtitle{font-size:9px;color:#666;letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px}
+.section{margin-bottom:24px;page-break-inside:avoid}
+.section-title{font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid #ddd;padding-bottom:6px;margin-bottom:12px}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:1px;background:#ddd;border:1px solid #ddd;margin-bottom:20px}
+.kpi{background:#fff;padding:12px 14px;text-align:center}
+.kpi-val{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;margin-bottom:3px}
+.kpi-lbl{font-size:8px;color:#888;letter-spacing:.15em;text-transform:uppercase}
+.kpi-val.g{color:#166534}.kpi-val.r{color:#991b1b}.kpi-val.a{color:#92400e}.kpi-val.b{color:#1e3a8a}.kpi-val.p{color:#5b21b6}
+table{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:12px}
+th{background:#111;color:#fff;padding:7px 10px;font-size:8px;letter-spacing:.14em;text-transform:uppercase;text-align:left;font-weight:600}
+td{padding:8px 10px;border-bottom:1px solid #eee;vertical-align:top}
+tr:nth-child(even) td{background:#f9f9f9}
+.badge{display:inline-block;padding:2px 8px;border-radius:2px;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.badge-g{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+.badge-a{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+.badge-b{background:#eff6ff;color:#1e3a8a;border:1px solid #bfdbfe}
+.badge-r{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.badge-grey{background:#f9fafb;color:#374151;border:1px solid #e5e7eb}
+.bar-wrap{height:6px;background:#f3f4f6;border-radius:3px;overflow:hidden;margin-top:4px}
+.bar{height:100%;border-radius:3px}
+.note{padding:10px 14px;background:#f9fafb;border-left:3px solid #374151;font-size:9px;color:#555;line-height:1.7;margin:12px 0}
+.footer{margin-top:40px;padding-top:12px;border-top:1px solid #ddd;display:flex;justify-content:space-between;font-size:8px;color:#aaa;letter-spacing:.1em;text-transform:uppercase}
+@page{margin:14mm;size:A4}
+@media print{.page+.page{page-break-before:always}}
+</style></head><body>`;
+}
+
+function _reportFoot() {
+  const d = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  return `<script>window.onload=()=>window.print()<\/script></body></html>`;
+}
+
+function _openReport(html) {
+  const w = window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+}
+
+// ── TOURS / LIVE PERFORMANCE REPORT ──────────────────────────────────────────
+function printToursReport() {
+  const fi  = getFinancialIntelligence();
+  const d   = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  const totalRev   = TOUR_DATA.reduce((s,t)=>s+t.revenue,0);
+  const totalCosts = TOUR_DATA.reduce((s,t)=>s+t.costs,0);
+  const totalNet   = totalRev - totalCosts;
+  const avgMargin  = totalRev > 0 ? ((totalNet/totalRev)*100).toFixed(1) : 0;
+  const avgFee     = TOUR_DATA.length ? (totalRev/TOUR_DATA.length).toFixed(0) : 0;
+  const now = new Date();
+  const upcoming = TOUR_DATA.filter(t => new Date(t.start) >= now).sort((a,b)=>new Date(a.start)-new Date(b.start));
+  const past = TOUR_DATA.filter(t => new Date(t.start) < now).sort((a,b)=>new Date(b.start)-new Date(a.start));
+  const maxRev = Math.max(...TOUR_DATA.map(t=>t.revenue),1);
+
+  let html = _reportHead('Live Performance Report','');
+  html += `<div class="page">
+  <div class="doc-header">
+    <div>
+      <div class="doc-band">The Ginskeys</div>
+      <div style="font-size:9px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:3px">Hard Rock · Sines, Portugal</div>
+    </div>
+    <div class="doc-meta"><div style="font-size:14px;font-family:'Oswald',sans-serif;color:#111">Live Performance Report</div><div>${d}</div><div>Confidential</div></div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val">${TOUR_DATA.length}</div><div class="kpi-lbl">Total Shows</div></div>
+    <div class="kpi"><div class="kpi-val g">€${totalRev.toLocaleString('pt-PT')}</div><div class="kpi-lbl">Total Revenue</div></div>
+    <div class="kpi"><div class="kpi-val r">€${totalCosts.toLocaleString('pt-PT')}</div><div class="kpi-lbl">Total Costs</div></div>
+    <div class="kpi"><div class="kpi-val ${totalNet>=0?'g':'r'}">€${totalNet.toLocaleString('pt-PT')}</div><div class="kpi-lbl">Net Profit</div></div>
+    <div class="kpi"><div class="kpi-val a">${avgMargin}%</div><div class="kpi-lbl">Avg Margin</div></div>
+    <div class="kpi"><div class="kpi-val">€${parseInt(avgFee).toLocaleString('pt-PT')}</div><div class="kpi-lbl">Avg Fee</div></div>
+  </div>
+
+  ${upcoming.length ? `<div class="section">
+    <div class="section-title">Upcoming Shows (${upcoming.length})</div>
+    <table><thead><tr><th>Date</th><th>Venue / Event</th><th>City</th><th style="text-align:right">Fee</th><th>Status</th></tr></thead><tbody>
+    ${upcoming.map(t=>`<tr><td style="white-space:nowrap">${t.start}</td><td style="font-weight:700">${t.name}</td><td>${t.cities}</td><td style="text-align:right;color:#166534;font-weight:700">€${t.revenue.toLocaleString('pt-PT')}</td><td><span class="badge ${t.status==='confirmed'?'badge-g':t.status==='active'?'badge-a':'badge-b'}">${t.status}</span></td></tr>`).join('')}
+    </tbody></table>
+  </div>` : ''}
+
+  <div class="section">
+    <div class="section-title">Performance History</div>
+    <table><thead><tr><th>Date</th><th>Venue / Event</th><th>City</th><th style="text-align:right">Revenue</th><th style="text-align:right">Costs</th><th style="text-align:right">Net</th><th style="text-align:right">Margin</th></tr></thead><tbody>
+    ${[...TOUR_DATA].sort((a,b)=>new Date(b.start)-new Date(a.start)).map(t=>{
+      const n=t.revenue-t.costs; const m=t.revenue>0?((n/t.revenue)*100).toFixed(0):0;
+      return `<tr><td>${t.start}</td><td style="font-weight:700">${t.name}</td><td>${t.cities}</td><td style="text-align:right;color:#166534">€${t.revenue.toLocaleString('pt-PT')}</td><td style="text-align:right;color:#991b1b">€${t.costs.toLocaleString('pt-PT')}</td><td style="text-align:right;font-weight:700;color:${n>=0?'#166534':'#991b1b'}">€${n.toLocaleString('pt-PT')}</td><td style="text-align:right">${m}%</td></tr>`;
+    }).join('')}
+    </tbody></table>
+  </div>
+
+  <div class="note">
+    This report reflects all live show activity recorded in the The Ginskeys management system.
+    Revenue figures represent confirmed booking fees. Margins above 70% indicate efficient show execution.
+    ${avgMargin < 60 ? 'Current margins below 60% — review transport and production cost structure.' : 'Margin profile is healthy. Focus on increasing average fee through venue tier progression.'}
+  </div>
+  <div class="footer"><div>The Ginskeys — Live Performance Report</div><div>${d} · Confidential</div></div>
+</div>`;
+  html += _reportFoot();
+  _openReport(html);
+}
+
+// ── LEDGER / FINANCIAL STATEMENT REPORT ──────────────────────────────────────
+function printLedgerReport() {
+  const fi = getFinancialIntelligence();
+  const d  = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  const sorted = [...LEDGER_DATA].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const income  = sorted.filter(e=>e.amount>0);
+  const expense = sorted.filter(e=>e.amount<0);
+  const totalIn = income.reduce((s,e)=>s+e.amount,0);
+  const totalEx = Math.abs(expense.reduce((s,e)=>s+e.amount,0));
+  const net = totalIn - totalEx;
+  const balance = sorted.length ? sorted[0].balance : 0;
+
+  // By category
+  const byCat = {};
+  sorted.forEach(e=>{byCat[e.cat]=(byCat[e.cat]||{in:0,out:0});if(e.amount>0)byCat[e.cat].in+=e.amount;else byCat[e.cat].out+=Math.abs(e.amount);});
+
+  let html = _reportHead('Financial Statement','');
+  html += `<div class="page">
+  <div class="doc-header">
+    <div><div class="doc-band">The Ginskeys</div><div style="font-size:9px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:3px">Financial Statement · All Time</div></div>
+    <div class="doc-meta"><div style="font-size:14px;font-family:'Oswald',sans-serif;color:#111">General Ledger</div><div>${d}</div><div>Confidential</div></div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val g">€${totalIn.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Total Income</div></div>
+    <div class="kpi"><div class="kpi-val r">€${totalEx.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Total Expenses</div></div>
+    <div class="kpi"><div class="kpi-val ${net>=0?'g':'r'}">€${net.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Net</div></div>
+    <div class="kpi"><div class="kpi-val">${totalIn>0?((net/totalIn)*100).toFixed(1):0}%</div><div class="kpi-lbl">Net Margin</div></div>
+    <div class="kpi"><div class="kpi-val b">€${balance.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Current Balance</div></div>
+    <div class="kpi"><div class="kpi-val">${sorted.length}</div><div class="kpi-lbl">Transactions</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Revenue & Expense by Category</div>
+    <table><thead><tr><th>Category</th><th style="text-align:right">Income</th><th style="text-align:right">Expenses</th><th style="text-align:right">Net</th></tr></thead><tbody>
+    ${Object.entries(byCat).sort((a,b)=>b[1].in-a[1].in).map(([cat,v])=>{const n=v.in-v.out;return`<tr><td style="font-weight:700">${cat}</td><td style="text-align:right;color:#166534">${v.in>0?'€'+v.in.toLocaleString('pt-PT',{minimumFractionDigits:2}):'—'}</td><td style="text-align:right;color:#991b1b">${v.out>0?'€'+v.out.toLocaleString('pt-PT',{minimumFractionDigits:2}):'—'}</td><td style="text-align:right;font-weight:700;color:${n>=0?'#166534':'#991b1b'}">€${n.toLocaleString('pt-PT',{minimumFractionDigits:2})}</td></tr>`;}).join('')}
+    </tbody></table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">All Transactions (${sorted.length})</div>
+    <table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th style="text-align:right">Amount</th><th style="text-align:right">Balance</th></tr></thead><tbody>
+    ${sorted.map(e=>`<tr><td style="white-space:nowrap;color:#666">${e.date?.slice(0,10)||'—'}</td><td style="font-weight:600">${e.desc}</td><td style="color:#666;font-size:9px">${e.cat}</td><td><span class="badge ${e.type==='income'?'badge-g':'badge-r'}">${e.type}</span></td><td style="text-align:right;font-weight:700;color:${e.amount>0?'#166534':'#991b1b'}">${e.amount>0?'+':''}€${Math.abs(e.amount).toLocaleString('pt-PT',{minimumFractionDigits:2})}</td><td style="text-align:right;color:#666">€${(e.balance||0).toLocaleString('pt-PT',{minimumFractionDigits:2})}</td></tr>`).join('')}
+    </tbody></table>
+  </div>
+  <div class="footer"><div>The Ginskeys — Financial Statement</div><div>${d} · Confidential</div></div>
+</div>`;
+  html += _reportFoot();
+  _openReport(html);
+}
+
+// ── PRESS & MEDIA REPORT ─────────────────────────────────────────────────────
+function printPressReport() {
+  const d = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  const published = PRESS_DATA.filter(p=>p.stage==='published');
+  const active    = PRESS_DATA.filter(p=>!['published','rejected','passed'].includes(p.stage));
+  const totalVal  = PRESS_DATA.reduce((s,p)=>s+parseFloat(p.estimated_value_eur||0),0);
+  const byType    = {};
+  PRESS_DATA.forEach(p=>{byType[p.type]=(byType[p.type]||[]);byType[p.type].push(p);});
+  const stageOrder = ['published','responded','following_up','pitched','target','rejected'];
+  const stageLbl   = {published:'Published',responded:'Responded',following_up:'Following Up',pitched:'Pitched',target:'Target',rejected:'Declined'};
+
+  let html = _reportHead('Press & Media Report','');
+  html += `<div class="page">
+  <div class="doc-header">
+    <div><div class="doc-band">The Ginskeys</div><div style="font-size:9px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:3px">Press & Media Pipeline</div></div>
+    <div class="doc-meta"><div style="font-size:14px;font-family:'Oswald',sans-serif;color:#111">Media Status Report</div><div>${d}</div><div>Confidential</div></div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val">${PRESS_DATA.length}</div><div class="kpi-lbl">Total Contacts</div></div>
+    <div class="kpi"><div class="kpi-val g">${published.length}</div><div class="kpi-lbl">Published</div></div>
+    <div class="kpi"><div class="kpi-val a">${active.length}</div><div class="kpi-lbl">Active Pipeline</div></div>
+    <div class="kpi"><div class="kpi-val b">${PRESS_DATA.filter(p=>p.type==='sync').length}</div><div class="kpi-lbl">Sync Opportunities</div></div>
+    <div class="kpi"><div class="kpi-val p">€${totalVal.toLocaleString('pt-PT')}</div><div class="kpi-lbl">Est. Pipeline Value</div></div>
+  </div>
+
+  ${stageOrder.filter(s=>PRESS_DATA.some(p=>p.stage===s)).map(stage=>{
+    const grp = PRESS_DATA.filter(p=>p.stage===stage);
+    const stCls = {published:'badge-g',responded:'badge-b',following_up:'badge-a',pitched:'badge-a',target:'badge-grey',rejected:'badge-r'};
+    return `<div class="section">
+      <div class="section-title">${stageLbl[stage]} <span style="font-size:11px;color:#888">(${grp.length})</span></div>
+      <table><thead><tr><th>Outlet</th><th>Type</th><th>Contact</th><th>Release Pitched</th><th>Follow-up</th><th style="text-align:right">Est. Value</th></tr></thead><tbody>
+      ${grp.map(p=>`<tr><td style="font-weight:700">${p.outlet||'—'}</td><td><span class="badge ${stCls[stage]||'badge-grey'}">${p.type||'press'}</span></td><td>${p.contact_name||'—'}${p.contact_email?'<br><span style="font-size:8px;color:#888">'+p.contact_email+'</span>':''}</td><td style="color:#666">${p.pitched_release||'—'}</td><td style="color:#666">${p.follow_up_date||'—'}</td><td style="text-align:right;color:#166534;font-weight:700">${p.estimated_value_eur?'€'+parseFloat(p.estimated_value_eur).toLocaleString('pt-PT'):'—'}</td></tr>`).join('')}
+      </tbody></table>
+    </div>`;
+  }).join('')}
+  <div class="footer"><div>The Ginskeys — Press & Media Report</div><div>${d} · Confidential</div></div>
+</div>`;
+  html += _reportFoot();
+  _openReport(html);
+}
+
+// ── RELEASES REPORT ───────────────────────────────────────────────────────────
+function printReleasesReport() {
+  const d = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  const released = RELEASES_DATA.filter(r=>r.stage==='released');
+  const inPipeline = RELEASES_DATA.filter(r=>r.stage!=='released'&&r.stage!=='idea');
+  const stageOrder = ['released','scheduled','submitted','artwork','mastered','mixed','recorded','idea'];
+  const stageLbl = {released:'Released',scheduled:'Scheduled',submitted:'Submitted to DSPs',artwork:'Artwork Phase',mastered:'Mastered',mixed:'Mixed',recorded:'Recorded',idea:'Concept/Idea'};
+
+  let html = _reportHead('Release Pipeline Report','');
+  html += `<div class="page">
+  <div class="doc-header">
+    <div><div class="doc-band">The Ginskeys</div><div style="font-size:9px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:3px">Release Pipeline & Catalog</div></div>
+    <div class="doc-meta"><div style="font-size:14px;font-family:'Oswald',sans-serif;color:#111">Release Status Report</div><div>${d}</div><div>Confidential</div></div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val">${RELEASES_DATA.length}</div><div class="kpi-lbl">Total Releases</div></div>
+    <div class="kpi"><div class="kpi-val g">${released.length}</div><div class="kpi-lbl">Live on DSPs</div></div>
+    <div class="kpi"><div class="kpi-val a">${inPipeline.length}</div><div class="kpi-lbl">In Pipeline</div></div>
+    <div class="kpi"><div class="kpi-val b">${RELEASES_DATA.filter(r=>r.type==='single').length}</div><div class="kpi-lbl">Singles</div></div>
+    <div class="kpi"><div class="kpi-val p">${RELEASES_DATA.filter(r=>r.type==='album'||r.type==='EP').length}</div><div class="kpi-lbl">Albums / EPs</div></div>
+  </div>
+
+  ${stageOrder.filter(s=>RELEASES_DATA.some(r=>r.stage===s)).map(stage=>{
+    const grp = RELEASES_DATA.filter(r=>r.stage===stage);
+    const stCls = {released:'badge-g',scheduled:'badge-b',submitted:'badge-b',artwork:'badge-a',mastered:'badge-a',mixed:'badge-grey',recorded:'badge-grey',idea:'badge-grey'};
+    const checks = r => [
+      r.artwork_done?'Artwork ✓':'Artwork ✗',
+      r.video_done?'Video ✓':'Video ✗',
+      r.press_pitched?'Press ✓':'Press ✗',
+      r.spotify_pitched?'Spotify ✓':'Spotify ✗'
+    ].join(' · ');
+    return `<div class="section">
+      <div class="section-title">${stageLbl[stage]} <span style="font-size:11px;color:#888">(${grp.length})</span></div>
+      <table><thead><tr><th>Title</th><th>Type</th><th>Release Date</th><th>Checklist</th>${stage!=='idea'?'<th>Notes</th>':''}</tr></thead><tbody>
+      ${grp.map(r=>`<tr><td style="font-weight:700">${r.title}</td><td><span class="badge ${stCls[stage]||'badge-grey'}">${r.type}</span></td><td>${r.release_date||'TBC'}</td><td style="font-size:9px;color:#666">${checks(r)}</td>${stage!=='idea'?`<td style="font-size:9px;color:#666">${r.notes||'—'}</td>`:''}</tr>`).join('')}
+      </tbody></table>
+    </div>`;
+  }).join('')}
+  <div class="footer"><div>The Ginskeys — Release Pipeline Report</div><div>${d} · Confidential</div></div>
+</div>`;
+  html += _reportFoot();
+  _openReport(html);
+}
+
+// ── SPLITS / FINANCIAL DISTRIBUTION REPORT ────────────────────────────────────
+function printSplitsReport() {
+  const d = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  const totalGross = SPLITS_DATA.reduce((s,sp)=>s+parseFloat(sp.gross_eur||0),0);
+  const totalFund  = SPLITS_DATA.reduce((s,sp)=>s+parseFloat(sp.band_fund_eur||0),0);
+  const totalPaid  = SPLITS_DATA.reduce((s,sp)=>s+parseFloat(sp.per_member_eur||0)*(sp.members?.length||4),0);
+
+  let html = _reportHead('Revenue Distribution Report','');
+  html += `<div class="page">
+  <div class="doc-header">
+    <div><div class="doc-band">The Ginskeys</div><div style="font-size:9px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:3px">Revenue Distribution & Member Earnings</div></div>
+    <div class="doc-meta"><div style="font-size:14px;font-family:'Oswald',sans-serif;color:#111">Splits Report</div><div>${d}</div><div>Confidential</div></div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val">${SPLITS_DATA.length}</div><div class="kpi-lbl">Gigs Recorded</div></div>
+    <div class="kpi"><div class="kpi-val g">€${totalGross.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Total Gross</div></div>
+    <div class="kpi"><div class="kpi-val a">€${totalFund.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Band Fund Total</div></div>
+    <div class="kpi"><div class="kpi-val b">€${totalPaid.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Members Paid Out</div></div>
+    <div class="kpi"><div class="kpi-val">${totalGross>0?((totalFund/totalGross)*100).toFixed(0):0}%</div><div class="kpi-lbl">Fund Rate</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Gig-by-Gig Breakdown</div>
+    <table><thead><tr><th>Event</th><th>Date</th><th style="text-align:right">Gross</th><th style="text-align:right">Band Fund</th><th style="text-align:right">Per Member</th><th>Members</th></tr></thead><tbody>
+    ${SPLITS_DATA.map(sp=>`<tr><td style="font-weight:700">${sp.name||sp.id||'—'}</td><td>${sp.date||'—'}</td><td style="text-align:right;color:#166534">€${parseFloat(sp.gross_eur||0).toLocaleString('pt-PT',{minimumFractionDigits:2})}</td><td style="text-align:right;color:#92400e">€${parseFloat(sp.band_fund_eur||0).toLocaleString('pt-PT',{minimumFractionDigits:2})}</td><td style="text-align:right;color:#1e3a8a;font-weight:700">€${parseFloat(sp.per_member_eur||0).toLocaleString('pt-PT',{minimumFractionDigits:2})}</td><td style="font-size:9px;color:#666">${sp.members?.map(m=>m.name||m).join(', ')||'All members'}</td></tr>`).join('')}
+    </tbody></table>
+  </div>
+  <div class="footer"><div>The Ginskeys — Revenue Distribution Report</div><div>${d} · Confidential</div></div>
+</div>`;
+  html += _reportFoot();
+  _openReport(html);
+}
+
+// ── STREAMING REPORT ──────────────────────────────────────────────────────────
+function printStreamingReport() {
+  const d = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  const totalStreams = PLATFORM_DATA.reduce((s,p)=>s+p.streams,0);
+  const totalRev    = PLATFORM_DATA.reduce((s,p)=>s+p.rev,0);
+  const annualEst   = totalRev * 12;
+
+  let html = _reportHead('Streaming Performance Report','');
+  html += `<div class="page">
+  <div class="doc-header">
+    <div><div class="doc-band">The Ginskeys</div><div style="font-size:9px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:3px">Digital Distribution Performance</div></div>
+    <div class="doc-meta"><div style="font-size:14px;font-family:'Oswald',sans-serif;color:#111">Streaming Report</div><div>${d}</div><div>Confidential</div></div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val p">${totalStreams.toLocaleString()}</div><div class="kpi-lbl">Total Streams</div></div>
+    <div class="kpi"><div class="kpi-val g">€${totalRev.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Monthly Revenue</div></div>
+    <div class="kpi"><div class="kpi-val a">€${annualEst.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Annual Estimate</div></div>
+    <div class="kpi"><div class="kpi-val">${PLATFORM_DATA.filter(p=>p.streams>0).length}</div><div class="kpi-lbl">Active Platforms</div></div>
+    <div class="kpi"><div class="kpi-val b">${totalStreams>0?'€'+(totalRev*1000/totalStreams).toFixed(3):'—'}</div><div class="kpi-lbl">€/1k Streams</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Platform Breakdown</div>
+    <table><thead><tr><th>Platform</th><th style="text-align:right">Streams</th><th style="text-align:right">Share</th><th style="text-align:right">Monthly Rev</th><th style="text-align:right">Annual Est.</th><th style="text-align:right">€/1k streams</th></tr></thead><tbody>
+    ${[...PLATFORM_DATA].sort((a,b)=>b.streams-a.streams).map(p=>{
+      const share=totalStreams>0?((p.streams/totalStreams)*100).toFixed(1):0;
+      const perK=p.streams>0?(p.rev*1000/p.streams).toFixed(3):'—';
+      return `<tr><td style="font-weight:700;color:${p.color||'#111'}">${p.name}</td><td style="text-align:right">${p.streams.toLocaleString()}</td><td style="text-align:right">${share}%<div class="bar-wrap"><div class="bar" style="width:${share}%;background:${p.color||'#888'}"></div></div></td><td style="text-align:right;color:#166534">€${p.rev.toLocaleString('pt-PT',{minimumFractionDigits:2})}</td><td style="text-align:right">€${(p.rev*12).toLocaleString('pt-PT',{minimumFractionDigits:2})}</td><td style="text-align:right;color:#666">€${perK}</td></tr>`;
+    }).join('')}
+    </tbody></table>
+  </div>
+
+  <div class="note">
+    Streaming revenue should scale with consistent release cadence. Industry benchmark for emerging artists:
+    10,000 streams/month generates approximately €30–€50/month. Priority action: release a new single within
+    60 days and pitch to Spotify Editorial playlists via the distributor dashboard.
+  </div>
+  <div class="footer"><div>The Ginskeys — Streaming Performance Report</div><div>${d} · Confidential</div></div>
+</div>`;
+  html += _reportFoot();
+  _openReport(html);
+}
+
+// ── FINANCIALS REPORT ─────────────────────────────────────────────────────────
+function printFinancialsReport() {
+  const fi = getFinancialIntelligence();
+  const d  = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  const entries = [...LEDGER_DATA].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const balance = entries.length ? entries[entries.length-1].balance : 0;
+
+  let html = _reportHead('Financial Overview','');
+  html += `<div class="page">
+  <div class="doc-header">
+    <div><div class="doc-band">The Ginskeys</div><div style="font-size:9px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:3px">Financial Overview & Projections</div></div>
+    <div class="doc-meta"><div style="font-size:14px;font-family:'Oswald',sans-serif;color:#111">Financials Report</div><div>${d}</div><div>Confidential</div></div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val g">€${balance.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Band Fund</div></div>
+    <div class="kpi"><div class="kpi-val b">€${fi.totalRevenue.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Total Revenue</div></div>
+    <div class="kpi"><div class="kpi-val a">€${fi.ytdRevenue.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">YTD Revenue</div></div>
+    <div class="kpi"><div class="kpi-val r">€${fi.ytdExpenses.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">YTD Expenses</div></div>
+    <div class="kpi"><div class="kpi-val ${fi.netPosition>=0?'g':'r'}">€${fi.netPosition.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Net Position</div></div>
+    <div class="kpi"><div class="kpi-val">${fi.runwayMonths===Infinity?'∞':fi.runwayMonths.toFixed(1)+' mo'}</div><div class="kpi-lbl">Cash Runway</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Revenue by Year</div>
+    <table><thead><tr><th>Year</th><th style="text-align:right">Revenue</th><th style="text-align:right">Expenses</th><th style="text-align:right">Net</th><th style="text-align:right">YoY Growth</th></tr></thead><tbody>
+    ${fi.years.map((yr,i)=>{
+      const rev=fi.revByYear[yr]||0; const exp=fi.expByYear?fi.expByYear[yr]||0:0; const net=rev-exp;
+      const prev=i>0?fi.revByYear[fi.years[i-1]]||0:0;
+      const yoy=prev>0?((rev-prev)/prev*100).toFixed(1):null;
+      return `<tr><td style="font-weight:700">${yr}</td><td style="text-align:right;color:#166534">€${rev.toLocaleString('pt-PT',{minimumFractionDigits:2})}</td><td style="text-align:right;color:#991b1b">€${exp.toLocaleString('pt-PT',{minimumFractionDigits:2})}</td><td style="text-align:right;font-weight:700;color:${net>=0?'#166534':'#991b1b'}">€${net.toLocaleString('pt-PT',{minimumFractionDigits:2})}</td><td style="text-align:right;color:${yoy&&yoy>0?'#166534':'#991b1b'}">${yoy?yoy+'%':'—'}</td></tr>`;
+    }).join('')}
+    </tbody></table>
+  </div>
+
+  <div class="note">
+    This financial statement reflects all recorded transactions in the The Ginskeys management system.
+    Band fund represents liquid cash available for operations and investment.
+    ${fi.runwayMonths < 6 ? '⚠ Cash runway below 6 months. Prioritise booking confirmations immediately.' :
+      fi.runwayMonths < 12 ? 'Runway is healthy but should be extended. Aim for 12+ months of operational reserve.' :
+      '✓ Financial position is healthy. Consider investing in recording or promotion.'}
+  </div>
+  <div class="footer"><div>The Ginskeys — Financial Report</div><div>${d} · Confidential</div></div>
+</div>`;
+  html += _reportFoot();
+  _openReport(html);
 }
 
 </script>
