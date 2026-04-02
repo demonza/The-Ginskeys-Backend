@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADzElEQVR4nO2WS09bRxTHf+NrG9tYrgteGCyKCEhESCzSRkipcL1IgRWLhofKApDIB2gU0hVdELEEwQdgRUpTIkTDAnAlCoHSesW+AoQRogRkLLB5XGPD3OmCxMGQtBQWqBVHGl3NmXvO+c95jgAU10im6zR+A+AGwA2AKwEQQiCEuDIAwRUbkclkQimFUpdTc2kP5Obm4na7MQzj0sYBzKc3Qgg0TUvvDcPIODMMA03TMAyDgoICSkpKWF1dJRwOs729jaZpKKUQQqCUQkqJEAKT6d09pZTnQKjLLqfTqQKBgHK73e89F0L8ow7x5keUUvh8Ph49+ga73Y7NZufFiyGE0MjKsuLz+RgdHaW2tpZwOEx5eTk2m43Z2Vncbjdzc3PU1dWRSqUoKipia2uL/v5+LBYLgUAAj8eDEIKRkRFSqVTaS2Y4SSQpJbduFfHkybcsLPyBplmYnp7i/v0v2dnZoa6ujs3NTerr64nHY9y79znBYJDFxUUaGxtpaGggFotRU1PDyMgIpaWldHZ2kkolefy4nZWVFV6+/AkpJSaTKSO8StM0Bajq6mr1+vWfGS4aGvpRtbe3q6WlRdXd3a0GBwfV8PCw6unpVoDy+XxqY2NDDQ0NKUCFQqG07Pz8vOrp6VbPn/+gHjz4SgHKYrFk6M+oAovFgmEYuN1umpqauH27lETiEJvNxt7ePnfvfobH4yESidDW9pBwOMzTp514vV4mJycByMnJYWZmBq/XS+j33wiFQsTjcZ49+5719XX8fj9AOtkzAJhMJ80lFovR1PQ1ra2txONxXC4Xy8vL6LqO3++nt7eXgoJPmJiY4M6dT1lYWKClpQWr1Yqu6wwODhKLxXA6neTkfExHx3eUlZWxtLRIfn5eRgVkAEgkErhcH9HQUI/FYkVKid1ux+FwYLVamZ6axm63oes6gcAXFBYWomkaU1O/sLa2RkdHB9FolGAwSDKZJCsrC2Uo9vb2KCwsJDs7O12S6e9pAPH4LlIaDAwMUFVVRTQaRdd1dnZ22N7eZvrVK4LBn6msrKSvr4/i4mLm5n5lf/+Arq4uKioqMJs1xsbGaGtrI3F4yGEySXNzM+Pj4+Tl5ROJRE4S703zymjFZrMZl8uFYRhYrVYODg5QSmEYBkdHR+kMFkJkNBSHw4Gu65jNZhwOB06nk93dXRwOB8lkEiklx8fHSCmRUmY2uNMArkJv6/rfkvks40MTLu2y9xh6y7vIdDwnyzU/y8954CydvvFF5//fheOsPvNFlF7W8Ifk3vHF9Yfgv/smvAHwvwHwF3mYz315wlP+AAAAAElFTkSuQmCC">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Barlow+Condensed:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Black+Han+Sans&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
 <style>
@@ -15,7 +15,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:13px;scroll-behavior:smooth}
 body{
-  background:#060a0e;
+  background:#0a0907;
   color:#b8ccd8;
   font-family:'IBM Plex Mono',monospace;
   font-size:11px;
@@ -27,39 +27,40 @@ body{
 
 /* ─── CSS VARIABLES ──────────────────────────────── */
 :root{
-  --bg0:#060a0e;
-  --bg1:#0a1018;
-  --bg2:#0f1822;
-  --bg3:#14202e;
-  --bg4:#1a2a3e;
-  --border:#1c2e42;
-  --border2:#243c54;
-  --border3:#2e4e6a;
-  --accent:#ff5c1a;
-  --accent2:#ff8a4a;
-  --accent3:#ffb380;
-  --blue:#2d7fff;
-  --blue2:#5a9fff;
-  --green:#16a34a;
+  /* ── Warm ink-black palette — matches the Ginskeys woodblock logo ── */
+  --bg0:#0a0907;
+  --bg1:#100e0b;
+  --bg2:#161310;
+  --bg3:#1e1a15;
+  --bg4:#26211a;
+  --border:#2a231c;
+  --border2:#362d24;
+  --border3:#463c30;
+  --accent:#e8561a;
+  --accent2:#f07840;
+  --accent3:#f5a070;
+  --blue:#4a8fff;
+  --blue2:#78b0ff;
+  --green:#15803d;
   --green2:#22c55e;
   --green3:#4ade80;
-  --red:#dc2626;
-  --red2:#ef4444;
-  --red3:#f87171;
-  --amber:#d97706;
-  --amber2:#f59e0b;
-  --amber3:#fbbf24;
-  --purple:#7c3aed;
-  --purple2:#a855f7;
-  --muted:#3a5468;
-  --muted2:#4a6a82;
-  --muted3:#608099;
-  --text:#b8ccd8;
-  --text2:#8aaabe;
-  --text3:#5a7a92;
-  --white:#ddeeff;
+  --red:#c53030;
+  --red2:#e05252;
+  --red3:#f28888;
+  --amber:#c87000;
+  --amber2:#e8990a;
+  --amber3:#f5bc30;
+  --purple:#7030d0;
+  --purple2:#9d6ee8;
+  --muted:#524438;
+  --muted2:#6e5c4c;
+  --muted3:#8c7a68;
+  --text:#e8ddd4;
+  --text2:#c4b5a8;
+  --text3:#9c8c7c;
+  --white:#f5ece4;
   --mono:'IBM Plex Mono',monospace;
-  --display:'Barlow Condensed',sans-serif;
+  --display:'Oswald',sans-serif;
   --panel-gap:1px;
 }
 
@@ -76,7 +77,7 @@ body{
   width:340px;padding:32px 28px 28px;
 }
 .login-logo{
-  font-family:var(--display);font-weight:800;font-size:22px;
+  font-family:"Black Han Sans","Oswald",sans-serif;font-weight:400;font-size:24px;
   color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px;
 }
 .login-sub{font-size:8px;color:var(--muted3);letter-spacing:.12em;margin-bottom:24px;text-transform:uppercase}
@@ -165,12 +166,22 @@ body::before{
   background:repeating-linear-gradient(
     0deg,
     transparent,
-    transparent 2px,
-    rgba(0,0,0,.08) 2px,
-    rgba(0,0,0,.08) 4px
+    transparent 3px,
+    rgba(0,0,0,.06) 3px,
+    rgba(0,0,0,.06) 4px
   );
   pointer-events:none;
   z-index:1000;
+}
+/* Subtle warm grain texture overlay */
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:999;
+  opacity:.4;
 }
 
 /* ─── SCROLLBAR ──────────────────────────────────── */
@@ -189,30 +200,31 @@ body::before{
 
 /* ─── TOP BAR ────────────────────────────────────── */
 .topbar{
-  background:var(--bg1);
-  border-bottom:1px solid var(--border);
+  background:var(--bg0);
+  border-bottom:2px solid var(--border2);
   display:flex;
   align-items:stretch;
-  height:38px;
+  height:40px;
   flex-shrink:0;
   position:sticky;
   top:0;
   z-index:200;
 }
 .tb-logo{
-  font-family:var(--display);
-  font-weight:800;
-  font-size:16px;
+  font-family:'Black Han Sans','Oswald',sans-serif;
+  font-weight:400;
+  font-size:15px;
   color:var(--accent);
-  letter-spacing:.1em;
-  padding:0 16px;
+  letter-spacing:.14em;
+  padding:0 18px;
   display:flex;
   align-items:center;
-  border-right:1px solid var(--border);
+  border-right:2px solid var(--border2);
   white-space:nowrap;
   text-transform:uppercase;
+  text-shadow:0 0 20px rgba(232,86,26,.25);
 }
-.tb-logo span{color:var(--text3)}
+.tb-logo span{color:var(--muted)}
 .tb-nav{
   display:flex;
   align-items:stretch;
@@ -221,23 +233,24 @@ body::before{
 }
 .tb-nav::-webkit-scrollbar{display:none}
 .tb-tab{
-  padding:0 14px;
+  padding:0 12px;
   display:flex;
   align-items:center;
   gap:5px;
-  font-size:9px;
-  font-weight:500;
-  letter-spacing:.12em;
+  font-size:8px;
+  font-weight:600;
+  letter-spacing:.1em;
   text-transform:uppercase;
-  color:var(--muted3);
+  color:var(--muted2);
   cursor:pointer;
-  border-bottom:2px solid transparent;
+  border-bottom:3px solid transparent;
   white-space:nowrap;
-  transition:all .15s;
+  transition:all .12s;
   position:relative;
+  font-family:var(--mono);
 }
 .tb-tab:hover{color:var(--text);background:var(--bg2)}
-.tb-tab.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--bg2)}
+.tb-tab.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--bg2);text-shadow:0 0 12px rgba(232,86,26,.3)}
 .tb-nav-sep{width:1px;background:var(--border2);margin:6px 4px;flex-shrink:0}
 .tb-tab .tab-badge{
   background:var(--red);
@@ -287,8 +300,8 @@ body::before{
 
 /* ─── ALERT TICKER ───────────────────────────────── */
 .alert-ticker{
-  background:#0e0800;
-  border-bottom:1px solid #2a1500;
+  background:#0d0b08;
+  border-bottom:1px solid #2e2218;
   padding:0 12px;
   display:flex;
   align-items:center;
@@ -325,7 +338,7 @@ body::before{
   flex-shrink:0;
 }
 .kpi-card{
-  background:var(--bg1);
+  background:var(--bg0);
   padding:10px 14px;
   position:relative;
   overflow:hidden;
@@ -394,15 +407,16 @@ body::before{
 .panel-header{
   display:flex;align-items:center;justify-content:space-between;
   padding:6px 12px;
-  background:var(--bg2);
-  border-bottom:1px solid var(--border);
+  background:var(--bg1);
+  border-bottom:1px solid var(--border2);
   flex-shrink:0;
 }
 .panel-title{
   font-size:8px;font-weight:600;
-  letter-spacing:.14em;text-transform:uppercase;
-  color:var(--muted3);
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text3);
   display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);
 }
 .panel-title-dot{
   width:5px;height:5px;border-radius:50%;
@@ -1631,28 +1645,28 @@ tr:hover .edit-btn{display:inline}
   <nav class="tb-nav">
     <!-- COMMAND -->
     <div class="tb-tab active" data-view="mgmt" onclick="switchView('mgmt',this)">◉ Overview</div>
-    <div class="tb-tab" data-view="alerts" onclick="switchView('alerts',this)">Alerts <span class="tab-badge">3</span></div>
-    <div class="tb-tab" data-view="agent" onclick="switchView('agent',this)" id="tab-agent" style="color:var(--accent)">⚡ Agent</div>
+    <div class="tb-tab" data-view="alerts" onclick="switchView('alerts',this)">⚡ Alerts <span class="tab-badge">3</span></div>
+    <div class="tb-tab" data-view="agent" onclick="switchView('agent',this)" id="tab-agent" style="color:var(--accent)">✦ Agent</div>
     <div class="tb-nav-sep"></div>
     <!-- MONEY -->
-    <div class="tb-tab" data-view="dashboard" onclick="switchView('dashboard',this)">Financials</div>
-    <div class="tb-tab" data-view="ledger" onclick="switchView('ledger',this)">Ledger</div>
-    <div class="tb-tab" data-view="splits" onclick="switchView('splits',this)" id="tab-splits">Splits</div>
+    <div class="tb-tab" data-view="dashboard" onclick="switchView('dashboard',this)">$ Financials</div>
+    <div class="tb-tab" data-view="ledger" onclick="switchView('ledger',this)">≡ Ledger</div>
+    <div class="tb-tab" data-view="splits" onclick="switchView('splits',this)" id="tab-splits">÷ Splits</div>
     <div class="tb-nav-sep"></div>
     <!-- LIVE -->
-    <div class="tb-tab" data-view="booking" onclick="switchView('booking',this)" id="tab-booking">Booking <span class="tab-badge" id="booking-badge" style="display:none">0</span></div>
-    <div class="tb-tab" data-view="tours" onclick="switchView('tours',this)">Tours</div>
+    <div class="tb-tab" data-view="booking" onclick="switchView('booking',this)" id="tab-booking">◎ Booking <span class="tab-badge" id="booking-badge" style="display:none">0</span></div>
+    <div class="tb-tab" data-view="tours" onclick="switchView('tours',this)">↗ Tours</div>
     <div class="tb-tab" data-view="production" onclick="switchView('production',this)" id="tab-production">🎚 Production</div>
     <div class="tb-nav-sep"></div>
     <!-- CONTENT -->
-    <div class="tb-tab" data-view="releases" onclick="switchView('releases',this)" id="tab-releases">Releases</div>
-    <div class="tb-tab" data-view="press" onclick="switchView('press',this)" id="tab-press">Press & Sync</div>
-    <div class="tb-tab" data-view="streaming" onclick="switchView('streaming',this)">Streaming</div>
+    <div class="tb-tab" data-view="releases" onclick="switchView('releases',this)" id="tab-releases">◈ Releases</div>
+    <div class="tb-tab" data-view="press" onclick="switchView('press',this)" id="tab-press">✉ Press & Sync</div>
+    <div class="tb-tab" data-view="streaming" onclick="switchView('streaming',this)">▶ Streaming</div>
     <div class="tb-nav-sep"></div>
     <!-- ADMIN -->
-    <div class="tb-tab" data-view="access" onclick="switchView('access',this)" id="tab-access">Access</div>
-    <div class="tb-tab" data-view="audit" onclick="switchView('audit',this)" id="tab-audit">Audit Log</div>
-    <div class="tb-tab" data-view="settings" onclick="switchView('settings',this)">Settings</div>
+    <div class="tb-tab" data-view="access" onclick="switchView('access',this)" id="tab-access">⊕ Access</div>
+    <div class="tb-tab" data-view="audit" onclick="switchView('audit',this)" id="tab-audit">⊞ Audit Log</div>
+    <div class="tb-tab" data-view="settings" onclick="switchView('settings',this)">⚙ Settings</div>
   </nav>
   <div class="tb-right">
     <div class="tb-live"><div class="tb-live-dot"></div>LIVE</div>
@@ -6320,19 +6334,19 @@ const TRANSLATIONS = {
   en: {
     // Tabs
     tab_mgmt:        '◉ Overview',
-    tab_dashboard:   'Financials',
-    tab_ledger:      'Ledger',
-    tab_tours:       'Tours',
-    tab_streaming:   'Streaming',
-    tab_access:      'Access',
-    tab_audit:       'Audit Log',
-    tab_alerts:      'Alerts',
-    tab_settings:    'Settings',
-    tab_booking:     'Booking',
-    tab_releases:    'Releases',
-    tab_press:       'Press & Sync',
-    tab_splits:      'Splits',
-    tab_agent:       '⚡ Agent',
+    tab_dashboard:   '$ Financials',
+    tab_ledger:      '≡ Ledger',
+    tab_tours:       '↗ Tours',
+    tab_streaming:   '▶ Streaming',
+    tab_access:      '⊕ Access',
+    tab_audit:       '⊞ Audit Log',
+    tab_alerts:      '⚡ Alerts',
+    tab_settings:    '⚙ Settings',
+    tab_booking:     '◎ Booking',
+    tab_releases:    '◈ Releases',
+    tab_press:       '✉ Press & Sync',
+    tab_splits:      '÷ Splits',
+    tab_agent:       '✦ Agent',
     tab_production:  '🎚 Production',
     // KPI labels
     kpi_balance:     'Total Balance',
@@ -6428,19 +6442,19 @@ const TRANSLATIONS = {
   pt: {
     // Tabs
     tab_mgmt:        '◉ Visão Geral',
-    tab_dashboard:   'Finanças',
-    tab_ledger:      'Livro',
-    tab_tours:       'Digressões',
-    tab_streaming:   'Streaming',
-    tab_access:      'Acesso',
-    tab_audit:       'Registo',
-    tab_alerts:      'Alertas',
-    tab_settings:    'Definições',
-    tab_booking:     'Reservas',
-    tab_releases:    'Lançamentos',
-    tab_press:       'Imprensa & Sync',
-    tab_splits:      'Divisão',
-    tab_agent:       '⚡ Agente',
+    tab_dashboard:   '$ Finanças',
+    tab_ledger:      '≡ Livro',
+    tab_tours:       '↗ Digressões',
+    tab_streaming:   '▶ Streaming',
+    tab_access:      '⊕ Acesso',
+    tab_audit:       '⊞ Registo',
+    tab_alerts:      '⚡ Alertas',
+    tab_settings:    '⚙ Definições',
+    tab_booking:     '◎ Reservas',
+    tab_releases:    '◈ Lançamentos',
+    tab_press:       '✉ Imprensa & Sync',
+    tab_splits:      '÷ Divisão',
+    tab_agent:       '✦ Agente',
     tab_production:  '🎚 Produção',
     // KPI labels
     kpi_balance:     'Saldo Total',
