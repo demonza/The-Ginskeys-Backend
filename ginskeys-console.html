@@ -213,38 +213,65 @@ body::after{
 .tb-logo{
   font-family:'Black Han Sans','Oswald',sans-serif;
   font-weight:400;
-  padding:0 20px;
+  padding:0 16px 0 20px;
   display:flex;
   align-items:center;
-  gap:0;
+  gap:8px;
   border-right:2px solid var(--border2);
   white-space:nowrap;
   text-transform:uppercase;
   position:relative;
+  height:100%;
 }
 .tb-logo .logo-the{
-  color:var(--muted3);
-  font-size:9px;
-  letter-spacing:.28em;
+  display:flex;
+  flex-direction:column-reverse;
+  align-items:center;
+  gap:0;
   font-family:var(--mono);
-  font-weight:400;
-  margin-right:7px;
+  font-weight:700;
+  font-size:9px;
+  letter-spacing:.05em;
+  color:var(--muted3);
+  line-height:1.1;
   text-transform:uppercase;
+  margin-right:2px;
+}
+.tb-logo .logo-the span{
+  display:block;
+  line-height:1.1;
+}
+.tb-logo .logo-main{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  line-height:1;
 }
 .tb-logo .logo-band{
   color:var(--white);
-  font-size:20px;
+  font-size:19px;
   letter-spacing:.12em;
   text-shadow:0 0 30px rgba(255,85,0,.35);
   line-height:1;
+  display:block;
+}
+.tb-logo .logo-console{
+  color:var(--muted2);
+  font-size:8px;
+  letter-spacing:.22em;
+  font-family:var(--mono);
+  font-weight:400;
+  text-transform:uppercase;
+  display:block;
+  margin-top:3px;
 }
 .tb-logo .logo-slash{
   color:var(--accent);
-  font-size:20px;
-  margin:0 6px;
+  font-size:19px;
   font-weight:700;
   line-height:1;
   text-shadow:0 0 16px rgba(255,85,0,.6);
+  margin-left:2px;
 }
 .tb-nav{
   display:flex;
@@ -1207,7 +1234,7 @@ tr:hover .edit-btn{display:inline}
         <input class="login-input" id="lg-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
       </div>
       <div class="login-err" id="lg-err"></div>
-      <button class="login-btn" onclick="doLogin()">Sign In</button>
+      <button class="login-btn" onclick="doLogin()"><span data-i18n="btn_signin">Sign In</span></button>
       <div class="login-divider">— or —</div>
       <div class="login-switch">Have an invite token? <a onclick="showForm('register')">Register with token →</a></div>
       <div class="login-switch" style="margin-top:6px"><a onclick="showForm('reset-request')" style="color:var(--muted3)">Forgot password?</a></div>
@@ -1232,7 +1259,7 @@ tr:hover .edit-btn{display:inline}
         <input class="login-input" id="rg-pass" type="password" placeholder="Min 8 characters">
       </div>
       <div class="login-err" id="rg-err"></div>
-      <button class="login-btn" onclick="doRegister()">Create Account</button>
+      <button class="login-btn" onclick="doRegister()"><span data-i18n="btn_create_account">Create Account</span></button>
       <div class="login-switch"><a onclick="showForm('login')">← Back to sign in</a></div>
     </div>
 
@@ -1345,7 +1372,7 @@ tr:hover .edit-btn{display:inline}
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
         <button class="btn-sm ghost" onclick="closeModal()">Cancel</button>
-        <button class="btn-sm primary" onclick="submitTxn()">Save Transaction</button>
+        <button class="btn-sm primary" onclick="submitTxn()"><span data-i18n="btn_save_txn">Save Transaction</span></button>
       </div>
     </div>
   </div>
@@ -1438,7 +1465,7 @@ tr:hover .edit-btn{display:inline}
       <button class="btn-sm ghost" style="color:var(--red3);border-color:var(--red2)" onclick="deleteCurrentTxn()">Delete</button>
       <div style="display:flex;gap:8px">
         <button class="btn-sm ghost" onclick="closeEditTxn()">Cancel</button>
-        <button class="btn-sm primary" onclick="saveEditTxn()">Save Changes</button>
+        <button class="btn-sm primary" onclick="saveEditTxn()"><span data-i18n="btn_save_changes">Save Changes</span></button>
       </div>
     </div>
   </div>
@@ -1653,7 +1680,7 @@ tr:hover .edit-btn{display:inline}
       <button class="btn-sm ghost" style="color:var(--red3);border-color:var(--red2)" onclick="deleteCurrentRelease()">Delete</button>
       <div style="display:flex;gap:8px">
         <button class="btn-sm ghost" onclick="closeEditRelease()">Cancel</button>
-        <button class="btn-sm primary" onclick="saveEditRelease()">Save Changes</button>
+        <button class="btn-sm primary" onclick="saveEditRelease()"><span data-i18n="btn_save_changes">Save Changes</span></button>
       </div>
     </div>
   </div>
@@ -1663,7 +1690,14 @@ tr:hover .edit-btn{display:inline}
 
 <!-- ══ TOP BAR ══════════════════════════════════════ -->
 <header class="topbar">
-  <div class="tb-logo"><span class="logo-the">The</span><span class="logo-band">Ginskeys</span><span class="logo-slash">/</span></div>
+  <div class="tb-logo">
+  <div class="logo-the"><span>E</span><span>H</span><span>T</span></div>
+  <div class="logo-main">
+    <span class="logo-band">Ginskeys</span>
+    <span class="logo-console" data-i18n="logo_console">Management Console</span>
+  </div>
+  <span class="logo-slash">/</span>
+</div>
   <nav class="tb-nav">
     <!-- COMMAND -->
     <div class="tb-tab active" data-view="mgmt" onclick="switchView('mgmt',this)">◉ Overview</div>
@@ -1825,7 +1859,7 @@ tr:hover .edit-btn{display:inline}
     <div style="display:flex;flex-direction:column;gap:10px">
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Priority Actions</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div><span data-i18n="priority_actions">Priority Actions</span></div>
           <span id="mgmt-actions-count" style="font-size:8px;color:var(--muted3)">0 items</span>
         </div>
         <div id="mgmt-priority-list" style="padding:0;display:flex;flex-direction:column;gap:0;overflow-y:auto;max-height:260px"></div>
@@ -1873,7 +1907,7 @@ tr:hover .edit-btn{display:inline}
 
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Release Pipeline</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div><span data-i18n="release_pipeline">Release Pipeline</span></div>
         <button class="btn-sm" onclick="switchView('releases',document.querySelector('[data-view=releases]'))">→</button>
       </div>
       <div id="mgmt-releases-list" style="padding:0;display:flex;flex-direction:column"></div>
@@ -1881,7 +1915,7 @@ tr:hover .edit-btn{display:inline}
 
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Booking Pipeline</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="booking_pipeline_title">Booking Pipeline</span></div>
         <button class="btn-sm" onclick="switchView('booking',document.querySelector('[data-view=booking]'))">→</button>
       </div>
       <div id="mgmt-booking-list" style="padding:0;display:flex;flex-direction:column"></div>
@@ -1902,7 +1936,7 @@ tr:hover .edit-btn{display:inline}
 
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Show Schedule</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div><span data-i18n="show_schedule">Show Schedule</span></div>
         <button class="btn-sm" onclick="switchView('production',document.querySelector('[data-view=production]'))">→</button>
       </div>
       <div id="mgmt-shows-list" style="padding:0;font-size:10px"></div>
@@ -1910,7 +1944,7 @@ tr:hover .edit-btn{display:inline}
 
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Setlists</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="setlists_title">Setlists</span></div>
         <button class="btn-sm" onclick="switchView('production',document.querySelector('[data-view=production]'))">→</button>
       </div>
       <div id="mgmt-setlists-list" style="padding:0;font-size:10px"></div>
@@ -1926,7 +1960,7 @@ tr:hover .edit-btn{display:inline}
 
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div>Splits Fund</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div><span data-i18n="splits_fund_title">Splits Fund</span></div>
         <button class="btn-sm" onclick="switchView('splits',document.querySelector('[data-view=splits]'))">→</button>
       </div>
       <div id="mgmt-splits-summary" style="font-size:10px"></div>
@@ -1934,7 +1968,7 @@ tr:hover .edit-btn{display:inline}
 
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Streaming</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div><span data-i18n="streaming_title">Streaming</span></div>
         <button class="btn-sm" onclick="switchView('streaming',document.querySelector('[data-view=streaming]'))">→</button>
       </div>
       <div id="mgmt-streaming-summary" style="font-size:10px"></div>
@@ -2151,7 +2185,7 @@ tr:hover .edit-btn{display:inline}
   <!-- Streaming mini -->
   <div class="panel col-span-3" style="grid-row:5; grid-column:1 / span 3">
     <div class="panel-header">
-      <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Streaming — Platform Revenue</div>
+      <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div><span data-i18n="streaming_platform">Streaming — Platform Revenue</span></div>
       <span class="panel-shortcut">F6</span>
     </div>
     <div class="platform-grid" id="dash-platform-grid"></div>
@@ -2171,8 +2205,8 @@ tr:hover .edit-btn{display:inline}
     <input class="ledger-search" placeholder="/ Search transactions…" id="ledger-search" oninput="searchLedger(this.value)">
     <div class="ledger-spacer"></div>
     <span class="ledger-count" id="ledger-count">— transactions</span>
-    <button class="btn-sm ghost" onclick="exportCSV()">Export CSV</button>
-    <button class="btn-sm ghost" id="btn-import" onclick="openImport()">Import CSV</button>
+    <button class="btn-sm ghost" onclick="exportCSV()"><span data-i18n="btn_export_csv">Export CSV</span></button>
+    <button class="btn-sm ghost" id="btn-import" onclick="openImport()"><span data-i18n="btn_import_csv">Import CSV</span></button>
     <button class="btn-sm primary" onclick="openModal()">+ New</button>
   </div>
   <div class="ledger-wrap" style="flex:1">
@@ -2229,7 +2263,7 @@ tr:hover .edit-btn{display:inline}
     <!-- LEFT: Tour list -->
     <div class="panel" style="display:flex;flex-direction:column">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>All Shows</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="all_shows">All Shows</span></div>
         <button class="btn-sm primary" id="btn-add-tour" onclick="openTourModal()">+ Show</button>
       </div>
       <div id="tours-list-panel" style="flex:1;overflow-y:auto"></div>
@@ -2270,7 +2304,7 @@ tr:hover .edit-btn{display:inline}
           </div>
         </div>
         <div style="display:flex;gap:8px">
-          <button class="login-btn" style="width:auto;padding:0 20px;font-size:10px" onclick="saveInlineTourEdit()">Save Changes</button>
+          <button class="login-btn" style="width:auto;padding:0 20px;font-size:10px" onclick="saveInlineTourEdit()"><span data-i18n="btn_save_changes">Save Changes</span></button>
           <button class="btn-sm" onclick="cancelInlineTourEdit()">Cancel</button>
           <div id="te-status-msg" style="font-size:9px;color:var(--muted3);align-self:center"></div>
         </div>
@@ -2291,7 +2325,7 @@ tr:hover .edit-btn{display:inline}
     <div style="display:flex;flex-direction:column;gap:10px">
       <div class="panel" style="flex:1">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--red2)"></div>Expense Breakdown</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--red2)"></div><span data-i18n="expense_breakdown">Expense Breakdown</span></div>
         </div>
         <div class="panel-body" id="tour-expense-chart"></div>
       </div>
@@ -2314,7 +2348,7 @@ tr:hover .edit-btn{display:inline}
     <!-- CDBaby Data Entry Panel -->
     <div class="panel col-span-2" id="cdbaby-entry-panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div>CDBaby Report Entry</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div><span data-i18n="cdbaby_entry">CDBaby Report Entry</span></div>
         <div style="display:flex;gap:8px;align-items:center">
           <select id="cdb-month" style="background:var(--bg2);color:var(--text);border:1px solid var(--border2);font-family:var(--mono);font-size:10px;padding:3px 6px;border-radius:2px"></select>
           <button class="btn-sm primary" onclick="saveCdbabyData()">Save to DB</button>
@@ -2347,14 +2381,14 @@ tr:hover .edit-btn{display:inline}
 
     <div class="panel col-span-2">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Platform Revenue — All Time</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div><span data-i18n="platform_all_time">Platform Revenue — All Time</span></div>
       </div>
       <div class="platform-grid" id="stream-platform-full"></div>
     </div>
 
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div>Monthly Revenue Trend</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div><span data-i18n="monthly_trend">Monthly Revenue Trend</span></div>
       </div>
       <div class="chart-container">
         <div class="chart-canvas-wrap"><canvas id="streamChart"></canvas></div>
@@ -2363,7 +2397,7 @@ tr:hover .edit-btn{display:inline}
 
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Fan Geography Heatmap</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="geo_heatmap">Fan Geography Heatmap</span></div>
       </div>
       <div class="panel-body">
         <div class="section-head">Top markets by stream count</div>
@@ -2390,14 +2424,14 @@ tr:hover .edit-btn{display:inline}
   <div class="main-grid" style="grid-template-columns:320px 1fr">
     <div class="panel" style="overflow-y:auto">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Users &amp; Roles</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div><span data-i18n="users_roles">Users &amp; Roles</span></div>
         <button class="btn-sm primary" id="btn-invite" onclick="openInvite()">+ Invite</button>
       </div>
       <div class="panel-body" id="access-users-panel"></div>
     </div>
     <div class="panel" style="overflow-y:auto">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Keyboard Shortcuts</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="kb_shortcuts">Keyboard Shortcuts</span></div>
       </div>
       <div class="panel-body">
         <div class="section-head">Navigation</div>
@@ -2430,7 +2464,7 @@ tr:hover .edit-btn{display:inline}
   <div class="main-grid" style="grid-template-columns:1fr 360px">
     <div class="panel" style="overflow-y:auto">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Audit Log — All Events</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="audit_all">Audit Log — All Events</span></div>
         <span class="panel-badge" id="audit-count">0 events</span>
       </div>
       <div class="ledger-wrap" style="flex:1">
@@ -2444,7 +2478,7 @@ tr:hover .edit-btn{display:inline}
     </div>
     <div class="panel" style="overflow-y:auto">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Email Templates</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div><span data-i18n="email_templates">Email Templates</span></div>
       </div>
       <div class="panel-body">
         <div class="email-tabs">
@@ -2463,14 +2497,14 @@ tr:hover .edit-btn{display:inline}
   <div class="main-grid" style="grid-template-columns:1fr 1fr">
     <div class="panel" style="overflow-y:auto">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--red2)"></div>Active Alerts</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--red2)"></div><span data-i18n="active_alerts">Active Alerts</span></div>
         <span class="panel-badge">3 CRITICAL</span>
       </div>
       <div class="panel-body" id="full-alerts-panel"></div>
     </div>
     <div class="panel" style="overflow-y:auto">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Alert Rules</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="alert_rules">Alert Rules</span></div>
         <button class="btn-sm primary" id="btn-add-rule" onclick="openAlertRule()">+ Rule</button>
       </div>
       <div class="panel-body">
@@ -2500,7 +2534,7 @@ tr:hover .edit-btn{display:inline}
   <div class="main-grid" style="grid-template-columns:1fr 1fr 1fr">
     <div class="panel" style="overflow-y:auto">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Account</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div><span data-i18n="settings_account">Account</span></div>
       </div>
       <div class="panel-body">
         <div class="settings-section">
@@ -2519,7 +2553,7 @@ tr:hover .edit-btn{display:inline}
     </div>
     <div class="panel" style="overflow-y:auto">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Integrations</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="settings_integrations">Integrations</span></div>
       </div>
       <div class="panel-body">
         <div class="settings-section">
@@ -2539,7 +2573,7 @@ tr:hover .edit-btn{display:inline}
     </div>
     <div class="panel" style="overflow-y:auto">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div>Display</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div><span data-i18n="settings_display">Display</span></div>
       </div>
       <div class="panel-body">
         <div class="settings-section">
@@ -2603,7 +2637,7 @@ tr:hover .edit-btn{display:inline}
     <div style="flex-shrink:0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Revenue Forecast</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div><span data-i18n="booking_forecast">Revenue Forecast</span></div>
         </div>
         <div class="panel-body" style="display:flex;flex-direction:column;gap:8px">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
@@ -2627,7 +2661,7 @@ tr:hover .edit-btn{display:inline}
       </div>
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Follow-up Queue</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="booking_followup_q">Follow-up Queue</span></div>
         </div>
         <div id="bk-followup-queue" style="padding:8px;font-size:10px;max-height:160px;overflow-y:auto">
           <div style="color:var(--muted3);padding:8px;font-size:9px">No follow-ups scheduled. Add follow-up dates when creating contacts.</div>
@@ -2635,7 +2669,7 @@ tr:hover .edit-btn{display:inline}
       </div>
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Stage Velocity</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div><span data-i18n="booking_velocity">Stage Velocity</span></div>
         </div>
         <div class="panel-body" style="display:flex;flex-direction:column;gap:6px">
           <div style="font-size:9px;color:var(--muted2);margin-bottom:4px">How fast contacts move through your pipeline</div>
@@ -2962,7 +2996,7 @@ tr:hover .edit-btn{display:inline}
     <div style="flex:1;display:grid;grid-template-columns:380px 1fr;gap:10px;min-height:180px">
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Add Press / Sync Contact</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="press_add">Add Press / Sync Contact</span></div>
         </div>
         <div class="panel-body" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">OUTLET *</div><input id="pr-outlet" class="login-input" style="width:100%" placeholder="Rock FM Portugal"></div>
@@ -2992,7 +3026,7 @@ tr:hover .edit-btn{display:inline}
       </div>
       <div class="panel" style="display:flex;flex-direction:column">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Press Pipeline</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="press_pipeline">Press Pipeline</span></div>
           <div style="display:flex;gap:6px">
             <select id="pr-filter-type" style="background:var(--bg2);color:var(--text);border:1px solid var(--border2);font-family:var(--mono);font-size:9px;padding:2px 6px" onchange="renderPressList()">
               <option value="">All Types</option>
@@ -6729,6 +6763,48 @@ const TRANSLATIONS = {
     no_contacts:         'No contacts yet.',
     no_shows:            'No shows yet.',
     no_setlists:         'No setlists yet.',
+    // Logo
+    logo_console:        'Management Console',
+    // Overview panel titles
+    priority_actions:    'Priority Actions',
+    release_pipeline:    'Release Pipeline',
+    booking_pipeline_title: 'Booking Pipeline',
+    show_schedule:       'Show Schedule',
+    setlists_title:      'Setlists',
+    splits_fund_title:   'Splits Fund',
+    streaming_title:     'Streaming',
+    // Financials
+    valuation_title:     'Financial Intelligence — Valuation & Health',
+    streaming_platform:  'Streaming — Platform Revenue',
+    // Tours
+    all_shows:           'All Shows',
+    expense_breakdown:   'Expense Breakdown',
+    pnl_per_show:        'P&L per Show',
+    // Streaming
+    cdbaby_entry:        'CDBaby Report Entry',
+    platform_all_time:   'Platform Revenue — All Time',
+    monthly_trend:       'Monthly Revenue Trend',
+    geo_heatmap:         'Fan Geography Heatmap',
+    // Access / Admin
+    users_roles:         'Users & Roles',
+    kb_shortcuts:        'Keyboard Shortcuts',
+    audit_all:           'Audit Log — All Events',
+    email_templates:     'Email Templates',
+    active_alerts:       'Active Alerts',
+    alert_rules:         'Alert Rules',
+    settings_account:    'Account',
+    settings_integrations:'Integrations',
+    settings_display:    'Display',
+    // Press
+    press_add:           'Add Press / Sync Contact',
+    press_pipeline:      'Press Pipeline',
+    // Buttons
+    btn_signin:          'Sign In',
+    btn_create_account:  'Create Account',
+    btn_export_csv:      'Export CSV',
+    btn_import_csv:      'Import CSV',
+    btn_save_txn:        'Save Transaction',
+    btn_save_changes:    'Save Changes',
   },
   pt: {
     // Tabs
@@ -6837,6 +6913,48 @@ const TRANSLATIONS = {
     no_contacts:         'Sem contactos ainda.',
     no_shows:            'Sem espetáculos ainda.',
     no_setlists:         'Sem alinhamentos ainda.',
+    // Logo
+    logo_console:        'Consola de Gestão',
+    // Overview panel titles
+    priority_actions:    'Ações Prioritárias',
+    release_pipeline:    'Pipeline de Lançamentos',
+    booking_pipeline_title: 'Pipeline de Reservas',
+    show_schedule:       'Agenda de Espetáculos',
+    setlists_title:      'Alinhamentos',
+    splits_fund_title:   'Fundo da Banda',
+    streaming_title:     'Streaming',
+    // Financials
+    valuation_title:     'Inteligência Financeira — Avaliação',
+    streaming_platform:  'Streaming — Receita por Plataforma',
+    // Tours
+    all_shows:           'Todos os Espetáculos',
+    expense_breakdown:   'Repartição de Custos',
+    pnl_per_show:        'P&L por Espetáculo',
+    // Streaming
+    cdbaby_entry:        'Relatório CDBaby',
+    platform_all_time:   'Receita por Plataforma — Total',
+    monthly_trend:       'Tendência Mensal',
+    geo_heatmap:         'Mapa de Fãs por País',
+    // Access / Admin
+    users_roles:         'Utilizadores & Funções',
+    kb_shortcuts:        'Atalhos de Teclado',
+    audit_all:           'Registo — Todos os Eventos',
+    email_templates:     'Modelos de Email',
+    active_alerts:       'Alertas Ativos',
+    alert_rules:         'Regras de Alerta',
+    settings_account:    'Conta',
+    settings_integrations:'Integrações',
+    settings_display:    'Apresentação',
+    // Press
+    press_add:           'Adicionar Contacto Imprensa/Sync',
+    press_pipeline:      'Pipeline de Imprensa',
+    // Buttons
+    btn_signin:          'Entrar',
+    btn_create_account:  'Criar Conta',
+    btn_export_csv:      'Exportar CSV',
+    btn_import_csv:      'Importar CSV',
+    btn_save_txn:        'Guardar Transação',
+    btn_save_changes:    'Guardar Alterações',
   }
 };
 
@@ -6911,6 +7029,34 @@ function applyTranslations() {
   // ── Re-render financial data with new labels/currency ─
   updateFinancialKpis();
   renderRevSource();
+
+  // ── Re-render all dynamic sections so JS-generated text updates ──
+  // Booking
+  if (typeof renderBookingList === 'function') renderBookingList();
+  if (typeof updateBookingBanner === 'function') updateBookingBanner();
+  // Releases
+  if (typeof renderReleasesList === 'function') renderReleasesList();
+  // Press
+  if (typeof renderPressList === 'function') renderPressList();
+  // Splits
+  if (typeof renderSplitHistory === 'function') renderSplitHistory();
+  // Production
+  if (typeof renderShowsList === 'function') renderShowsList();
+  if (typeof renderSetlistDisplay === 'function') renderSetlistDisplay();
+  if (typeof renderChecklist === 'function') renderChecklist();
+  // Tours
+  if (typeof renderToursList === 'function') renderToursList();
+  if (typeof renderTourBannerKpis === 'function') renderTourBannerKpis();
+  // Overview
+  if (typeof renderMgmtDashboard === 'function') setTimeout(renderMgmtDashboard, 0);
+
+  // ── Translate all static text nodes with data-i18n-text ──
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+  });
+  // Logo console subtitle
+  const lc = document.querySelector('.logo-console');
+  if (lc) lc.textContent = t('logo_console');
 }
 
 
