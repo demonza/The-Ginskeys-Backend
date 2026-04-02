@@ -3940,7 +3940,6 @@ function renderSplitHistory() {
 }
 
 // ── LOAD ALL GROWTH DATA ───────────────────────────────────────────────────
-async 
 
 // ── PRODUCTION HELPERS (stubs, real fns in production script) ──────────────
 
@@ -11120,9 +11119,9 @@ function printBookingReport() {
   const confirmed  = BOOKING_DATA.filter(b => b.stage === 'confirmed');
   const negot      = BOOKING_DATA.filter(b => b.stage === 'negotiating');
   const completed  = BOOKING_DATA.filter(b => b.stage === 'completed');
-  const pipeline€  = confirmed.reduce((s,b) => s + parseFloat(b.fee_eur||0), 0);
-  const earned€    = completed.reduce((s,b) => s + parseFloat(b.fee_eur||0), 0);
-  const avgFee     = completed.length ? (earned€ / completed.length) : 0;
+  const pipelineEur  = confirmed.reduce((s,b) => s + parseFloat(b.fee_eur||0), 0);
+  const earnedEur    = completed.reduce((s,b) => s + parseFloat(b.fee_eur||0), 0);
+  const avgFee     = completed.length ? (earnedEur / completed.length) : 0;
   const convRate   = total ? Math.round(confirmed.concat(completed).length / total * 100) : 0;
 
   // Group by stage for sections
@@ -11541,7 +11540,7 @@ function printBookingReport() {
       <div class="cover-kpi-lbl">Negotiating</div>
     </div>
     <div class="cover-kpi">
-      <div class="cover-kpi-val green">€${pipeline€.toLocaleString('pt-PT')}</div>
+      <div class="cover-kpi-val green">€${pipelineEur.toLocaleString('pt-PT')}</div>
       <div class="cover-kpi-lbl">Confirmed Pipeline</div>
     </div>
     <div class="cover-kpi">
