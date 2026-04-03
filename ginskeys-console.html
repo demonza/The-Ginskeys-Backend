@@ -1150,11 +1150,13 @@ tr:hover .edit-btn{display:inline}
 .rider-section-hdr:hover{background:var(--bg3)}
 .rider-section-body{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text)}
 .rider-editable{
-  outline:none;border-radius:1px;padding:1px 3px;transition:background .1s;
-  min-width:40px;display:inline-block;
+  outline:none;border-radius:1px;padding:2px 4px;transition:background .12s,box-shadow .12s;
+  min-width:40px;display:inline-block;cursor:text;
+  border-bottom:1px dashed transparent;
 }
-.rider-editable:hover{background:rgba(255,92,26,.08)}
-.rider-editable:focus{background:rgba(255,92,26,.14);box-shadow:0 0 0 1px var(--accent)}
+.rider-editable:hover{background:rgba(255,92,26,.10);border-bottom-color:var(--accent)}
+.rider-editable:focus{background:rgba(255,92,26,.16);box-shadow:0 0 0 1px var(--accent);cursor:text}
+.rider-editable[contenteditable="true"]:empty:before{content:attr(data-placeholder);color:var(--muted);font-style:italic}
 .input-row{
   display:grid;grid-template-columns:30px 40px 1fr 110px 60px 70px;
   gap:8px;padding:5px 8px;font-size:12px;border-bottom:1px solid var(--border1);align-items:center;
@@ -3483,6 +3485,8 @@ let BOOKING_DATA = [], RELEASES_DATA = [], PRESS_DATA = [], SPLITS_DATA = [];
 let PROD_SHOWS = [], PROD_SETLISTS = [];
 let PROD_CHECKLIST = [], SL_PENDING_SONGS = [];
 let CURRENT_SHOW_ID = null;
+var _riderSaveTimer = null;
+var _riderCurrentShowId = null;
 let SP_EXPENSES = [], SP_MEMBERS = [];
 
 const STAGE_COLORS = {
@@ -7239,7 +7243,7 @@ function applyTranslations() {
   });
 
   // Re-translate rider show picker placeholder
-  populateRiderShowPicker();
+  if (typeof populateRiderShowPicker === 'function') populateRiderShowPicker();
 
   // ── Booking KPI labels ────────────────────────────────
   const bkLabels = {
@@ -8892,7 +8896,7 @@ async function loadShows() {
   try {
     PROD_SHOWS = await apiGet('/production/shows');
     renderShowsList();
-    populateRiderShowPicker();
+    if (typeof populateRiderShowPicker === 'function') populateRiderShowPicker();
     populateChecklistShowPicker();
   } catch(e) { console.warn('loadShows:', e.message); }
 }
@@ -8973,9 +8977,6 @@ async function deleteShow(id, name) {
 // ── TECH RIDER ────────────────────────────────────────
 
 // ── TECH RIDER PERSISTENCE ───────────────────────────────
-
-let _riderSaveTimer = null;
-let _riderCurrentShowId = null;
 
 function setRiderStatus(msg, color) {
   var el = document.getElementById('rider-save-status');
