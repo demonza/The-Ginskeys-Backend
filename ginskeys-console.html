@@ -4649,31 +4649,44 @@ function _initAll_old_1() {
 
     <!-- ── TECH RIDER ── -->
     <div class="prod-sub" id="prod-rider" style="flex:1;overflow-y:auto">
-      <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--accent)">
-        <div>
+
+      <!-- ── TOOLBAR ─────────────────────────────────────────── -->
+      <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid var(--accent)">
+        <div style="display:flex;flex-direction:column;gap:4px">
           <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--text);letter-spacing:.12em">THE GINSKEYS</div>
-          <div style="font-size:10px;color:var(--muted2);letter-spacing:.1em;margin-top:2px">TECHNICAL RIDER · HARD ROCK · 4 PIECE · SINES, PORTUGAL · v2.0 2026</div>
+          <div style="font-size:10px;color:var(--muted2);letter-spacing:.1em"><span data-i18n="rider_subtitle">TECHNICAL RIDER · HARD ROCK · 4 PIECE · SINES, PORTUGAL · v2.0 2026</span></div>
         </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div id="rider-save-status" style="font-size:9px;color:var(--green3);padding:3px 8px;background:rgba(0,230,118,.08);border-radius:1px">✎ Click any field to edit</div>
-          <button class="btn-sm" onclick="printRider()">⎙ Print / PDF</button>
-          <button class="btn-sm" onclick="copyRiderText()">Copy Text</button>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+          <!-- Show picker -->
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:9px;color:var(--muted);letter-spacing:.08em" data-i18n="rider_show_label">SHOW:</span>
+            <select id="rider-show-picker" onchange="onRiderShowChange()" style="font-size:10px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:3px 6px;min-width:160px">
+              <option value="" data-i18n="rider_global_template">— Global Template —</option>
+            </select>
+          </div>
+          <div id="rider-save-status" style="font-size:9px;color:var(--green3);padding:3px 8px;background:rgba(0,230,118,.08);border-radius:1px" data-i18n="rider_click_edit">✎ Click any field to edit</div>
+          <button class="btn-sm" onclick="printRider()"><span data-i18n="btn_print">⎙ Print / PDF</span></button>
+          <button class="btn-sm" onclick="copyRiderText()"><span data-i18n="rider_copy_text">Copy Text</span></button>
         </div>
       </div>
+
+      <!-- ── DOCUMENT ───────────────────────────────────────── -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+
         <!-- LEFT COLUMN -->
         <div style="display:flex;flex-direction:column;gap:10px">
+
           <!-- 01 Band Lineup -->
           <div class="rider-section">
             <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-              <span><span style="color:var(--accent)">01</span>&nbsp;&nbsp;BAND LINEUP</span><span>▼</span>
+              <span><span style="color:var(--accent)">01</span>&nbsp;&nbsp;<span data-i18n="rider_s1_title">BAND LINEUP</span></span><span>▼</span>
             </div>
             <div class="rider-section-body" style="padding:0">
               <table style="width:100%;border-collapse:collapse">
                 <tr style="border-bottom:1px solid var(--border2)">
-                  <th style="text-align:left;padding:5px 10px;font-size:8px;color:var(--muted);letter-spacing:.12em;font-weight:400">MEMBER</th>
-                  <th style="text-align:left;padding:5px 10px;font-size:8px;color:var(--muted);letter-spacing:.12em;font-weight:400">ROLE</th>
-                  <th style="text-align:left;padding:5px 10px;font-size:8px;color:var(--muted);letter-spacing:.12em;font-weight:400">POSITION</th>
+                  <th style="text-align:left;padding:5px 10px;font-size:8px;color:var(--muted);letter-spacing:.12em;font-weight:400" data-i18n="rider_col_member">MEMBER</th>
+                  <th style="text-align:left;padding:5px 10px;font-size:8px;color:var(--muted);letter-spacing:.12em;font-weight:400" data-i18n="rider_col_role">ROLE</th>
+                  <th style="text-align:left;padding:5px 10px;font-size:8px;color:var(--muted);letter-spacing:.12em;font-weight:400" data-i18n="rider_col_position">POSITION</th>
                 </tr>
                 <tr style="border-bottom:1px solid var(--border1)">
                   <td style="padding:8px 10px;font-weight:700;color:var(--accent)">FÁBIO</td>
@@ -4698,133 +4711,148 @@ function _initAll_old_1() {
               </table>
             </div>
           </div>
+
           <!-- 02 Input List -->
           <div class="rider-section">
             <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-              <span><span style="color:var(--accent)">02</span>&nbsp;&nbsp;INPUT LIST / PATCH (<span class="rider-editable" contenteditable="true" onclick="event.stopPropagation()" data-rider-key="input_ch_count">15</span> CH)</span><span>▼</span>
+              <span><span style="color:var(--accent)">02</span>&nbsp;&nbsp;<span data-i18n="rider_s2_title">INPUT LIST / PATCH</span> (<span class="rider-editable" contenteditable="true" onclick="event.stopPropagation()" data-rider-key="input_ch_count">15</span> <span data-i18n="rider_ch">CH</span>)</span><span>▼</span>
             </div>
             <div class="rider-section-body" style="padding:0">
-              <div class="input-row hdr-row"><div>CH</div><div>TYPE</div><div>SOURCE</div><div>MIC / DI</div><div>STAND</div><div>NOTES</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">1</div><div style="color:var(--muted2)">MIC</div><div>Kick Drum</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_1_mic">Beta 91A / D112</span></div><div style="color:var(--muted3)">None</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_1_notes">Gate req.</span></div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">2</div><div style="color:var(--muted2)">MIC</div><div>Snare Top</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_2_mic">SM57</span></div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">3</div><div style="color:var(--muted2)">MIC</div><div>Snare Bottom</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_3_mic">SM57</span></div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_3_notes">Phase flip</span></div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">4</div><div style="color:var(--muted2)">MIC</div><div>Hi-Hat</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_4_mic">SM81 / C451</span></div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">5</div><div style="color:var(--muted2)">MIC</div><div>Tom 1</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_5_mic">E904 clip</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">6</div><div style="color:var(--muted2)">MIC</div><div>Tom 2</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_6_mic">E904 clip</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">7</div><div style="color:var(--muted2)">MIC</div><div>Tom 3 (floor)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_7_mic">E904 clip</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">8</div><div style="color:var(--muted2)">MIC</div><div>OH Left</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_8_mic">SM81 / C451</span></div><div style="color:var(--muted3)">Tall</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">9</div><div style="color:var(--muted2)">MIC</div><div>OH Right</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_9_mic">SM81 / C451</span></div><div style="color:var(--muted3)">Tall</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row" style="background:rgba(170,0,255,.04)"><div style="color:var(--accent);font-weight:700">10</div><div style="color:var(--muted2)">DI</div><div>Bass (direct)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_10_mic">Radial J48</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_10_notes">Pre-amp out</span></div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">11</div><div style="color:var(--muted2)">MIC</div><div>Bass Amp</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_11_mic">SM57 / β52</span></div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_11_notes">Optional</span></div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">12</div><div style="color:var(--muted2)">MIC</div><div>Guitar 1 Amp</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_12_mic">SM57</span></div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_12_notes">Off-axis</span></div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">13</div><div style="color:var(--muted2)">MIC</div><div>Guitar 2 Amp</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_13_mic">SM57</span></div><div style="color:var(--muted3)">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_13_notes">Off-axis</span></div></div>
-              <div class="input-row" style="background:rgba(255,92,26,.04)"><div style="color:var(--accent);font-weight:700">14</div><div style="color:var(--muted2)">MIC</div><div>Vocal 1 (lead)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_14_mic">SM58</span></div><div style="color:var(--muted3)">Tall</div><div style="color:var(--green3);font-weight:700">PRIORITY</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">15</div><div style="color:var(--muted2)">MIC</div><div>Vocal 2 (BG)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_15_mic">SM58</span></div><div style="color:var(--muted3)">Tall</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_15_notes">Rhythm gtr</span></div></div>
+              <div class="input-row hdr-row">
+                <div data-i18n="rider_col_ch">CH</div>
+                <div data-i18n="rider_col_type">TYPE</div>
+                <div data-i18n="rider_col_source">SOURCE</div>
+                <div data-i18n="rider_col_mic">MIC / DI</div>
+                <div data-i18n="rider_col_stand">STAND</div>
+                <div data-i18n="rider_col_notes">NOTES</div>
+              </div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">1</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_kick">Kick Drum</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_1_mic">Beta 91A / D112</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_none">None</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_1_notes">Gate req.</span></div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">2</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_snare_top">Snare Top</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_2_mic">SM57</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">3</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_snare_bot">Snare Bottom</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_3_mic">SM57</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_3_notes">Phase flip</span></div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">4</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_hihat">Hi-Hat</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_4_mic">SM81 / C451</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">5</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_tom1">Tom 1</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_5_mic">E904 clip</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">6</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_tom2">Tom 2</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_6_mic">E904 clip</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">7</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_tom3">Tom 3 (floor)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_7_mic">E904 clip</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">8</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_oh_l">OH Left</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_8_mic">SM81 / C451</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">9</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_oh_r">OH Right</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_9_mic">SM81 / C451</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row" style="background:rgba(170,0,255,.04)"><div style="color:var(--accent);font-weight:700">10</div><div style="color:var(--muted2)" data-i18n="rider_di">DI</div><div data-i18n="rider_src_bass_di">Bass (direct)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_10_mic">Radial J48</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_10_notes">Pre-amp out</span></div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">11</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_bass_amp">Bass Amp</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_11_mic">SM57 / β52</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_11_notes">Optional</span></div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">12</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_gtr1">Guitar 1 Amp</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_12_mic">SM57</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_12_notes">Off-axis</span></div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">13</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_gtr2">Guitar 2 Amp</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_13_mic">SM57</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_13_notes">Off-axis</span></div></div>
+              <div class="input-row" style="background:rgba(255,92,26,.04)"><div style="color:var(--accent);font-weight:700">14</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_vox1">Vocal 1 (lead)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_14_mic">SM58</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--green3);font-weight:700" data-i18n="rider_priority">PRIORITY</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">15</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_vox2">Vocal 2 (BG)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_15_mic">SM58</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_15_notes">Rhythm gtr</span></div></div>
             </div>
           </div>
+
           <!-- 03 FOH Mix Notes -->
           <div class="rider-section">
             <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-              <span><span style="color:var(--accent)">03</span>&nbsp;&nbsp;FOH MIX NOTES</span><span>▼</span>
+              <span><span style="color:var(--accent)">03</span>&nbsp;&nbsp;<span data-i18n="rider_s3_title">FOH MIX NOTES</span></span><span>▼</span>
             </div>
             <div class="rider-section-body">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:10px;color:var(--muted2);line-height:1.9">
                 <div>
-                  <div style="font-size:8px;color:var(--accent);letter-spacing:.1em;margin-bottom:6px">GENERAL</div>
+                  <div style="font-size:8px;color:var(--accent);letter-spacing:.1em;margin-bottom:6px" data-i18n="rider_foh_general">GENERAL</div>
                   <div class="rider-editable" contenteditable="true" data-rider-key="foh_general" style="display:block;line-height:1.9">▸ Hard rock — guitars prominent, kick punchy<br>▸ Vocals clear above guitars at all times<br>▸ No click track · No tracks / playback<br>▸ Mono-compatible mix essential</div>
                 </div>
                 <div>
-                  <div style="font-size:8px;color:var(--accent);letter-spacing:.1em;margin-bottom:6px">PER INSTRUMENT</div>
+                  <div style="font-size:8px;color:var(--accent);letter-spacing:.1em;margin-bottom:6px" data-i18n="rider_foh_per_inst">PER INSTRUMENT</div>
                   <div class="rider-editable" contenteditable="true" data-rider-key="foh_eq_notes" style="display:block;line-height:1.9">▸ Kick: tight low-mid, gate, transient shaper<br>▸ Guitar: +3dB @ 3–5kHz, cut @ 300Hz<br>▸ Bass: DI + amp blend, LP @ 5kHz<br>▸ Vocals: plate reverb 1.2s, chorus delay only</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
         <!-- RIGHT COLUMN -->
         <div style="display:flex;flex-direction:column;gap:10px">
+
           <!-- 04 Monitor Requirements -->
           <div class="rider-section">
             <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-              <span><span style="color:var(--accent)">04</span>&nbsp;&nbsp;MONITOR REQUIREMENTS (<span class="rider-editable" contenteditable="true" onclick="event.stopPropagation()" data-rider-key="mon_mix_count">4</span> MIXES)</span><span>▼</span>
+              <span><span style="color:var(--accent)">04</span>&nbsp;&nbsp;<span data-i18n="rider_s4_title">MONITOR REQUIREMENTS</span> (<span class="rider-editable" contenteditable="true" onclick="event.stopPropagation()" data-rider-key="mon_mix_count">4</span> <span data-i18n="rider_mixes">MIXES</span>)</span><span>▼</span>
             </div>
             <div class="rider-section-body">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                 <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--accent)">
-                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px">MIX 1 — FÁBIO (Lead Vocal)</div>
+                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 1 — FÁBIO (<span data-i18n="rider_lead_vox">Lead Vocal</span>)</div>
                   <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_1" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Vocal (self, loud) · Guitar (self, low)<br>Kick · Snare · Bass (low)</div>
                 </div>
                 <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--blue2)">
-                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px">MIX 2 — PEDRO (Bass)</div>
+                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 2 — PEDRO (<span data-i18n="rider_bass">Bass</span>)</div>
                   <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_2" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Kick · Snare · Guitar 1<br>Vocal 1 · Bass (self, med)</div>
                 </div>
                 <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--green3)">
-                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px">MIX 3 — MANUEL (Drums)</div>
+                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 3 — MANUEL (<span data-i18n="rider_drums">Drums</span>)</div>
                   <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_3" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Vocal 1 · Guitar 1 · Bass<br>Click track (optional)</div>
                 </div>
                 <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--amber2)">
-                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px">MIX 4 — TIAGO (BG Vocal)</div>
+                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 4 — TIAGO (<span data-i18n="rider_bg_vox">BG Vocal</span>)</div>
                   <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_4" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Vocal 1 · Vocal 2 (self)<br>Guitar 1 · Kick · Bass (low)</div>
                 </div>
               </div>
               <div style="margin-top:8px;font-size:9px;color:var(--muted2);padding:8px;background:var(--bg4);border-radius:2px">
-                <span style="color:var(--amber2)">Min:</span> <span class="rider-editable" contenteditable="true" data-rider-key="mon_min_req">4× wedge monitors · Preferred: coax or QSC KW · IEM acceptable if provided</span>
+                <span style="color:var(--amber2)" data-i18n="rider_min">Min:</span> <span class="rider-editable" contenteditable="true" data-rider-key="mon_min_req">4× wedge monitors · Preferred: coax or QSC KW · IEM acceptable if provided</span>
               </div>
             </div>
           </div>
+
           <!-- 05 Backline -->
           <div class="rider-section">
             <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-              <span><span style="color:var(--accent)">05</span>&nbsp;&nbsp;BACKLINE &amp; EQUIPMENT</span><span>▼</span>
+              <span><span style="color:var(--accent)">05</span>&nbsp;&nbsp;<span data-i18n="rider_s5_title">BACKLINE &amp; EQUIPMENT</span></span><span>▼</span>
             </div>
             <div class="rider-section-body">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                 <div>
-                  <div style="font-size:8px;color:var(--green3);letter-spacing:.12em;margin-bottom:8px;font-weight:700">BAND PROVIDES</div>
+                  <div style="font-size:8px;color:var(--green3);letter-spacing:.12em;margin-bottom:8px;font-weight:700" data-i18n="rider_band_provides">BAND PROVIDES</div>
                   <div class="rider-editable" contenteditable="true" data-rider-key="backline_band_provides" style="font-size:9px;color:var(--muted2);line-height:1.9;display:block">▸ All guitars and bass<br>▸ Amp heads (Marshall / Mesa)<br>▸ All instrument cables<br>▸ All pedalboards + PSUs<br>▸ Vocal mics SM58 ×2 (if preferred)<br>▸ Gaffer, spare strings, 9V</div>
                 </div>
                 <div>
-                  <div style="font-size:8px;color:var(--accent);letter-spacing:.12em;margin-bottom:8px;font-weight:700">VENUE PROVIDES</div>
+                  <div style="font-size:8px;color:var(--accent);letter-spacing:.12em;margin-bottom:8px;font-weight:700" data-i18n="rider_venue_provides">VENUE PROVIDES</div>
                   <div class="rider-editable" contenteditable="true" data-rider-key="backline_venue_provides" style="font-size:9px;color:var(--muted2);line-height:1.9;display:block">▸ Guitar cab 4×12 (Marshall 1960)<br>▸ Bass cab 4×10 or 2×15<br>▸ Full drum kit + hardware + throne + rug<br>▸ All mic stands per input list<br>▸ All XLR cables · DI boxes ×2 (Radial)<br>▸ Power strips ×4 · Water ×6 on stage</div>
                 </div>
               </div>
             </div>
           </div>
+
           <!-- 06 Hospitality -->
           <div class="rider-section">
             <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-              <span><span style="color:var(--accent)">06</span>&nbsp;&nbsp;HOSPITALITY RIDER</span><span>▼</span>
+              <span><span style="color:var(--accent)">06</span>&nbsp;&nbsp;<span data-i18n="rider_s6_title">HOSPITALITY RIDER</span></span><span>▼</span>
             </div>
             <div class="rider-section-body">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                 <div>
-                  <div style="font-size:8px;color:var(--blue2);letter-spacing:.12em;margin-bottom:8px;font-weight:700">DRESSING ROOM</div>
+                  <div style="font-size:8px;color:var(--blue2);letter-spacing:.12em;margin-bottom:8px;font-weight:700" data-i18n="rider_dressing_room">DRESSING ROOM</div>
                   <div class="rider-editable" contenteditable="true" data-rider-key="hosp_dressing_room" style="font-size:9px;color:var(--muted2);line-height:1.9;display:block">▸ Access from load-in<br>▸ 12× water bottles<br>▸ 4× towels<br>▸ Mirror + adequate lighting<br>▸ Power outlets ×4<br>▸ WiFi access</div>
                 </div>
                 <div>
-                  <div style="font-size:8px;color:var(--amber2);letter-spacing:.12em;margin-bottom:8px;font-weight:700">CATERING</div>
+                  <div style="font-size:8px;color:var(--amber2);letter-spacing:.12em;margin-bottom:8px;font-weight:700" data-i18n="rider_catering">CATERING</div>
                   <div class="rider-editable" contenteditable="true" data-rider-key="hosp_catering" style="font-size:9px;color:var(--muted2);line-height:1.9;display:block">▸ Light meal or buy-out €15/person (×4)<br>▸ 6× water on stage<br>▸ 6× beer post-show<br>▸ Parking for 1 van (transit size)</div>
                 </div>
               </div>
             </div>
           </div>
-          <!-- 07 Contact -->
+
+          <!-- 07 Technical Contact -->
           <div class="rider-section">
             <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-              <span><span style="color:var(--accent)">07</span>&nbsp;&nbsp;TECHNICAL CONTACT</span><span>▼</span>
+              <span><span style="color:var(--accent)">07</span>&nbsp;&nbsp;<span data-i18n="rider_s7_title">TECHNICAL CONTACT</span></span><span>▼</span>
             </div>
             <div class="rider-section-body">
               <div style="font-size:10px;color:var(--muted2);line-height:2">
-                <div>Name: <span class="rider-editable" contenteditable="true" data-rider-key="contact_name" style="color:var(--text)">Tiago M.</span></div>
-                <div>Role: <span class="rider-editable" contenteditable="true" data-rider-key="contact_role" style="color:var(--text)">Stage Manager / Backline Tech</span></div>
-                <div>Email: <span class="rider-editable" contenteditable="true" data-rider-key="contact_email" style="color:var(--accent)">tiago@ginskeys.com</span></div>
-                <div>Phone: <span class="rider-editable" contenteditable="true" data-rider-key="contact_phone" style="color:var(--text)">+351 — — —</span></div>
+                <div><span data-i18n="rider_contact_name_label">Name:</span> <span class="rider-editable" contenteditable="true" data-rider-key="contact_name" style="color:var(--text)">Tiago M.</span></div>
+                <div><span data-i18n="rider_contact_role_label">Role:</span> <span class="rider-editable" contenteditable="true" data-rider-key="contact_role" style="color:var(--text)">Stage Manager / Backline Tech</span></div>
+                <div><span data-i18n="rider_contact_email_label">Email:</span> <span class="rider-editable" contenteditable="true" data-rider-key="contact_email" style="color:var(--accent)">tiago@ginskeys.com</span></div>
+                <div><span data-i18n="rider_contact_phone_label">Phone:</span> <span class="rider-editable" contenteditable="true" data-rider-key="contact_phone" style="color:var(--text)">+351 — — —</span></div>
                 <div style="margin-top:8px;padding:8px;background:var(--bg4);border-radius:2px;font-size:9px">
                   <span class="rider-editable" contenteditable="true" data-rider-key="notes_general" style="display:block">Full EPK, stage plot, and production photos available on request. All requirements are negotiable for smaller venues — please get in touch before the show.</span>
                 </div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -6804,6 +6832,67 @@ const TRANSLATIONS = {
     prod_checklist:      'Show Checklist',
     prod_create_show:    'Create Show',
     prod_upcoming:       'Upcoming Shows',
+    // Rider
+    rider_subtitle:       'TECHNICAL RIDER · HARD ROCK · 4 PIECE · SINES, PORTUGAL · v2.0 2026',
+    rider_show_label:     'SHOW:',
+    rider_global_template:'— Global Template —',
+    rider_click_edit:     '✎ Click any field to edit',
+    rider_copy_text:      'Copy Text',
+    rider_s1_title:       'BAND LINEUP',
+    rider_s2_title:       'INPUT LIST / PATCH',
+    rider_s3_title:       'FOH MIX NOTES',
+    rider_s4_title:       'MONITOR REQUIREMENTS',
+    rider_s5_title:       'BACKLINE & EQUIPMENT',
+    rider_s6_title:       'HOSPITALITY RIDER',
+    rider_s7_title:       'TECHNICAL CONTACT',
+    rider_col_member:     'MEMBER',
+    rider_col_role:       'ROLE',
+    rider_col_position:   'POSITION',
+    rider_col_ch:         'CH',
+    rider_col_type:       'TYPE',
+    rider_col_source:     'SOURCE',
+    rider_col_mic:        'MIC / DI',
+    rider_col_stand:      'STAND',
+    rider_col_notes:      'NOTES',
+    rider_ch:             'CH',
+    rider_mic:            'MIC',
+    rider_di:             'DI',
+    rider_stand_none:     'None',
+    rider_stand_short:    'Short',
+    rider_stand_tall:     'Tall',
+    rider_src_kick:       'Kick Drum',
+    rider_src_snare_top:  'Snare Top',
+    rider_src_snare_bot:  'Snare Bottom',
+    rider_src_hihat:      'Hi-Hat',
+    rider_src_tom1:       'Tom 1',
+    rider_src_tom2:       'Tom 2',
+    rider_src_tom3:       'Tom 3 (floor)',
+    rider_src_oh_l:       'OH Left',
+    rider_src_oh_r:       'OH Right',
+    rider_src_bass_di:    'Bass (direct)',
+    rider_src_bass_amp:   'Bass Amp',
+    rider_src_gtr1:       'Guitar 1 Amp',
+    rider_src_gtr2:       'Guitar 2 Amp',
+    rider_src_vox1:       'Vocal 1 (lead)',
+    rider_src_vox2:       'Vocal 2 (BG)',
+    rider_priority:       'PRIORITY',
+    rider_foh_general:    'GENERAL',
+    rider_foh_per_inst:   'PER INSTRUMENT',
+    rider_mixes:          'MIXES',
+    rider_mix:            'MIX',
+    rider_lead_vox:       'Lead Vocal',
+    rider_bass:           'Bass',
+    rider_drums:          'Drums',
+    rider_bg_vox:         'BG Vocal',
+    rider_min:            'Min:',
+    rider_band_provides:  'BAND PROVIDES',
+    rider_venue_provides: 'VENUE PROVIDES',
+    rider_dressing_room:  'DRESSING ROOM',
+    rider_catering:       'CATERING',
+    rider_contact_name_label:  'Name:',
+    rider_contact_role_label:  'Role:',
+    rider_contact_email_label: 'Email:',
+    rider_contact_phone_label: 'Phone:',
     // Booking
     booking_forecast:    'Revenue Forecast',
     booking_followup_q:  'Follow-up Queue',
@@ -6954,6 +7043,67 @@ const TRANSLATIONS = {
     prod_checklist:      'Lista de Verificação',
     prod_create_show:    'Criar Espetáculo',
     prod_upcoming:       'Próximos Espetáculos',
+    // Rider
+    rider_subtitle:       'RIDER TÉCNICO · HARD ROCK · 4 ELEMENTOS · SINES, PORTUGAL · v2.0 2026',
+    rider_show_label:     'ESPETÁCULO:',
+    rider_global_template:'— Modelo Global —',
+    rider_click_edit:     '✎ Clique em qualquer campo para editar',
+    rider_copy_text:      'Copiar Texto',
+    rider_s1_title:       'FORMAÇÃO',
+    rider_s2_title:       'LISTA DE CANAIS',
+    rider_s3_title:       'NOTAS FOH',
+    rider_s4_title:       'MONITORES',
+    rider_s5_title:       'BACKLINE E EQUIPAMENTO',
+    rider_s6_title:       'RIDER DE HOSPITALIDADE',
+    rider_s7_title:       'CONTACTO TÉCNICO',
+    rider_col_member:     'ELEMENTO',
+    rider_col_role:       'FUNÇÃO',
+    rider_col_position:   'POSIÇÃO',
+    rider_col_ch:         'C.',
+    rider_col_type:       'TIPO',
+    rider_col_source:     'FONTE',
+    rider_col_mic:        'MIC / DI',
+    rider_col_stand:      'SUPORTE',
+    rider_col_notes:      'NOTAS',
+    rider_ch:             'C.',
+    rider_mic:            'MIC',
+    rider_di:             'DI',
+    rider_stand_none:     'Nenhum',
+    rider_stand_short:    'Curto',
+    rider_stand_tall:     'Alto',
+    rider_src_kick:       'Bombo',
+    rider_src_snare_top:  'Caixa (cima)',
+    rider_src_snare_bot:  'Caixa (baixo)',
+    rider_src_hihat:      'Chimbal',
+    rider_src_tom1:       'Tom 1',
+    rider_src_tom2:       'Tom 2',
+    rider_src_tom3:       'Tom 3 (chão)',
+    rider_src_oh_l:       'OH Esquerdo',
+    rider_src_oh_r:       'OH Direito',
+    rider_src_bass_di:    'Baixo (direto)',
+    rider_src_bass_amp:   'Amp de Baixo',
+    rider_src_gtr1:       'Amp Guitarra 1',
+    rider_src_gtr2:       'Amp Guitarra 2',
+    rider_src_vox1:       'Voz 1 (principal)',
+    rider_src_vox2:       'Voz 2 (segundas)',
+    rider_priority:       'PRIORIDADE',
+    rider_foh_general:    'GERAL',
+    rider_foh_per_inst:   'POR INSTRUMENTO',
+    rider_mixes:          'MIXES',
+    rider_mix:            'MIX',
+    rider_lead_vox:       'Voz Principal',
+    rider_bass:           'Baixo',
+    rider_drums:          'Bateria',
+    rider_bg_vox:         'Segundas Vozes',
+    rider_min:            'Mín:',
+    rider_band_provides:  'BANDA FORNECE',
+    rider_venue_provides: 'LOCAL FORNECE',
+    rider_dressing_room:  'CAMARIM',
+    rider_catering:       'CATERING',
+    rider_contact_name_label:  'Nome:',
+    rider_contact_role_label:  'Função:',
+    rider_contact_email_label: 'Email:',
+    rider_contact_phone_label: 'Telefone:',
     // Booking
     booking_forecast:    'Previsão de Receita',
     booking_followup_q:  'Fila de Seguimento',
@@ -7087,6 +7237,9 @@ function applyTranslations() {
   document.querySelectorAll('.lang-btn').forEach(b => {
     b.classList.toggle('active', b.getAttribute('data-lang') === ACTIVE_LANG);
   });
+
+  // Re-translate rider show picker placeholder
+  populateRiderShowPicker();
 
   // ── Booking KPI labels ────────────────────────────────
   const bkLabels = {
@@ -8739,6 +8892,7 @@ async function loadShows() {
   try {
     PROD_SHOWS = await apiGet('/production/shows');
     renderShowsList();
+    populateRiderShowPicker();
     populateChecklistShowPicker();
   } catch(e) { console.warn('loadShows:', e.message); }
 }
@@ -8818,9 +8972,10 @@ async function deleteShow(id, name) {
 
 // ── TECH RIDER ────────────────────────────────────────
 
-// -- TECH RIDER PERSISTENCE -----------------------------------------------
+// ── TECH RIDER PERSISTENCE ───────────────────────────────
 
 let _riderSaveTimer = null;
+let _riderCurrentShowId = null;
 
 function setRiderStatus(msg, color) {
   var el = document.getElementById('rider-save-status');
@@ -8829,21 +8984,46 @@ function setRiderStatus(msg, color) {
   el.style.color = color || 'var(--green3)';
 }
 
+function populateRiderShowPicker() {
+  var picker = document.getElementById('rider-show-picker');
+  if (!picker || !PROD_SHOWS) return;
+  var current = _riderCurrentShowId;
+  picker.innerHTML = '<option value="">' + t('rider_global_template') + '</option>';
+  (PROD_SHOWS || [])
+    .slice()
+    .sort(function(a,b){ return new Date(a.show_date)-new Date(b.show_date); })
+    .forEach(function(s) {
+      var opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.show_date + ' — ' + (s.venue_name || 'Show');
+      if (s.id === current) opt.selected = true;
+      picker.appendChild(opt);
+    });
+}
+
+function onRiderShowChange() {
+  var picker = document.getElementById('rider-show-picker');
+  _riderCurrentShowId = picker && picker.value ? picker.value : null;
+  loadRiderData();
+}
+
 async function loadRiderData() {
   if (!API_BASE || !SESSION || !SESSION.token) return;
+  populateRiderShowPicker();
   try {
-    var data = await apiGet('/production/rider');
-    var keys = Object.keys(data);
-    if (!keys.length) return;
+    var url = _riderCurrentShowId
+      ? '/production/rider/' + _riderCurrentShowId
+      : '/production/rider';
+    var data = await apiGet(url);
+    // Reset to HTML defaults first, then apply saved values
     document.querySelectorAll('[data-rider-key]').forEach(function(el) {
       var val = data[el.dataset.riderKey];
       if (val !== undefined && val !== '') el.innerHTML = val;
     });
-    setRiderStatus('Loaded', 'var(--green3)');
-    setTimeout(function() { setRiderStatus('Click any field to edit', 'var(--green3)'); }, 1500);
+    setRiderStatus(t('rider_click_edit'), 'var(--green3)');
   } catch(e) {
     console.warn('Rider load failed', e);
-    setRiderStatus('Click any field to edit', 'var(--green3)');
+    setRiderStatus(t('rider_click_edit'), 'var(--green3)');
   }
 }
 
@@ -8852,14 +9032,21 @@ async function saveRiderField(key, value) {
   try {
     var res = await fetch(API_BASE + '/production/rider', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SESSION.token },
-      body: JSON.stringify({ field_key: key, field_value: value })
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + SESSION.token
+      },
+      body: JSON.stringify({
+        field_key: key,
+        field_value: value,
+        show_id: _riderCurrentShowId || null
+      })
     });
     if (!res.ok) throw new Error(await res.text());
-    setRiderStatus('Saved', 'var(--green3)');
+    setRiderStatus(t('rider_click_edit'), 'var(--green3)');
   } catch(e) {
     console.warn('Rider save failed', e);
-    setRiderStatus('Save failed - check connection', 'var(--red2)');
+    setRiderStatus('Save failed — check connection', 'var(--red2)');
   }
 }
 
@@ -8870,11 +9057,10 @@ document.addEventListener('DOMContentLoaded', function() {
   riderPanel.addEventListener('input', function(e) {
     var el = e.target.closest('[data-rider-key]');
     if (!el) return;
-    var key = el.dataset.riderKey;
-    setRiderStatus('Saving...', 'var(--amber2)');
+    setRiderStatus('Saving…', 'var(--amber2)');
     clearTimeout(_riderSaveTimer);
     _riderSaveTimer = setTimeout(function() {
-      saveRiderField(key, el.innerHTML);
+      saveRiderField(el.dataset.riderKey, el.innerHTML);
     }, 700);
   });
 
