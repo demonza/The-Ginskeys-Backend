@@ -7846,10 +7846,7 @@ function _renderUsersHtml(el, allUsers, rawInvites, roleColors, canManage){
 
 // ─── RENDER: TOUR DETAIL (dynamic) ────────────────────
 
-// Render detail for most recent tour on load
-if(typeof TOUR_DATA!=='undefined' && TOUR_DATA.length){
-  document.addEventListener('DOMContentLoaded',()=>renderTourDetail(TOUR_DATA[0], 0));
-}
+// (auto-open tour drawer on load removed — opened only on explicit user action)
 
 // ─── EMAIL TEMPLATES ──────────────────────────────────
 const EMAIL_TEMPLATES = {
@@ -12278,7 +12275,7 @@ function printStreamingReport() {
   _openReport(html);
 }
 
-// ── FINANCIALS REPORT ─────────────────────────────────────────────────────────
+// ── FINANCIALS REPORT (ENHANCED — charts + investment recommendations) ────────
 function printFinancialsReport() {
   const fi = getFinancialIntelligence();
   const d  = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
@@ -12289,210 +12286,405 @@ function printFinancialsReport() {
   const ytdRevenue  = ytdEntries.filter(e=>e.amount>0).reduce((s,e)=>s+e.amount, 0);
   const ytdExpenses = ytdEntries.filter(e=>e.amount<0).reduce((s,e)=>s+Math.abs(e.amount), 0);
 
-  // ── Render charts in THIS page's context using Chart.js already loaded ────────
-  function makeChartImg(config, w, h) {
-    w = w || 560; h = h || 220;
-    var cvs = document.createElement('canvas');
+  // ── Chart helpers: render Chart.js to PNG data URL via offscreen canvas ──────
+  function makeChartImg(config, w=560, h=220) {
+    const cvs = document.createElement('canvas');
     cvs.width = w * 2; cvs.height = h * 2;
-    var ctx = cvs.getContext('2d');
+    cvs.style.width = w + 'px'; cvs.style.height = h + 'px';
+    const ctx = cvs.getContext('2d');
     ctx.scale(2, 2);
-    config.options = config.options || {};
-    config.options.animation = false;
-    config.options.responsive = false;
+    // Ensure animation is disabled for static export
+    const cfg = JSON.parse(JSON.stringify(config));
+    cfg.options = cfg.options || {};
+    cfg.options.animation = false;
+    cfg.options.responsive = false;
+    cfg.options.plugins = cfg.options.plugins || {};
+    cfg.options.plugins.legend = cfg.options.plugins.legend || {};
     try {
-      var chart = new Chart(ctx, config);
-      var url = cvs.toDataURL('image/png');
+      const chart = new Chart(ctx, cfg);
+      const url = cvs.toDataURL('image/png');
       chart.destroy();
       return url;
-    } catch(e) { return ''; }
+    } catch(e) { return null; }
   }
 
-  // Cash flow chart
-  var monthMap = {};
-  entries.forEach(function(e) {
-    var k = e.date.slice(0,7);
-    if (!monthMap[k]) monthMap[k] = {inc:0,exp:0};
+  // ── 1. Cash Flow Bar Chart (monthly income vs expense vs net) ────────────────
+  const monthMap = {};
+  entries.forEach(e => {
+    const k = e.date.slice(0,7);
+    if (!monthMap[k]) monthMap[k] = { inc:0, exp:0 };
     if (e.amount > 0) monthMap[k].inc += e.amount;
     else monthMap[k].exp += Math.abs(e.amount);
   });
-  var cfMonths = Object.keys(monthMap).sort().slice(-18);
-  var MNAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var cfLabels = cfMonths.map(function(m){var p=m.split('-');return MNAMES[+p[1]-1]+' '+p[0].slice(2);});
-  var cfInc = cfMonths.map(function(m){return monthMap[m].inc;});
-  var cfExp = cfMonths.map(function(m){return -monthMap[m].exp;});
-  var cfNet = cfMonths.map(function(m,i){return cfInc[i]+cfExp[i];});
-  var cfImg = makeChartImg({type:'bar',data:{labels:cfLabels,datasets:[
-    {label:'Income',data:cfInc,backgroundColor:'rgba(22,101,52,0.75)',borderRadius:2},
-    {label:'Expenses',data:cfExp,backgroundColor:'rgba(153,27,27,0.65)',borderRadius:2},
-    {label:'Net',data:cfNet,type:'line',borderColor:'#f59e0b',borderWidth:2,pointRadius:2,fill:false,tension:0.3}
-  ]},options:{scales:{x:{ticks:{font:{size:8},maxRotation:45},grid:{display:false}},y:{ticks:{font:{size:8}},grid:{color:'#f3f4f6'}}},plugins:{legend:{labels:{font:{size:8},boxWidth:10}}}}}, 540, 190);
+  const cfMonths = Object.keys(monthMap).sort().slice(-18);
+  const cfInc = cfMonths.map(m=>monthMap[m].inc);
+  const cfExp = cfMonths.map(m=>-monthMap[m].exp);
+  const cfNet = cfMonths.map((m,i)=>cfInc[i]+cfExp[i]);
+  const cfImgUrl = makeChartImg({
+    type:'bar',
+    data:{
+      labels: cfMonths.map(m=>{ const [y,mo]=m.split('-'); return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+mo-1]+' '+y.slice(2); }),
+      datasets:[
+        {label:'Income', data:cfInc, backgroundColor:'rgba(22,101,52,0.75)', borderRadius:2},
+        {label:'Expenses', data:cfExp, backgroundColor:'rgba(153,27,27,0.65)', borderRadius:2},
+        {label:'Net', data:cfNet, type:'line', borderColor:'#f59e0b', borderWidth:2, pointRadius:2, fill:false, tension:0.3, yAxisID:'y'}
+      ]
+    },
+    options:{
+      scales:{
+        x:{ticks:{font:{size:8},maxRotation:45},grid:{display:false}},
+        y:{ticks:{font:{size:8},callback:v=>'€'+v.toFixed(0)},grid:{color:'#f3f4f6'}}
+      },
+      plugins:{legend:{labels:{font:{size:8},boxWidth:10}}}
+    }
+  }, 560, 200);
 
-  // Balance chart
-  var balLabels = entries.map(function(e){var p=e.date.split('-');return p[2]+'/'+p[1]+'/'+p[0].slice(2);});
-  var balVals = entries.map(function(e){return e.balance;});
-  var balImg = makeChartImg({type:'line',data:{labels:balLabels,datasets:[{label:'Balance',data:balVals,borderColor:'#2d7fff',backgroundColor:'rgba(45,127,255,0.08)',borderWidth:2,fill:true,tension:0.25,pointRadius:entries.length>30?0:3}]},options:{scales:{x:{ticks:{font:{size:7},maxRotation:45,maxTicksLimit:14},grid:{display:false}},y:{ticks:{font:{size:8}},grid:{color:'#f3f4f6'}}},plugins:{legend:{labels:{font:{size:8},boxWidth:10}}}}}, 540, 170);
+  // ── 2. Balance Over Time Line Chart ──────────────────────────────────────────
+  const balDates = entries.map(e=>e.date);
+  const balVals  = entries.map(e=>e.balance);
+  const balImgUrl = makeChartImg({
+    type:'line',
+    data:{
+      labels: balDates.map(d=>{ const [y,m,day]=d.split('-'); return day+'/'+m+'/'+y.slice(2); }),
+      datasets:[{
+        label:'Band Fund Balance',
+        data: balVals,
+        borderColor:'#2d7fff',
+        backgroundColor:'rgba(45,127,255,0.08)',
+        borderWidth:2,
+        fill:true,
+        tension:0.25,
+        pointRadius: balDates.length > 30 ? 0 : 3
+      }]
+    },
+    options:{
+      scales:{
+        x:{ticks:{font:{size:7},maxRotation:45,maxTicksLimit:14},grid:{display:false}},
+        y:{ticks:{font:{size:8},callback:v=>'€'+v.toFixed(0)},grid:{color:'#f3f4f6'}}
+      },
+      plugins:{legend:{labels:{font:{size:8},boxWidth:10}}}
+    }
+  }, 560, 180);
 
-  // Revenue by year
-  var revImg = makeChartImg({type:'bar',data:{labels:fi.years.map(String),datasets:[
-    {label:'Revenue',data:fi.years.map(function(y){return fi.revByYear[y]||0;}),backgroundColor:'rgba(22,101,52,0.75)',borderRadius:3},
-    {label:'Expenses',data:fi.years.map(function(y){return fi.expByYear?fi.expByYear[y]||0:0;}),backgroundColor:'rgba(153,27,27,0.6)',borderRadius:3}
-  ]},options:{scales:{x:{ticks:{font:{size:9}},grid:{display:false}},y:{ticks:{font:{size:8}},grid:{color:'#f3f4f6'}}},plugins:{legend:{labels:{font:{size:8},boxWidth:10}}}}}, 350, 170);
+  // ── 3. Revenue by Year Bar Chart ─────────────────────────────────────────────
+  const revYears = fi.years;
+  const revImgUrl = makeChartImg({
+    type:'bar',
+    data:{
+      labels: revYears.map(String),
+      datasets:[
+        {label:'Revenue', data:revYears.map(y=>fi.revByYear[y]||0), backgroundColor:'rgba(22,101,52,0.75)', borderRadius:3},
+        {label:'Expenses', data:revYears.map(y=>fi.expByYear?fi.expByYear[y]||0:0), backgroundColor:'rgba(153,27,27,0.6)', borderRadius:3}
+      ]
+    },
+    options:{
+      scales:{
+        x:{ticks:{font:{size:9}},grid:{display:false}},
+        y:{ticks:{font:{size:8},callback:v=>'€'+v.toFixed(0)},grid:{color:'#f3f4f6'}}
+      },
+      plugins:{legend:{labels:{font:{size:8},boxWidth:10}}}
+    }
+  }, 360, 180);
 
-  // Expense doughnut
-  var spendCats = Object.keys(fi.spendByCat).filter(function(c){return fi.spendByCat[c]>0;});
-  var donutColors = ['#1e3a8a','#166534','#92400e','#7c3aed','#991b1b','#065f46','#374151','#b45309'];
-  var donutImg = makeChartImg({type:'doughnut',data:{labels:spendCats,datasets:[{data:spendCats.map(function(c){return fi.spendByCat[c];}),backgroundColor:donutColors.slice(0,spendCats.length),borderWidth:1,borderColor:'#fff'}]},options:{cutout:'55%',plugins:{legend:{position:'right',labels:{font:{size:8},boxWidth:10,padding:8}}}}}, 350, 170);
+  // ── 4. Expense Breakdown Doughnut ─────────────────────────────────────────────
+  const spendCats = Object.keys(fi.spendByCat).filter(c=>fi.spendByCat[c]>0);
+  const spendVals = spendCats.map(c=>fi.spendByCat[c]);
+  const donutColors = ['#1e3a8a','#166534','#92400e','#7c3aed','#991b1b','#065f46','#374151','#b45309'];
+  const donutImgUrl = makeChartImg({
+    type:'doughnut',
+    data:{
+      labels: spendCats,
+      datasets:[{data:spendVals, backgroundColor:donutColors.slice(0,spendCats.length), borderWidth:1, borderColor:'#fff', hoverOffset:4}]
+    },
+    options:{
+      cutout:'55%',
+      plugins:{legend:{position:'right',labels:{font:{size:8},boxWidth:10,padding:8}}}
+    }
+  }, 360, 180);
 
-  // DCF chart
-  var dcfImg = makeChartImg({type:'bar',data:{labels:['Bear -5%/yr','Base +15%/yr','Bull +40%/yr'],datasets:[{label:'5yr DCF',data:['bear','base','bull'].map(function(k){return Math.max(0,fi.dcfResults[k].value);}),backgroundColor:['rgba(239,68,68,0.7)','rgba(245,158,11,0.75)','rgba(34,197,94,0.75)'],borderRadius:4}]},options:{indexAxis:'y',scales:{x:{ticks:{font:{size:8}},grid:{color:'#f3f4f6'}},y:{ticks:{font:{size:9}},grid:{display:false}}},plugins:{legend:{display:false}}}}, 350, 130);
+  // ── 5. DCF Scenario Bar Chart ─────────────────────────────────────────────────
+  const dcfKeys = ['bear','base','bull'];
+  const dcfVals = dcfKeys.map(k=>Math.max(0, fi.dcfResults[k].value));
+  const dcfImgUrl = makeChartImg({
+    type:'bar',
+    data:{
+      labels:['Bear (−5%/yr)','Base (+15%/yr)','Bull (+40%/yr)'],
+      datasets:[{
+        label:'5-Year DCF Value',
+        data: dcfVals,
+        backgroundColor:['rgba(239,68,68,0.7)','rgba(245,158,11,0.75)','rgba(34,197,94,0.75)'],
+        borderRadius:4
+      }]
+    },
+    options:{
+      indexAxis:'y',
+      scales:{
+        x:{ticks:{font:{size:8},callback:v=>'€'+v.toFixed(0)},grid:{color:'#f3f4f6'}},
+        y:{ticks:{font:{size:9}},grid:{display:false}}
+      },
+      plugins:{legend:{display:false}}
+    }
+  }, 340, 140);
 
-  // Investment recommendations
-  var investRecs = [];
-  var reserveTarget = Math.max(400, fi.opBurn * 6);
-  var investable = Math.max(0, balance - reserveTarget);
+  // ── Investment recommendation engine ─────────────────────────────────────────
+  const investRecs = [];
+  const totalBandFund = balance;
+  const reserveTarget = Math.max(400, fi.opBurn * 6); // 6-month opex reserve
+  const investable = Math.max(0, totalBandFund - reserveTarget);
 
-  if (balance < reserveTarget) {
-    investRecs.push({p:1,icon:'&#9888;',label:'Build 6-Month Operating Reserve',amt:'&euro;'+(reserveTarget-balance).toFixed(2),color:'#991b1b',bg:'#fef2f2',border:'#fecaca',
-      rationale:'Balance &euro;'+balance.toFixed(2)+' is below the recommended 6-month reserve of &euro;'+reserveTarget.toFixed(2)+'. Defer all discretionary spend until reserve is fully funded.',
-      action:'Focus all incoming revenue on replenishing the safety buffer before any other investment.'});
+  // Priority 1: Reserve check
+  if (totalBandFund < reserveTarget) {
+    investRecs.push({
+      priority: 1, icon: '⚠', label: 'Build 6-Month Operating Reserve',
+      amount: (reserveTarget - totalBandFund).toFixed(2),
+      color: '#991b1b', bg: '#fef2f2', border: '#fecaca',
+      rationale: `Current balance €${totalBandFund.toFixed(2)} is below the recommended 6-month reserve of €${reserveTarget.toFixed(2)}. Before any discretionary spend, focus all incoming revenue on replenishing the safety buffer.`,
+      action: 'Defer all non-essential expenditure until reserve is fully funded.'
+    });
   }
-  var studioSpend = fi.spendByCat['Est\u00fadio']||0;
-  investRecs.push({p:2,icon:'&#127897;',label:'Album Recording &amp; Mastering',amt:'&euro;'+Math.max(0,800-studioSpend).toFixed(0)+' remaining',color:'#1e3a8a',bg:'#eff6ff',border:'#bfdbfe',
-    rationale:'&euro;'+studioSpend.toFixed(0)+' invested in studio so far. Estimated total to deliver a mixed &amp; mastered 8-track album: ~&euro;800. A completed album is the highest-ROI asset for booking leverage and sync licensing.',
-    action:investable>400?'Allocate &euro;'+Math.min(investable*0.40,Math.max(0,800-studioSpend)).toFixed(0)+' toward studio sessions in the next 90 days.':'Queue for next revenue milestone.'});
-  investRecs.push({p:3,icon:'&#128227;',label:'Singles Release Campaign (Spotify + Social)',amt:'&euro;150&ndash;300',color:'#5b21b6',bg:'#f5f3ff',border:'#ddd6fe',
-    rationale:'Streaming revenue is critically low (&euro;'+fi.streamingRev.toFixed(2)+' recorded). Each promoted single can generate 2,000&ndash;10,000 streams in 30 days if pitched to editorial playlists. Budget covers paid social, press release, Submithub, and artwork.',
-    action:'Stagger releases every 6&ndash;8 weeks. Submit via CDBaby at least 7 days before release to enable Spotify editorial pitching.'});
+
+  // Priority 2: Studio / album completion
+  const studioSpend = fi.spendByCat['Estúdio'] || 0;
+  const albumStatus = studioSpend > 600 ? 'in progress' : 'not started';
+  investRecs.push({
+    priority: 2, icon: '🎙', label: 'Album Recording & Mastering',
+    amount: (800 - studioSpend > 0 ? (800 - studioSpend).toFixed(2) : '0.00'),
+    color: '#1e3a8a', bg: '#eff6ff', border: '#bfdbfe',
+    rationale: `€${studioSpend.toFixed(0)} invested in studio so far (album ${albumStatus}). Estimated remaining budget to deliver a mixed & mastered 8-track album: ~€800 total. A completed album is the single highest-ROI asset for booking leverage and sync licensing.`,
+    action: investable > 400 ? `Allocate €${Math.min(investable * 0.40, 800 - studioSpend > 0 ? 800 - studioSpend : 0).toFixed(0)} toward studio sessions in the next 90 days.` : 'Queue for next revenue milestone.'
+  });
+
+  // Priority 3: Marketing / single release push
+  investRecs.push({
+    priority: 3, icon: '📣', label: 'Singles Release Campaign (Spotify + Social)',
+    amount: '150–300',
+    color: '#5b21b6', bg: '#f5f3ff', border: '#ddd6fe',
+    rationale: `Streaming revenue is critically low (€${fi.streamingRev.toFixed(2)} recorded). Each well-promoted single can generate 2,000–10,000 streams in the first 30 days if pitched to editorial playlists. Budget covers: paid social (€80–€120), press release distribution (€30–€50), Submithub pitching (€20–€50), and artwork/content creation.`,
+    action: 'Stagger releases every 6–8 weeks. Submit via DistroKid/CDBaby at least 7 days before release to enable Spotify editorial pitching.'
+  });
+
+  // Priority 4: Booking fee increase signal
   if (fi.avgGigFee < 800) {
-    investRecs.push({p:4,icon:'&#127928;',label:'Raise Booking Fee (&euro;'+fi.avgGigFee.toFixed(0)+'&rarr;&euro;800 target)',amt:'n/a',color:'#166534',bg:'#f0fdf4',border:'#bbf7d0',
-      rationale:'Average fee of &euro;'+fi.avgGigFee.toFixed(0)+' is below the &euro;800 threshold for emerging hard rock acts in Portugal. With a proper EPK this is achievable at municipal theatres and mid-size venues.',
-      action:'Update booking quote to &euro;800 minimum for 2026. Produce a one-page EPK referencing FMM-calibre production experience.'});
-  }
-  investRecs.push({p:5,icon:'&copy;',label:'SPA Registration &mdash; Collect Performance Royalties',amt:'&euro;0',color:'#374151',bg:'#f9fafb',border:'#e5e7eb',
-    rationale:'SPA (Sociedade Portuguesa de Autores) collects neighbouring rights when your music is performed live or broadcast. Registration is free. Every confirmed gig generates a claim &mdash; typically &euro;20&ndash;&euro;80/show for emerging artists.',
-    action:'Register all original compositions at spa.pt. Nominate one member as administrator. File performance reports after each show.'});
-
-  function chartOrMsg(url, msg) {
-    return url ? '<img src="'+url+'" style="width:100%;height:auto;display:block" alt="">' : '<div style="color:#aaa;font-size:10px;padding:16px 0;text-align:center">'+msg+'</div>';
+    investRecs.push({
+      priority: 4, icon: '🎸', label: 'Increase Booking Fee (€' + fi.avgGigFee.toFixed(0) + '→ €800 target)',
+      amount: 'n/a',
+      color: '#166534', bg: '#f0fdf4', border: '#bbf7d0',
+      rationale: `Average fee of €${fi.avgGigFee.toFixed(0)} is below the €800 threshold for emerging hard rock acts in Portugal. With an EPK (press pack, rider, stage plot, video links) this is achievable at municipal theatres and mid-size venues. Your gig margin of ${fi.gigMargin !== null ? (fi.gigMargin*100).toFixed(0)+'%' : 'n/a'} confirms headroom to absorb higher-spec technical requirements without eroding profitability.`,
+      action: 'Update booking quote to €800 minimum for 2026. Produce a one-page EPK referencing FMM-calibre production experience.'
+    });
   }
 
-  var extraCss = '<style>'
-    +'.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}'
-    +'.cbox{border:1px solid #e5e7eb;border-radius:3px;padding:10px}'
-    +'.cbox-t{font-family:\'Oswald\',sans-serif;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;color:#374151}'
-    +'.icard{padding:10px 12px;border-radius:3px;margin-bottom:8px;border-left:3px solid}'
-    +'.icard-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}'
-    +'.icard-title{font-family:\'Oswald\',sans-serif;font-size:11px;font-weight:600}'
-    +'.icard-amt{font-size:10px;font-weight:700;white-space:nowrap}'
-    +'.icard-body{font-size:8.5px;color:#555;line-height:1.7;margin-bottom:4px}'
-    +'.icard-act{font-size:8px;font-weight:700;color:#374151}'
-    +'.pbadge{display:inline-block;background:#111;color:#fff;font-size:7px;font-weight:700;padding:1px 5px;border-radius:2px;margin-right:5px}'
-    +'.sig-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}'
-    +'.sig{padding:5px 8px;border-radius:3px;flex:1;min-width:110px;border:1px solid #e5e7eb;font-size:8.5px}'
-    +'.sig.positive{background:#f0fdf4;border-color:#bbf7d0}'
-    +'.sig.warning{background:#fffbeb;border-color:#fde68a}'
-    +'.sig.danger{background:#fef2f2;border-color:#fecaca}'
-    +'.sig.neutral{background:#f9fafb}'
-    +'.sig-val{font-family:\'Oswald\',sans-serif;font-size:13px;font-weight:700}'
-    +'.sig-lbl{font-size:7.5px;color:#555;letter-spacing:.07em;text-transform:uppercase}'
-    +'.sig-det{font-size:7.5px;color:#888;margin-top:1px}'
-    +'.fcbox{border:1px solid #e5e7eb;border-radius:3px;padding:10px;margin-bottom:18px}'
-    +'</style>';
+  // Priority 5: Equipment capex strategy
+  const equipSpend = fi.spendByCat['Equipamento'] || 0;
+  investRecs.push({
+    priority: 5, icon: '🔧', label: 'Equipment — Deferred Capex Strategy',
+    amount: (Math.min(investable * 0.20, 300)).toFixed(0),
+    color: '#92400e', bg: '#fffbeb', border: '#fde68a',
+    rationale: `€${equipSpend.toFixed(0)} spent on equipment to date. Priority items for 2026: in-ear monitor system (reduces stage monitor bleed, professionalises FOH mix) and a reliable DI box set. Avoid impulse Thomann orders — batch purchases quarterly to minimise shipping costs.`,
+    action: 'Compile shared equipment wishlist with members. Vote on priorities. Single annual Thomann order in Q2.'
+  });
 
-  var html = _reportHead('Financial Overview','') + extraCss;
+  // Priority 6: SPA registration (zero cost, high upside)
+  investRecs.push({
+    priority: 6, icon: '©', label: 'SPA Registration — Collect Performance Royalties',
+    amount: '0',
+    color: '#374151', bg: '#f9fafb', border: '#e5e7eb',
+    rationale: `SPA (Sociedade Portuguesa de Autores) collects neighbouring rights when your music is performed live, broadcast on radio/TV, or played in venues. Registration is free. With originals in the set, every confirmed gig generates a claim — typically €20–€80/show for emerging artists. This is free recurring revenue being left uncollected.`,
+    action: 'Register all original compositions at spa.pt. Nominate one member as administrator. File performance reports after each show.'
+  });
 
-  html += '<div class="page">'
-    +'<div class="doc-header">'
-    +'<div><div class="doc-band">The Ginskeys</div><div style="font-size:9px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:3px">Financial Overview &amp; Investment Strategy</div></div>'
-    +'<div class="doc-meta"><div style="font-size:14px;font-family:\'Oswald\',sans-serif;color:#111">Full Financials Report</div><div>'+d+'</div><div>Confidential</div></div>'
-    +'</div>'
+  // ── Build HTML ──────────────────────────────────────────────────────────────
+  // Charts are rendered in the PARENT page's canvas context (Chart.js already loaded),
+  // then embedded as base64 data URLs — no script injection into the popup needed.
+  let html = _reportHead('Financial Overview — Full Report','');
+  // Append extra CSS for report-specific layout classes (pure CSS, no script tags)
+  html += '<style>'
+    + '.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}'
+    + '.chart-box{border:1px solid #e5e7eb;border-radius:4px;padding:12px}'
+    + '.chart-box-title{font-family:\'Oswald\',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;color:#374151}'
+    + '.chart-box img{width:100%;height:auto;display:block}'
+    + '.inv-card{padding:12px 14px;border-radius:4px;margin-bottom:10px;border-left:3px solid}'
+    + '.inv-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}'
+    + '.inv-card-title{font-family:\'Oswald\',sans-serif;font-size:12px;font-weight:600;letter-spacing:.06em}'
+    + '.inv-card-amount{font-family:\'IBM Plex Mono\',monospace;font-size:11px;font-weight:600;white-space:nowrap}'
+    + '.inv-card-rationale{font-size:9px;color:#555;line-height:1.7;margin-bottom:5px}'
+    + '.inv-card-action{font-size:8.5px;font-weight:600;letter-spacing:.05em;color:#374151}'
+    + '.priority-badge{display:inline-block;background:#111;color:#fff;font-size:7px;font-weight:700;letter-spacing:.1em;padding:2px 6px;border-radius:2px;margin-right:6px;vertical-align:middle}'
+    + '.signal-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}'
+    + '.signal-chip{padding:6px 10px;border-radius:3px;font-size:9px;line-height:1.5;flex:1;min-width:120px;border:1px solid #e5e7eb}'
+    + '.signal-chip.positive{background:#f0fdf4;border-color:#bbf7d0}'
+    + '.signal-chip.warning{background:#fffbeb;border-color:#fde68a}'
+    + '.signal-chip.danger{background:#fef2f2;border-color:#fecaca}'
+    + '.signal-chip.neutral{background:#f9fafb;border-color:#e5e7eb}'
+    + '.signal-chip-val{font-family:\'Oswald\',sans-serif;font-size:14px;font-weight:700}'
+    + '.signal-chip-lbl{font-size:8px;color:#555;letter-spacing:.08em;text-transform:uppercase}'
+    + '.signal-chip-detail{font-size:8px;color:#888;margin-top:2px}'
+    + '.full-chart-box{border:1px solid #e5e7eb;border-radius:4px;padding:12px;margin-bottom:20px}'
+    + '</style>';
 
-    +'<div class="kpi-row">'
-    +'<div class="kpi"><div class="kpi-val g">&euro;'+balance.toLocaleString('pt-PT',{minimumFractionDigits:2})+'</div><div class="kpi-lbl">Band Fund</div></div>'
-    +'<div class="kpi"><div class="kpi-val b">&euro;'+fi.totalRevenue.toLocaleString('pt-PT',{minimumFractionDigits:2})+'</div><div class="kpi-lbl">Total Revenue</div></div>'
-    +'<div class="kpi"><div class="kpi-val a">&euro;'+ytdRevenue.toLocaleString('pt-PT',{minimumFractionDigits:2})+'</div><div class="kpi-lbl">YTD Revenue</div></div>'
-    +'<div class="kpi"><div class="kpi-val r">&euro;'+ytdExpenses.toLocaleString('pt-PT',{minimumFractionDigits:2})+'</div><div class="kpi-lbl">YTD Expenses</div></div>'
-    +'<div class="kpi"><div class="kpi-val '+(fi.netPosition>=0?'g':'r')+'">&euro;'+fi.netPosition.toLocaleString('pt-PT',{minimumFractionDigits:2})+'</div><div class="kpi-lbl">Net Position</div></div>'
-    +'<div class="kpi"><div class="kpi-val">'+(fi.runwayMonths===Infinity?'&infin;':fi.runwayMonths.toFixed(1)+' mo')+'</div><div class="kpi-lbl">Cash Runway</div></div>'
-    +'<div class="kpi"><div class="kpi-val">'+fi.gigCount+'</div><div class="kpi-lbl">Total Gigs</div></div>'
-    +'<div class="kpi"><div class="kpi-val '+(fi.gigMargin!==null&&fi.gigMargin>0.6?'g':'a')+'">'+(fi.gigMargin!==null?(fi.gigMargin*100).toFixed(0)+'%':'&mdash;')+'</div><div class="kpi-lbl">Gig Margin</div></div>'
-    +'</div>'
+  html += `<div class="page">
+  <div class="doc-header">
+    <div>
+      <div class="doc-band">The Ginskeys</div>
+      <div style="font-size:9px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:3px">Financial Overview & Investment Strategy</div>
+    </div>
+    <div class="doc-meta">
+      <div style="font-size:14px;font-family:'Oswald',sans-serif;color:#111">Full Financials Report</div>
+      <div>${d}</div><div>Confidential</div>
+    </div>
+  </div>
 
-    +'<div class="section"><div class="section-title">Strategic Signals</div><div class="sig-row">'
-    +fi.signals.map(function(s){return '<div class="sig '+s.type+'"><div class="sig-val">'+s.icon+' '+s.value+'</div><div class="sig-lbl">'+s.label+'</div><div class="sig-det">'+s.detail+'</div></div>';}).join('')
-    +'</div></div>'
+  <!-- KPI Strip -->
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val g">€${balance.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Band Fund</div></div>
+    <div class="kpi"><div class="kpi-val b">€${fi.totalRevenue.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Total Revenue</div></div>
+    <div class="kpi"><div class="kpi-val a">€${ytdRevenue.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">YTD Revenue</div></div>
+    <div class="kpi"><div class="kpi-val r">€${ytdExpenses.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">YTD Expenses</div></div>
+    <div class="kpi"><div class="kpi-val ${fi.netPosition>=0?'g':'r'}">€${fi.netPosition.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Net Position</div></div>
+    <div class="kpi"><div class="kpi-val">${fi.runwayMonths===Infinity?'∞':fi.runwayMonths.toFixed(1)+' mo'}</div><div class="kpi-lbl">Cash Runway</div></div>
+    <div class="kpi"><div class="kpi-val">${fi.gigCount}</div><div class="kpi-lbl">Total Gigs</div></div>
+    <div class="kpi"><div class="kpi-val ${fi.gigMargin!==null&&fi.gigMargin>0.6?'g':'a'}">${fi.gigMargin!==null?(fi.gigMargin*100).toFixed(0)+'%':'—'}</div><div class="kpi-lbl">Gig Margin</div></div>
+  </div>
 
-    +'<div class="fcbox"><div class="cbox-t">Band Fund Balance &mdash; Full History</div>'+chartOrMsg(balImg,'No transaction data')+'</div>'
+  <!-- Strategic Signals -->
+  <div class="section">
+    <div class="section-title">Strategic Intelligence Signals</div>
+    <div class="signal-row">
+    ${fi.signals.map(s=>`
+      <div class="signal-chip ${s.type}">
+        <div class="signal-chip-val">${s.icon} ${s.value}</div>
+        <div class="signal-chip-lbl">${s.label}</div>
+        <div class="signal-chip-detail">${s.detail}</div>
+      </div>`).join('')}
+    </div>
+  </div>
 
-    +'<div class="two-col">'
-    +'<div class="cbox"><div class="cbox-t">Monthly Cash Flow &mdash; Last 18 Months</div>'+chartOrMsg(cfImg,'No data')+'</div>'
-    +'<div class="cbox"><div class="cbox-t">Revenue vs Expenses by Year</div>'+chartOrMsg(revImg,'No data')+'</div>'
-    +'</div>'
+  <!-- Balance Over Time -->
+  <div class="full-chart-box">
+    <div class="chart-box-title">Band Fund Balance — Full History</div>
+    ${balImgUrl ? `<img src="${balImgUrl}" alt="Balance chart">` : '<div style="color:#aaa;font-size:10px;padding:20px 0;text-align:center">Chart unavailable (no transaction data)</div>'}
+  </div>
 
-    +'<div class="two-col">'
-    +'<div class="cbox"><div class="cbox-t">Expense Breakdown by Category</div>'+chartOrMsg(donutImg,'No data')+'</div>'
-    +'<div class="cbox"><div class="cbox-t">5-Year DCF Valuation &mdash; Scenarios</div>'+chartOrMsg(dcfImg,'No data')
-    +'<div style="font-size:7.5px;color:#888;margin-top:6px;line-height:1.6">Bear: &minus;5%/yr &nbsp;&middot;&nbsp; Base: +15%/yr &nbsp;&middot;&nbsp; Bull: +40%/yr<br>Discount 12% &middot; Terminal growth 2% &middot; Base net &euro;'+fi.baseAnnualNet.toFixed(0)+'</div></div>'
-    +'</div>'
+  <!-- Cash Flow & Revenue/Year side by side -->
+  <div class="two-col">
+    <div class="chart-box">
+      <div class="chart-box-title">Monthly Cash Flow — Last 18 Months</div>
+      ${cfImgUrl ? `<img src="${cfImgUrl}" alt="Cash flow chart">` : '<div style="color:#aaa;font-size:10px;padding:20px 0;text-align:center">No data</div>'}
+    </div>
+    <div class="chart-box">
+      <div class="chart-box-title">Revenue vs Expenses by Year</div>
+      ${revImgUrl ? `<img src="${revImgUrl}" alt="Revenue by year">` : '<div style="color:#aaa;font-size:10px;padding:20px 0;text-align:center">No data</div>'}
+    </div>
+  </div>
 
-    +'<div class="section"><div class="section-title">Revenue Ledger by Year</div>'
-    +'<table><thead><tr><th>Year</th><th style="text-align:right">Revenue</th><th style="text-align:right">Expenses</th><th style="text-align:right">Net</th><th style="text-align:right">Gigs</th><th style="text-align:right">YoY</th></tr></thead><tbody>'
-    +fi.years.map(function(yr,i){
-      var rev=fi.revByYear[yr]||0,exp=fi.expByYear?fi.expByYear[yr]||0:0,net=rev-exp;
-      var gigs=LEDGER_DATA.filter(function(e){return new Date(e.date).getFullYear()===yr&&e.cat==='Espet\u00e1culo'&&e.amount>0;}).length;
-      var prev=i>0?fi.revByYear[fi.years[i-1]]||0:0;
-      var yoy=prev>0?((rev-prev)/prev*100).toFixed(1):null;
-      return '<tr><td style="font-weight:700">'+yr+'</td>'
-        +'<td style="text-align:right;color:#166534">&euro;'+rev.toLocaleString('pt-PT',{minimumFractionDigits:2})+'</td>'
-        +'<td style="text-align:right;color:#991b1b">&euro;'+exp.toLocaleString('pt-PT',{minimumFractionDigits:2})+'</td>'
-        +'<td style="text-align:right;font-weight:700;color:'+(net>=0?'#166534':'#991b1b')+'">&euro;'+net.toLocaleString('pt-PT',{minimumFractionDigits:2})+'</td>'
-        +'<td style="text-align:right">'+gigs+'</td>'
-        +'<td style="text-align:right;color:'+(yoy&&yoy>0?'#166534':'#991b1b')+'">'+(yoy?yoy+'%':'&mdash;')+'</td></tr>';
-    }).join('')
-    +'</tbody></table></div>'
+  <!-- Expense breakdown & DCF side by side -->
+  <div class="two-col">
+    <div class="chart-box">
+      <div class="chart-box-title">Expense Breakdown by Category</div>
+      ${donutImgUrl ? `<img src="${donutImgUrl}" alt="Expense breakdown">` : '<div style="color:#aaa;font-size:10px;padding:20px 0;text-align:center">No data</div>'}
+    </div>
+    <div class="chart-box">
+      <div class="chart-box-title">5-Year DCF Valuation — Scenarios</div>
+      ${dcfImgUrl ? `<img src="${dcfImgUrl}" alt="DCF valuation">` : '<div style="color:#aaa;font-size:10px;padding:20px 0;text-align:center">No data</div>'}
+      <div style="font-size:8px;color:#888;margin-top:8px;line-height:1.6">
+        Bear: −5%/yr (fewer gigs) &nbsp;·&nbsp; Base: +15%/yr (1 release + 4 gigs) &nbsp;·&nbsp; Bull: +40%/yr (album + festivals)<br>
+        Discount rate: 12% · Terminal growth: 2% · Base annual net: €${fi.baseAnnualNet.toFixed(0)}
+      </div>
+    </div>
+  </div>
 
-    +'<div class="footer"><div>The Ginskeys &mdash; Financial Report &middot; Page 1</div><div>'+d+' &middot; Confidential</div></div>'
-    +'</div>'
+  <!-- Revenue by Year Table -->
+  <div class="section">
+    <div class="section-title">Revenue Ledger by Year</div>
+    <table><thead><tr>
+      <th>Year</th>
+      <th style="text-align:right">Revenue</th>
+      <th style="text-align:right">Expenses</th>
+      <th style="text-align:right">Net</th>
+      <th style="text-align:right">Gig Bookings</th>
+      <th style="text-align:right">YoY Growth</th>
+    </tr></thead><tbody>
+    ${fi.years.map((yr,i)=>{
+      const rev=fi.revByYear[yr]||0;
+      const exp=fi.expByYear?fi.expByYear[yr]||0:0;
+      const net=rev-exp;
+      const gigs=LEDGER_DATA.filter(e=>new Date(e.date).getFullYear()===yr&&e.cat==='Espetáculo'&&e.amount>0).length;
+      const prev=i>0?fi.revByYear[fi.years[i-1]]||0:0;
+      const yoy=prev>0?((rev-prev)/prev*100).toFixed(1):null;
+      return `<tr>
+        <td style="font-weight:700">${yr}</td>
+        <td style="text-align:right;color:#166534">€${rev.toLocaleString('pt-PT',{minimumFractionDigits:2})}</td>
+        <td style="text-align:right;color:#991b1b">€${exp.toLocaleString('pt-PT',{minimumFractionDigits:2})}</td>
+        <td style="text-align:right;font-weight:700;color:${net>=0?'#166534':'#991b1b'}">€${net.toLocaleString('pt-PT',{minimumFractionDigits:2})}</td>
+        <td style="text-align:right">${gigs}</td>
+        <td style="text-align:right;color:${yoy&&yoy>0?'#166534':'#991b1b'}">${yoy?yoy+'%':'—'}</td>
+      </tr>`;
+    }).join('')}
+    </tbody></table>
+  </div>
 
-    +'<div class="page">'
-    +'<div class="doc-header">'
-    +'<div><div class="doc-band">The Ginskeys</div><div style="font-size:9px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:3px">Capital Allocation &amp; Investment Recommendations</div></div>'
-    +'<div class="doc-meta"><div style="font-size:14px;font-family:\'Oswald\',sans-serif;color:#111">Where to Invest the Band Fund</div><div>'+d+'</div><div>Confidential</div></div>'
-    +'</div>'
+  <div class="footer"><div>The Ginskeys — Financial Report · Page 1</div><div>${d} · Confidential</div></div>
+</div>
 
-    +'<div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">'
-    +'<div class="kpi"><div class="kpi-val g">&euro;'+balance.toLocaleString('pt-PT',{minimumFractionDigits:2})+'</div><div class="kpi-lbl">Available Fund</div></div>'
-    +'<div class="kpi"><div class="kpi-val a">&euro;'+reserveTarget.toLocaleString('pt-PT',{minimumFractionDigits:2})+'</div><div class="kpi-lbl">Reserve Target 6mo</div></div>'
-    +'<div class="kpi"><div class="kpi-val '+(investable>0?'b':'r')+'">&euro;'+investable.toLocaleString('pt-PT',{minimumFractionDigits:2})+'</div><div class="kpi-lbl">Deployable Capital</div></div>'
-    +'<div class="kpi"><div class="kpi-val">'+(fi.opBurn>0?'&euro;'+fi.opBurn.toFixed(0)+'/mo':'&infin;')+'</div><div class="kpi-lbl">Monthly Op. Burn</div></div>'
-    +'</div>'
+<!-- PAGE 2: Investment Recommendations -->
+<div class="page">
+  <div class="doc-header">
+    <div>
+      <div class="doc-band">The Ginskeys</div>
+      <div style="font-size:9px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:3px">Capital Allocation & Investment Recommendations</div>
+    </div>
+    <div class="doc-meta">
+      <div style="font-size:14px;font-family:'Oswald',sans-serif;color:#111">Where to Invest the Band Fund</div>
+      <div>${d}</div><div>Confidential</div>
+    </div>
+  </div>
 
-    +'<div class="note" style="margin-bottom:14px"><strong>Allocation framework:</strong> Deployable capital = band fund above 6-month operational reserve. '
-    +'Revenue split target once reserves are healthy: <strong>60% to members &middot; 25% to Band Fund &middot; 15% to operating costs.</strong> '
-    +'Log all spend in the Terminal immediately after payment.</div>'
+  <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kpi"><div class="kpi-val g">€${totalBandFund.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Available Fund</div></div>
+    <div class="kpi"><div class="kpi-val a">€${reserveTarget.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Reserve Target (6mo)</div></div>
+    <div class="kpi"><div class="kpi-val ${investable>0?'b':'r'}">€${investable.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div><div class="kpi-lbl">Deployable Capital</div></div>
+    <div class="kpi"><div class="kpi-val">${fi.opBurn>0?'€'+fi.opBurn.toFixed(0)+'/mo':'∞'}</div><div class="kpi-lbl">Monthly Op. Burn</div></div>
+  </div>
 
-    +investRecs.map(function(rec){
-      return '<div class="icard" style="background:'+rec.bg+';border-color:'+rec.color+'">'
-        +'<div class="icard-hdr"><div class="icard-title"><span class="pbadge">'+rec.p+'</span>'+rec.icon+' '+rec.label+'</div>'
-        +'<div class="icard-amt" style="color:'+rec.color+'">'+rec.amt+'</div></div>'
-        +'<div class="icard-body">'+rec.rationale+'</div>'
-        +'<div class="icard-act">&rarr; '+rec.action+'</div>'
-        +'</div>';
-    }).join('')
+  <div class="note" style="margin-bottom:16px">
+    <strong>Allocation framework:</strong> The deployable capital figure (€${investable.toFixed(2)}) represents band fund above a 6-month operational reserve.
+    Recommendations below are ranked by expected ROI and strategic urgency. Revenue from gigs should be split:
+    <strong>60% to members, 25% to Band Fund, 15% to operating costs</strong> — this is the target split once reserves are healthy.
+    All spend should be logged in the Terminal immediately after payment.
+  </div>
 
-    +'<div class="section" style="margin-top:16px"><div class="section-title">Gig Economics &mdash; Profitability Analysis</div>'
-    +'<table><thead><tr><th>Metric</th><th style="text-align:right">Value</th><th>Benchmark</th><th>Status</th></tr></thead><tbody>'
-    +'<tr><td>Total gigs played</td><td style="text-align:right;font-weight:700">'+fi.gigCount+'</td><td>&mdash;</td><td>&mdash;</td></tr>'
-    +'<tr><td>Average booking fee</td><td style="text-align:right;font-weight:700">&euro;'+fi.avgGigFee.toFixed(2)+'</td><td>&euro;800 target</td><td><span class="badge '+(fi.avgGigFee>=800?'badge-g':'badge-a')+'">'+(fi.avgGigFee>=800?'&#10003; On target':'Below target')+'</span></td></tr>'
-    +'<tr><td>Avg direct cost/gig</td><td style="text-align:right;font-weight:700">&euro;'+fi.costPerGig.toFixed(2)+'</td><td>&lt;&euro;150</td><td><span class="badge '+(fi.costPerGig<150?'badge-g':'badge-a')+'">'+(fi.costPerGig<150?'&#10003; Efficient':'Review costs')+'</span></td></tr>'
-    +'<tr><td>Gross gig margin</td><td style="text-align:right;font-weight:700">'+(fi.gigMargin!==null?(fi.gigMargin*100).toFixed(1)+'%':'&mdash;')+'</td><td>&gt;70%</td><td><span class="badge '+(fi.gigMargin&&fi.gigMargin>0.7?'badge-g':'badge-a')+'">'+(fi.gigMargin&&fi.gigMargin>0.7?'&#10003; Healthy':'Improve margin')+'</span></td></tr>'
-    +'<tr><td>Revenue ROI on invested capital</td><td style="text-align:right;font-weight:700">'+(fi.gigRevenue/Math.max(1,fi.investmentTotal)).toFixed(2)+'x</td><td>&gt;1.5x</td><td><span class="badge '+(fi.gigRevenue/Math.max(1,fi.investmentTotal)>1.5?'badge-g':'badge-a')+'">'+(fi.gigRevenue/Math.max(1,fi.investmentTotal)>1.5?'&#10003; Positive ROI':'Building')+'</span></td></tr>'
-    +'<tr><td>Revenue concentration (live)</td><td style="text-align:right;font-weight:700">'+fi.liveShare.toFixed(0)+'%</td><td>&lt;70%</td><td><span class="badge '+(fi.liveShare<70?'badge-g':'badge-r')+'">'+(fi.liveShare<70?'&#10003; Diversified':'High concentration')+'</span></td></tr>'
-    +'</tbody></table></div>'
+  ${investRecs.map(rec=>`
+  <div class="inv-card" style="background:${rec.bg};border-color:${rec.color}">
+    <div class="inv-card-header">
+      <div class="inv-card-title">
+        <span class="priority-badge">${rec.priority}</span>
+        ${rec.icon} ${rec.label}
+      </div>
+      <div class="inv-card-amount" style="color:${rec.color}">€${rec.amount}</div>
+    </div>
+    <div class="inv-card-rationale">${rec.rationale}</div>
+    <div class="inv-card-action">→ ${rec.action}</div>
+  </div>`).join('')}
 
-    +'<div class="footer"><div>The Ginskeys &mdash; Financial Report &middot; Page 2</div><div>'+d+' &middot; Confidential</div></div>'
-    +'</div>';
+  <!-- Gig Economics Summary -->
+  <div class="section" style="margin-top:20px">
+    <div class="section-title">Gig Economics — Profitability Analysis</div>
+    <table><thead><tr>
+      <th>Metric</th><th style="text-align:right">Value</th><th>Benchmark</th><th>Status</th>
+    </tr></thead><tbody>
+      <tr><td>Total gigs played</td><td style="text-align:right;font-weight:700">${fi.gigCount}</td><td>—</td><td>—</td></tr>
+      <tr><td>Average booking fee</td><td style="text-align:right;font-weight:700">€${fi.avgGigFee.toFixed(2)}</td><td>€800 target</td><td><span class="badge ${fi.avgGigFee>=800?'badge-g':'badge-a'}">${fi.avgGigFee>=800?'✓ On target':'Below target'}</span></td></tr>
+      <tr><td>Average direct cost per gig</td><td style="text-align:right;font-weight:700">€${fi.costPerGig.toFixed(2)}</td><td>&lt;€150</td><td><span class="badge ${fi.costPerGig<150?'badge-g':'badge-a'}">${fi.costPerGig<150?'✓ Efficient':'Review costs'}</span></td></tr>
+      <tr><td>Gross gig margin</td><td style="text-align:right;font-weight:700">${fi.gigMargin!==null?(fi.gigMargin*100).toFixed(1)+'%':'—'}</td><td>&gt;70%</td><td><span class="badge ${fi.gigMargin&&fi.gigMargin>0.7?'badge-g':'badge-a'}">${fi.gigMargin&&fi.gigMargin>0.7?'✓ Healthy':'Improve margin'}</span></td></tr>
+      <tr><td>Total investment in band assets</td><td style="text-align:right;font-weight:700">€${fi.investmentTotal.toFixed(2)}</td><td>—</td><td>—</td></tr>
+      <tr><td>Revenue ROI on invested capital</td><td style="text-align:right;font-weight:700">${(fi.gigRevenue/Math.max(1,fi.investmentTotal)).toFixed(2)}x</td><td>&gt;1.5x</td><td><span class="badge ${fi.gigRevenue/Math.max(1,fi.investmentTotal)>1.5?'badge-g':'badge-a'}">${fi.gigRevenue/Math.max(1,fi.investmentTotal)>1.5?'✓ Positive ROI':'Building'}</span></td></tr>
+      <tr><td>Gigs to break even (fixed overheads)</td><td style="text-align:right;font-weight:700">${fi.gigsToBreakEven!==null?fi.gigsToBreakEven+' gigs/yr':'—'}</td><td>&lt;4</td><td><span class="badge ${fi.gigsToBreakEven&&fi.gigsToBreakEven<=4?'badge-g':'badge-a'}">${fi.gigsToBreakEven&&fi.gigsToBreakEven<=4?'✓ Achievable':'Review overheads'}</span></td></tr>
+      <tr><td>Revenue concentration (live/total)</td><td style="text-align:right;font-weight:700">${fi.liveShare.toFixed(0)}%</td><td>&lt;70%</td><td><span class="badge ${fi.liveShare<70?'badge-g':'badge-r'}">${fi.liveShare<70?'✓ Diversified':'High concentration'}</span></td></tr>
+    </tbody></table>
+  </div>
 
+  <div class="footer"><div>The Ginskeys — Financial Report · Page 2</div><div>${d} · Confidential</div></div>
+</div>`;
   html += _reportFoot();
   _openReport(html);
 }
