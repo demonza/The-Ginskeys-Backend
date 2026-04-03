@@ -230,4 +230,35 @@ router.patch('/checklist/:id', requireAuth, requirePerm('addTxn'), async (req, r
   } catch(err) { next(err); }
 });
 
+// ── GET /api/production/rider ──────────────────────
+// Returns all rider fields as { field_key: field_value, ... }
+router.get('/rider', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
+  try {
+    const { rows } = await pool.query(`SELECT field_key, field_value FROM tech_rider_fields`);
+    const data = {};
+    for (const row of rows) data[row.field_key] = row.field_value;
+    res.json(data);
+  } catch (err) { next(err); }
+});
+
+// ── PUT /api/production/rider ──────────────────────
+// Body: { field_key: string, field_value: string }
+// Upserts a single field. Called on every blur/debounced input.
+router.put('/rider', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
+  try {
+    const { field_key, field_value } = req.body;
+    if (!field_key) return res.status(400).json({ error: 'field_key required' });
+    await pool.query(
+      `INSERT INTO tech_rider_fields (field_key, field_value, updated_by, updated_at)
+       VALUES ($1, $2, $3, now())
+       ON CONFLICT (field_key) DO UPDATE
+         SET field_value = EXCLUDED.field_value,
+             updated_by  = EXCLUDED.updated_by,
+             updated_at  = now()`,
+      [field_key, field_value ?? '', req.user.id]
+    );
+    res.json({ ok: true, field_key });
+  } catch (err) { next(err); }
+});
+
 module.exports = router;
