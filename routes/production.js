@@ -231,33 +231,76 @@ router.patch('/checklist/:id', requireAuth, requirePerm('addTxn'), async (req, r
 });
 
 // ── GET /api/production/rider ──────────────────────
-// Returns all rider fields as { field_key: field_value, ... }
+// ?show_id=UUID — returns all fields for that show (or global if omitted)
 router.get('/rider', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
   try {
-    const { rows } = await pool.query(`SELECT field_key, field_value FROM tech_rider_fields`);
+    const { show_id } = req.query;
+    let rows;
+    if (show_id) {
+      // Return show-specific fields, falling back to global defaults where missing
+      const result = await pool.query(
+        `SELECT COALESCE(s.field_key, g.field_key) AS field_key,
+                COALESCE(s.field_value, g.field_value) AS field_value
+         FROM tech_rider_fields g
+         FULL OUTER JOIN tech_rider_fields s
+           ON s.field_key = g.field_key || ':show:' || $1
+         WHERE g.show_id IS NULL OR s.show_id = $1`,
+        [show_id]
+      );
+      rows = result.rows;
+    } else {
+      // Simple: return all fields scoped to no show (global defaults)
+      const result = await pool.query(
+        `SELECT field_key, field_value FROM tech_rider_fields WHERE show_id IS NULL ORDER BY field_key`
+      );
+      rows = result.rows;
+    }
     const data = {};
     for (const row of rows) data[row.field_key] = row.field_value;
     res.json(data);
   } catch (err) { next(err); }
 });
 
+// ── GET /api/production/rider/:show_id ─────────────
+// Cleaner per-show fetch
+router.get('/rider/:show_id', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
+  try {
+    const { show_id } = req.params;
+    // Get show-specific fields
+    const { rows } = await pool.query(
+      `SELECT field_key, field_value FROM tech_rider_fields WHERE show_id = $1`,
+      [show_id]
+    );
+    // Also get global defaults
+    const { rows: globalRows } = await pool.query(
+      `SELECT field_key, field_value FROM tech_rider_fields WHERE show_id IS NULL`
+    );
+    // Merge: show-specific overrides globals
+    const data = {};
+    for (const row of globalRows) data[row.field_key] = row.field_value;
+    for (const row of rows) data[row.field_key] = row.field_value;
+    res.json(data);
+  } catch (err) { next(err); }
+});
+
 // ── PUT /api/production/rider ──────────────────────
-// Body: { field_key: string, field_value: string }
-// Upserts a single field. Called on every blur/debounced input.
+// Body: { field_key, field_value, show_id? }
+// show_id = null → saves as global default (template)
+// show_id = UUID → saves for that specific show only
 router.put('/rider', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
   try {
-    const { field_key, field_value } = req.body;
+    const { field_key, field_value, show_id = null } = req.body;
     if (!field_key) return res.status(400).json({ error: 'field_key required' });
     await pool.query(
-      `INSERT INTO tech_rider_fields (field_key, field_value, updated_by, updated_at)
-       VALUES ($1, $2, $3, now())
-       ON CONFLICT (field_key) DO UPDATE
+      `INSERT INTO tech_rider_fields (field_key, field_value, show_id, updated_by, updated_at)
+       VALUES ($1, $2, $3, $4, now())
+       ON CONFLICT (field_key, show_id) DO UPDATE
          SET field_value = EXCLUDED.field_value,
              updated_by  = EXCLUDED.updated_by,
              updated_at  = now()`,
-      [field_key, field_value ?? '', req.user.id]
+      [field_key, field_value ?? '', show_id, req.user.id]
     );
-    res.json({ ok: true, field_key });
+    res.json({ ok: true, field_key, show_id });
   } catch (err) { next(err); }
 });
 
