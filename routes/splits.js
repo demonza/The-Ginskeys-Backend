@@ -74,3 +74,47 @@ router.delete('/:id', requireAuth, requirePerm('deleteTxn'), async (req, res, ne
 });
 
 module.exports = router;
+// ── GET /api/splits/member-accounts ───────────────────────
+// Returns balance per member + recent transactions
+router.get('/member-accounts', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
+  try {
+    // Get balances
+    const { rows: balances } = await pool.query(`
+      SELECT member_key, member_name,
+        COALESCE(SUM(CASE WHEN txn_type IN ('split_credit','deposit') THEN amount ELSE 0 END), 0) AS total_in,
+        COALESCE(SUM(CASE WHEN txn_type = 'withdrawal' THEN amount ELSE 0 END), 0) AS total_out,
+        COALESCE(SUM(CASE WHEN txn_type IN ('split_credit','deposit') THEN amount ELSE -amount END), 0) AS balance
+      FROM member_account_txns
+      GROUP BY member_key, member_name
+      ORDER BY member_key
+    `);
+
+    // Get recent transactions (last 50)
+    const { rows: txns } = await pool.query(`
+      SELECT * FROM member_account_txns
+      ORDER BY txn_date DESC, created_at DESC
+      LIMIT 50
+    `);
+
+    res.json({ balances, txns });
+  } catch (err) { next(err); }
+});
+
+// ── POST /api/splits/member-accounts/txn ──────────────────
+router.post('/member-accounts/txn', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
+  try {
+    const { member_key, member_name, amount, txn_type, description, txn_date, split_id } = req.body;
+    if (!member_key || !amount || !txn_type) return res.status(400).json({ error: 'member_key, amount, txn_type required' });
+    const { rows } = await pool.query(`
+      INSERT INTO member_account_txns
+        (member_key, member_name, amount, txn_type, description, txn_date, split_id, created_by)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
+      [member_key, member_name || member_key, Math.abs(parseFloat(amount)),
+       txn_type, description || null, txn_date || new Date().toISOString().split('T')[0],
+       split_id || null, req.user.id]
+    );
+    res.status(201).json(rows[0]);
+  } catch (err) { next(err); }
+});
+
+module.exports = router;
