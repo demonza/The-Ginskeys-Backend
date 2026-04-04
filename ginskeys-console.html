@@ -1849,10 +1849,14 @@ tr:hover .edit-btn{display:inline}
 </div>
 
 <!-- ══ KPI STRIP ═════════════════════════════════════ -->
-    <div class="kpi-sub up" id="kpi-balance-change">+€0 vs last txn</div>
-<div id="export-report-bar" style="display:none;justify-content:flex-end;padding:4px 8px;border-bottom:1px solid var(--border);flex-shrink:0">
+<div id="export-report-bar" style="display:none;justify-content:flex-end;padding:4px 10px;background:var(--bg0);border-bottom:1px solid var(--border);flex-shrink:0">
   <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printFinancialsReport()">⎙ Export Financial Report</button>
 </div>
+<div class="kpi-strip" style="grid-template-columns:repeat(8,1fr)">
+  <div class="kpi-card green">
+    <div class="kpi-label" data-i18n="kpi_balance">Total Balance</div>
+    <div class="kpi-value green" id="kpi-total-balance">€ 1,626.65</div>
+    <div class="kpi-sub up" id="kpi-balance-change">+€0 vs last txn</div>
 
   </div>
   <div class="kpi-card blue">
@@ -1890,9 +1894,6 @@ tr:hover .edit-btn{display:inline}
     <div class="kpi-value white" id="kpi-fcf">€ —</div>
     <div class="kpi-sub neutral" id="kpi-fcf-sub">trailing − capex</div>
   </div>
-</div>
-<div id="export-report-bar" style="display:none;justify-content:flex-end;padding:4px 8px;background:var(--bg0);border-bottom:1px solid var(--border);flex-shrink:0">
-  <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printFinancialsReport()">⎙ Export Financial Report</button>
 </div>
 
 <!-- ══ CONTENT AREA ══════════════════════════════════ -->
