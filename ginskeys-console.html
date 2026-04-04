@@ -8746,6 +8746,9 @@ function enterApp(){
   }
   applyRolePermissions();
   applyTranslations();
+  // Activate default view properly so inline style matches CSS
+  var defaultTab = document.querySelector('.tb-tab[data-view="mgmt"]');
+  switchView('mgmt', defaultTab);
   initAll();
 }
 
