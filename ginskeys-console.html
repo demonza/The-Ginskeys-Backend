@@ -1849,7 +1849,7 @@ tr:hover .edit-btn{display:inline}
 </div>
 
 <!-- ══ KPI STRIP ═════════════════════════════════════ -->
-<div style="display:flex;justify-content:flex-end;padding:4px 10px;background:var(--bg0);border-bottom:1px solid var(--border);flex-shrink:0">
+<div id="export-report-bar" style="display:none;justify-content:flex-end;padding:4px 10px;background:var(--bg0);border-bottom:1px solid var(--border);flex-shrink:0">
   <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printFinancialsReport()">⎙ Export Financial Report</button>
 </div>
 <div class="kpi-strip" style="grid-template-columns:repeat(8,1fr)">
@@ -8710,6 +8710,9 @@ function switchView(view, tab){
     alert('Your role ('+SESSION.role+') does not have permission to view this section.');
     return;
   }
+  // Show Export Financial Report button only on Financials tab
+  var exportBar = document.getElementById('export-report-bar');
+  if (exportBar) exportBar.style.display = (view === 'dashboard') ? 'flex' : 'none';
   document.querySelectorAll('.view').forEach(v=>{
     v.classList.remove('active');
     v.style.display='none';
