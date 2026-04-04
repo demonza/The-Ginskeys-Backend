@@ -1853,10 +1853,15 @@ tr:hover .edit-btn{display:inline}
   <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printFinancialsReport()">⎙ Export Financial Report</button>
 </div>
 <div class="kpi-strip" style="grid-template-columns:repeat(8,1fr)">
-  <div class="kpi-card green">
+  <div class="kpi-card green" style="grid-column:span 2">
     <div class="kpi-label" data-i18n="kpi_balance">Total Balance</div>
-    <div class="kpi-value green" id="kpi-total-balance">€ 1,626.65</div>
-    <div class="kpi-sub up" id="kpi-balance-change">+€0 vs last txn</div>
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <div class="kpi-value green" id="kpi-total-balance">€ 1,626.65</div>
+      <div class="kpi-sub up" id="kpi-balance-change" style="flex-shrink:0">+€0 vs last txn</div>
+    </div>
+    <div id="kpi-member-breakdown" style="font-size:9px;color:var(--muted3);margin-top:3px;letter-spacing:.04em;line-height:1.6">
+      loading member accounts…
+    </div>
   </div>
   <div class="kpi-card blue">
     <div class="kpi-label" data-i18n="kpi_runway">Cash Runway</div>
@@ -3233,6 +3238,7 @@ tr:hover .edit-btn{display:inline}
           <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
             <span>Member</span>
             <select id="mw-member" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+              <option value="band_fund">Band Fund</option>
               <option value="fabio">Fábio</option>
               <option value="pedro">Pedro</option>
               <option value="manuel">Manuel</option>
@@ -3268,6 +3274,7 @@ tr:hover .edit-btn{display:inline}
           <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
             <span>Member</span>
             <select id="md-member" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+              <option value="band_fund">Band Fund</option>
               <option value="fabio">Fábio</option>
               <option value="pedro">Pedro</option>
               <option value="manuel">Manuel</option>
@@ -3827,7 +3834,7 @@ function renderReleasesList() {
         <div style="display:flex;gap:8px;margin-top:4px">
           <span style="font-size:9px;color:${RELEASE_STAGE_COLORS[r.stage]};font-weight:700;text-transform:uppercase">${r.stage}</span>
           ${r.release_date?`<span style="font-size:9px;color:var(--muted3)">${r.release_date}</span>`:''}
-          <span style="font-size:9px;color:var(--muted3)">${doneCount}/4 tasks</span>
+          <span style="font-size:9px;color:var(--muted3)">${doneCount}/5 tasks</span>
         </div>
         <div style="display:flex;gap:6px;margin-top:4px">
           ${checks.map(c=>`<span style="font-size:8px;padding:1px 5px;border-radius:1px;background:${c.done?'rgba(0,230,118,.12)':'rgba(255,255,255,.04)'};color:${c.done?'var(--green3)':'var(--muted3)'}">${c.label}</span>`).join('')}
@@ -4176,10 +4183,11 @@ function renderSplitHistory() {
 var MEMBER_ACCOUNTS_DATA = { balances: [], txns: [], total_balance: 0 };
 
 var MEMBER_DEFS = [
-  { key: 'fabio',  name: 'Fabio',  color: 'var(--accent)' },
-  { key: 'pedro',  name: 'Pedro',  color: 'var(--blue2)' },
-  { key: 'manuel', name: 'Manuel', color: 'var(--green3)' },
-  { key: 'tiago',  name: 'Tiago',  color: 'var(--purple2)' },
+  { key: 'fabio',     name: 'Fábio',     color: 'var(--accent)' },
+  { key: 'pedro',     name: 'Pedro',     color: 'var(--blue2)' },
+  { key: 'manuel',    name: 'Manuel',    color: 'var(--green3)' },
+  { key: 'tiago',     name: 'Tiago',     color: 'var(--purple2)' },
+  { key: 'band_fund', name: 'Band Fund', color: 'var(--amber2)' },
 ];
 
 async function loadMemberAccounts() {
@@ -4187,6 +4195,8 @@ async function loadMemberAccounts() {
   try {
     MEMBER_ACCOUNTS_DATA = await apiGet('/splits/member-accounts');
     renderMemberAccounts();
+    // After member data arrives, always update the KPI immediately
+    updateKpiMemberBreakdown();
   } catch(e) { console.warn('loadMemberAccounts:', e.message); }
 }
 
@@ -4197,11 +4207,17 @@ function renderMemberAccounts() {
   var balMap = {};
   (MEMBER_ACCOUNTS_DATA.balances || []).forEach(function(b) { balMap[b.member_key] = b; });
 
-  var totalBandBalance = parseFloat(MEMBER_ACCOUNTS_DATA.total_balance || 0);
+  // Use frontend ledger balance as source of truth (same as KPI), fall back to backend
+  var ledgerBalance = LEDGER_DATA && LEDGER_DATA.length > 0
+    ? parseFloat(LEDGER_DATA[0].balance || 0)
+    : parseFloat(MEMBER_ACCOUNTS_DATA.total_balance || 0);
+  var totalBandBalance = ledgerBalance;
+
+  // Keep KPI breakdown in sync whenever member accounts update
+  updateKpiMemberBreakdown();
   var totalMemberBalances = MEMBER_DEFS.reduce(function(s, m) {
     return s + parseFloat((balMap[m.key] || {}).balance || 0);
   }, 0);
-  var unallocated = totalBandBalance - totalMemberBalances;
 
   // Summary bar
   var sumEl = document.getElementById('member-accounts-summary');
@@ -4209,16 +4225,8 @@ function renderMemberAccounts() {
     sumEl.innerHTML =
       '<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:10px;padding:8px 12px;' +
       'background:var(--bg4);border-radius:2px;margin-bottom:8px;border-left:3px solid var(--amber2)">' +
-        '<span style="color:var(--muted);font-size:9px;letter-spacing:.08em">TOTAL BAND BALANCE</span>' +
-        '<span style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--text)">€' + totalBandBalance.toFixed(2) + '</span>' +
-        '<span style="color:var(--border2)">|</span>' +
-        '<span style="color:var(--muted);font-size:9px">OWED TO MEMBERS</span>' +
-        '<span style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--amber2)">€' + totalMemberBalances.toFixed(2) + '</span>' +
-        '<span style="color:var(--border2)">|</span>' +
-        '<span style="color:var(--muted);font-size:9px">NOT YET SPLIT</span>' +
-        '<span style="font-family:var(--display);font-size:16px;font-weight:700;color:' + (unallocated >= 0 ? 'var(--green3)' : 'var(--red3)') + '">' +
-          (unallocated >= 0 ? '' : '-') + '€' + Math.abs(unallocated).toFixed(2) +
-        '</span>' +
+        '<span style="color:var(--muted);font-size:9px;letter-spacing:.08em">BAND TOTAL (MEMBER ACCOUNTS)</span>' +
+        '<span style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green3)">€' + totalMemberBalances.toFixed(2) + '</span>' +
       '</div>';
   }
 
@@ -6478,14 +6486,15 @@ function updateFinancialKpis(){
   const entries=[...LEDGER_DATA].sort((a,b)=>new Date(a.date)-new Date(b.date));
   const latest=entries[entries.length-1];
   const prev=entries[entries.length-2];
+  // KPI balance is driven exclusively by member accounts sum — see updateKpiMemberBreakdown()
+  // Only set a loading placeholder if member data hasn't arrived yet
   const balanceEl=document.getElementById('kpi-total-balance');
   const balanceChangeEl=document.getElementById('kpi-balance-change');
-  if(balanceEl) balanceEl.textContent = fmtMoney(latest?.balance||0);
-  if(balanceChangeEl&&prev&&latest){
-    const diff=latest.balance-prev.balance;
-    balanceChangeEl.textContent=`${diff>=0?'+':''}${fmtMoney(diff)} ${t('vs_last_txn')}`;
-    balanceChangeEl.className='kpi-sub '+(diff>=0?'up':'down');
+  if(balanceEl && (!MEMBER_ACCOUNTS_DATA || !MEMBER_ACCOUNTS_DATA.balances || !MEMBER_ACCOUNTS_DATA.balances.length)){
+    balanceEl.textContent = '—';
   }
+  // Always trigger the member breakdown update (it will set the real value when ready)
+  updateKpiMemberBreakdown();
 
   const now=new Date();
   const year=now.getFullYear();
@@ -7919,6 +7928,40 @@ function initChartsDelayed(){
 }
 
 // ─── RECONCILE STRIP (dynamic) ────────────────────────
+
+function updateKpiMemberBreakdown() {
+  var el = document.getElementById('kpi-member-breakdown');
+  var balEl = document.getElementById('kpi-total-balance');
+  var subEl = document.getElementById('kpi-balance-change');
+
+  if (!MEMBER_ACCOUNTS_DATA || !MEMBER_ACCOUNTS_DATA.balances || !MEMBER_ACCOUNTS_DATA.balances.length) {
+    if (el) el.textContent = 'member accounts loading…';
+    return;
+  }
+
+  var balMap = {};
+  (MEMBER_ACCOUNTS_DATA.balances || []).forEach(function(b) { balMap[b.member_key] = parseFloat(b.balance || 0); });
+
+  // Total = sum of all member account balances (this IS the real band balance)
+  var totalMemberBal = MEMBER_DEFS.reduce(function(s, m) { return s + (balMap[m.key] || 0); }, 0);
+
+  // Update the KPI value to show total member accounts sum
+  if (balEl) balEl.textContent = fmtMoney(totalMemberBal);
+  // Clear the "vs last txn" line — replace with member totals as sub
+  if (subEl) { subEl.textContent = ''; subEl.className = 'kpi-sub neutral'; }
+
+  var MCOL = { fabio: 'var(--accent)', pedro: 'var(--blue2)', manuel: 'var(--green3)', tiago: 'var(--purple2)', band_fund: 'var(--amber2)' };
+
+  var parts = MEMBER_DEFS.map(function(m) {
+    var bal = balMap[m.key] || 0;
+    var col = MCOL[m.key] || 'var(--muted)';
+    return '<span style="color:' + col + ';font-weight:700">' + m.name + '</span> ' +
+           '<span style="color:' + (bal >= 0 ? 'var(--text)' : 'var(--red3)') + '">' + fmtMoney(bal) + '</span>';
+  });
+
+  if (el) el.innerHTML = parts.join('<span style="color:var(--border2);margin:0 4px">·</span>');
+}
+
 function updateReconcileStrip(){
   const total=LEDGER_DATA.length;
   const bal=LEDGER_DATA[0]?.balance??0;
@@ -11168,7 +11211,7 @@ function mgmtReleasesPipeline() {
       </div>
       ${stageBar(r.stage)}
       <div style="display:flex;gap:5px;margin-top:5px">
-        ${[{l:'Art',d:r.artwork_done},{l:'Vid',d:r.video_done},{l:'Press',d:r.press_pitched},{l:'Spot',d:r.spotify_pitched}].map(c=>`<span style="font-size:8px;padding:1px 5px;border-radius:1px;background:${c.d?'rgba(0,230,118,.12)':'rgba(255,255,255,.04)'};color:${c.d?'var(--green3)':'var(--muted3)'}">${c.l}</span>`).join('')}
+        ${[{l:'Art',d:r.artwork_done},{l:'Vid',d:r.video_done},{l:'Press',d:r.press_pitched},{l:'Spot',d:r.spotify_pitched},{l:'Social',d:r.social_media}].map(c=>`<span style="font-size:8px;padding:1px 5px;border-radius:1px;background:${c.d?'rgba(0,230,118,.12)':'rgba(255,255,255,.04)'};color:${c.d?'var(--green3)':'var(--muted3)'}">${c.l}</span>`).join('')}
         ${r.release_date?`<span style="font-size:8px;color:var(--muted3);margin-left:auto">${r.release_date}</span>`:''}
       </div>
     </div>`).join('');
@@ -11875,7 +11918,7 @@ function openReleaseDrawer(id) {
 
   const stageColors = {idea:'var(--muted3)',recorded:'var(--blue2)',mixed:'var(--blue2)',mastered:'var(--purple2)',artwork:'var(--amber2)',submitted:'var(--amber2)',scheduled:'var(--green3)',released:'var(--green3)'};
   const sc = stageColors[r.stage] || 'var(--muted2)';
-  const checks = [{l:'Artwork',d:r.artwork_done},{l:'Video',d:r.video_done},{l:'Press pitched',d:r.press_pitched},{l:'Spotify pitched',d:r.spotify_pitched}];
+  const checks = [{l:'Artwork',d:r.artwork_done},{l:'Video',d:r.video_done},{l:'Press pitched',d:r.press_pitched},{l:'Spotify pitched',d:r.spotify_pitched},{l:'Social media',d:r.social_media}];
   const done = checks.filter(c=>c.d).length;
 
   const body = `
@@ -11889,7 +11932,7 @@ function openReleaseDrawer(id) {
         <div class="drawer-stat-lbl">Type</div>
       </div>
       <div class="drawer-stat">
-        <div class="drawer-stat-val" style="color:${done===4?'var(--green3)':'var(--amber2)'}">${done}/4</div>
+        <div class="drawer-stat-val" style="color:${done===5?'var(--green3)':'var(--amber2)'}">${done}/5</div>
         <div class="drawer-stat-lbl">Tasks done</div>
       </div>
     </div>
