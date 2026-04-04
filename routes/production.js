@@ -13,6 +13,7 @@ router.get('/shows', requireAuth, requirePerm('viewLedger'), async (req, res, ne
   try {
     const { rows } = await pool.query(`
       SELECT s.*,
+        s.show_date::text AS show_date,
         b.name AS venue_name, b.location AS venue_location,
         b.contact_email AS venue_email
       FROM production_shows s
