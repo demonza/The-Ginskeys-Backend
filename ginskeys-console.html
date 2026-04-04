@@ -1140,7 +1140,7 @@ tr:hover .edit-btn{display:inline}
 .advance-field{display:flex;flex-direction:column;gap:4px}
 .advance-label{font-size:10px;color:var(--muted3);letter-spacing:.1em;text-transform:uppercase}
 /* ── TECH RIDER ── */
-.rider-section{background:var(--bg3);border:1px solid var(--border2);border-radius:2px;margin-bottom:10px;overflow:hidden}
+.rider-section{background:var(--bg3);border:1px solid var(--border2);border-radius:2px;margin-bottom:10px;overflow:visible}
 .rider-section-hdr{
   padding:10px 14px;font-size:12px;font-weight:700;color:var(--text);
   letter-spacing:.06em;border-bottom:1px solid var(--border2);
@@ -1148,18 +1148,20 @@ tr:hover .edit-btn{display:inline}
   background:var(--bg4);user-select:none;
 }
 .rider-section-hdr:hover{background:var(--bg3)}
-.rider-section-body{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.rider-section-body{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text);user-select:text;-webkit-user-select:text}
 .rider-editable{
   outline:none;border-radius:1px;padding:2px 4px;transition:background .12s,box-shadow .12s;
   min-width:40px;display:inline-block;cursor:text;
   border-bottom:1px dashed transparent;
+  user-select:text;-webkit-user-select:text;
 }
 .rider-editable:hover{background:rgba(255,92,26,.10);border-bottom-color:var(--accent)}
-.rider-editable:focus{background:rgba(255,92,26,.16);box-shadow:0 0 0 1px var(--accent);cursor:text}
+.rider-editable:focus{background:rgba(255,92,26,.16);box-shadow:0 0 0 1px var(--accent);cursor:text;user-select:text;-webkit-user-select:text}
 .rider-editable[contenteditable="true"]:empty:before{content:attr(data-placeholder);color:var(--muted);font-style:italic}
 .input-row{
   display:grid;grid-template-columns:30px 40px 1fr 110px 60px 70px;
   gap:8px;padding:5px 8px;font-size:12px;border-bottom:1px solid var(--border1);align-items:center;
+  user-select:text;-webkit-user-select:text;
 }
 .input-row.hdr-row{color:var(--muted);font-size:11px;letter-spacing:.08em;background:var(--bg4)}
 /* ── SETLIST ── */
@@ -4730,21 +4732,21 @@ function _initAll_old_1() {
                 <div data-i18n="rider_col_stand">STAND</div>
                 <div data-i18n="rider_col_notes">NOTES</div>
               </div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">1</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_kick">Kick Drum</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_1_mic">Beta 91A / D112</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_none">None</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_1_notes">Gate req.</span></div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">2</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_snare_top">Snare Top</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_2_mic">SM57</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">3</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_snare_bot">Snare Bottom</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_3_mic">SM57</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_3_notes">Phase flip</span></div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">4</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_hihat">Hi-Hat</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_4_mic">SM81 / C451</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">5</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_tom1">Tom 1</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_5_mic">E904 clip</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">6</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_tom2">Tom 2</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_6_mic">E904 clip</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">7</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_tom3">Tom 3 (floor)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_7_mic">E904 clip</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">8</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_oh_l">OH Left</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_8_mic">SM81 / C451</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">9</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_oh_r">OH Right</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_9_mic">SM81 / C451</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row" style="background:rgba(170,0,255,.04)"><div style="color:var(--accent);font-weight:700">10</div><div style="color:var(--muted2)" data-i18n="rider_di">DI</div><div data-i18n="rider_src_bass_di">Bass (direct)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_10_mic">Radial J48</span></div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_10_notes">Pre-amp out</span></div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">11</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_bass_amp">Bass Amp</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_11_mic">SM57 / β52</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_11_notes">Optional</span></div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">12</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_gtr1">Guitar 1 Amp</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_12_mic">SM57</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_12_notes">Off-axis</span></div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">13</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_gtr2">Guitar 2 Amp</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_13_mic">SM57</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_13_notes">Off-axis</span></div></div>
-              <div class="input-row" style="background:rgba(255,92,26,.04)"><div style="color:var(--accent);font-weight:700">14</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_vox1">Vocal 1 (lead)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_14_mic">SM58</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--green3);font-weight:700" data-i18n="rider_priority">PRIORITY</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">15</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_vox2">Vocal 2 (BG)</div><div style="color:var(--purple2)"><span class="rider-editable" contenteditable="true" data-rider-key="input_15_mic">SM58</span></div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="input_15_notes">Rhythm gtr</span></div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">1</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_kick">Kick Drum</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_1_mic">Beta 91A / D112</div><div style="color:var(--muted3)" data-i18n="rider_stand_none">None</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_1_notes">Gate req.</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">2</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_snare_top">Snare Top</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_2_mic">SM57</div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">3</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_snare_bot">Snare Bottom</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_3_mic">SM57</div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_3_notes">Phase flip</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">4</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_hihat">Hi-Hat</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_4_mic">SM81 / C451</div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">5</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_tom1">Tom 1</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_5_mic">E904 clip</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">6</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_tom2">Tom 2</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_6_mic">E904 clip</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">7</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_tom3">Tom 3 (floor)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_7_mic">E904 clip</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">8</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_oh_l">OH Left</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_8_mic">SM81 / C451</div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">9</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_oh_r">OH Right</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_9_mic">SM81 / C451</div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--muted3)">—</div></div>
+              <div class="input-row" style="background:rgba(170,0,255,.04)"><div style="color:var(--accent);font-weight:700">10</div><div style="color:var(--muted2)" data-i18n="rider_di">DI</div><div data-i18n="rider_src_bass_di">Bass (direct)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_10_mic">Radial J48</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_10_notes">Pre-amp out</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">11</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_bass_amp">Bass Amp</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_11_mic">SM57 / β52</div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_11_notes">Optional</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">12</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_gtr1">Guitar 1 Amp</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_12_mic">SM57</div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_12_notes">Off-axis</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">13</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_gtr2">Guitar 2 Amp</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_13_mic">SM57</div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_13_notes">Off-axis</div></div>
+              <div class="input-row" style="background:rgba(255,92,26,.04)"><div style="color:var(--accent);font-weight:700">14</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_vox1">Vocal 1 (lead)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_14_mic">SM58</div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--green3);font-weight:700" data-i18n="rider_priority">PRIORITY</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700">15</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_vox2">Vocal 2 (BG)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_15_mic">SM58</div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_15_notes">Rhythm gtr</div></div>
             </div>
           </div>
 
@@ -7234,7 +7236,10 @@ function applyTranslations() {
 
   // ── data-i18n attributes ──────────────────────────────
   document.querySelectorAll('[data-i18n]').forEach(el => {
-    el.textContent = t(el.getAttribute('data-i18n'));
+    // Never overwrite elements that contain child elements (e.g. rider-editable spans inside labelled cells)
+    if (el.children.length === 0) {
+      el.textContent = t(el.getAttribute('data-i18n'));
+    }
   });
 
   // ── Lang button active state ──────────────────────────
@@ -9054,6 +9059,28 @@ async function saveRiderField(key, value) {
 document.addEventListener('DOMContentLoaded', function() {
   var riderPanel = document.getElementById('prod-rider');
   if (!riderPanel) return;
+
+  // Forward clicks on grid-cell wrapper divs to the rider-editable inside them
+  riderPanel.addEventListener('click', function(e) {
+    // If click landed on a wrapper div (not directly on a rider-editable), 
+    // find and focus the editable child
+    if (!e.target.closest('[data-rider-key]')) {
+      var cell = e.target.closest('.input-row > div');
+      if (cell) {
+        var editable = cell.querySelector('[data-rider-key]');
+        if (editable) {
+          editable.focus();
+          // Place caret at end
+          var range = document.createRange();
+          var sel = window.getSelection();
+          range.selectNodeContents(editable);
+          range.collapse(false);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
+    }
+  });
 
   riderPanel.addEventListener('input', function(e) {
     var el = e.target.closest('[data-rider-key]');
