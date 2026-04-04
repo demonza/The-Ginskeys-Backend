@@ -1859,9 +1859,7 @@ tr:hover .edit-btn{display:inline}
       <div class="kpi-value green" id="kpi-total-balance">€ 1,626.65</div>
       <div class="kpi-sub up" id="kpi-balance-change" style="flex-shrink:0">+€0 vs last txn</div>
     </div>
-    <div id="kpi-member-breakdown" style="font-size:9px;color:var(--muted3);margin-top:3px;letter-spacing:.04em;line-height:1.6">
-      loading member accounts…
-    </div>
+
   </div>
   <div class="kpi-card blue">
     <div class="kpi-label" data-i18n="kpi_runway">Cash Runway</div>
@@ -7930,36 +7928,23 @@ function initChartsDelayed(){
 // ─── RECONCILE STRIP (dynamic) ────────────────────────
 
 function updateKpiMemberBreakdown() {
-  var el = document.getElementById('kpi-member-breakdown');
   var balEl = document.getElementById('kpi-total-balance');
   var subEl = document.getElementById('kpi-balance-change');
+  var el    = document.getElementById('kpi-member-breakdown');
 
   if (!MEMBER_ACCOUNTS_DATA || !MEMBER_ACCOUNTS_DATA.balances || !MEMBER_ACCOUNTS_DATA.balances.length) {
-    if (el) el.textContent = 'member accounts loading…';
+    // No data yet — leave whatever is showing, don't flash "loading"
     return;
   }
 
   var balMap = {};
   (MEMBER_ACCOUNTS_DATA.balances || []).forEach(function(b) { balMap[b.member_key] = parseFloat(b.balance || 0); });
 
-  // Total = sum of all member account balances (this IS the real band balance)
   var totalMemberBal = MEMBER_DEFS.reduce(function(s, m) { return s + (balMap[m.key] || 0); }, 0);
 
-  // Update the KPI value to show total member accounts sum
   if (balEl) balEl.textContent = fmtMoney(totalMemberBal);
-  // Clear the "vs last txn" line — replace with member totals as sub
-  if (subEl) { subEl.textContent = ''; subEl.className = 'kpi-sub neutral'; }
-
-  var MCOL = { fabio: 'var(--accent)', pedro: 'var(--blue2)', manuel: 'var(--green3)', tiago: 'var(--purple2)', band_fund: 'var(--amber2)' };
-
-  var parts = MEMBER_DEFS.map(function(m) {
-    var bal = balMap[m.key] || 0;
-    var col = MCOL[m.key] || 'var(--muted)';
-    return '<span style="color:' + col + ';font-weight:700">' + m.name + '</span> ' +
-           '<span style="color:' + (bal >= 0 ? 'var(--text)' : 'var(--red3)') + '">' + fmtMoney(bal) + '</span>';
-  });
-
-  if (el) el.innerHTML = parts.join('<span style="color:var(--border2);margin:0 4px">·</span>');
+  if (subEl) { subEl.textContent = '5 member accounts'; subEl.className = 'kpi-sub neutral'; }
+  if (el)    { el.textContent = ''; }
 }
 
 function updateReconcileStrip(){
