@@ -4472,8 +4472,8 @@ function renderMemberAccounts() {
     var isOut = t.txn_type === 'withdrawal';
     var run = parseFloat(t._run || 0);
     var ledgerLink = t.ledger_txn_id
-      ? '<span style="color:var(--green3);cursor:pointer;text-decoration:underline" onclick="switchView('ledger',document.querySelector('[data-view=ledger]'))" title="View in Ledger">→ Ledger</span>'
-      : '<span style="color:var(--muted3)">—</span>';
+      ? '<span style="color:var(--green3);cursor:pointer;text-decoration:underline" onclick="switchView(&quot;ledger&quot;,document.querySelector(&quot;[data-view=ledger]&quot;))" title="View in Ledger">&rarr; Ledger</span>'
+      : '<span style="color:var(--muted3)">&mdash;</span>';
     return '<div style="display:grid;grid-template-columns:90px 80px 1fr 90px 90px 90px 90px;gap:6px;padding:5px 10px;border-bottom:1px solid var(--border1);align-items:center;font-size:10px">' +
       '<div style="color:var(--muted2)">' + String(t.txn_date || '').slice(0,10) + '</div>' +
       '<div style="color:' + def.color + ';font-weight:700">' + def.name + '</div>' +
