@@ -4191,9 +4191,10 @@ async function loadMemberAccounts() {
   try {
     MEMBER_ACCOUNTS_DATA = await apiGet('/splits/member-accounts');
     renderMemberAccounts();
-    // After member data arrives, update KPI and banner with real values
+    // After member data arrives, update all balance-sensitive displays
     updateKpiMemberBreakdown();
     mgmtBanner();
+    if (typeof refreshAllFinanceCharts === 'function') refreshAllFinanceCharts();
   } catch(e) { console.warn('loadMemberAccounts:', e.message); }
 }
 
@@ -5964,7 +5965,14 @@ function getFinancialIntelligence() {
   const totalRevenue  = entries.filter(e => e.amount > 0).reduce((s,e) => s + e.amount, 0);
   const totalExpenses = entries.filter(e => e.amount < 0).reduce((s,e) => s + Math.abs(e.amount), 0);
   const netPosition   = totalRevenue - totalExpenses;
-  const cashBalance   = entries.length ? entries[entries.length-1].balance : 0;
+  // Cash = member accounts total (real money), falls back to ledger if not loaded
+  var _memberBal = 0;
+  if (MEMBER_ACCOUNTS_DATA && MEMBER_ACCOUNTS_DATA.balances && MEMBER_ACCOUNTS_DATA.balances.length) {
+    var _bm = {};
+    MEMBER_ACCOUNTS_DATA.balances.forEach(function(b){ _bm[b.member_key] = parseFloat(b.balance||0); });
+    _memberBal = MEMBER_DEFS.reduce(function(s,m){ return s+(_bm[m.key]||0); }, 0);
+  }
+  const cashBalance = (_memberBal !== 0) ? _memberBal : (entries.length ? entries[entries.length-1].balance : 0);
 
   // ── 2. Revenue by year ────────────────────────────────────────────────────
   const revByYear = {};
@@ -9563,7 +9571,14 @@ function populateRiderShowPicker() {
     .forEach(function(s) {
       var opt = document.createElement('option');
       opt.value = s.id;
-      opt.textContent = s.show_date + ' — ' + (s.venue_name || 'Show');
+      // Format date cleanly regardless of ISO or DATE format
+      var rawDate = s.show_date || '';
+      var d = new Date(rawDate);
+      var dateStr = !isNaN(d.getTime())
+        ? d.toLocaleDateString('pt-PT', {day:'2-digit', month:'2-digit', year:'numeric'})
+        : rawDate.slice(0,10);
+      var label = (s.venue_name || s.venue_address || 'Show');
+      opt.textContent = dateStr + ' — ' + label;
       if (s.id === current) opt.selected = true;
       picker.appendChild(opt);
     });
@@ -10921,7 +10936,11 @@ function populateChecklistShowPicker() {
   if (!sel) return;
   const current = sel.value;
   sel.innerHTML = '<option value="">— select a show —</option>' +
-    PROD_SHOWS.map(s=>`<option value="${s.id}"${s.id===current?' selected':''}>${s.show_date} — ${s.venue_name||'Show'}</option>`).join('');
+    PROD_SHOWS.map(s=>{
+        var d2=new Date(s.show_date||'');
+        var ds=!isNaN(d2.getTime())?d2.toLocaleDateString('pt-PT',{day:'2-digit',month:'2-digit',year:'numeric'}):(s.show_date||'').slice(0,10);
+        return `<option value="${s.id}"${s.id===current?' selected':''}>${ds} — ${s.venue_name||s.venue_address||'Show'}</option>`;
+      }).join('');
 }
 
 async function loadChecklist() {
