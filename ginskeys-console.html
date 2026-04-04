@@ -1853,12 +1853,10 @@ tr:hover .edit-btn{display:inline}
   <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printFinancialsReport()">⎙ Export Financial Report</button>
 </div>
 <div class="kpi-strip" style="grid-template-columns:repeat(8,1fr)">
-  <div class="kpi-card green" style="grid-column:span 2">
+  <div class="kpi-card green">
     <div class="kpi-label" data-i18n="kpi_balance">Total Balance</div>
-    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
-      <div class="kpi-value green" id="kpi-total-balance">€ 1,626.65</div>
-      <div class="kpi-sub up" id="kpi-balance-change" style="flex-shrink:0">+€0 vs last txn</div>
-    </div>
+    <div class="kpi-value green" id="kpi-total-balance">€ 1,626.65</div>
+    <div class="kpi-sub up" id="kpi-balance-change">+€0 vs last txn</div>
 
   </div>
   <div class="kpi-card blue">
@@ -4193,8 +4191,9 @@ async function loadMemberAccounts() {
   try {
     MEMBER_ACCOUNTS_DATA = await apiGet('/splits/member-accounts');
     renderMemberAccounts();
-    // After member data arrives, always update the KPI immediately
+    // After member data arrives, update KPI and banner with real values
     updateKpiMemberBreakdown();
+    mgmtBanner();
   } catch(e) { console.warn('loadMemberAccounts:', e.message); }
 }
 
@@ -7263,6 +7262,7 @@ const TRANSLATIONS = {
     tab_production:  '🎚 Production',
     // KPI labels
     kpi_balance:     'Total Balance',
+    kpi_member_accounts_sub: 'across member accounts',
     kpi_runway:      'Cash Runway',
     kpi_ytd_rev:     'YTD Revenue',
     kpi_ytd_exp:     'YTD Expenses',
@@ -7480,6 +7480,7 @@ const TRANSLATIONS = {
     tab_production:  '🎚 Produção',
     // KPI labels
     kpi_balance:     'Saldo Total',
+    kpi_member_accounts_sub: 'nas contas dos membros',
     kpi_runway:      'Autonomia Financeira',
     kpi_ytd_rev:     'Receita YTD',
     kpi_ytd_exp:     'Despesas YTD',
@@ -7943,7 +7944,7 @@ function updateKpiMemberBreakdown() {
   var totalMemberBal = MEMBER_DEFS.reduce(function(s, m) { return s + (balMap[m.key] || 0); }, 0);
 
   if (balEl) balEl.textContent = fmtMoney(totalMemberBal);
-  if (subEl) { subEl.textContent = ''; subEl.className = 'kpi-sub neutral'; }
+  if (subEl) { subEl.textContent = t('kpi_member_accounts_sub'); subEl.className = 'kpi-sub neutral'; }
   if (el)    { el.textContent = ''; }
 }
 
@@ -11013,9 +11014,16 @@ function renderMgmtDashboard() {
 
 // ── Banner stats ──────────────────────────────────────────────────────────────
 function mgmtBanner() {
-  const entries = [...LEDGER_DATA].sort((a,b) => new Date(a.date)-new Date(b.date));
-  const balance = entries.length ? entries[entries.length-1].balance : 0;
   const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+
+  // Balance = sum of member accounts (same as KPI)
+  var balMap = {};
+  if (MEMBER_ACCOUNTS_DATA && MEMBER_ACCOUNTS_DATA.balances) {
+    MEMBER_ACCOUNTS_DATA.balances.forEach(function(b) { balMap[b.member_key] = parseFloat(b.balance || 0); });
+  }
+  var memberTotal = MEMBER_DEFS.reduce(function(s,m){ return s + (balMap[m.key]||0); }, 0);
+  var hasData = MEMBER_ACCOUNTS_DATA && MEMBER_ACCOUNTS_DATA.balances && MEMBER_ACCOUNTS_DATA.balances.length > 0;
+  var balance = hasData ? memberTotal : (LEDGER_DATA.length ? LEDGER_DATA[0].balance : 0);
 
   set('mgmt-balance', fmtMoney(balance));
 
