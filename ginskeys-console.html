@@ -1460,6 +1460,105 @@ tr:hover .edit-btn{display:inline}
   </div>
 </div>
 
+
+<!-- ══ INVOICE MODAL ═══════════════════════════════════ -->
+<div id="invoice-modal" class="overlay-bg" onclick="if(event.target===this)closeInvoiceModal()">
+  <div class="overlay-box" style="width:680px;max-height:90vh;overflow-y:auto">
+    <div class="overlay-hdr">
+      <span class="overlay-title">⎙ Generate Invoice</span>
+      <button class="overlay-close" onclick="closeInvoiceModal()">✕</button>
+    </div>
+    <div class="overlay-body" style="display:flex;flex-direction:column;gap:16px">
+
+      <!-- Client info -->
+      <div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px">CLIENT</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="form-field"><label>Client / Venue Name *</label><input class="form-input" id="inv-client-name" placeholder="Câmara Municipal de Sines"></div>
+          <div class="form-field"><label>Contact Person</label><input class="form-input" id="inv-client-contact" placeholder="João Silva"></div>
+          <div class="form-field"><label>Client NIF (Tax ID)</label><input class="form-input" id="inv-client-nif" placeholder="123456789"></div>
+          <div class="form-field"><label>Client Email</label><input class="form-input" id="inv-client-email" type="email" placeholder="joao@venue.pt"></div>
+          <div class="form-field" style="grid-column:span 2"><label>Client Address</label><input class="form-input" id="inv-client-address" placeholder="Rua Principal 1, 7520-000 Sines"></div>
+        </div>
+      </div>
+
+      <!-- Service info -->
+      <div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px">SERVICE</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="form-field"><label>Show Date *</label><input class="form-input" id="inv-show-date" type="date"></div>
+          <div class="form-field"><label>Venue</label><input class="form-input" id="inv-venue" placeholder="Auditório Municipal"></div>
+          <div class="form-field" style="grid-column:span 2">
+            <label>Service Description *</label>
+            <input class="form-input" id="inv-description" placeholder="Prestação de serviços artísticos — concerto ao vivo da banda The Ginskeys">
+          </div>
+          <div class="form-field"><label>Set Duration</label><input class="form-input" id="inv-duration" placeholder="60 min" value="60 min"></div>
+          <div class="form-field"><label>Invoice Number</label><input class="form-input" id="inv-number" placeholder="GK-2026-001"></div>
+        </div>
+      </div>
+
+      <!-- Financials -->
+      <div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px">AMOUNTS</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <div class="form-field">
+            <label>Base Fee (€) *</label>
+            <input class="form-input" id="inv-fee" type="number" step="0.01" min="0" placeholder="1000.00" oninput="invoiceCalc()">
+          </div>
+          <div class="form-field">
+            <label>IVA Rate</label>
+            <select class="form-select" id="inv-iva" onchange="invoiceCalc()">
+              <option value="0">0% — Isento (Art. 9º CIVA)</option>
+              <option value="6">6% — Taxa reduzida</option>
+              <option value="23">23% — Taxa normal</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Travel / Expenses (€)</label>
+            <input class="form-input" id="inv-expenses" type="number" step="0.01" min="0" placeholder="0.00" oninput="invoiceCalc()">
+          </div>
+        </div>
+        <!-- Live preview -->
+        <div id="inv-preview-box" style="background:var(--bg4);border:1px solid var(--border2);border-radius:2px;padding:12px;margin-top:8px;font-size:11px">
+          <div style="display:grid;grid-template-columns:1fr auto;gap:4px;line-height:2">
+            <span style="color:var(--muted2)">Cachê artístico</span><span id="inv-p-fee" style="color:var(--text)">€ 0.00</span>
+            <span style="color:var(--muted2)">Deslocação / despesas</span><span id="inv-p-exp" style="color:var(--text)">€ 0.00</span>
+            <span style="color:var(--muted2)">Subtotal</span><span id="inv-p-sub" style="color:var(--text)">€ 0.00</span>
+            <span style="color:var(--muted2)" id="inv-p-iva-label">IVA 0%</span><span id="inv-p-iva" style="color:var(--muted3)">€ 0.00</span>
+            <span style="font-weight:700;color:var(--text);font-size:13px">TOTAL</span>
+            <span id="inv-p-total" style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--green3)">€ 0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Band details -->
+      <div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px">BAND DETAILS (pre-filled, edit if needed)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="form-field"><label>Band Name</label><input class="form-input" id="inv-band-name" value="The Ginskeys"></div>
+          <div class="form-field"><label>Band NIF</label><input class="form-input" id="inv-band-nif" placeholder="NIF da banda / representante"></div>
+          <div class="form-field"><label>IBAN</label><input class="form-input" id="inv-iban" placeholder="PT50 0000 0000 0000 0000 0000 0"></div>
+          <div class="form-field"><label>Email</label><input class="form-input" id="inv-band-email" value="tiago@ginskeys.com"></div>
+          <div class="form-field" style="grid-column:span 2"><label>Address</label><input class="form-input" id="inv-band-address" value="Sines, Portugal"></div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-field">
+        <label>Notes / Payment Terms</label>
+        <input class="form-input" id="inv-notes" value="Pagamento por transferência bancária no prazo de 30 dias. Obrigado pela preferência.">
+      </div>
+
+      <div id="inv-status" style="font-size:10px;color:var(--red3);min-height:14px"></div>
+    </div>
+
+    <div class="overlay-hdr" style="justify-content:flex-end;border-top:1px solid var(--border);border-bottom:none;gap:8px">
+      <button class="btn-sm ghost" onclick="closeInvoiceModal()">Cancel</button>
+      <button class="btn-sm" onclick="invoiceAutoFill()" style="color:var(--blue2);border-color:var(--blue2)">⚡ Auto-fill from Show</button>
+      <button class="btn-sm primary" onclick="printInvoice()" style="background:var(--green3);color:#000;border-color:var(--green3);font-weight:700">⎙ Generate PDF</button>
+    </div>
+  </div>
+</div>
 <!-- ══ IMPORT CSV MODAL ═══════════════════════════════ -->
 <div class="overlay-bg" id="import-modal" onclick="if(event.target===this)closeImport()">
   <div class="overlay-box" style="width:500px">
@@ -1849,15 +1948,7 @@ tr:hover .edit-btn{display:inline}
 </div>
 
 <!-- ══ KPI STRIP ═════════════════════════════════════ -->
-<div id="export-report-bar" style="display:none;justify-content:flex-end;padding:4px 10px;background:var(--bg0);border-bottom:1px solid var(--border);flex-shrink:0">
-  <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printFinancialsReport()">⎙ Export Financial Report</button>
-</div>
-<div class="kpi-strip" style="grid-template-columns:repeat(8,1fr)">
-  <div class="kpi-card green">
-    <div class="kpi-label" data-i18n="kpi_balance">Total Balance</div>
-    <div class="kpi-value green" id="kpi-total-balance">€ 1,626.65</div>
     <div class="kpi-sub up" id="kpi-balance-change">+€0 vs last txn</div>
-
   </div>
   <div class="kpi-card blue">
     <div class="kpi-label" data-i18n="kpi_runway">Cash Runway</div>
@@ -1894,6 +1985,9 @@ tr:hover .edit-btn{display:inline}
     <div class="kpi-value white" id="kpi-fcf">€ —</div>
     <div class="kpi-sub neutral" id="kpi-fcf-sub">trailing − capex</div>
   </div>
+</div>
+<div id="export-report-bar" style="display:none;justify-content:flex-end;padding:4px 8px;background:var(--bg0);border-bottom:1px solid var(--border);flex-shrink:0">
+  <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printFinancialsReport()">⎙ Export Financial Report</button>
 </div>
 
 <!-- ══ CONTENT AREA ══════════════════════════════════ -->
@@ -2675,6 +2769,9 @@ tr:hover .edit-btn{display:inline}
       <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
         <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--amber2)" id="bk-banner-conversion">0%</div>
         <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">CONVERSION</div>
+      </div>
+      <div style="padding:0 12px;border-left:1px solid var(--border2)">
+        <button class="btn-sm" onclick="openInvoiceModal()" style="color:var(--green3);border-color:var(--green3);white-space:nowrap">⎙ New Invoice</button>
       </div>
     </div>
 
@@ -4387,6 +4484,258 @@ document.addEventListener('DOMContentLoaded', function() {
     if (el) el.addEventListener('click', function(e) { if (e.target === el) closeMemberModal(id); });
   });
 });
+
+
+// ══════════════════════════════════════════════════════════
+// INVOICE ENGINE
+// ══════════════════════════════════════════════════════════
+
+var _invoiceNum = 1;
+
+function openInvoiceModal() {
+  document.getElementById('invoice-modal').classList.add('open');
+  // Set default invoice number based on current year + count
+  var year = new Date().getFullYear();
+  var existing = (SPLITS_DATA || []).length + _invoiceNum;
+  var padded = String(existing).padStart(3, '0');
+  document.getElementById('inv-number').value = 'GK-' + year + '-' + padded;
+  // Default show date to today
+  var d = document.getElementById('inv-show-date');
+  if (d && !d.value) d.value = new Date().toISOString().split('T')[0];
+  invoiceCalc();
+}
+
+function closeInvoiceModal() {
+  document.getElementById('invoice-modal').classList.remove('open');
+}
+
+function invoiceAutoFill() {
+  // Pull from the next upcoming show
+  var upcoming = (PROD_SHOWS || [])
+    .filter(function(s) { return new Date(s.show_date) >= new Date(); })
+    .sort(function(a,b) { return new Date(a.show_date) - new Date(b.show_date); });
+  var show = upcoming[0] || PROD_SHOWS[0];
+
+  if (show) {
+    var d = document.getElementById('inv-show-date');
+    if (d) d.value = (show.show_date || '').slice(0,10);
+    var v = document.getElementById('inv-venue');
+    if (v && show.venue_name) v.value = show.venue_name;
+    var dur = document.getElementById('inv-duration');
+    if (dur && show.set_length_min) dur.value = show.set_length_min + ' min';
+    var desc = document.getElementById('inv-description');
+    if (desc) desc.value = 'Prestação de serviços artísticos — concerto ao vivo da banda The Ginskeys' +
+      (show.venue_name ? ' em ' + show.venue_name : '');
+  }
+
+  // Pull from booking contacts if a confirmed booking matches
+  var confirmed = (BOOKING_DATA || []).filter(function(b) { return b.stage === 'confirmed' || b.stage === 'completed'; });
+  if (confirmed.length) {
+    var bk = confirmed[0];
+    var cn = document.getElementById('inv-client-name');
+    if (cn && !cn.value && bk.name) cn.value = bk.name;
+    var ce = document.getElementById('inv-client-email');
+    if (ce && !ce.value && bk.contact_email) ce.value = bk.contact_email;
+    var cc = document.getElementById('inv-client-contact');
+    if (cc && !cc.value && bk.contact_name) cc.value = bk.contact_name;
+    var fee = document.getElementById('inv-fee');
+    if (fee && !fee.value && bk.fee_eur) fee.value = parseFloat(bk.fee_eur).toFixed(2);
+  }
+
+  invoiceCalc();
+  showToast('Auto-filled from upcoming show & booking data', 'ok');
+}
+
+function invoiceCalc() {
+  var fee  = parseFloat(document.getElementById('inv-fee')?.value || 0) || 0;
+  var exp  = parseFloat(document.getElementById('inv-expenses')?.value || 0) || 0;
+  var iva  = parseFloat(document.getElementById('inv-iva')?.value || 0);
+  var sub  = fee + exp;
+  var ivaAmt = sub * iva / 100;
+  var total = sub + ivaAmt;
+
+  var fmt = function(v) { return '€ ' + v.toFixed(2).replace('.', ','); };
+  var set = function(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
+
+  set('inv-p-fee',   fmt(fee));
+  set('inv-p-exp',   fmt(exp));
+  set('inv-p-sub',   fmt(sub));
+  set('inv-p-iva',   fmt(ivaAmt));
+  set('inv-p-total', fmt(total));
+  set('inv-p-iva-label', 'IVA ' + iva + '%');
+}
+
+function printInvoice() {
+  var get = function(id) { return document.getElementById(id)?.value?.trim() || ''; };
+
+  var clientName = get('inv-client-name');
+  var showDate   = get('inv-show-date');
+  var fee        = parseFloat(get('inv-fee')) || 0;
+  var statusEl   = document.getElementById('inv-status');
+
+  if (!clientName) { statusEl.textContent = 'Client name is required'; return; }
+  if (!showDate)   { statusEl.textContent = 'Show date is required'; return; }
+  if (!fee)        { statusEl.textContent = 'Fee amount is required'; return; }
+  statusEl.textContent = '';
+
+  var clientContact = get('inv-client-contact');
+  var clientNIF     = get('inv-client-nif');
+  var clientEmail   = get('inv-client-email');
+  var clientAddress = get('inv-client-address');
+  var venue         = get('inv-venue');
+  var description   = get('inv-description') || 'Prestação de serviços artísticos — concerto ao vivo';
+  var duration      = get('inv-duration');
+  var invNum        = get('inv-number');
+  var exp           = parseFloat(get('inv-expenses')) || 0;
+  var ivaRate       = parseFloat(document.getElementById('inv-iva')?.value || 0);
+  var bandName      = get('inv-band-name') || 'The Ginskeys';
+  var bandNIF       = get('inv-band-nif');
+  var iban          = get('inv-iban');
+  var bandEmail     = get('inv-band-email');
+  var bandAddress   = get('inv-band-address');
+  var notes         = get('inv-notes');
+
+  var sub    = fee + exp;
+  var ivaAmt = sub * ivaRate / 100;
+  var total  = sub + ivaAmt;
+
+  var fmt = function(v) {
+    return '€ ' + v.toLocaleString('pt-PT', {minimumFractionDigits:2, maximumFractionDigits:2});
+  };
+
+  // Format date
+  var dObj = new Date(showDate);
+  var dateStr = dObj.toLocaleDateString('pt-PT', {day:'2-digit', month:'long', year:'numeric'});
+  var today   = new Date().toLocaleDateString('pt-PT', {day:'2-digit', month:'long', year:'numeric'});
+
+  var ivaNote = ivaRate === 0
+    ? '<div class="iva-note">IVA — Isento nos termos do Art. 9º do CIVA (serviços artísticos / culturais)</div>'
+    : '';
+
+  var html = '<!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8"><title>Fatura ' + invNum + ' — ' + bandName + '</title><style>' +
+    '*{box-sizing:border-box;margin:0;padding:0}' +
+    'body{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;color:#1a1a1a;background:#fff;padding:32px 40px}' +
+    'h1{font-size:28px;font-weight:900;letter-spacing:.08em;color:#111}' +
+    '.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;padding-bottom:16px;border-bottom:3px solid #111}' +
+    '.band-info{max-width:260px}' +
+    '.band-name{font-size:22px;font-weight:900;letter-spacing:.12em;color:#111;margin-bottom:4px}' +
+    '.band-meta{font-size:9px;color:#666;line-height:1.8}' +
+    '.invoice-meta{text-align:right}' +
+    '.invoice-title{font-size:28px;font-weight:900;color:#111;letter-spacing:.1em}' +
+    '.invoice-num{font-size:12px;color:#444;margin-top:4px;font-weight:700}' +
+    '.invoice-date{font-size:10px;color:#888;margin-top:2px}' +
+    '.parties{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:28px}' +
+    '.party-label{font-size:8px;font-weight:700;letter-spacing:.14em;color:#888;margin-bottom:8px;text-transform:uppercase}' +
+    '.party-name{font-size:14px;font-weight:700;color:#111;margin-bottom:4px}' +
+    '.party-detail{font-size:10px;color:#555;line-height:1.7}' +
+    '.service-box{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:4px;padding:16px 20px;margin-bottom:24px}' +
+    '.service-label{font-size:8px;font-weight:700;letter-spacing:.14em;color:#888;margin-bottom:8px;text-transform:uppercase}' +
+    '.service-desc{font-size:12px;font-weight:700;color:#111;margin-bottom:6px}' +
+    '.service-meta{font-size:10px;color:#666;line-height:1.8}' +
+    '.amounts{width:100%;border-collapse:collapse;margin-bottom:16px}' +
+    '.amounts td{padding:7px 12px;border-bottom:1px solid #eee;font-size:11px}' +
+    '.amounts tr:last-child td{border-bottom:none}' +
+    '.amounts .label{color:#555}' +
+    '.amounts .value{text-align:right;font-weight:600;color:#111;white-space:nowrap}' +
+    '.total-row td{background:#111;color:#fff;font-size:14px;font-weight:900;padding:10px 12px}' +
+    '.total-row .value{color:#4ade80;font-size:18px}' +
+    '.iva-note{font-size:9px;color:#888;font-style:italic;margin-bottom:16px;padding:8px 12px;background:#fffbf0;border-left:3px solid #f59e0b}' +
+    '.payment{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;padding:14px 16px;margin-bottom:20px}' +
+    '.payment-label{font-size:8px;font-weight:700;letter-spacing:.14em;color:#166534;margin-bottom:6px;text-transform:uppercase}' +
+    '.payment-iban{font-size:13px;font-weight:700;font-family:monospace;color:#111;letter-spacing:.04em}' +
+    '.payment-name{font-size:10px;color:#555;margin-top:3px}' +
+    '.footer{margin-top:20px;padding-top:16px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:flex-end}' +
+    '.footer-note{font-size:9px;color:#888;max-width:360px;line-height:1.6}' +
+    '.footer-sig{text-align:right}' +
+    '.sig-line{border-top:1px solid #bbb;margin-top:40px;padding-top:6px;font-size:9px;color:#888;min-width:180px}' +
+    '@page{margin:10mm;size:A4}' +
+    '@media print{body{padding:0}}' +
+    '</style></head><body>' +
+
+    '<div class="header">' +
+      '<div class="band-info">' +
+        '<div class="band-name">' + bandName.toUpperCase() + '</div>' +
+        '<div class="band-meta">' +
+          (bandNIF ? 'NIF: ' + bandNIF + '<br>' : '') +
+          bandAddress + '<br>' +
+          bandEmail +
+        '</div>' +
+      '</div>' +
+      '<div class="invoice-meta">' +
+        '<div class="invoice-title">FATURA</div>' +
+        '<div class="invoice-num">Nº ' + (invNum || 'GK-' + new Date().getFullYear() + '-001') + '</div>' +
+        '<div class="invoice-date">Data de emissão: ' + today + '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="parties">' +
+      '<div>' +
+        '<div class="party-label">Prestador de Serviços</div>' +
+        '<div class="party-name">' + bandName + '</div>' +
+        '<div class="party-detail">' +
+          (bandNIF ? 'NIF: <strong>' + bandNIF + '</strong><br>' : '') +
+          bandAddress + '<br>' +
+          bandEmail +
+        '</div>' +
+      '</div>' +
+      '<div>' +
+        '<div class="party-label">Cliente / Adquirente</div>' +
+        '<div class="party-name">' + clientName + '</div>' +
+        '<div class="party-detail">' +
+          (clientContact ? clientContact + '<br>' : '') +
+          (clientNIF ? 'NIF: <strong>' + clientNIF + '</strong><br>' : '') +
+          (clientAddress ? clientAddress + '<br>' : '') +
+          (clientEmail ? clientEmail : '') +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="service-box">' +
+      '<div class="service-label">Descrição do Serviço</div>' +
+      '<div class="service-desc">' + description + '</div>' +
+      '<div class="service-meta">' +
+        'Data do espetáculo: <strong>' + dateStr + '</strong>' +
+        (venue ? ' &nbsp;·&nbsp; Local: <strong>' + venue + '</strong>' : '') +
+        (duration ? ' &nbsp;·&nbsp; Duração: <strong>' + duration + '</strong>' : '') +
+      '</div>' +
+    '</div>' +
+
+    '<table class="amounts">' +
+      '<tr><td class="label">Cachê artístico</td><td class="value">' + fmt(fee) + '</td></tr>' +
+      (exp > 0 ? '<tr><td class="label">Deslocação e despesas</td><td class="value">' + fmt(exp) + '</td></tr>' : '') +
+      '<tr><td class="label" style="color:#999">Subtotal</td><td class="value" style="color:#999">' + fmt(sub) + '</td></tr>' +
+      '<tr><td class="label">IVA ' + ivaRate + '%</td><td class="value">' + fmt(ivaAmt) + '</td></tr>' +
+      '<tr class="total-row"><td class="label">TOTAL A PAGAR</td><td class="value">' + fmt(total) + '</td></tr>' +
+    '</table>' +
+
+    ivaNote +
+
+    (iban ? '<div class="payment">' +
+      '<div class="payment-label">Dados para Pagamento</div>' +
+      '<div class="payment-iban">' + iban + '</div>' +
+      '<div class="payment-name">Titular: ' + bandName + '</div>' +
+    '</div>' : '') +
+
+    '<div class="footer">' +
+      '<div class="footer-note">' +
+        (notes || 'Pagamento por transferência bancária no prazo de 30 dias.') +
+        '<br><br>Documento emitido por software de gestão — ' + bandName + ' · ' + bandEmail +
+      '</div>' +
+      '<div class="footer-sig">' +
+        '<div class="sig-line">Assinatura / ' + bandName + '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '</body></html>';
+
+  _invoiceNum++;
+  var w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(function() { w.print(); }, 600);
+  closeInvoiceModal();
+  showToast('Invoice generated — ' + invNum, 'ok');
+}
 
 // ── LOAD ALL GROWTH DATA ───────────────────────────────────────────────────
 
