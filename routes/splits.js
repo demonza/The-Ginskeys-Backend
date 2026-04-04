@@ -94,7 +94,7 @@ router.get('/member-accounts', requireAuth, requirePerm('viewLedger'), async (re
     if (tableCheck.rows.length === 0) {
       // Table not created yet — return empty state
       const { rows: totals } = await pool.query(
-        `SELECT COALESCE(SUM(amount_eur), 0) AS total_balance FROM transactions`
+        `SELECT COALESCE(SUM(CASE WHEN type='income' THEN amount_eur ELSE -amount_eur END), 0) AS total_balance FROM transactions`
       );
       return res.json({ balances: [], txns: [], total_balance: parseFloat(totals[0].total_balance) });
     }
@@ -134,9 +134,10 @@ router.get('/member-accounts', requireAuth, requirePerm('viewLedger'), async (re
       txns = rows;
     }
 
-    // Band total balance from ledger
+    // Band total balance — net income minus expenses
     const { rows: totals } = await pool.query(`
-      SELECT COALESCE(SUM(amount_eur), 0) AS total_balance FROM transactions
+      SELECT COALESCE(SUM(CASE WHEN type='income' THEN amount_eur ELSE -amount_eur END), 0) AS total_balance
+      FROM transactions
     `);
 
     res.json({ balances, txns, total_balance: parseFloat(totals[0].total_balance) });
