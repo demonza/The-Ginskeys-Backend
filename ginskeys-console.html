@@ -1736,6 +1736,7 @@ tr:hover .edit-btn{display:inline}
             <label style="font-size:9px;color:var(--muted3);display:flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" id="edit-rel-video"> Video done</label>
             <label style="font-size:9px;color:var(--muted3);display:flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" id="edit-rel-press"> Press pitched</label>
             <label style="font-size:9px;color:var(--muted3);display:flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" id="edit-rel-spotify-pitched"> Spotify pitched</label>
+            <label style="font-size:9px;color:var(--accent);display:flex;gap:5px;align-items:center;cursor:pointer;font-weight:700"><input type="checkbox" id="edit-rel-social-media"> Social media</label>
           </div>
         </div>
         <div class="form-field" style="grid-column:span 2">
@@ -2868,13 +2869,12 @@ tr:hover .edit-btn{display:inline}
             </select></div>
           <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">RELEASE DATE</div><input id="rel-date" class="login-input" type="date" style="width:100%"></div>
           <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">SPOTIFY URL</div><input id="rel-spotify" class="login-input" style="width:100%" placeholder="https://open.spotify.com/..."></div>
-          <div style="display:flex;gap:10px;align-items:center">
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;grid-column:1/-1">
             <label style="font-size:9px;color:var(--muted3);display:flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" id="rel-artwork"> Artwork</label>
             <label style="font-size:9px;color:var(--muted3);display:flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" id="rel-video"> Video</label>
-          </div>
-          <div style="display:flex;gap:10px;align-items:center">
             <label style="font-size:9px;color:var(--muted3);display:flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" id="rel-press"> Press pitched</label>
             <label style="font-size:9px;color:var(--muted3);display:flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" id="rel-spotify-pitched"> Spotify pitched</label>
+            <label style="font-size:9px;color:var(--accent);display:flex;gap:5px;align-items:center;cursor:pointer;font-weight:700"><input type="checkbox" id="rel-social-media"> Social media</label>
           </div>
           <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">NOTES</div><input id="rel-notes" class="login-input" style="width:100%" placeholder="e.g. Lead single. Video filmed at Praia de Sines."></div>
           <div style="grid-column:1/-1;display:flex;gap:8px;align-items:center">
@@ -3277,6 +3277,97 @@ tr:hover .edit-btn{display:inline}
       </div>
     </div>
 
+
+    <!-- ── MEMBER ACCOUNTS ENGINE ───────────────────────────── -->
+    <div style="flex-shrink:0" id="member-accounts-panel">
+      <div style="font-family:var(--display);font-size:11px;font-weight:700;color:var(--amber2);letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        MEMBER ACCOUNTS
+        <span style="font-size:9px;color:var(--muted2);font-family:var(--mono);font-weight:400;letter-spacing:.04em">Live balances — connected to total band ledger</span>
+        <button class="btn-sm" onclick="loadMemberAccounts()" style="margin-left:auto">&#8634; Refresh</button>
+        <button class="btn-sm" onclick="showMemberWithdrawModal()" style="color:var(--red3);border-color:var(--red3)">&#8595; Log Withdrawal</button>
+        <button class="btn-sm" onclick="showMemberDepositModal()" style="color:var(--green3);border-color:var(--green3)">&#8593; Log Deposit</button>
+      </div>
+      <div id="member-accounts-summary"></div>
+      <div id="member-accounts-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px">
+        <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:12px;text-align:center;color:var(--muted3);font-size:9px;grid-column:1/-1">Loading member accounts...</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px;max-height:200px;overflow-y:auto">
+        <div style="padding:5px 10px;font-size:9px;color:var(--muted);letter-spacing:.08em;border-bottom:1px solid var(--border1);position:sticky;top:0;background:var(--bg3);display:grid;grid-template-columns:90px 80px 1fr 90px 90px 90px 90px;gap:6px">
+          <span>DATE</span><span>MEMBER</span><span>DESCRIPTION</span><span style="text-align:right">AMOUNT</span><span style="text-align:right">BALANCE</span><span>TYPE</span><span>LEDGER LINK</span>
+        </div>
+        <div id="member-txn-rows" style="font-size:10px"></div>
+      </div>
+    </div>
+
+    <!-- Member Withdrawal Modal -->
+    <div id="member-withdraw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:8000;align-items:center;justify-content:center">
+      <div style="background:var(--bg2);border:1px solid var(--red3);border-radius:3px;padding:24px;min-width:360px;font-family:var(--mono)">
+        <div style="font-size:13px;font-weight:700;color:var(--red3);letter-spacing:.1em;margin-bottom:16px">LOG WITHDRAWAL</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--muted2)">
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Member</span>
+            <select id="mw-member" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+              <option value="fabio">Fabio</option>
+              <option value="pedro">Pedro</option>
+              <option value="manuel">Manuel</option>
+              <option value="tiago">Tiago</option>
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Amount (EUR)</span>
+            <input id="mw-amount" type="number" min="0.01" step="0.01" placeholder="0.00" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+          </div>
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Date</span>
+            <input id="mw-date" type="date" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+          </div>
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Description</span>
+            <input id="mw-desc" type="text" placeholder="e.g. Fuel reimbursement" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+          </div>
+          <div id="mw-status" style="font-size:10px;color:var(--red3);min-height:14px"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <button class="btn-sm" onclick="closeMemberModal('member-withdraw-modal')">Cancel</button>
+          <button class="btn-sm" onclick="saveMemberTransaction('withdrawal')" style="background:var(--red3);color:#000;font-weight:700;border-color:var(--red3)">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Member Deposit Modal -->
+    <div id="member-deposit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:8000;align-items:center;justify-content:center">
+      <div style="background:var(--bg2);border:1px solid var(--green3);border-radius:3px;padding:24px;min-width:360px;font-family:var(--mono)">
+        <div style="font-size:13px;font-weight:700;color:var(--green3);letter-spacing:.1em;margin-bottom:16px">LOG DEPOSIT</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--muted2)">
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Member</span>
+            <select id="md-member" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+              <option value="fabio">Fabio</option>
+              <option value="pedro">Pedro</option>
+              <option value="manuel">Manuel</option>
+              <option value="tiago">Tiago</option>
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Amount (EUR)</span>
+            <input id="md-amount" type="number" min="0.01" step="0.01" placeholder="0.00" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+          </div>
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Date</span>
+            <input id="md-date" type="date" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+          </div>
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Description</span>
+            <input id="md-desc" type="text" placeholder="e.g. Merch sale, royalties" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+          </div>
+          <div id="md-status" style="font-size:10px;color:var(--green3);min-height:14px"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <button class="btn-sm" onclick="closeMemberModal('member-deposit-modal')">Cancel</button>
+          <button class="btn-sm" onclick="saveMemberTransaction('deposit')" style="background:var(--green3);color:#000;font-weight:700;border-color:var(--green3)">Confirm</button>
+        </div>
+      </div>
+    </div>
     <!-- Calculator + History -->
     <div style="flex:1;display:grid;grid-template-columns:380px 1fr;gap:10px;min-height:180px">
       <div class="panel">
@@ -3709,7 +3800,7 @@ function renderReleasesList() {
   if (!el) return;
   if (!RELEASES_DATA.length) { el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted3);font-size:10px">No releases yet.</div>'; return; }
   el.innerHTML = RELEASES_DATA.map(r => {
-    const checks = [{label:'Artwork',done:r.artwork_done},{label:'Video',done:r.video_done},{label:'Press',done:r.press_pitched},{label:'Spotify',done:r.spotify_pitched}];
+    const checks = [{label:'Artwork',done:r.artwork_done},{label:'Video',done:r.video_done},{label:'Press',done:r.press_pitched},{label:'Spotify',done:r.spotify_pitched},{label:'Social',done:r.social_media}];
     const doneCount = checks.filter(c=>c.done).length;
     return `<div onclick="openReleaseDrawer('${r.id}')" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" style="display:grid;grid-template-columns:8px 1fr auto;gap:12px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border1);cursor:pointer;transition:background .1s">
       <div style="width:8px;height:8px;border-radius:50%;background:${RELEASE_STAGE_COLORS[r.stage]||'var(--muted)'}"></div>
@@ -3789,10 +3880,12 @@ async function addRelease() {
       video_done: document.getElementById('rel-video').checked,
       press_pitched: document.getElementById('rel-press').checked,
       spotify_pitched: document.getElementById('rel-spotify-pitched').checked,
+      social_media: document.getElementById('rel-social-media').checked,
       notes: document.getElementById('rel-notes').value,
     });
     statusEl.textContent='✓ Saved';
     ['rel-title','rel-date','rel-spotify','rel-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+    ['rel-artwork','rel-video','rel-press','rel-spotify-pitched','rel-social-media'].forEach(id=>{const e=document.getElementById(id);if(e)e.checked=false;});
     await loadReleases();
   } catch(e) { statusEl.textContent='✗ '+e.message; }
 }
@@ -3826,6 +3919,7 @@ function openEditRelease(id) {
   document.getElementById('edit-rel-video').checked      = !!r.video_done;
   document.getElementById('edit-rel-press').checked      = !!r.press_pitched;
   document.getElementById('edit-rel-spotify-pitched').checked = !!r.spotify_pitched;
+  document.getElementById('edit-rel-social-media').checked = !!r.social_media;
   document.getElementById('edit-rel-notes').value        = r.notes || '';
   const errEl = document.getElementById('edit-rel-err');
   if (errEl) { errEl.style.display='none'; errEl.textContent=''; }
@@ -3853,6 +3947,7 @@ async function saveEditRelease() {
       video_done:       document.getElementById('edit-rel-video').checked,
       press_pitched:    document.getElementById('edit-rel-press').checked,
       spotify_pitched:  document.getElementById('edit-rel-spotify-pitched').checked,
+      social_media:     document.getElementById('edit-rel-social-media').checked,
       notes:            document.getElementById('edit-rel-notes').value || null,
     });
     closeEditRelease();
@@ -4020,11 +4115,16 @@ async function saveSplit() {
     var savedSplit = await apiPost('/splits', splitPayload);
     statusEl.textContent='✓ Saved';
     await loadSplits();
-    // Auto-credit member accounts
+    // Auto-credit member accounts from the split
     if (savedSplit && savedSplit.id) {
-      await postSplitToMemberAccounts({...splitPayload, band_fund_eur: savedSplit.band_fund_eur, members: savedSplit.members || splitPayload.members}, savedSplit.id);
+      await postSplitToMemberAccounts({
+        gig_name: splitPayload.gig_name,
+        gig_date: splitPayload.gig_date,
+        per_member_eur: savedSplit.per_member_eur,
+        members: savedSplit.members || splitPayload.members
+      }, savedSplit.id);
     }
-    showToast('Split saved + member accounts updated','ok');
+    showToast('Split saved — member accounts credited','ok');
   } catch(e) { statusEl.textContent='✗ '+e.message; }
 }
 
@@ -4264,6 +4364,220 @@ async function postSplitToMemberAccounts(splitData, splitId) {
 
   await loadMemberAccounts();
 }
+
+
+// ══════════════════════════════════════════════════════════════════
+// MEMBER ACCOUNTS ENGINE
+// ══════════════════════════════════════════════════════════════════
+
+var MEMBER_ACCOUNTS_DATA = { balances: [], txns: [], total_balance: 0 };
+
+var MEMBER_DEFS = [
+  { key: 'fabio',  name: 'Fabio',  color: 'var(--accent)' },
+  { key: 'pedro',  name: 'Pedro',  color: 'var(--blue2)' },
+  { key: 'manuel', name: 'Manuel', color: 'var(--green3)' },
+  { key: 'tiago',  name: 'Tiago',  color: 'var(--purple2)' },
+];
+
+async function loadMemberAccounts() {
+  if (!API_BASE || !SESSION || !SESSION.token) return;
+  try {
+    MEMBER_ACCOUNTS_DATA = await apiGet('/splits/member-accounts');
+    renderMemberAccounts();
+  } catch(e) { console.warn('loadMemberAccounts:', e.message); }
+}
+
+function renderMemberAccounts() {
+  var grid = document.getElementById('member-accounts-grid');
+  if (!grid) return;
+
+  var balMap = {};
+  (MEMBER_ACCOUNTS_DATA.balances || []).forEach(function(b) { balMap[b.member_key] = b; });
+
+  var totalBandBalance = parseFloat(MEMBER_ACCOUNTS_DATA.total_balance || 0);
+  var totalMemberBalances = MEMBER_DEFS.reduce(function(s, m) {
+    return s + parseFloat((balMap[m.key] || {}).balance || 0);
+  }, 0);
+  var unallocated = totalBandBalance - totalMemberBalances;
+
+  // Summary bar
+  var sumEl = document.getElementById('member-accounts-summary');
+  if (sumEl) {
+    sumEl.innerHTML =
+      '<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:10px;padding:8px 12px;' +
+      'background:var(--bg4);border-radius:2px;margin-bottom:8px;border-left:3px solid var(--amber2)">' +
+        '<span style="color:var(--muted);font-size:9px;letter-spacing:.08em">BAND BALANCE</span>' +
+        '<span style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--text)">€' + totalBandBalance.toFixed(2) + '</span>' +
+        '<span style="color:var(--border2)">|</span>' +
+        '<span style="color:var(--muted);font-size:9px">IN MEMBER ACCOUNTS</span>' +
+        '<span style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--amber2)">€' + totalMemberBalances.toFixed(2) + '</span>' +
+        '<span style="color:var(--border2)">|</span>' +
+        '<span style="color:var(--muted);font-size:9px">UNALLOCATED</span>' +
+        '<span style="font-family:var(--display);font-size:16px;font-weight:700;color:' + (unallocated >= 0 ? 'var(--green3)' : 'var(--red3)') + '">' +
+          (unallocated >= 0 ? '' : '-') + '€' + Math.abs(unallocated).toFixed(2) +
+        '</span>' +
+      '</div>';
+  }
+
+  // Account cards
+  grid.innerHTML = MEMBER_DEFS.map(function(m) {
+    var b = balMap[m.key] || { balance: 0, total_in: 0, total_out: 0 };
+    var bal = parseFloat(b.balance || 0);
+    var tin = parseFloat(b.total_in || 0);
+    var tout = parseFloat(b.total_out || 0);
+    var balColor = bal >= 0 ? 'var(--green3)' : 'var(--red3)';
+    var pct = totalBandBalance > 0 ? Math.max(0, bal / totalBandBalance * 100) : 0;
+    return '<div style="background:var(--bg3);border:1px solid var(--border2);border-left:3px solid ' + m.color + ';border-radius:2px;padding:12px;text-align:center">' +
+      '<div style="font-size:9px;color:' + m.color + ';letter-spacing:.1em;margin-bottom:6px;font-weight:700">' + m.name.toUpperCase() + '</div>' +
+      '<div style="font-family:var(--display);font-size:22px;font-weight:700;color:' + balColor + '">' +
+        (bal < 0 ? '-' : '') + '€' + Math.abs(bal).toFixed(2) +
+      '</div>' +
+      '<div style="font-size:8px;color:var(--muted);margin-top:2px">' + pct.toFixed(1) + '% of total</div>' +
+      '<div style="height:3px;background:var(--bg4);border-radius:1px;margin:5px 0;overflow:hidden">' +
+        '<div style="height:100%;background:' + m.color + ';width:' + Math.min(100, pct) + '%;transition:width .4s"></div>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:9px">' +
+        '<div style="color:var(--green3)">€' + tin.toFixed(2) + '<br><span style="color:var(--muted);font-size:8px">IN</span></div>' +
+        '<div style="color:var(--red3)">€' + tout.toFixed(2) + '<br><span style="color:var(--muted);font-size:8px">OUT</span></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  // Transaction history
+  var txnsEl = document.getElementById('member-txn-rows');
+  if (!txnsEl) return;
+  var txns = MEMBER_ACCOUNTS_DATA.txns || [];
+  if (!txns.length) {
+    txnsEl.innerHTML = '<div style="padding:12px;color:var(--muted3);font-size:10px;text-align:center">' +
+      'No transactions yet. Save a gig split to auto-credit member accounts.</div>';
+    return;
+  }
+
+  // Compute running balance per member (forward pass)
+  var runBals = {};
+  var forwardTxns = txns.slice().reverse();
+  forwardTxns.forEach(function(t) {
+    if (!runBals[t.member_key]) runBals[t.member_key] = 0;
+    if (t.txn_type === 'withdrawal') runBals[t.member_key] -= parseFloat(t.amount);
+    else runBals[t.member_key] += parseFloat(t.amount);
+    t._run = runBals[t.member_key];
+  });
+
+  var typeColors = { split_credit: 'var(--green3)', withdrawal: 'var(--red3)', deposit: 'var(--blue2)' };
+  var typeLabels = { split_credit: 'GIG SPLIT', withdrawal: 'WITHDRAWAL', deposit: 'DEPOSIT' };
+
+  txnsEl.innerHTML = txns.map(function(t) {
+    var def = MEMBER_DEFS.find(function(m) { return m.key === t.member_key; }) || { color: 'var(--muted)', name: t.member_name };
+    var amt = parseFloat(t.amount);
+    var isOut = t.txn_type === 'withdrawal';
+    var run = parseFloat(t._run || 0);
+    var ledgerLink = t.ledger_txn_id
+      ? '<span style="color:var(--green3);cursor:pointer;text-decoration:underline" onclick="switchView('ledger',document.querySelector('[data-view=ledger]'))" title="View in Ledger">→ Ledger</span>'
+      : '<span style="color:var(--muted3)">—</span>';
+    return '<div style="display:grid;grid-template-columns:90px 80px 1fr 90px 90px 90px 90px;gap:6px;padding:5px 10px;border-bottom:1px solid var(--border1);align-items:center;font-size:10px">' +
+      '<div style="color:var(--muted2)">' + String(t.txn_date || '').slice(0,10) + '</div>' +
+      '<div style="color:' + def.color + ';font-weight:700">' + def.name + '</div>' +
+      '<div style="color:var(--text)">' + (t.description || t.ledger_description || '—') + '</div>' +
+      '<div style="text-align:right;color:' + (isOut ? 'var(--red3)' : 'var(--green3)') + ';font-weight:700">' +
+        (isOut ? '-' : '+') + '€' + amt.toFixed(2) + '</div>' +
+      '<div style="text-align:right;color:' + (run >= 0 ? 'var(--text)' : 'var(--red3)') + '">€' + run.toFixed(2) + '</div>' +
+      '<div style="font-size:8px;color:' + (typeColors[t.txn_type] || 'var(--muted)') + ';letter-spacing:.05em">' + (typeLabels[t.txn_type] || t.txn_type) + '</div>' +
+      '<div>' + ledgerLink + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function showMemberWithdrawModal() {
+  var m = document.getElementById('member-withdraw-modal');
+  if (!m) return;
+  document.getElementById('mw-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('mw-amount').value = '';
+  document.getElementById('mw-desc').value = '';
+  document.getElementById('mw-status').textContent = '';
+  m.style.display = 'flex';
+}
+
+function showMemberDepositModal() {
+  var m = document.getElementById('member-deposit-modal');
+  if (!m) return;
+  document.getElementById('md-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('md-amount').value = '';
+  document.getElementById('md-desc').value = '';
+  document.getElementById('md-status').textContent = '';
+  m.style.display = 'flex';
+}
+
+function closeMemberModal(id) {
+  var m = document.getElementById(id);
+  if (m) m.style.display = 'none';
+}
+
+async function saveMemberTransaction(type) {
+  var prefix = type === 'withdrawal' ? 'mw' : 'md';
+  var memberKey = document.getElementById(prefix + '-member').value;
+  var amount = parseFloat(document.getElementById(prefix + '-amount').value);
+  var date = document.getElementById(prefix + '-date').value;
+  var desc = document.getElementById(prefix + '-desc').value.trim();
+  var statusEl = document.getElementById(prefix + '-status');
+  if (!amount || amount <= 0) { statusEl.textContent = 'Enter a valid amount'; return; }
+  var def = MEMBER_DEFS.find(function(d) { return d.key === memberKey; });
+  statusEl.textContent = 'Saving...';
+  try {
+    await apiPost('/splits/member-accounts/txn', {
+      member_key: memberKey,
+      member_name: def ? def.name : memberKey,
+      amount: amount,
+      txn_type: type,
+      description: desc || (type === 'withdrawal' ? 'Withdrawal' : 'Deposit'),
+      txn_date: date
+    });
+    closeMemberModal(type === 'withdrawal' ? 'member-withdraw-modal' : 'member-deposit-modal');
+    await loadMemberAccounts();
+    // Reload ledger to reflect the mirrored transaction
+    if (typeof loadLedger === 'function') loadLedger();
+    showToast((type === 'withdrawal' ? 'Withdrawal' : 'Deposit') + ' logged for ' + (def ? def.name : memberKey), type === 'withdrawal' ? 'warn' : 'ok');
+  } catch(e) {
+    statusEl.textContent = 'Failed: ' + e.message;
+  }
+}
+
+async function postSplitToMemberAccounts(splitData, splitId) {
+  if (!splitData) return;
+  var members = splitData.members || [];
+  var date = splitData.gig_date || new Date().toISOString().split('T')[0];
+  var gigName = splitData.gig_name || 'Gig';
+  var perMember = parseFloat(splitData.per_member_eur || 0);
+  // Use per_member_eur if members array lacks individual amounts
+  for (var i = 0; i < members.length; i++) {
+    var m = members[i];
+    var memberName = m.member_name || m.name || 'Member';
+    var def = MEMBER_DEFS.find(function(d) {
+      return d.name.toLowerCase() === memberName.toLowerCase() || d.key === memberName.toLowerCase();
+    });
+    var key = def ? def.key : memberName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    var memberAmt = parseFloat(m.net_eur || m.base_share || perMember || 0);
+    if (memberAmt <= 0) continue;
+    try {
+      await apiPost('/splits/member-accounts/txn', {
+        member_key: key,
+        member_name: def ? def.name : memberName,
+        amount: memberAmt,
+        txn_type: 'split_credit',
+        description: gigName,
+        txn_date: date,
+        split_id: splitId
+      });
+    } catch(e) { console.warn('Credit failed for', memberName, e.message); }
+  }
+  await loadMemberAccounts();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  ['member-withdraw-modal','member-deposit-modal'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('click', function(e) { if (e.target === el) closeMemberModal(id); });
+  });
+});
 
 // ── LOAD ALL GROWTH DATA ───────────────────────────────────────────────────
 
@@ -4732,15 +5046,16 @@ function renderReleaseChecklist() {
     {label:'Mix & master done',   done: ['mastered','artwork','submitted','scheduled','released'].includes(r.stage)},
     {label:'Artwork done',        done: r.artwork_done},
     {label:'Video done',          done: r.video_done},
-    {label:'Spotify pitched',     done: r.spotify_pitched},
     {label:'Press pitched',       done: r.press_pitched},
+    {label:'Spotify pitched',     done: r.spotify_pitched},
+    {label:'Social media',        done: r.social_media},
     {label:'Released on DSPs',    done: r.stage === 'released'},
   ];
   const doneCount = checks.filter(c=>c.done).length;
   el.innerHTML = `
-    <div style="font-weight:700;font-size:10px;color:var(--text);margin-bottom:8px">${r.title} — ${doneCount}/7 done</div>
+    <div style="font-weight:700;font-size:10px;color:var(--text);margin-bottom:8px">${r.title} — ${doneCount}/8 done</div>
     <div style="height:4px;background:var(--bg4);border-radius:1px;overflow:hidden;margin-bottom:8px">
-      <div style="height:100%;background:var(--purple2);width:${Math.round(doneCount/7*100)}%"></div>
+      <div style="height:100%;background:var(--purple2);width:${Math.round(doneCount/8*100)}%"></div>
     </div>
     ${checks.map(c=>`
     <div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:9px">
@@ -5105,19 +5420,19 @@ function _initAll_old_1() {
             <div class="rider-section-body">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                 <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--accent)">
-                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 1 — FÁBIO (Voz Lead)</div>
+                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 1 — FÁBIO (<span data-i18n="rider_lead_vox">Lead Vocal</span>)</div>
                   <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_1" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Vocal (self, loud) · Guitar (self, low)<br>Kick · Snare · Bass (low)</div>
                 </div>
                 <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--blue2)">
-                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 2 — PEDRO (Baixo)</div>
+                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 2 — PEDRO (<span data-i18n="rider_bass">Bass</span>)</div>
                   <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_2" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Kick · Snare · Guitar 1<br>Vocal 1 · Bass (self, med)</div>
                 </div>
                 <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--green3)">
-                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 3 — MANUEL (Bateria)</div>
+                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 3 — MANUEL (<span data-i18n="rider_drums">Drums</span>)</div>
                   <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_3" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Vocal 1 · Guitar 1 · Bass<br>Click track (optional)</div>
                 </div>
                 <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--amber2)">
-                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 4 — TIAGO (Guitarra)</div>
+                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 4 — TIAGO (<span data-i18n="rider_bg_vox">BG Vocal</span>)</div>
                   <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_4" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Vocal 1 · Vocal 2 (self)<br>Guitar 1 · Kick · Bass (low)</div>
                 </div>
               </div>
