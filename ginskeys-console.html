@@ -3181,6 +3181,102 @@ tr:hover .edit-btn{display:inline}
       </div>
     </div>
 
+
+    <!-- ── MEMBER ACCOUNTS ENGINE ───────────────────────────── -->
+    <div style="flex-shrink:0" id="member-accounts-panel">
+      <div style="font-family:var(--display);font-size:11px;font-weight:700;color:var(--amber2);letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:12px">
+        MEMBER ACCOUNTS
+        <span style="font-size:9px;color:var(--muted2);font-family:var(--mono);font-weight:400;letter-spacing:.04em">Live balances · auto-updated from gig splits</span>
+        <button class="btn-sm" onclick="loadMemberAccounts()" style="margin-left:auto">↺ Refresh</button>
+        <button class="btn-sm" onclick="showMemberWithdrawModal()" style="color:var(--red3);border-color:var(--red3)">↓ Log Withdrawal</button>
+        <button class="btn-sm" onclick="showMemberDepositModal()" style="color:var(--green3);border-color:var(--green3)">↑ Log Deposit</button>
+      </div>
+      <div id="member-accounts-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px">
+        <!-- Populated by loadMemberAccounts() -->
+        <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:12px;text-align:center;animation:pulse .8s infinite alternate">
+          <div style="font-size:9px;color:var(--muted);letter-spacing:.1em">Loading…</div>
+        </div>
+      </div>
+      <div id="member-txn-history" style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px;max-height:180px;overflow-y:auto">
+        <div style="padding:6px 10px;font-size:9px;color:var(--muted);letter-spacing:.08em;border-bottom:1px solid var(--border1);position:sticky;top:0;background:var(--bg3);display:grid;grid-template-columns:90px 80px 1fr 80px 80px 90px;gap:8px">
+          <span>DATE</span><span>MEMBER</span><span>DESCRIPTION</span><span style="text-align:right">AMOUNT</span><span style="text-align:right">BALANCE</span><span>TYPE</span>
+        </div>
+        <div id="member-txn-rows" style="font-size:10px"></div>
+      </div>
+    </div>
+
+    <!-- Member Withdrawal Modal -->
+    <div id="member-withdraw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:8000;align-items:center;justify-content:center">
+      <div style="background:var(--bg2);border:1px solid var(--red3);border-radius:3px;padding:24px;min-width:360px;font-family:var(--mono)">
+        <div style="font-size:13px;font-weight:700;color:var(--red3);letter-spacing:.1em;margin-bottom:16px">LOG WITHDRAWAL</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--muted2)">
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Member</span>
+            <select id="mw-member" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+              <option value="band_fund">Band Fund</option>
+              <option value="fabio">Fábio</option>
+              <option value="pedro">Pedro</option>
+              <option value="manuel">Manuel</option>
+              <option value="tiago">Tiago</option>
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Amount (€)</span>
+            <input id="mw-amount" type="number" min="0.01" step="0.01" placeholder="0.00" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+          </div>
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Date</span>
+            <input id="mw-date" type="date" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+          </div>
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Description</span>
+            <input id="mw-desc" type="text" placeholder="e.g. Fuel reimbursement" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+          </div>
+          <div id="mw-status" style="font-size:10px;color:var(--red3);min-height:14px"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <button class="btn-sm" onclick="closeMemberModal('member-withdraw-modal')">Cancel</button>
+          <button class="btn-sm" onclick="saveMemberTransaction('withdrawal')" style="background:var(--red3);color:#000;font-weight:700;border-color:var(--red3)">Confirm Withdrawal</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Member Deposit Modal -->
+    <div id="member-deposit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:8000;align-items:center;justify-content:center">
+      <div style="background:var(--bg2);border:1px solid var(--green3);border-radius:3px;padding:24px;min-width:360px;font-family:var(--mono)">
+        <div style="font-size:13px;font-weight:700;color:var(--green3);letter-spacing:.1em;margin-bottom:16px">LOG DEPOSIT / EXPENSE REPAYMENT</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--muted2)">
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Member</span>
+            <select id="md-member" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+              <option value="band_fund">Band Fund</option>
+              <option value="fabio">Fábio</option>
+              <option value="pedro">Pedro</option>
+              <option value="manuel">Manuel</option>
+              <option value="tiago">Tiago</option>
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Amount (€)</span>
+            <input id="md-amount" type="number" min="0.01" step="0.01" placeholder="0.00" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+          </div>
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Date</span>
+            <input id="md-date" type="date" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+          </div>
+          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
+            <span>Description</span>
+            <input id="md-desc" type="text" placeholder="e.g. Equipment sale, royalties" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+          </div>
+          <div id="md-status" style="font-size:10px;color:var(--green3);min-height:14px"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <button class="btn-sm" onclick="closeMemberModal('member-deposit-modal')">Cancel</button>
+          <button class="btn-sm" onclick="saveMemberTransaction('deposit')" style="background:var(--green3);color:#000;font-weight:700;border-color:var(--green3)">Confirm Deposit</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Calculator + History -->
     <div style="flex:1;display:grid;grid-template-columns:380px 1fr;gap:10px;min-height:180px">
       <div class="panel">
@@ -3914,15 +4010,21 @@ async function saveSplit() {
   if (!gig_name||!gross_eur) { statusEl.textContent='Gig name and gross required'; return; }
   statusEl.textContent='Saving…';
   try {
-    await apiPost('/splits',{
+    var splitPayload = {
       gig_name, gross_eur:parseFloat(gross_eur),
       gig_date:document.getElementById('sp-date').value||null,
       band_fund_pct:parseFloat(document.getElementById('sp-fund-pct').value||10),
       shared_expenses:SP_EXPENSES.map(e=>({label:e.label,amount:e.amount})),
       members:SP_MEMBERS.map(m=>({name:m.name,personal_expenses:0})),
-    });
+    };
+    var savedSplit = await apiPost('/splits', splitPayload);
     statusEl.textContent='✓ Saved';
-    await loadSplits(); showToast('Split saved','ok');
+    await loadSplits();
+    // Auto-credit member accounts
+    if (savedSplit && savedSplit.id) {
+      await postSplitToMemberAccounts({...splitPayload, band_fund_eur: savedSplit.band_fund_eur, members: savedSplit.members || splitPayload.members}, savedSplit.id);
+    }
+    showToast('Split saved + member accounts updated','ok');
   } catch(e) { statusEl.textContent='✗ '+e.message; }
 }
 
@@ -3930,6 +4032,7 @@ async function loadSplits() {
   if (!API_BASE || !SESSION?.token) return;
   try { SPLITS_DATA=await apiGet('/splits'); renderSplitHistory(); updateSplitsBanner(); }
   catch(e) { console.warn('loadSplits:', e.message); }
+  await loadMemberAccounts();
 }
 
 
@@ -3946,6 +4049,220 @@ function renderSplitHistory() {
       <div style="text-align:right;color:var(--amber2)">fund €${parseFloat(s.band_fund_eur||0).toFixed(2)}</div>
       <div style="text-align:right;color:var(--green3);font-weight:700">€${parseFloat(s.per_member_eur||0).toFixed(2)}/mbr</div>
     </div>`).join('');
+}
+
+
+// ══════════════════════════════════════════════════════════
+// MEMBER ACCOUNTS ENGINE
+// ══════════════════════════════════════════════════════════
+
+var MEMBER_ACCOUNTS_DATA = { balances: [], txns: [] };
+
+var MEMBER_DEFS = [
+  { key: 'fabio',     name: 'Fábio',     color: 'var(--accent)' },
+  { key: 'pedro',     name: 'Pedro',     color: 'var(--blue2)' },
+  { key: 'manuel',    name: 'Manuel',    color: 'var(--green3)' },
+  { key: 'tiago',     name: 'Tiago',     color: 'var(--purple2)' },
+  { key: 'band_fund', name: 'Band Fund', color: 'var(--amber2)' },
+];
+
+async function loadMemberAccounts() {
+  if (!API_BASE || !SESSION?.token) return;
+  try {
+    MEMBER_ACCOUNTS_DATA = await apiGet('/splits/member-accounts');
+    renderMemberAccounts();
+  } catch(e) {
+    console.warn('loadMemberAccounts:', e.message);
+  }
+}
+
+function renderMemberAccounts() {
+  var grid = document.getElementById('member-accounts-grid');
+  if (!grid) return;
+
+  var balMap = {};
+  (MEMBER_ACCOUNTS_DATA.balances || []).forEach(function(b) {
+    balMap[b.member_key] = b;
+  });
+
+  grid.innerHTML = MEMBER_DEFS.map(function(m) {
+    var b = balMap[m.key] || { balance: 0, total_in: 0, total_out: 0 };
+    var bal = parseFloat(b.balance || 0);
+    var totalIn = parseFloat(b.total_in || 0);
+    var totalOut = parseFloat(b.total_out || 0);
+    var balColor = bal >= 0 ? 'var(--green3)' : 'var(--red3)';
+    return '<div style="background:var(--bg3);border:1px solid var(--border2);border-left:3px solid ' + m.color + ';border-radius:2px;padding:12px;text-align:center">' +
+      '<div style="font-size:9px;color:' + m.color + ';letter-spacing:.1em;margin-bottom:6px;font-weight:700">' + m.name.toUpperCase() + '</div>' +
+      '<div style="font-family:var(--display);font-size:22px;font-weight:700;color:' + balColor + '">' +
+        (bal >= 0 ? '+' : '') + '€' + Math.abs(bal).toFixed(2) +
+      '</div>' +
+      '<div style="font-size:8px;color:var(--muted);margin-top:4px">BALANCE</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px;font-size:9px">' +
+        '<div style="color:var(--green3)">€' + totalIn.toFixed(2) + '<br><span style="color:var(--muted);font-size:8px">IN</span></div>' +
+        '<div style="color:var(--red3)">€' + totalOut.toFixed(2) + '<br><span style="color:var(--muted);font-size:8px">OUT</span></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  // Render transaction history
+  var txnsEl = document.getElementById('member-txn-rows');
+  if (!txnsEl) return;
+  var txns = MEMBER_ACCOUNTS_DATA.txns || [];
+  if (!txns.length) {
+    txnsEl.innerHTML = '<div style="padding:12px;color:var(--muted3);font-size:10px;text-align:center">No transactions yet. Save a gig split to auto-credit member accounts.</div>';
+    return;
+  }
+
+  // Running balances per member
+  var runBal = {};
+  // Build forward order for running balance calc
+  var fwd = txns.slice().reverse();
+  var runMap = {};
+  fwd.forEach(function(t) {
+    if (!runMap[t.member_key]) runMap[t.member_key] = 0;
+    if (t.txn_type === 'withdrawal') runMap[t.member_key] -= parseFloat(t.amount);
+    else runMap[t.member_key] += parseFloat(t.amount);
+    t._running = runMap[t.member_key];
+  });
+
+  var typeColors = { split_credit: 'var(--green3)', withdrawal: 'var(--red3)', deposit: 'var(--blue2)' };
+  var typeLabels = { split_credit: 'GIG SPLIT', withdrawal: 'WITHDRAWAL', deposit: 'DEPOSIT' };
+
+  txnsEl.innerHTML = txns.map(function(t) {
+    var def = MEMBER_DEFS.find(function(m) { return m.key === t.member_key; }) || { color: 'var(--muted)', name: t.member_name };
+    var amt = parseFloat(t.amount);
+    var isOut = t.txn_type === 'withdrawal';
+    var runBal = parseFloat(t._running || 0);
+    return '<div style="display:grid;grid-template-columns:90px 80px 1fr 80px 80px 90px;gap:8px;padding:6px 10px;border-bottom:1px solid var(--border1);align-items:center;font-size:10px">' +
+      '<div style="color:var(--muted2)">' + (t.txn_date || '').toString().slice(0,10) + '</div>' +
+      '<div style="color:' + def.color + ';font-weight:700">' + (def.name) + '</div>' +
+      '<div style="color:var(--text)">' + (t.description || '—') + '</div>' +
+      '<div style="text-align:right;color:' + (isOut ? 'var(--red3)' : 'var(--green3)') + ';font-weight:700">' +
+        (isOut ? '-' : '+') + '€' + amt.toFixed(2) +
+      '</div>' +
+      '<div style="text-align:right;color:' + (runBal >= 0 ? 'var(--text)' : 'var(--red3)') + '">€' + runBal.toFixed(2) + '</div>' +
+      '<div style="font-size:8px;color:' + typeColors[t.txn_type] + ';letter-spacing:.06em">' + (typeLabels[t.txn_type] || t.txn_type) + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function showMemberWithdrawModal() {
+  var m = document.getElementById('member-withdraw-modal');
+  if (!m) return;
+  m.style.display = 'flex';
+  document.getElementById('mw-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('mw-amount').value = '';
+  document.getElementById('mw-desc').value = '';
+  document.getElementById('mw-status').textContent = '';
+}
+
+function showMemberDepositModal() {
+  var m = document.getElementById('member-deposit-modal');
+  if (!m) return;
+  m.style.display = 'flex';
+  document.getElementById('md-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('md-amount').value = '';
+  document.getElementById('md-desc').value = '';
+  document.getElementById('md-status').textContent = '';
+}
+
+function closeMemberModal(id) {
+  var m = document.getElementById(id);
+  if (m) m.style.display = 'none';
+}
+
+async function saveMemberTransaction(type) {
+  var isWithdraw = type === 'withdrawal';
+  var prefix = isWithdraw ? 'mw' : 'md';
+  var memberKey = document.getElementById(prefix + '-member').value;
+  var amount = document.getElementById(prefix + '-amount').value;
+  var date = document.getElementById(prefix + '-date').value;
+  var desc = document.getElementById(prefix + '-desc').value;
+  var statusEl = document.getElementById(prefix + '-status');
+
+  if (!amount || parseFloat(amount) <= 0) {
+    statusEl.textContent = 'Enter a valid amount';
+    return;
+  }
+
+  var def = MEMBER_DEFS.find(function(m) { return m.key === memberKey; });
+  statusEl.textContent = 'Saving…';
+
+  try {
+    await apiPost('/splits/member-accounts/txn', {
+      member_key: memberKey,
+      member_name: def ? def.name : memberKey,
+      amount: parseFloat(amount),
+      txn_type: type,
+      description: desc || (isWithdraw ? 'Withdrawal' : 'Deposit'),
+      txn_date: date
+    });
+    closeMemberModal(isWithdraw ? 'member-withdraw-modal' : 'member-deposit-modal');
+    await loadMemberAccounts();
+    showToast((isWithdraw ? 'Withdrawal' : 'Deposit') + ' logged for ' + (def ? def.name : memberKey), isWithdraw ? 'warn' : 'ok');
+  } catch(e) {
+    statusEl.textContent = '✗ ' + e.message;
+  }
+}
+
+// Auto-post member split credits when a gig split is saved
+var _origSaveSplit = null;
+document.addEventListener('DOMContentLoaded', function() {
+  // Close member modals on backdrop click
+  ['member-withdraw-modal','member-deposit-modal'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('click', function(e) {
+      if (e.target === el) closeMemberModal(id);
+    });
+  });
+});
+
+// Hook into saveSplit to auto-credit member accounts
+// Called after a split is saved successfully
+async function postSplitToMemberAccounts(splitData, splitId) {
+  if (!splitData || !splitData.members) return;
+  var gig_date = splitData.gig_date || new Date().toISOString().split('T')[0];
+  var gigName = splitData.gig_name || 'Gig';
+
+  // Credit each member
+  for (var i = 0; i < splitData.members.length; i++) {
+    var m = splitData.members[i];
+    var memberName = m.name || m.member_name;
+    // Find member key
+    var def = MEMBER_DEFS.find(function(d) {
+      return d.name.toLowerCase() === memberName.toLowerCase() ||
+             d.key === memberName.toLowerCase();
+    });
+    var key = def ? def.key : memberName.toLowerCase().replace(/\s+/g, '_');
+    try {
+      await apiPost('/splits/member-accounts/txn', {
+        member_key: key,
+        member_name: memberName,
+        amount: parseFloat(m.net_eur || m.base_share || 0),
+        txn_type: 'split_credit',
+        description: gigName,
+        txn_date: gig_date,
+        split_id: splitId
+      });
+    } catch(e) { console.warn('Member credit failed for', memberName, e.message); }
+  }
+
+  // Credit band fund
+  if (splitData.band_fund_eur && parseFloat(splitData.band_fund_eur) > 0) {
+    try {
+      await apiPost('/splits/member-accounts/txn', {
+        member_key: 'band_fund',
+        member_name: 'Band Fund',
+        amount: parseFloat(splitData.band_fund_eur),
+        txn_type: 'split_credit',
+        description: gigName,
+        txn_date: gig_date,
+        split_id: splitId
+      });
+    } catch(e) { console.warn('Band fund credit failed:', e.message); }
+  }
+
+  await loadMemberAccounts();
 }
 
 // ── LOAD ALL GROWTH DATA ───────────────────────────────────────────────────
@@ -4663,12 +4980,13 @@ function _initAll_old_1() {
           <div style="font-size:10px;color:var(--muted2);letter-spacing:.1em"><span data-i18n="rider_subtitle">TECHNICAL RIDER · HARD ROCK · 4 PIECE · SINES, PORTUGAL · v2.0 2026</span></div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
-          <!-- Show picker -->
-          <div style="display:flex;align-items:center;gap:6px">
+          <!-- Show picker + New Show inline -->
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
             <span style="font-size:9px;color:var(--muted);letter-spacing:.08em" data-i18n="rider_show_label">SHOW:</span>
             <select id="rider-show-picker" onchange="onRiderShowChange()" style="font-size:10px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:3px 6px;min-width:160px">
               <option value="" data-i18n="rider_global_template">— Global Template —</option>
             </select>
+            <button class="btn-sm" onclick="riderNewShowModal()" style="background:rgba(255,92,26,.12);border-color:var(--accent);color:var(--accent)" data-i18n="rider_new_show">+ New Show</button>
           </div>
           <div id="rider-save-status" style="font-size:9px;color:var(--green3);padding:3px 8px;background:rgba(0,230,118,.08);border-radius:1px" data-i18n="rider_click_edit">✎ Click any field to edit</div>
           <button class="btn-sm" onclick="printRider()"><span data-i18n="btn_print">⎙ Print / PDF</span></button>
@@ -4732,21 +5050,27 @@ function _initAll_old_1() {
                 <div data-i18n="rider_col_stand">STAND</div>
                 <div data-i18n="rider_col_notes">NOTES</div>
               </div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">1</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_kick">Kick Drum</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_1_mic">Beta 91A / D112</div><div style="color:var(--muted3)" data-i18n="rider_stand_none">None</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_1_notes">Gate req.</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">2</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_snare_top">Snare Top</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_2_mic">SM57</div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">3</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_snare_bot">Snare Bottom</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_3_mic">SM57</div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_3_notes">Phase flip</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">4</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_hihat">Hi-Hat</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_4_mic">SM81 / C451</div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">5</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_tom1">Tom 1</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_5_mic">E904 clip</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">6</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_tom2">Tom 2</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_6_mic">E904 clip</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">7</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_tom3">Tom 3 (floor)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_7_mic">E904 clip</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">8</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_oh_l">OH Left</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_8_mic">SM81 / C451</div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">9</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_oh_r">OH Right</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_9_mic">SM81 / C451</div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--muted3)">—</div></div>
-              <div class="input-row" style="background:rgba(170,0,255,.04)"><div style="color:var(--accent);font-weight:700">10</div><div style="color:var(--muted2)" data-i18n="rider_di">DI</div><div data-i18n="rider_src_bass_di">Bass (direct)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_10_mic">Radial J48</div><div style="color:var(--muted3)">—</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_10_notes">Pre-amp out</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">11</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_bass_amp">Bass Amp</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_11_mic">SM57 / β52</div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_11_notes">Optional</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">12</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_gtr1">Guitar 1 Amp</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_12_mic">SM57</div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_12_notes">Off-axis</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">13</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_gtr2">Guitar 2 Amp</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_13_mic">SM57</div><div style="color:var(--muted3)" data-i18n="rider_stand_short">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_13_notes">Off-axis</div></div>
-              <div class="input-row" style="background:rgba(255,92,26,.04)"><div style="color:var(--accent);font-weight:700">14</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_vox1">Vocal 1 (lead)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_14_mic">SM58</div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--green3);font-weight:700" data-i18n="rider_priority">PRIORITY</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700">15</div><div style="color:var(--muted2)" data-i18n="rider_mic">MIC</div><div data-i18n="rider_src_vox2">Vocal 2 (BG)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_15_mic">SM58</div><div style="color:var(--muted3)" data-i18n="rider_stand_tall">Tall</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_15_notes">Rhythm gtr</div></div>
+              <div id="rider-input-rows">
+              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_1_ch">1</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_1_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_1_src">Kick Drum</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_1_mic">Beta 91A / D112</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_1_stand">None</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_1_notes">Gate req.</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_2_ch">2</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_2_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_2_src">Snare Top</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_2_mic">SM57</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_2_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_2_notes">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_3_ch">3</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_3_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_3_src">Snare Bottom</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_3_mic">SM57</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_3_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_3_notes">Phase flip</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_4_ch">4</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_4_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_4_src">Hi-Hat</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_4_mic">SM81 / C451</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_4_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_4_notes">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_5_ch">5</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_5_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_5_src">Tom 1</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_5_mic">E904 clip</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_5_stand">—</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_5_notes">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_6_ch">6</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_6_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_6_src">Tom 2</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_6_mic">E904 clip</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_6_stand">—</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_6_notes">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_7_ch">7</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_7_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_7_src">Tom 3 (floor)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_7_mic">E904 clip</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_7_stand">—</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_7_notes">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_8_ch">8</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_8_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_8_src">OH Left</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_8_mic">SM81 / C451</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_8_stand">Tall</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_8_notes">—</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_9_ch">9</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_9_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_9_src">OH Right</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_9_mic">SM81 / C451</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_9_stand">Tall</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_9_notes">—</div></div>
+              <div class="input-row" style="background:rgba(170,0,255,.04)"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_10_ch">10</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_10_type">DI</div><div class="rider-editable" contenteditable="true" data-rider-key="input_10_src">Bass (direct)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_10_mic">Radial J48</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_10_stand">—</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_10_notes">Pre-amp out</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_11_ch">11</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_11_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_11_src">Bass Amp</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_11_mic">SM57 / β52</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_11_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_11_notes">Optional</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_12_ch">12</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_12_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_12_src">Guitar 1 Amp</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_12_mic">SM57</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_12_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_12_notes">Off-axis</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_13_ch">13</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_13_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_13_src">Guitar 2 Amp</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_13_mic">SM57</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_13_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_13_notes">Off-axis</div></div>
+              <div class="input-row" style="background:rgba(255,92,26,.04)"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_14_ch">14</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_14_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_14_src">Vocal 1 (lead)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_14_mic">SM58</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_14_stand">Tall</div><div style="color:var(--green3);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_14_notes">PRIORITY</div></div>
+              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_15_ch">15</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_15_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_15_src">Vocal 2 (BG)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_15_mic">SM58</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_15_stand">Tall</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_15_notes">Rhythm gtr</div></div>
+              </div>
+              <div style="padding:6px 8px;border-top:1px solid var(--border2);display:flex;gap:6px;align-items:center">
+                <button class="btn-sm" onclick="riderAddRow()" style="font-size:10px">+ Add Row</button>
+                <button class="btn-sm" onclick="riderRemoveRow()" style="font-size:10px;color:var(--red2)">− Remove Last</button>
+              </div>
             </div>
           </div>
 
@@ -4859,6 +5183,31 @@ function _initAll_old_1() {
             </div>
           </div>
 
+        </div>
+      </div>
+    </div>
+    <!-- Rider New Show Modal -->
+    <div id="rider-new-show-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:8000;align-items:center;justify-content:center">
+      <div style="background:var(--bg2);border:1px solid var(--accent);border-radius:3px;padding:24px;min-width:360px;max-width:480px;font-family:var(--mono)">
+        <div style="font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.1em;margin-bottom:16px" data-i18n="rider_new_show_title">CREATE SHOW FOR RIDER</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--muted2)">
+          <div style="display:grid;grid-template-columns:120px 1fr;align-items:center;gap:8px">
+            <span data-i18n="rider_ns_date">Show Date *</span>
+            <input id="rns-date" type="date" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+          </div>
+          <div style="display:grid;grid-template-columns:120px 1fr;align-items:center;gap:8px">
+            <span data-i18n="rider_ns_venue">Venue</span>
+            <input id="rns-venue" type="text" placeholder="Venue name" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+          </div>
+          <div style="display:grid;grid-template-columns:120px 1fr;align-items:center;gap:8px">
+            <span data-i18n="rider_ns_city">City</span>
+            <input id="rns-city" type="text" placeholder="City / location" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
+          </div>
+          <div id="rns-status" style="font-size:10px;color:var(--amber2);min-height:14px;margin-top:4px"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <button class="btn-sm" onclick="riderCloseModal()">Cancel</button>
+          <button class="btn-sm" onclick="riderCreateShow()" style="background:var(--accent);color:#000;font-weight:700;border-color:var(--accent)" data-i18n="rider_ns_create">Create &amp; Switch</button>
         </div>
       </div>
     </div>
@@ -6844,6 +7193,12 @@ const TRANSLATIONS = {
     rider_global_template:'— Global Template —',
     rider_click_edit:     '✎ Click any field to edit',
     rider_copy_text:      'Copy Text',
+    rider_new_show:       '+ New Show',
+    rider_new_show_title: 'CREATE SHOW FOR RIDER',
+    rider_ns_date:        'Show Date *',
+    rider_ns_venue:       'Venue',
+    rider_ns_city:        'City',
+    rider_ns_create:      'Create & Switch',
     rider_s1_title:       'BAND LINEUP',
     rider_s2_title:       'INPUT LIST / PATCH',
     rider_s3_title:       'FOH MIX NOTES',
@@ -7055,6 +7410,12 @@ const TRANSLATIONS = {
     rider_global_template:'— Modelo Global —',
     rider_click_edit:     '✎ Clique em qualquer campo para editar',
     rider_copy_text:      'Copiar Texto',
+    rider_new_show:       '+ Novo Espetáculo',
+    rider_new_show_title: 'CRIAR ESPETÁCULO PARA O RIDER',
+    rider_ns_date:        'Data do Espetáculo *',
+    rider_ns_venue:       'Local',
+    rider_ns_city:        'Cidade',
+    rider_ns_create:      'Criar e Mudar',
     rider_s1_title:       'FORMAÇÃO',
     rider_s2_title:       'LISTA DE CANAIS',
     rider_s3_title:       'NOTAS FOH',
@@ -9098,6 +9459,91 @@ document.addEventListener('DOMContentLoaded', function() {
     clearTimeout(_riderSaveTimer);
     saveRiderField(el.dataset.riderKey, el.innerHTML);
   }, true);
+});
+
+
+// ── RIDER ROW MANAGEMENT ─────────────────────────────────
+var _riderRowCount = 15;
+
+function riderAddRow() {
+  _riderRowCount++;
+  var n = _riderRowCount;
+  var row = document.createElement('div');
+  row.className = 'input-row';
+  row.innerHTML =
+    '<div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_'+n+'_ch">'+n+'</div>' +
+    '<div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_'+n+'_type">MIC</div>' +
+    '<div class="rider-editable" contenteditable="true" data-rider-key="input_'+n+'_src">Source</div>' +
+    '<div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_'+n+'_mic">—</div>' +
+    '<div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_'+n+'_stand">—</div>' +
+    '<div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_'+n+'_notes">—</div>';
+  var container = document.getElementById('rider-input-rows');
+  if (container) container.appendChild(row);
+  // Update ch count display
+  var chEl = document.querySelector('[data-rider-key="input_ch_count"]');
+  if (chEl) { chEl.textContent = _riderRowCount; saveRiderField('input_ch_count', String(_riderRowCount)); }
+  row.querySelector('[data-rider-key]').focus();
+}
+
+function riderRemoveRow() {
+  if (_riderRowCount <= 1) return;
+  var container = document.getElementById('rider-input-rows');
+  if (!container) return;
+  var rows = container.querySelectorAll('.input-row');
+  if (rows.length > 0) rows[rows.length - 1].remove();
+  _riderRowCount--;
+  var chEl = document.querySelector('[data-rider-key="input_ch_count"]');
+  if (chEl) { chEl.textContent = _riderRowCount; saveRiderField('input_ch_count', String(_riderRowCount)); }
+}
+
+// ── RIDER NEW SHOW MODAL ─────────────────────────────────
+function riderNewShowModal() {
+  var modal = document.getElementById('rider-new-show-modal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  var today = new Date().toISOString().split('T')[0];
+  var d = document.getElementById('rns-date');
+  if (d && !d.value) d.value = today;
+  document.getElementById('rns-status').textContent = '';
+}
+
+function riderCloseModal() {
+  var modal = document.getElementById('rider-new-show-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function riderCreateShow() {
+  var date = document.getElementById('rns-date').value;
+  var venue = document.getElementById('rns-venue').value;
+  var city = document.getElementById('rns-city').value;
+  var status = document.getElementById('rns-status');
+  if (!date) { status.textContent = 'Date is required'; return; }
+  status.textContent = 'Creating…';
+  try {
+    var show = await apiPost('/production/shows', {
+      show_date: date,
+      venue_name: venue || null,
+      venue_address: city || null,
+    });
+    await loadShows(); // refreshes PROD_SHOWS and picker
+    // Switch rider to the new show
+    _riderCurrentShowId = show.id;
+    var picker = document.getElementById('rider-show-picker');
+    if (picker) picker.value = show.id;
+    riderCloseModal();
+    showToast('Show created — rider now linked to ' + (venue || date), 'ok');
+    setRiderStatus('New show — start editing to save fields', 'var(--amber2)');
+  } catch(e) {
+    status.textContent = '✗ ' + e.message;
+  }
+}
+
+// Close modal on backdrop click
+document.addEventListener('DOMContentLoaded', function() {
+  var modal = document.getElementById('rider-new-show-modal');
+  if (modal) modal.addEventListener('click', function(e) {
+    if (e.target === modal) riderCloseModal();
+  });
 });
 
 function toggleRiderSection(el) {
