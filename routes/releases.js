@@ -32,13 +32,33 @@ router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
     if (!title) return res.status(400).json({ error: 'title required' });
 
     const id = uuid();
-    const { rows } = await pool.query(
-      `INSERT INTO releases (id,title,type,stage,release_date,spotify_url,artwork_done,
-         video_done,press_pitched,spotify_pitched,social_media,notes,created_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
-      [id,title,type,stage,release_date||null,spotify_url||null,
-       artwork_done,video_done,press_pitched,spotify_pitched,social_media,notes||null,req.user.id]
-    );
+    // Check if social_media column exists (added in migrate_v5)
+    const postColChk = await pool.query(`
+      SELECT 1 FROM information_schema.columns
+      WHERE table_name = 'releases' AND column_name = 'social_media'
+    `);
+    const postHasSocialCol = postColChk.rows.length > 0;
+
+    let rows;
+    if (postHasSocialCol) {
+      const result = await pool.query(
+        `INSERT INTO releases (id,title,type,stage,release_date,spotify_url,artwork_done,
+           video_done,press_pitched,spotify_pitched,social_media,notes,created_by)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
+        [id,title,type,stage,release_date||null,spotify_url||null,
+         artwork_done,video_done,press_pitched,spotify_pitched,social_media,notes||null,req.user.id]
+      );
+      rows = result.rows;
+    } else {
+      const result = await pool.query(
+        `INSERT INTO releases (id,title,type,stage,release_date,spotify_url,artwork_done,
+           video_done,press_pitched,spotify_pitched,notes,created_by)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
+        [id,title,type,stage,release_date||null,spotify_url||null,
+         artwork_done,video_done,press_pitched,spotify_pitched,notes||null,req.user.id]
+      );
+      rows = result.rows;
+    }
 
     for (const [i, t] of tracks.entries()) {
       await pool.query(
@@ -58,19 +78,45 @@ router.put('/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) =>
   try {
     const { title,type,stage,release_date,spotify_url,artwork_done,
             video_done,press_pitched,spotify_pitched,social_media,notes } = req.body;
-    const { rows } = await pool.query(
-      `UPDATE releases SET
-         title=COALESCE($1,title), type=COALESCE($2,type), stage=COALESCE($3,stage),
-         release_date=COALESCE($4,release_date), spotify_url=COALESCE($5,spotify_url),
-         artwork_done=COALESCE($6,artwork_done), video_done=COALESCE($7,video_done),
-         press_pitched=COALESCE($8,press_pitched), spotify_pitched=COALESCE($9,spotify_pitched),
-         social_media=COALESCE($10,social_media),
-         notes=COALESCE($11,notes), updated_at=now()
-       WHERE id=$12 RETURNING *`,
-      [title||null,type||null,stage||null,release_date||null,spotify_url||null,
-       artwork_done??null,video_done??null,press_pitched??null,spotify_pitched??null,
-       social_media??null,notes||null,req.params.id]
-    );
+
+    // Check if social_media column exists (added in migrate_v5)
+    const colChk = await pool.query(`
+      SELECT 1 FROM information_schema.columns
+      WHERE table_name = 'releases' AND column_name = 'social_media'
+    `);
+    const hasSocialCol = colChk.rows.length > 0;
+
+    let rows;
+    if (hasSocialCol) {
+      const result = await pool.query(
+        `UPDATE releases SET
+           title=COALESCE($1,title), type=COALESCE($2,type), stage=COALESCE($3,stage),
+           release_date=COALESCE($4,release_date), spotify_url=COALESCE($5,spotify_url),
+           artwork_done=COALESCE($6,artwork_done), video_done=COALESCE($7,video_done),
+           press_pitched=COALESCE($8,press_pitched), spotify_pitched=COALESCE($9,spotify_pitched),
+           social_media=COALESCE($10,social_media),
+           notes=COALESCE($11,notes), updated_at=now()
+         WHERE id=$12 RETURNING *`,
+        [title||null,type||null,stage||null,release_date||null,spotify_url||null,
+         artwork_done??null,video_done??null,press_pitched??null,spotify_pitched??null,
+         social_media??null,notes||null,req.params.id]
+      );
+      rows = result.rows;
+    } else {
+      const result = await pool.query(
+        `UPDATE releases SET
+           title=COALESCE($1,title), type=COALESCE($2,type), stage=COALESCE($3,stage),
+           release_date=COALESCE($4,release_date), spotify_url=COALESCE($5,spotify_url),
+           artwork_done=COALESCE($6,artwork_done), video_done=COALESCE($7,video_done),
+           press_pitched=COALESCE($8,press_pitched), spotify_pitched=COALESCE($9,spotify_pitched),
+           notes=COALESCE($10,notes), updated_at=now()
+         WHERE id=$11 RETURNING *`,
+        [title||null,type||null,stage||null,release_date||null,spotify_url||null,
+         artwork_done??null,video_done??null,press_pitched??null,spotify_pitched??null,
+         notes||null,req.params.id]
+      );
+      rows = result.rows;
+    }
     if (!rows[0]) return res.status(404).json({ error: 'Release not found' });
     await writeAudit(req,'RELEASE_UPDATE',{entityType:'release',entityId:req.params.id});
     res.json(rows[0]);
