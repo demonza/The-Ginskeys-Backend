@@ -7943,7 +7943,7 @@ function updateKpiMemberBreakdown() {
   var totalMemberBal = MEMBER_DEFS.reduce(function(s, m) { return s + (balMap[m.key] || 0); }, 0);
 
   if (balEl) balEl.textContent = fmtMoney(totalMemberBal);
-  if (subEl) { subEl.textContent = '5 member accounts'; subEl.className = 'kpi-sub neutral'; }
+  if (subEl) { subEl.textContent = ''; subEl.className = 'kpi-sub neutral'; }
   if (el)    { el.textContent = ''; }
 }
 
