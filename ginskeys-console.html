@@ -1994,7 +1994,7 @@ tr:hover .edit-btn{display:inline}
 <div id="content-wrap" style="flex:1;display:flex;flex-direction:column;min-height:0">
 
 <!-- ─ MANAGEMENT OVERVIEW ────────────────────────── -->
-<div id="view-mgmt" class="view new-view active">
+<div id="view-mgmt" class="view new-view active" style="display:flex;flex:1;flex-direction:column;min-height:0;overflow-y:auto">
 <div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:10px;min-height:0;overflow-y:auto">
 
   <!-- Band identity banner -->
@@ -9056,7 +9056,7 @@ async function submitTxn(){
 
 // ─── SWITCH VIEW (with permission check) ─────────────
 function switchView(view, tab){
-  const permMap={mgmt:'viewDashboard',dashboard:'viewDashboard',ledger:'viewLedger',tours:'viewTours',streaming:'viewStreaming',access:'viewAccess',audit:'viewAudit',alerts:'viewAlerts',settings:'viewSettings'};
+  const permMap={dashboard:'viewDashboard',ledger:'viewLedger',tours:'viewTours',streaming:'viewStreaming',access:'viewAccess',audit:'viewAudit',alerts:'viewAlerts',settings:'viewSettings'};
   const perm=permMap[view];
   if(SESSION && perm && !can(perm)){
     alert('Your role ('+SESSION.role+') does not have permission to view this section.');
