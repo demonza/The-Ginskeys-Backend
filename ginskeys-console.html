@@ -5338,83 +5338,113 @@ function _initAll_old_1() {
 
     <!-- ── STAGE PLOT ── -->
     <div class="prod-sub" id="prod-stageplot" style="flex:1;overflow-y:auto;min-height:0">
-      <div style="display:grid;grid-template-columns:1fr 240px;gap:12px;height:100%;min-height:560px">
+      <div style="display:flex;flex-direction:column;gap:0;height:100%;min-height:580px">
 
-        <!-- Canvas area -->
-        <div style="display:flex;flex-direction:column;gap:0">
-          <!-- Toolbar -->
-          <div class="splot-toolbar">
-            <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-right:2px">ADD:</div>
-            <button class="splot-btn" onclick="splotAddElement('vocal')">🎤 Vocal</button>
-            <button class="splot-btn" onclick="splotAddElement('guitar')">🎸 Guitar</button>
-            <button class="splot-btn" onclick="splotAddElement('bass')">🎸 Bass</button>
-            <button class="splot-btn" onclick="splotAddElement('drums')">🥁 Drums</button>
-            <button class="splot-btn" onclick="splotAddElement('amp')">🔊 Amp</button>
-            <button class="splot-btn" onclick="splotAddElement('monitor')">📢 Wed</button>
-            <button class="splot-btn" onclick="splotAddElement('iem')">🎧 IEM</button>
-            <button class="splot-btn" onclick="splotAddElement('di')">DI</button>
-            <button class="splot-btn" onclick="splotAddElement('riser')">▭ Riser</button>
-            <button class="splot-btn" onclick="splotAddElement('sub')">◉ Sub</button>
-            <div style="flex:1"></div>
-            <button class="splot-btn" id="splot-grid-btn" onclick="splotToggleGrid(this)">⊞ Grid</button>
-            <button class="splot-btn" onclick="splotReset()">↺ Clear</button>
-            <button class="splot-btn" onclick="splotLoadDefault()">⚡ Default</button>
-            <button class="splot-btn" style="color:var(--accent);border-color:var(--accent)" onclick="printStagePlot()">⎙ Print PDF</button>
-          </div>
+        <!-- Toolbar row 1: elements -->
+        <div style="display:flex;align-items:center;gap:4px;padding:6px 8px;background:var(--bg4);border-bottom:1px solid var(--border2);flex-wrap:wrap;flex-shrink:0">
+          <span style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-right:4px">MUSICIANS</span>
+          <button class="splot-btn" onclick="splotAdd('vocal_lead')"    title="Lead Vocalist">VOC 1</button>
+          <button class="splot-btn" onclick="splotAdd('vocal_bg')"      title="BG Vocalist">VOC 2</button>
+          <button class="splot-btn" onclick="splotAdd('guitar_amp')"    title="Guitar + Amp">GTR</button>
+          <button class="splot-btn" onclick="splotAdd('bass_amp')"      title="Bass + DI/Amp">BASS</button>
+          <button class="splot-btn" onclick="splotAdd('keys')"          title="Keys / Piano">KEYS</button>
+          <button class="splot-btn" onclick="splotAdd('drums')"         title="Full Drum Kit">DRUMS</button>
+          <span style="color:var(--border2);margin:0 4px">|</span>
+          <span style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-right:4px">PA/MON</span>
+          <button class="splot-btn" onclick="splotAdd('monitor_wedge')" title="Wedge Monitor">WEDGE</button>
+          <button class="splot-btn" onclick="splotAdd('monitor_side')"  title="Side-fill Monitor">SIDEFILL</button>
+          <button class="splot-btn" onclick="splotAdd('iem')"           title="In-Ear Monitor Pack">IEM</button>
+          <button class="splot-btn" onclick="splotAdd('pa_cab')"        title="PA Speaker Cabinet">PA CAB</button>
+          <button class="splot-btn" onclick="splotAdd('sub')"           title="Subwoofer">SUB</button>
+          <button class="splot-btn" onclick="splotAdd('foh_desk')"      title="FOH Console">FOH</button>
+          <span style="color:var(--border2);margin:0 4px">|</span>
+          <span style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-right:4px">GEAR</span>
+          <button class="splot-btn" onclick="splotAdd('amp_head')"      title="Amp Head + Cab">AMP</button>
+          <button class="splot-btn" onclick="splotAdd('di_box')"        title="DI Box">DI</button>
+          <button class="splot-btn" onclick="splotAdd('pedalboard')"    title="Pedalboard">FX</button>
+          <button class="splot-btn" onclick="splotAdd('riser')"         title="Stage Riser / Platform">RISER</button>
+          <button class="splot-btn" onclick="splotAdd('power_strip')"   title="Power Distribution">PWR</button>
+          <button class="splot-btn" onclick="splotAdd('label')"         title="Text Label">TEXT</button>
+          <div style="flex:1"></div>
+          <button class="splot-btn" id="splot-snap-btn" onclick="splotToggleSnap(this)" title="Snap to grid">SNAP</button>
+          <button class="splot-btn" id="splot-grid-btn" onclick="splotToggleGrid(this)" title="Show grid">GRID</button>
+          <button class="splot-btn" onclick="splotDuplicate()"          title="Duplicate selected (D)">DUP</button>
+          <button class="splot-btn" onclick="splotDeleteSelected()"     title="Delete selected (Del)" style="color:var(--red3)">DEL</button>
+          <span style="color:var(--border2);margin:0 4px">|</span>
+          <button class="splot-btn" onclick="splotReset()"              title="Clear all">CLR</button>
+          <button class="splot-btn" onclick="splotLoadDefault()"        title="Load The Ginskeys default">DEFAULT</button>
+          <button class="splot-btn" style="color:var(--accent);border-color:var(--accent)" onclick="printStagePlot()">⎙ PDF</button>
+        </div>
+
+        <!-- Main area: canvas + side panel -->
+        <div style="display:grid;grid-template-columns:1fr 220px;gap:0;flex:1;min-height:0">
+
           <!-- Canvas -->
-          <div class="splot-canvas-wrap" style="flex:1;position:relative">
+          <div style="position:relative;background:#0a0a0a;border-right:1px solid var(--border2)">
             <canvas id="splot-canvas" class="splot-canvas"
-              style="width:100%;height:100%;min-height:500px;cursor:crosshair"
+              style="width:100%;height:100%;display:block;cursor:default"
               onmousedown="splotMouseDown(event)"
               onmousemove="splotMouseMove(event)"
               onmouseup="splotMouseUp(event)"
               onmouseleave="splotMouseUp(event)"
               ondblclick="splotDblClick(event)"
-              oncontextmenu="event.preventDefault();splotRightClick(event)">
+              oncontextmenu="event.preventDefault();splotCtxMenu(event)"
+              onkeydown="splotKeyDown(event)"
+              tabindex="0">
             </canvas>
-            <!-- Hover tooltip -->
-            <div id="splot-tooltip" style="position:absolute;pointer-events:none;display:none;background:rgba(0,0,0,.85);border:1px solid var(--border2);padding:4px 8px;font-size:9px;color:var(--text);border-radius:2px;white-space:nowrap;z-index:10"></div>
+            <div id="splot-tooltip" style="position:absolute;pointer-events:none;display:none;background:rgba(0,0,0,.9);border:1px solid var(--border2);padding:4px 8px;font-size:9px;color:var(--text);border-radius:2px;white-space:nowrap;z-index:10;font-family:var(--mono)"></div>
+            <!-- Stage depth/width labels -->
+            <div id="splot-stage-label" style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.1em;pointer-events:none;font-family:var(--mono)">AUDIENCE</div>
           </div>
-          <!-- Legend -->
-          <div class="splot-legend">
-            <div class="splot-legend-item"><span style="width:10px;height:10px;background:#ff3c1e;border-radius:50%;display:inline-block"></span>Vocal</div>
-            <div class="splot-legend-item"><span style="width:10px;height:10px;background:#aa00ff;border-radius:2px;display:inline-block"></span>Guitar</div>
-            <div class="splot-legend-item"><span style="width:10px;height:10px;background:#2979ff;border-radius:2px;display:inline-block"></span>Bass</div>
-            <div class="splot-legend-item"><span style="width:10px;height:10px;background:#ff8f00;border-radius:2px;display:inline-block"></span>Drums</div>
-            <div class="splot-legend-item"><span style="width:10px;height:10px;background:#546e7a;border-radius:2px;display:inline-block"></span>Amp</div>
-            <div class="splot-legend-item"><span style="width:10px;height:10px;background:#00e676;border-radius:2px;display:inline-block"></span>Monitor</div>
-            <div class="splot-legend-item"><span style="width:10px;height:10px;background:#e91e63;border-radius:2px;display:inline-block"></span>IEM</div>
-            <div style="flex:1"></div>
-            <span style="font-size:8px;color:var(--muted3)">Drag · Dbl-click rename · Right-click delete</span>
+
+          <!-- Side panel -->
+          <div style="display:flex;flex-direction:column;gap:0;overflow-y:auto;background:var(--bg2)">
+
+            <!-- Selected element properties -->
+            <div style="padding:10px 12px;border-bottom:1px solid var(--border2)">
+              <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px">ELEMENT PROPERTIES</div>
+              <div id="splot-props" style="font-size:10px;color:var(--muted3)">Select an element</div>
+            </div>
+
+            <!-- Stage settings -->
+            <div style="padding:10px 12px;border-bottom:1px solid var(--border2)">
+              <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px">STAGE SIZE</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px">
+                <div>
+                  <div style="font-size:8px;color:var(--muted3);margin-bottom:3px">WIDTH (m)</div>
+                  <input id="splot-stage-w" type="number" value="12" min="4" max="40" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:4px 6px;font-family:var(--mono);font-size:10px" onchange="splotDrawAll()">
+                </div>
+                <div>
+                  <div style="font-size:8px;color:var(--muted3);margin-bottom:3px">DEPTH (m)</div>
+                  <input id="splot-stage-d" type="number" value="8" min="3" max="20" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:4px 6px;font-family:var(--mono);font-size:10px" onchange="splotDrawAll()">
+                </div>
+              </div>
+            </div>
+
+            <!-- Input list auto-generated -->
+            <div style="padding:10px 12px;flex:1">
+              <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px;display:flex;align-items:center;gap:8px">
+                INPUT LIST
+                <span id="splot-ch-count" style="color:var(--accent)">0 CH</span>
+              </div>
+              <div id="splot-ch-list" style="font-size:9px;color:var(--muted2);display:flex;flex-direction:column;gap:2px">
+                <div style="color:var(--muted3)">Add elements to auto-generate.</div>
+              </div>
+            </div>
+
+            <!-- Legend -->
+            <div style="padding:8px 12px;border-top:1px solid var(--border2);font-size:8px;color:var(--muted3);line-height:1.8">
+              <div style="color:var(--muted);letter-spacing:.1em;margin-bottom:4px">CONTROLS</div>
+              Drag to move · Dbl-click to rename<br>
+              Del key to delete · D to duplicate<br>
+              Drag corner to resize · Right-click menu
+            </div>
+
           </div>
         </div>
-
-        <!-- Side panel -->
-        <div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto">
-          <!-- Selected element -->
-          <div class="panel">
-            <div class="panel-header">
-              <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Selected</div>
-            </div>
-            <div class="panel-body" id="splot-info-body" style="font-size:10px;color:var(--muted3)">
-              Click any element to edit.
-            </div>
-          </div>
-          <!-- Input list -->
-          <div class="panel" style="flex:1">
-            <div class="panel-header">
-              <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Input List</div>
-              <span id="splot-ch-count" style="font-size:9px;color:var(--muted3)">0 ch</span>
-            </div>
-            <div class="panel-body" style="font-size:9px;color:var(--muted2);padding:0" id="splot-ch-list">
-              <div style="padding:10px;color:var(--muted3)">Load default or add elements.</div>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
-    <!-- ── SETLIST ── -->
+        <!-- ── SETLIST ── -->
     <div class="prod-sub" id="prod-setlist" style="flex:1;overflow-y:auto">
       <div style="display:grid;grid-template-columns:320px 1fr;gap:14px">
         <div>
@@ -9859,933 +9889,1218 @@ function copyRiderText() {
 }
 
 // ── STAGE PLOT ENGINE ──────────────────────────────────
-
-// ── Constants ──
-const SPLOT_COLORS = {
-  vocal:'#ff3c1e', guitar:'#aa00ff', bass:'#2979ff',
-  drums:'#ff8f00', amp:'#546e7a', monitor:'#00e676',
-  iem:'#e91e63', di:'#00bcd4', riser:'#263238', sub:'#ff6f00'
-};
-const SPLOT_DEFAULTS_SIZE = {
-  vocal:{w:38,h:38}, guitar:{w:48,h:48}, bass:{w:48,h:48},
-  drums:{w:100,h:88}, amp:{w:52,h:46}, monitor:{w:50,h:32},
-  iem:{w:28,h:28}, di:{w:30,h:22}, riser:{w:140,h:70}, sub:{w:52,h:46}
-};
-const SPLOT_CH_MAP = {
-  drums:['Kick','Snare Top','Snare Bot','Hi-Hat','Tom 1','Tom 2','Floor Tom','OH L','OH R'],
-  bass:['Bass DI','Bass Amp'], guitar:['Guitar Amp'],
-  vocal:['Vocal'], amp:['Amp Mic'], di:['DI'],
-  monitor:[], iem:[], riser:[], sub:['Sub (LF)']
-};
+// Professional canvas-based stage plot editor
 
 // ── State ──
-let SPLOT_ELEMENTS = [];
-let SPLOT_CANVAS_W = 780;
-let SPLOT_CANVAS_H = 520;
-let splotDragging = null;
-let splotDragOffX = 0, splotDragOffY = 0;
-let splotSelected = null;
-let splotCtx = null;
-let splotShowGrid = false;
-let splotHover = null;
-let splotAnimFrame = null;
-let splotGlow = 0;
-let splotGlowDir = 1;
+let SPLOT_ELS = [];          // all elements
+let SPLOT_SEL = null;        // selected element id
+let SPLOT_DRAG = null;       // {el, offX, offY}
+let SPLOT_RESIZE = null;     // {el, handle, startX, startY, origX, origY, origW, origH}
+let SPLOT_CTX = null;
+let SPLOT_W = 800;
+let SPLOT_H = 540;
+let SPLOT_SHOW_GRID = false;
+let SPLOT_SNAP = true;
+let SPLOT_HOVER = null;
+let SPLOT_RAF = null;
+let SPLOT_NEXT_CH = 1;
 
-// ── Init ──
+const SNAP_SIZE = 10;
+
+// ── Element definitions: type → { label, w, h, color, channels, symbol } ──
+const SPLOT_DEFS = {
+  vocal_lead:    { label:'VOC 1\nFábio', w:52, h:52, color:'#ff3c1e', channels:[{src:'Lead Vocal',type:'MIC',stand:'Tall'}] },
+  vocal_bg:      { label:'VOC 2\nTiago', w:52, h:52, color:'#ff7043', channels:[{src:'BG Vocal',type:'MIC',stand:'Tall'}] },
+  guitar_amp:    { label:'GTR\nFábio', w:60, h:60, color:'#aa00ff', channels:[{src:'Guitar Amp',type:'MIC',stand:'Short'},{src:'Guitar DI',type:'DI',stand:'-'}] },
+  bass_amp:      { label:'BASS\nPedro', w:60, h:60, color:'#2979ff', channels:[{src:'Bass DI',type:'DI',stand:'-'},{src:'Bass Amp',type:'MIC',stand:'Short'}] },
+  keys:          { label:'KEYS', w:80, h:44, color:'#00bcd4', channels:[{src:'Keys L',type:'DI',stand:'-'},{src:'Keys R',type:'DI',stand:'-'}] },
+  drums:         { label:'DRUMS\nManuel', w:110, h:90, color:'#ff8f00', channels:[
+    {src:'Kick',type:'MIC',stand:'None'},{src:'Snare Top',type:'MIC',stand:'Short'},
+    {src:'Snare Bot',type:'MIC',stand:'Short'},{src:'Hi-Hat',type:'MIC',stand:'Short'},
+    {src:'Tom 1',type:'MIC',stand:'-'},{src:'Tom 2',type:'MIC',stand:'-'},
+    {src:'Tom 3',type:'MIC',stand:'-'},{src:'OH L',type:'MIC',stand:'Tall'},{src:'OH R',type:'MIC',stand:'Tall'}
+  ]},
+  monitor_wedge: { label:'WEDGE', w:52, h:34, color:'#00e676', channels:[] },
+  monitor_side:  { label:'SIDEFILL', w:60, h:40, color:'#69f0ae', channels:[] },
+  iem:           { label:'IEM', w:36, h:36, color:'#e91e63', channels:[] },
+  pa_cab:        { label:'PA', w:48, h:64, color:'#546e7a', channels:[] },
+  sub:           { label:'SUB', w:60, h:44, color:'#37474f', channels:[] },
+  foh_desk:      { label:'FOH\nCONSOLE', w:90, h:48, color:'#ffd600', channels:[] },
+  amp_head:      { label:'AMP', w:56, h:40, color:'#7c4dff', channels:[] },
+  di_box:        { label:'DI', w:30, h:30, color:'#80cbc4', channels:[{src:'DI',type:'DI',stand:'-'}] },
+  pedalboard:    { label:'FX', w:60, h:28, color:'#a1887f', channels:[] },
+  riser:         { label:'RISER', w:120, h:70, color:'#455a64', channels:[] },
+  power_strip:   { label:'PWR', w:44, h:20, color:'#78909c', channels:[] },
+  label:         { label:'LABEL', w:80, h:28, color:'transparent', channels:[] },
+};
+
+// ── Channel count map for the input list ──
+const SPLOT_CH_MAP = {
+  vocal_lead:1, vocal_bg:1, guitar_amp:2, bass_amp:2, keys:2, drums:9,
+  di_box:1, pedalboard:0, monitor_wedge:0, monitor_side:0, iem:0,
+  pa_cab:0, sub:0, foh_desk:0, amp_head:0, riser:0, power_strip:0, label:0
+};
+
+let _splotId = 1;
+function splotNextId() { return _splotId++; }
+
 function splotInit() {
   const canvas = document.getElementById('splot-canvas');
   if (!canvas) return;
   const wrap = canvas.parentElement;
-  SPLOT_CANVAS_W = wrap.clientWidth || 780;
-  SPLOT_CANVAS_H = Math.max(500, wrap.clientHeight || 520);
-  canvas.width = SPLOT_CANVAS_W;
-  canvas.height = SPLOT_CANVAS_H;
-  splotCtx = canvas.getContext('2d');
-  splotStartGlow();
+  SPLOT_W = wrap.clientWidth || 800;
+  SPLOT_H = Math.max(wrap.clientHeight, 500);
+  canvas.width  = SPLOT_W;
+  canvas.height = SPLOT_H;
+  SPLOT_CTX = canvas.getContext('2d');
+  canvas.focus();
+  splotRAF();
 }
 
-function splotStartGlow() {
-  if (splotAnimFrame) return;
-  function tick() {
-    splotGlow += splotGlowDir * 0.8;
-    if (splotGlow > 60) splotGlowDir = -1;
-    if (splotGlow < 0) splotGlowDir = 1;
-    splotDraw();
-    splotAnimFrame = requestAnimationFrame(tick);
-  }
-  splotAnimFrame = requestAnimationFrame(tick);
+function splotRAF() {
+  if (SPLOT_RAF) cancelAnimationFrame(SPLOT_RAF);
+  SPLOT_RAF = requestAnimationFrame(() => { splotDrawAll(); SPLOT_RAF = null; });
 }
 
-function splotStopGlow() {
-  if (splotAnimFrame) { cancelAnimationFrame(splotAnimFrame); splotAnimFrame = null; }
-}
-
-// ── Default layout ──
-function splotLoadDefault() {
-  splotInit();
-  const W = SPLOT_CANVAS_W, H = SPLOT_CANVAS_H;
-  const cx = W / 2;
-
-  SPLOT_ELEMENTS = [
-    // PA subs flanking stage
-    {id:'sub_l',type:'sub',label:'SUB L',x:62,y:H*0.25,w:52,h:46,color:'#ff6f00'},
-    {id:'sub_r',type:'sub',label:'SUB R',x:W-114,y:H*0.25,w:52,h:46,color:'#ff6f00'},
-    // Drum riser
-    {id:'riser1',type:'riser',label:'DRUM RISER',x:cx-80,y:H*0.10,w:160,h:90,color:'#263238'},
-    // Drum kit on riser
-    {id:'drums1',type:'drums',label:'MANUEL\nDrums',x:cx-48,y:H*0.12,w:96,h:84,color:'#ff8f00'},
-    // Bass amp
-    {id:'bass_amp',type:'amp',label:'BASS AMP\nPedro',x:W*0.63,y:H*0.10,w:52,h:46,color:'#546e7a'},
-    // Guitar amps
-    {id:'gtr_amp1',type:'amp',label:'GTR AMP\nFábio',x:W*0.14,y:H*0.10,w:52,h:46,color:'#546e7a'},
-    {id:'gtr_amp2',type:'amp',label:'GTR AMP\nTiago',x:W*0.76,y:H*0.10,w:52,h:46,color:'#546e7a'},
-    // DI
-    {id:'di1',type:'di',label:'BASS DI',x:W*0.58,y:H*0.30,w:30,h:22,color:'#00bcd4'},
-    // Players
-    {id:'bass1',type:'bass',label:'PEDRO\nBass',x:W*0.60,y:H*0.36,w:52,h:52,color:'#2979ff'},
-    {id:'gtr1',type:'guitar',label:'FÁBIO\nLd.Gtr+Vox',x:W*0.18,y:H*0.36,w:52,h:52,color:'#aa00ff'},
-    {id:'gtr2',type:'guitar',label:'TIAGO\nRhm+Vox',x:W*0.72,y:H*0.36,w:52,h:52,color:'#aa00ff'},
-    // Vocals
-    {id:'voc1',type:'vocal',label:'VOC 1\nFábio',x:W*0.24,y:H*0.55,w:38,h:38,color:'#ff3c1e'},
-    {id:'voc2',type:'vocal',label:'VOC 2\nTiago',x:W*0.68,y:H*0.55,w:38,h:38,color:'#ff3c1e'},
-    // Monitors
-    {id:'mon1',type:'monitor',label:'MON 1\nFábio',x:W*0.20,y:H*0.68,w:50,h:32,color:'#00e676'},
-    {id:'mon2',type:'monitor',label:'MON 2\nPedro',x:W*0.44,y:H*0.68,w:50,h:32,color:'#00e676'},
-    {id:'mon3',type:'monitor',label:'MON 3\nManuel',x:cx-24,y:H*0.37,w:50,h:32,color:'#00e676'},
-    {id:'mon4',type:'monitor',label:'MON 4\nTiago',x:W*0.68,y:H*0.68,w:50,h:32,color:'#00e676'},
-  ];
-
-  splotSelected = null;
-  splotDraw();
-  updateSplotChannelList();
-  showToast('Stage plot loaded', 'ok');
+// ── Add element ──
+function splotAdd(type) {
+  const def = SPLOT_DEFS[type];
+  if (!def) return;
+  const startCh = SPLOT_NEXT_CH;
+  def.channels.forEach(() => SPLOT_NEXT_CH++);
+  const el = {
+    id: splotNextId(),
+    type,
+    label: def.label,
+    x: Math.round((SPLOT_W/2 - def.w/2) / SNAP_SIZE) * SNAP_SIZE,
+    y: Math.round((SPLOT_H/2 - def.h/2) / SNAP_SIZE) * SNAP_SIZE,
+    w: def.w,
+    h: def.h,
+    color: def.color,
+    ch: startCh,
+    rotate: 0,   // future: rotation
+  };
+  SPLOT_ELS.push(el);
+  SPLOT_SEL = el.id;
+  splotUpdateInputList();
+  splotUpdateProps();
+  splotRAF();
 }
 
 function splotReset() {
-  if (SPLOT_ELEMENTS.length && !confirm('Clear the stage plot?')) return;
-  SPLOT_ELEMENTS = [];
-  splotSelected = null;
-  splotDraw();
-  updateSplotChannelList();
+  if (SPLOT_ELS.length && !confirm('Clear the stage plot?')) return;
+  SPLOT_ELS = [];
+  SPLOT_SEL = null;
+  SPLOT_NEXT_CH = 1;
+  splotUpdateInputList();
+  splotUpdateProps();
+  splotRAF();
 }
 
 function splotToggleGrid(btn) {
-  splotShowGrid = !splotShowGrid;
-  btn.classList.toggle('active', splotShowGrid);
-  splotDraw();
+  SPLOT_SHOW_GRID = !SPLOT_SHOW_GRID;
+  btn.classList.toggle('active', SPLOT_SHOW_GRID);
+  splotRAF();
 }
 
-function splotAddElement(type) {
-  splotInit();
-  const sz = SPLOT_DEFAULTS_SIZE[type] || {w:44,h:44};
-  const labels = {
-    vocal:'Vocal', guitar:'Guitar', bass:'Bass', drums:'Drums',
-    amp:'Amp', monitor:'Monitor', iem:'IEM Pack', di:'DI Box',
-    riser:'Riser', sub:'Sub'
-  };
-  SPLOT_ELEMENTS.push({
-    id: type + '_' + Date.now(),
-    type, label: labels[type],
-    x: 80 + Math.random() * (SPLOT_CANVAS_W - 200),
-    y: 80 + Math.random() * (SPLOT_CANVAS_H - 200),
-    w: sz.w, h: sz.h,
-    color: SPLOT_COLORS[type] || '#888'
+function splotToggleSnap(btn) {
+  SPLOT_SNAP = !SPLOT_SNAP;
+  btn.classList.toggle('active', SPLOT_SNAP);
+}
+
+function splotDeleteSelected() {
+  if (!SPLOT_SEL) return;
+  SPLOT_ELS = SPLOT_ELS.filter(e => e.id !== SPLOT_SEL);
+  SPLOT_SEL = null;
+  splotRenumberChannels();
+  splotUpdateInputList();
+  splotUpdateProps();
+  splotRAF();
+}
+
+function splotDuplicate() {
+  const src = SPLOT_ELS.find(e => e.id === SPLOT_SEL);
+  if (!src) return;
+  const el = {...src, id: splotNextId(), x: src.x + 20, y: src.y + 20};
+  SPLOT_ELS.push(el);
+  SPLOT_SEL = el.id;
+  splotRenumberChannels();
+  splotUpdateInputList();
+  splotUpdateProps();
+  splotRAF();
+}
+
+function splotRenumberChannels() {
+  let ch = 1;
+  SPLOT_ELS.forEach(el => {
+    const def = SPLOT_DEFS[el.type];
+    if (def && def.channels.length > 0) {
+      el.ch = ch;
+      ch += def.channels.length;
+    }
   });
-  splotDraw();
-  updateSplotChannelList();
+  SPLOT_NEXT_CH = ch;
 }
 
-// ── Drawing ──
-function splotDraw() {
-  const canvas = document.getElementById('splot-canvas');
-  if (!canvas || !splotCtx) {
-    if (document.getElementById('splot-canvas')) splotInit();
-    return;
-  }
-  const ctx = splotCtx;
-  const W = canvas.width, H = canvas.height;
-  if (!W || !H) return;
+// ── Default layout for The Ginskeys ──
+function splotLoadDefault() {
+  if (SPLOT_ELS.length && !confirm('Replace current plot with The Ginskeys default?')) return;
+  SPLOT_ELS = [];
+  _splotId = 1;
+  SPLOT_NEXT_CH = 1;
 
-  // ── Background ──
-  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-  bgGrad.addColorStop(0, '#0a0a0f');
-  bgGrad.addColorStop(1, '#080810');
-  ctx.fillStyle = bgGrad;
+  const W = SPLOT_W, H = SPLOT_H;
+  const cx = W / 2;
+
+  const placements = [
+    // Back line (upstage)
+    { type: 'drums',        x: cx - 55,     y: H * 0.12 },
+    { type: 'riser',        x: cx - 70,     y: H * 0.08, w: 140, h: 80 },
+    // Mid line
+    { type: 'guitar_amp',   x: cx - 200,    y: H * 0.30 },
+    { type: 'bass_amp',     x: cx + 130,    y: H * 0.30 },
+    { type: 'amp_head',     x: cx - 210,    y: H * 0.52 },
+    { type: 'amp_head',     x: cx + 140,    y: H * 0.52 },
+    // Front line (downstage)
+    { type: 'vocal_lead',   x: cx - 26,     y: H * 0.58 },
+    { type: 'vocal_bg',     x: cx + 140,    y: H * 0.58 },
+    // Monitors
+    { type: 'monitor_wedge',x: cx - 85,     y: H * 0.72, label:'WEDGE 1\nFábio' },
+    { type: 'monitor_wedge',x: cx + 35,     y: H * 0.72, label:'WEDGE 2\nTiago' },
+    { type: 'monitor_wedge',x: cx - 160,    y: H * 0.55, label:'WEDGE 3\nPedro' },
+    { type: 'monitor_wedge',x: cx + 20,     y: H * 0.30, label:'WEDGE 4\nManuel' },
+    // PA
+    { type: 'pa_cab',       x: cx - 220,    y: H * 0.70, label:'PA L' },
+    { type: 'pa_cab',       x: cx + 165,    y: H * 0.70, label:'PA R' },
+    { type: 'sub',          x: cx - 60,     y: H * 0.82, label:'SUB L' },
+    { type: 'sub',          x: cx + 10,     y: H * 0.82, label:'SUB R' },
+    // FOH
+    { type: 'foh_desk',     x: cx - 45,     y: H * 0.92, label:'FOH\nCONSOLE' },
+    // Pedalboards
+    { type: 'pedalboard',   x: cx - 210,    y: H * 0.46, label:'FX\nFábio' },
+    { type: 'pedalboard',   x: cx + 145,    y: H * 0.46, label:'FX\nPedro' },
+  ];
+
+  placements.forEach(p => {
+    const def = SPLOT_DEFS[p.type];
+    if (!def) return;
+    const startCh = SPLOT_NEXT_CH;
+    def.channels.forEach(() => SPLOT_NEXT_CH++);
+    SPLOT_ELS.push({
+      id: splotNextId(),
+      type: p.type,
+      label: p.label || def.label,
+      x: Math.round((p.x) / SNAP_SIZE) * SNAP_SIZE,
+      y: Math.round((p.y) / SNAP_SIZE) * SNAP_SIZE,
+      w: p.w || def.w,
+      h: p.h || def.h,
+      color: def.color,
+      ch: startCh,
+    });
+  });
+
+  SPLOT_SEL = null;
+  splotUpdateInputList();
+  splotUpdateProps();
+  splotRAF();
+}
+
+// ── DRAW ──
+function splotDrawAll() {
+  const canvas = document.getElementById('splot-canvas');
+  if (!canvas || !SPLOT_CTX) return;
+  const ctx = SPLOT_CTX;
+  const W = SPLOT_W, H = SPLOT_H;
+
+  // Background
+  ctx.fillStyle = '#0d0d0d';
   ctx.fillRect(0, 0, W, H);
 
-  // ── Grid ──
-  if (splotShowGrid) {
+  // Grid
+  if (SPLOT_SHOW_GRID) {
     ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-    ctx.lineWidth = 0.5;
-    const step = 40;
-    for (let x = 0; x < W; x += step) {
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += SNAP_SIZE) {
       ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
     }
-    for (let y = 0; y < H; y += step) {
+    for (let y = 0; y < H; y += SNAP_SIZE) {
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
     }
   }
 
-  // ── Stage floor ──
-  const stageMargin = 55;
-  const stageTop = 28;
-  const stageBot = H - 95;
-  const stageW = W - stageMargin * 2;
+  // Stage area (upper 80% of canvas)
+  const stageY = H * 0.04;
+  const stageH = H * 0.80;
+  const stageX = W * 0.04;
+  const stageW = W * 0.92;
 
-  // Stage glow
-  const stageGlow = ctx.createRadialGradient(W/2, stageBot, 10, W/2, stageBot, stageW*0.6);
-  stageGlow.addColorStop(0, `rgba(255,92,26,${0.04 + splotGlow/3000})`);
-  stageGlow.addColorStop(1, 'transparent');
-  ctx.fillStyle = stageGlow;
-  ctx.fillRect(0, 0, W, H);
+  // Stage floor
+  ctx.fillStyle = 'rgba(255,255,255,0.018)';
+  ctx.fillRect(stageX, stageY, stageW, stageH);
 
-  // Stage body
-  ctx.save();
-  ctx.beginPath();
-  splotRoundRect(ctx, stageMargin, stageTop, stageW, stageBot - stageTop, 6);
-  const floorGrad = ctx.createLinearGradient(0, stageTop, 0, stageBot);
-  floorGrad.addColorStop(0, '#111118');
-  floorGrad.addColorStop(0.5, '#0f0f18');
-  floorGrad.addColorStop(1, '#0a0a12');
-  ctx.fillStyle = floorGrad;
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+  // Stage edge (downstage lip)
+  const lipY = stageY + stageH;
+  ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(stageX, lipY); ctx.lineTo(stageX + stageW, lipY); ctx.stroke();
+
+  // Stage left/right wings
+  ctx.strokeStyle = 'rgba(255,255,255,0.10)';
   ctx.lineWidth = 1;
-  ctx.stroke();
-  ctx.restore();
+  ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(stageX, stageY); ctx.lineTo(stageX, lipY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(stageX+stageW, stageY); ctx.lineTo(stageX+stageW, lipY); ctx.stroke();
+  ctx.setLineDash([]);
 
-  // Stage edge glow line
-  const glowAlpha = 0.3 + splotGlow / 300;
-  const edgeGrad = ctx.createLinearGradient(stageMargin, 0, W - stageMargin, 0);
-  edgeGrad.addColorStop(0, 'transparent');
-  edgeGrad.addColorStop(0.15, `rgba(255,92,26,${glowAlpha})`);
-  edgeGrad.addColorStop(0.5, `rgba(255,120,40,${glowAlpha * 1.3})`);
-  edgeGrad.addColorStop(0.85, `rgba(255,92,26,${glowAlpha})`);
-  edgeGrad.addColorStop(1, 'transparent');
-  ctx.strokeStyle = edgeGrad;
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  ctx.moveTo(stageMargin + 8, stageBot);
-  ctx.lineTo(W - stageMargin - 8, stageBot);
-  ctx.stroke();
+  // Stage back wall (upstage)
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(stageX, stageY); ctx.lineTo(stageX+stageW, stageY); ctx.stroke();
 
-  // Stage edge highlight (thin white)
-  ctx.strokeStyle = `rgba(255,255,255,0.12)`;
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(stageMargin + 8, stageBot);
-  ctx.lineTo(W - stageMargin - 8, stageBot);
-  ctx.stroke();
-
-  // ── Stage labels ──
-  ctx.save();
-  ctx.font = '700 8px monospace';
-  ctx.letterSpacing = '3px';
-  ctx.fillStyle = 'rgba(255,255,255,0.15)';
-  ctx.textAlign = 'center';
-  ctx.fillText('S  T  A  G  E', W/2, stageTop + 16);
-
-  // SR / SL
-  ctx.font = '700 8px monospace';
-  ctx.letterSpacing = '1px';
-  ctx.fillStyle = 'rgba(255,255,255,0.2)';
-  ctx.textAlign = 'left';
-  ctx.fillText('SR', stageMargin + 8, stageBot - 8);
-  ctx.textAlign = 'right';
-  ctx.fillText('SL', W - stageMargin - 8, stageBot - 8);
-  ctx.restore();
-
-  // ── Audience area ──
-  ctx.save();
+  // SR / SL labels
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
   ctx.font = '700 9px monospace';
-  ctx.letterSpacing = '4px';
-  ctx.fillStyle = 'rgba(255,255,255,0.08)';
-  ctx.textAlign = 'center';
-  ctx.fillText('◀  AUDIENCE  ▶', W/2, H - 55);
-  ctx.restore();
-
-  // ── FOH position ──
-  const fohX = W/2, fohY = H - 28;
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(fohX, fohY, 16, 0, Math.PI * 2);
-  const fohGrad = ctx.createRadialGradient(fohX, fohY, 0, fohX, fohY, 16);
-  fohGrad.addColorStop(0, 'rgba(255,92,26,0.3)');
-  fohGrad.addColorStop(1, 'rgba(255,92,26,0.05)');
-  ctx.fillStyle = fohGrad;
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255,92,26,0.4)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
-  ctx.font = '700 7px monospace';
-  ctx.fillStyle = 'rgba(255,92,26,0.8)';
-  ctx.textAlign = 'center';
   ctx.letterSpacing = '1px';
-  ctx.fillText('FOH', fohX, fohY + 3);
-  ctx.restore();
+  ctx.textAlign = 'left';
+  ctx.fillText('SR', stageX + 8, lipY - 6);
+  ctx.textAlign = 'right';
+  ctx.fillText('SL', stageX + stageW - 8, lipY - 6);
 
-  // ── PA wings (decorative) ──
-  const paW = stageMargin - 4;
-  [stageMargin - paW - 2, W - stageMargin + 2].forEach((px, i) => {
-    ctx.save();
-    const paGrad = ctx.createLinearGradient(px, stageTop, px + (i === 0 ? paW : -paW), stageBot);
-    paGrad.addColorStop(0, 'rgba(255,92,26,0.08)');
-    paGrad.addColorStop(1, 'rgba(255,92,26,0.02)');
-    ctx.fillStyle = paGrad;
-    ctx.fillRect(i === 0 ? px : px - paW + 2, stageTop + 10, paW - 2, (stageBot - stageTop) * 0.5);
-    ctx.strokeStyle = 'rgba(255,92,26,0.15)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(i === 0 ? px : px - paW + 2, stageTop + 10, paW - 2, (stageBot - stageTop) * 0.5);
-    ctx.font = '700 7px monospace';
-    ctx.fillStyle = 'rgba(255,92,26,0.4)';
-    ctx.textAlign = 'center';
-    ctx.letterSpacing = '0px';
-    ctx.save();
-    ctx.translate(i === 0 ? px + paW/2 - 1 : px - paW/2 + 1, stageTop + 10 + (stageBot - stageTop) * 0.25);
-    ctx.rotate(-Math.PI/2);
-    ctx.fillText('PA ' + (i === 0 ? 'L' : 'R'), 0, 4);
-    ctx.restore();
-    ctx.restore();
-  });
+  // UPSTAGE / DOWNSTAGE
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.font = '700 8px monospace';
+  ctx.fillText('UPSTAGE', W / 2, stageY + 14);
+  ctx.fillText('DOWNSTAGE', W / 2, lipY - 6);
 
-  // ── Elements ──
-  for (const el of SPLOT_ELEMENTS) {
-    const isSel = splotSelected?.id === el.id;
-    const isHov = splotHover?.id === el.id && !isSel;
+  // Stage dimensions
+  const sw = parseFloat(document.getElementById('splot-stage-w')?.value || 12);
+  const sd = parseFloat(document.getElementById('splot-stage-d')?.value || 8);
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.font = '9px monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText(sw + 'm wide · ' + sd + 'm deep', stageX + 6, stageY + 26);
+
+  // Audience zone label
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  ctx.font = '700 10px monospace';
+  ctx.letterSpacing = '3px';
+  ctx.textAlign = 'center';
+  ctx.fillText('AUDIENCE', W / 2, H * 0.94);
+  ctx.letterSpacing = '0px';
+
+  // Draw elements (non-selected first, then selected on top)
+  const sorted = [...SPLOT_ELS].sort((a, b) => (a.id === SPLOT_SEL ? 1 : 0) - (b.id === SPLOT_SEL ? 1 : 0));
+  for (const el of sorted) {
+    const isSel = el.id === SPLOT_SEL;
+    const isHov = el.id === SPLOT_HOVER;
     splotDrawElement(ctx, el, isSel, isHov);
-  }
-
-  // ── Measurement guides when dragging ──
-  if (splotDragging) {
-    const el = splotDragging;
-    const cx = el.x + el.w/2, cy = el.y + el.h/2;
-    ctx.save();
-    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-    ctx.lineWidth = 0.5;
-    ctx.setLineDash([4, 4]);
-    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.restore();
   }
 }
 
 function splotDrawElement(ctx, el, isSel, isHov) {
-  const glow = splotGlow;
   ctx.save();
 
-  // Glow / shadow
+  const x = el.x, y = el.y, w = el.w, h = el.h;
+  const col = el.color || '#888';
+  const alpha = isSel ? 1 : (isHov ? 0.92 : 0.85);
+
+  // Glow
   if (isSel) {
-    ctx.shadowColor = el.color;
-    ctx.shadowBlur = 18 + glow * 0.2;
+    ctx.shadowColor = col;
+    ctx.shadowBlur = 16;
   } else if (isHov) {
-    ctx.shadowColor = el.color;
-    ctx.shadowBlur = 10;
+    ctx.shadowColor = col;
+    ctx.shadowBlur = 8;
   }
 
-  // ── Shape by type ──
-  if (el.type === 'riser') {
-    // Riser: hatched rectangle
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-    ctx.lineWidth = 1;
-    splotRoundRect(ctx, el.x, el.y, el.w, el.h, 4);
+  const drawFns = {
+    drums:         () => splotDrawDrums(ctx, el, isSel),
+    monitor_wedge: () => splotDrawWedge(ctx, el, isSel),
+    monitor_side:  () => splotDrawSidefill(ctx, el, isSel),
+    vocal_lead:    () => splotDrawVocalMic(ctx, el, isSel, true),
+    vocal_bg:      () => splotDrawVocalMic(ctx, el, isSel, false),
+    guitar_amp:    () => splotDrawGuitarist(ctx, el, isSel),
+    bass_amp:      () => splotDrawBassist(ctx, el, isSel),
+    pa_cab:        () => splotDrawPACab(ctx, el, isSel),
+    sub:           () => splotDrawSub(ctx, el, isSel),
+    foh_desk:      () => splotDrawFOH(ctx, el, isSel),
+    amp_head:      () => splotDrawAmpHead(ctx, el, isSel),
+    di_box:        () => splotDrawDIBox(ctx, el, isSel),
+    iem:           () => splotDrawIEM(ctx, el, isSel),
+    riser:         () => splotDrawRiser(ctx, el, isSel),
+    label:         () => splotDrawLabel(ctx, el, isSel),
+    pedalboard:    () => splotDrawPedalboard(ctx, el, isSel),
+    power_strip:   () => splotDrawPowerStrip(ctx, el, isSel),
+    keys:          () => splotDrawKeys(ctx, el, isSel),
+  };
+
+  (drawFns[el.type] || (() => splotDrawGenericBox(ctx, el, isSel)))();
+
+  // Channel number badge
+  const def = SPLOT_DEFS[el.type];
+  if (def && def.channels.length > 0 && el.ch) {
+    ctx.shadowBlur = 0;
+    const badge = def.channels.length > 1 ? `${el.ch}–${el.ch + def.channels.length - 1}` : String(el.ch);
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(x + w - 8, y + 8, 9, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.5;
     ctx.stroke();
-    // Hatch
-    ctx.save();
-    ctx.clip();
-    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-    ctx.lineWidth = 1;
-    for (let i = -el.h; i < el.w + el.h; i += 12) {
-      ctx.beginPath();
-      ctx.moveTo(el.x + i, el.y);
-      ctx.lineTo(el.x + i + el.h, el.y + el.h);
-      ctx.stroke();
-    }
-    ctx.restore();
-    // Label
-    ctx.fillStyle = 'rgba(255,255,255,0.15)';
-    ctx.font = '700 8px monospace';
+    ctx.fillStyle = col;
+    ctx.font = `700 7px monospace`;
     ctx.textAlign = 'center';
-    ctx.letterSpacing = '1px';
-    ctx.fillText(el.label.split('\n')[0].toUpperCase(), el.x + el.w/2, el.y + el.h/2 + 3);
-
-  } else if (el.type === 'drums') {
-    splotDrawDrums(ctx, el, isSel, glow);
-
-  } else if (el.type === 'monitor') {
-    splotDrawMonitor(ctx, el, isSel);
-
-  } else if (el.type === 'vocal') {
-    splotDrawVocal(ctx, el, isSel, glow);
-
-  } else if (el.type === 'amp' || el.type === 'sub') {
-    splotDrawAmp(ctx, el, isSel);
-
-  } else if (el.type === 'di') {
-    splotDrawDI(ctx, el, isSel);
-
-  } else if (el.type === 'iem') {
-    splotDrawIEM(ctx, el, isSel);
-
-  } else {
-    // Guitar / Bass — player icon
-    splotDrawPlayer(ctx, el, isSel, glow);
+    ctx.fillText(badge, x + w - 8, y + 11);
   }
 
-  // Selection dashes
+  // Selection handles
   if (isSel) {
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)';
     ctx.lineWidth = 1;
-    ctx.setLineDash([3, 3]);
-    ctx.strokeRect(el.x - 4, el.y - 4, el.w + 8, el.h + 8);
+    ctx.setLineDash([3,3]);
+    ctx.strokeRect(x - 3, y - 3, w + 6, h + 6);
     ctx.setLineDash([]);
-    // Corner handles
-    [[el.x-4,el.y-4],[el.x+el.w+4,el.y-4],[el.x-4,el.y+el.h+4],[el.x+el.w+4,el.y+el.h+4]].forEach(([hx,hy]) => {
+    // 4 corner resize handles
+    [[x-3,y-3],[x+w+3,y-3],[x-3,y+h+3],[x+w+3,y+h+3]].forEach(([hx,hy]) => {
       ctx.fillStyle = '#fff';
-      ctx.fillRect(hx - 3, hy - 3, 6, 6);
+      ctx.fillRect(hx - 4, hy - 4, 8, 8);
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(hx - 4, hy - 4, 8, 8);
     });
   }
 
   ctx.restore();
 }
 
-function splotDrawDrums(ctx, el, isSel, glow) {
-  const c = el.color;
-  // Outer case
-  ctx.fillStyle = c + '18';
-  splotRoundRect(ctx, el.x, el.y, el.w, el.h, 5);
-  ctx.fill();
-  ctx.strokeStyle = isSel ? c : c + '88';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+// ── Individual draw functions ──
 
-  // Kick drum
-  const kcx = el.x + el.w * 0.5, kcy = el.y + el.h * 0.68;
-  const kr = el.w * 0.18;
-  splotDrawDrum(ctx, kcx, kcy, kr * 1.1, kr * 0.85, c, true);
-
-  // Snare
-  splotDrawDrum(ctx, el.x + el.w * 0.3, el.y + el.h * 0.42, el.w * 0.12, el.h * 0.1, c, false);
-
-  // Hi-hat (two discs)
-  const hhx = el.x + el.w * 0.2, hhy = el.y + el.h * 0.25;
-  ctx.strokeStyle = c + 'cc';
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.ellipse(hhx, hhy, 9, 4, 0, 0, Math.PI*2); ctx.stroke();
-  ctx.beginPath(); ctx.ellipse(hhx, hhy - 4, 9, 4, 0, 0, Math.PI*2); ctx.stroke();
-
-  // Tom 1
-  splotDrawDrum(ctx, el.x + el.w * 0.55, el.y + el.h * 0.28, el.w * 0.12, el.h * 0.1, c, false);
-  // Tom 2
-  splotDrawDrum(ctx, el.x + el.w * 0.72, el.y + el.h * 0.35, el.w * 0.12, el.h * 0.1, c, false);
-
-  // Cymbal stands (right)
-  ctx.strokeStyle = c + '55';
-  ctx.lineWidth = 0.8;
-  ctx.beginPath();
-  ctx.moveTo(el.x + el.w * 0.8, el.y + el.h * 0.6);
-  ctx.lineTo(el.x + el.w * 0.85, el.y + el.h * 0.22);
-  ctx.stroke();
-  ctx.beginPath(); ctx.ellipse(el.x + el.w * 0.85, el.y + el.h * 0.2, 10, 3.5, -0.1, 0, Math.PI*2); ctx.stroke();
-
-  // Throne
-  ctx.fillStyle = c + '33';
-  ctx.beginPath();
-  ctx.arc(el.x + el.w * 0.5, el.y + el.h * 0.88, 8, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = c + '66'; ctx.lineWidth = 1;
-  ctx.stroke();
-
-  // Label
-  ctx.fillStyle = '#fff';
-  ctx.font = '700 8px monospace';
+function splotText(ctx, text, x, y, col, size, bold) {
+  ctx.fillStyle = col || 'rgba(255,255,255,0.85)';
+  ctx.font = `${bold?'700 ':''}${size||9}px monospace`;
   ctx.textAlign = 'center';
-  ctx.letterSpacing = '0px';
-  const lines = el.label.split('\n');
-  ctx.fillText(lines[0], el.x + el.w/2, el.y + el.h * 0.5);
-  if (lines[1]) {
-    ctx.fillStyle = c;
-    ctx.font = '7px monospace';
-    ctx.fillText(lines[1], el.x + el.w/2, el.y + el.h * 0.5 + 9);
-  }
+  const lines = text.split('\n');
+  lines.forEach((l, i) => ctx.fillText(l, x, y + i * (size || 9) * 1.3));
 }
 
-function splotDrawDrum(ctx, cx, cy, rx, ry, color, filled) {
+function splotBox(ctx, x, y, w, h, col, fillAlpha, r) {
+  r = r || 3;
   ctx.beginPath();
-  ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2);
-  if (filled) {
-    ctx.fillStyle = color + '44';
+  ctx.roundRect ? ctx.roundRect(x,y,w,h,r) : splotRoundRectPath(ctx,x,y,w,h,r);
+  if (fillAlpha > 0) {
+    ctx.fillStyle = col + Math.round(fillAlpha * 255).toString(16).padStart(2,'0');
     ctx.fill();
   }
-  ctx.strokeStyle = color + 'aa';
-  ctx.lineWidth = 1.2;
-  ctx.stroke();
-  // Shell highlight
-  ctx.beginPath();
-  ctx.ellipse(cx, cy, rx * 0.6, ry * 0.6, 0, 0, Math.PI*2);
-  ctx.strokeStyle = color + '44';
-  ctx.lineWidth = 0.8;
-  ctx.stroke();
-}
-
-function splotDrawMonitor(ctx, el, isSel) {
-  const c = el.color;
-  ctx.save();
-  // Wedge body
-  ctx.beginPath();
-  ctx.moveTo(el.x + 4, el.y + el.h);
-  ctx.lineTo(el.x + el.w - 4, el.y + el.h);
-  ctx.lineTo(el.x + el.w - 2, el.y + 4);
-  ctx.lineTo(el.x + 2, el.y + 4);
-  ctx.closePath();
-  ctx.fillStyle = c + '22';
-  ctx.fill();
-  ctx.strokeStyle = isSel ? c : c + '88';
+  ctx.strokeStyle = col;
   ctx.lineWidth = 1.5;
   ctx.stroke();
-  // Speaker grille lines
-  ctx.strokeStyle = c + '55';
-  ctx.lineWidth = 0.8;
-  for (let i = 0; i < 3; i++) {
-    const lx = el.x + 8 + (el.w - 16) * i / 2;
-    ctx.beginPath();
-    ctx.moveTo(lx, el.y + 6); ctx.lineTo(lx, el.y + el.h - 2); ctx.stroke();
-  }
-  // Label
-  ctx.fillStyle = c;
-  ctx.font = '700 7px monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText(el.label.split('\n')[0], el.x + el.w/2, el.y + el.h/2 + 2);
-  if (el.label.includes('\n')) {
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.font = '6px monospace';
-    ctx.fillText(el.label.split('\n')[1], el.x + el.w/2, el.y + el.h/2 + 10);
-  }
-  ctx.restore();
 }
 
-function splotDrawVocal(ctx, el, isSel, glow) {
-  const c = el.color;
-  const cx = el.x + el.w/2, cy = el.y + el.h/2;
-  const r = Math.min(el.w, el.h) / 2;
+function splotRoundRectPath(ctx, x, y, w, h, r) {
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.arcTo(x+w, y, x+w, y+r, r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+  ctx.lineTo(x+r, y+h);
+  ctx.arcTo(x, y+h, x, y+h-r, r);
+  ctx.lineTo(x, y+r);
+  ctx.arcTo(x, y, x+r, y, r);
+  ctx.closePath();
+}
 
-  // Glow ring
+function splotDrawGenericBox(ctx, el, isSel) {
+  splotBox(ctx, el.x, el.y, el.w, el.h, el.color, 0.15);
+  splotText(ctx, el.label, el.x + el.w/2, el.y + el.h/2 - 4, 'rgba(255,255,255,0.9)', 9, true);
+}
+
+function splotDrawRiser(ctx, el, isSel) {
+  // Hatched platform
+  ctx.save();
+  splotBox(ctx, el.x, el.y, el.w, el.h, el.color, 0.06);
   ctx.beginPath();
-  ctx.arc(cx, cy, r + 4, 0, Math.PI*2);
-  ctx.fillStyle = c + (isSel ? '30' : '15');
-  ctx.fill();
-
-  // Mic body
-  ctx.beginPath();
-  ctx.arc(cx, cy - r*0.2, r*0.45, 0, Math.PI*2);
-  ctx.fillStyle = c + '44';
-  ctx.fill();
-  ctx.strokeStyle = isSel ? c : c + 'aa';
-  ctx.lineWidth = 1.8;
-  ctx.stroke();
-
-  // Mic grille lines
-  ctx.strokeStyle = c + '66';
-  ctx.lineWidth = 0.8;
-  for (let i = -1; i <= 1; i++) {
+  ctx.roundRect ? ctx.roundRect(el.x,el.y,el.w,el.h,3) : splotRoundRectPath(ctx,el.x,el.y,el.w,el.h,3);
+  ctx.clip();
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 1;
+  for (let i = -el.h; i < el.w + el.h; i += 14) {
     ctx.beginPath();
-    ctx.arc(cx + i * r * 0.12, cy - r * 0.2, r * 0.35, 0, Math.PI * 2);
+    ctx.moveTo(el.x + i, el.y);
+    ctx.lineTo(el.x + i + el.h, el.y + el.h);
     ctx.stroke();
   }
-
-  // Mic stand
-  ctx.strokeStyle = c + '88';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(cx, cy); ctx.lineTo(cx, el.y + el.h - 3); ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(cx - r*0.5, el.y + el.h - 3); ctx.lineTo(cx + r*0.5, el.y + el.h - 3); ctx.stroke();
-
-  // Channel dot
-  ctx.beginPath();
-  ctx.arc(cx, cy - r*0.2, 4, 0, Math.PI*2);
-  ctx.fillStyle = c;
-  ctx.fill();
-
-  // Label
-  ctx.fillStyle = '#fff';
-  ctx.font = '700 7px monospace';
+  ctx.restore();
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.font = '700 9px monospace';
   ctx.textAlign = 'center';
-  ctx.letterSpacing = '0px';
-  ctx.fillText(el.label.split('\n')[0], cx, el.y + el.h + 10);
-  if (el.label.includes('\n')) {
-    ctx.fillStyle = c;
-    ctx.font = '6px monospace';
-    ctx.fillText(el.label.split('\n')[1], cx, el.y + el.h + 18);
+  ctx.fillText(el.label.split('\n')[0].toUpperCase(), el.x + el.w/2, el.y + el.h/2 + 4);
+}
+
+function splotDrawLabel(ctx, el, isSel) {
+  if (isSel) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2,3]);
+    ctx.strokeRect(el.x, el.y, el.w, el.h);
+    ctx.setLineDash([]);
+  }
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.font = '700 10px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(el.label.split('\n')[0], el.x + el.w/2, el.y + el.h/2 + 4);
+}
+
+function splotDrawVocalMic(ctx, el, isSel, lead) {
+  const cx = el.x + el.w/2, cy = el.y + el.h/2;
+  const col = el.color;
+  // Mic stand base
+  ctx.strokeStyle = col + '99';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy + 10);
+  ctx.lineTo(cx, cy - 6);
+  ctx.stroke();
+  // Boom arm
+  ctx.beginPath();
+  ctx.moveTo(cx - 8, cy - 6);
+  ctx.lineTo(cx + 8, cy - 6);
+  ctx.stroke();
+  // Mic capsule
+  ctx.fillStyle = col;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy - 14, 6, 9, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  // Stand base feet
+  ctx.strokeStyle = col + '88';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(cx - 12, cy + 10);
+  ctx.lineTo(cx + 12, cy + 10);
+  ctx.stroke();
+  // Label
+  splotText(ctx, el.label, cx, cy + 22, 'rgba(255,255,255,0.7)', 8, true);
+  // Channel ring
+  if (lead) {
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy - 14, 10, 0, Math.PI*2);
+    ctx.stroke();
   }
 }
 
-function splotDrawPlayer(ctx, el, isSel, glow) {
-  const c = el.color;
+function splotDrawGuitarist(ctx, el, isSel) {
+  const col = el.color;
+  // Amp cab
+  splotBox(ctx, el.x + 4, el.y + el.h - 28, el.w - 8, 24, col, 0.2);
+  // Speaker circles
+  const cabCx = el.x + el.w/2, cabY = el.y + el.h - 16;
+  [-10,10].forEach(dx => {
+    ctx.beginPath();
+    ctx.arc(cabCx + dx, cabY, 7, 0, Math.PI*2);
+    ctx.strokeStyle = col + 'cc';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cabCx + dx, cabY, 3, 0, Math.PI*2);
+    ctx.fillStyle = col + '66';
+    ctx.fill();
+  });
+  // Amp head
+  splotBox(ctx, el.x + 8, el.y + el.h - 40, el.w - 16, 10, col, 0.35);
+  // Guitar outline (simplified)
+  ctx.strokeStyle = col + 'bb';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(el.x + el.w/2, el.y + 16, 14, 18, 0, 0, Math.PI*2);
+  ctx.stroke();
+  ctx.fillStyle = col + '22';
+  ctx.fill();
+  // Neck
+  ctx.strokeStyle = col + '99';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(el.x + el.w/2, el.y - 2);
+  ctx.lineTo(el.x + el.w/2 + 4, el.y - 26);
+  ctx.stroke();
+  // Label
+  splotText(ctx, el.label, el.x + el.w/2, el.y + el.h + 10, 'rgba(255,255,255,0.7)', 8, true);
+}
+
+function splotDrawBassist(ctx, el, isSel) {
+  const col = el.color;
+  // Bass cab (taller)
+  splotBox(ctx, el.x + 2, el.y + el.h - 32, el.w - 4, 28, col, 0.2);
+  const cabCx = el.x + el.w/2, cabY = el.y + el.h - 18;
+  // 4 speakers
+  [-12,-4,4,12].forEach(dx => {
+    ctx.beginPath();
+    ctx.arc(cabCx + dx, cabY, 5, 0, Math.PI*2);
+    ctx.strokeStyle = col + 'cc';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+  // DI box indicator
+  ctx.fillStyle = col + '44';
+  ctx.fillRect(el.x + 6, el.y + el.h - 38, 12, 8);
+  ctx.strokeStyle = col;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(el.x + 6, el.y + el.h - 38, 12, 8);
+  ctx.fillStyle = col;
+  ctx.font = '600 6px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('DI', el.x + 12, el.y + el.h - 32);
+  // Bass guitar outline
+  ctx.strokeStyle = col + 'bb';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(el.x + el.w/2, el.y + 16, 13, 17, 0.2, 0, Math.PI*2);
+  ctx.stroke();
+  ctx.fillStyle = col + '22';
+  ctx.fill();
+  ctx.strokeStyle = col + '88';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(el.x + el.w/2 + 8, el.y + 6);
+  ctx.lineTo(el.x + el.w/2 + 14, el.y - 24);
+  ctx.stroke();
+  splotText(ctx, el.label, el.x + el.w/2, el.y + el.h + 10, 'rgba(255,255,255,0.7)', 8, true);
+}
+
+function splotDrawDrums(ctx, el, isSel) {
+  const col = el.color;
   const cx = el.x + el.w/2, cy = el.y + el.h/2;
 
-  // Body glow
-  ctx.fillStyle = c + (isSel ? '25' : '12');
-  splotRoundRect(ctx, el.x, el.y, el.w, el.h, 6);
+  // Bass drum (kick)
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + 8, 22, 18, 0, 0, Math.PI*2);
+  ctx.fillStyle = col + '25';
   ctx.fill();
-  ctx.strokeStyle = isSel ? c : c + 'aa';
-  ctx.lineWidth = 1.8;
-  splotRoundRect(ctx, el.x, el.y, el.w, el.h, 6);
+  ctx.strokeStyle = col;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  // Kick drum hoops
+  ctx.strokeStyle = col + '55';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + 8, 18, 14, 0, 0, Math.PI*2);
   ctx.stroke();
 
-  // Guitar body silhouette
-  if (el.type === 'guitar' || el.type === 'bass') {
-    ctx.fillStyle = c + '55';
-    // Upper bout
-    ctx.beginPath();
-    ctx.ellipse(cx - 5, cy - 4, 9, 11, -0.2, 0, Math.PI*2);
-    ctx.fill();
-    // Lower bout
-    ctx.beginPath();
-    ctx.ellipse(cx + 3, cy + 6, 11, 12, 0.15, 0, Math.PI*2);
-    ctx.fill();
-    // Neck
-    ctx.fillStyle = c + '33';
-    ctx.fillRect(cx + 10, el.y + 4, 6, el.h * 0.65);
-  }
+  // Snare
+  ctx.beginPath();
+  ctx.ellipse(cx - 18, cy - 8, 10, 7, -0.3, 0, Math.PI*2);
+  ctx.fillStyle = col + '40';
+  ctx.fill();
+  ctx.strokeStyle = col + 'cc';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
 
-  // Label
-  ctx.fillStyle = '#fff';
+  // Hi-hat
+  ctx.strokeStyle = '#aaa';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.ellipse(cx - 22, cy - 20, 9, 3, 0, 0, Math.PI*2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(cx - 22, cy - 24, 9, 3, 0, 0, Math.PI*2);
+  ctx.stroke();
+  // HH stand
+  ctx.beginPath();
+  ctx.moveTo(cx - 22, cy - 20);
+  ctx.lineTo(cx - 22, cy + 20);
+  ctx.strokeStyle = '#88888888';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Tom 1 (mounted)
+  ctx.beginPath();
+  ctx.ellipse(cx + 4, cy - 16, 8, 6, 0, 0, Math.PI*2);
+  ctx.fillStyle = col + '35';
+  ctx.fill();
+  ctx.strokeStyle = col + 'bb';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Tom 2 (mounted)
+  ctx.beginPath();
+  ctx.ellipse(cx + 18, cy - 10, 8, 6, 0, 0, Math.PI*2);
+  ctx.fillStyle = col + '35';
+  ctx.fill();
+  ctx.strokeStyle = col + 'bb';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Floor tom
+  ctx.beginPath();
+  ctx.ellipse(cx + 20, cy + 10, 12, 9, 0, 0, Math.PI*2);
+  ctx.fillStyle = col + '35';
+  ctx.fill();
+  ctx.strokeStyle = col + 'bb';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  // Floor tom legs
+  ctx.strokeStyle = '#66666688';
+  ctx.lineWidth = 1;
+  [-8,0,8].forEach(dx => {
+    ctx.beginPath();
+    ctx.moveTo(cx + 20 + dx, cy + 19);
+    ctx.lineTo(cx + 20 + dx, cy + 28);
+    ctx.stroke();
+  });
+
+  // Crash cymbal
+  ctx.beginPath();
+  ctx.ellipse(cx + 22, cy - 22, 11, 3, 0.3, 0, Math.PI*2);
+  ctx.strokeStyle = '#ccbb0088';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Throne (simplified)
+  ctx.beginPath();
+  ctx.arc(cx + 2, cy + 30, 6, 0, Math.PI*2);
+  ctx.strokeStyle = '#55555599';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  splotText(ctx, el.label, cx, el.y + el.h + 10, 'rgba(255,255,255,0.7)', 8, true);
+}
+
+function splotDrawWedge(ctx, el, isSel) {
+  const col = el.color;
+  const x = el.x, y = el.y, w = el.w, h = el.h;
+  // Wedge shape (trapezoid pointing toward downstage)
+  ctx.beginPath();
+  ctx.moveTo(x, y + h);         // bottom left
+  ctx.lineTo(x + w, y + h);     // bottom right
+  ctx.lineTo(x + w - 8, y);     // top right
+  ctx.lineTo(x + 8, y);         // top left
+  ctx.closePath();
+  ctx.fillStyle = col + '28';
+  ctx.fill();
+  ctx.strokeStyle = col;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  // Speaker cone
+  ctx.beginPath();
+  ctx.arc(x + w/2, y + h * 0.55, Math.min(w, h) * 0.25, 0, Math.PI*2);
+  ctx.strokeStyle = col + 'aa';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(x + w/2, y + h * 0.55, Math.min(w, h) * 0.1, 0, Math.PI*2);
+  ctx.fillStyle = col + '66';
+  ctx.fill();
+  splotText(ctx, el.label, x + w/2, y + h + 10, 'rgba(255,255,255,0.65)', 8, false);
+}
+
+function splotDrawSidefill(ctx, el, isSel) {
+  const col = el.color;
+  splotBox(ctx, el.x, el.y, el.w, el.h, col, 0.2);
+  // Multiple drivers
+  const cx = el.x + el.w/2, cy = el.y + el.h/2;
+  [-12,0,12].forEach(dx => {
+    ctx.beginPath();
+    ctx.arc(cx + dx, cy, 7, 0, Math.PI*2);
+    ctx.strokeStyle = col + 'aa';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+  splotText(ctx, el.label, cx, el.y + el.h + 10, 'rgba(255,255,255,0.65)', 8, false);
+}
+
+function splotDrawPACab(ctx, el, isSel) {
+  const col = el.color;
+  splotBox(ctx, el.x, el.y, el.w, el.h, col, 0.2);
+  // Line array dots
+  const cx = el.x + el.w/2;
+  for (let i = 0; i < 4; i++) {
+    const cy = el.y + 10 + i * 12;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 5, 0, Math.PI*2);
+    ctx.strokeStyle = col + 'cc';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy, 2, 0, Math.PI*2);
+    ctx.fillStyle = col + '88';
+    ctx.fill();
+  }
+  splotText(ctx, el.label, cx, el.y + el.h + 10, 'rgba(255,255,255,0.65)', 8, false);
+}
+
+function splotDrawSub(ctx, el, isSel) {
+  const col = el.color;
+  splotBox(ctx, el.x, el.y, el.w, el.h, col, 0.25);
+  const cx = el.x + el.w/2, cy = el.y + el.h/2;
+  // Large woofer
+  ctx.beginPath();
+  ctx.arc(cx, cy, Math.min(el.w, el.h)/2 - 6, 0, Math.PI*2);
+  ctx.strokeStyle = col + 'cc';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx, cy, Math.min(el.w, el.h)/2 - 14, 0, Math.PI*2);
+  ctx.strokeStyle = col + '55';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx, cy, 4, 0, Math.PI*2);
+  ctx.fillStyle = col + '88';
+  ctx.fill();
+  splotText(ctx, el.label, cx, el.y + el.h + 10, 'rgba(255,255,255,0.65)', 8, false);
+}
+
+function splotDrawFOH(ctx, el, isSel) {
+  const col = el.color;
+  splotBox(ctx, el.x, el.y, el.w, el.h, col, 0.18);
+  const cx = el.x + el.w/2, cy = el.y + el.h/2;
+  // Console surface lines
+  for (let i = 0; i < 5; i++) {
+    const lx = el.x + 8 + i * (el.w - 16) / 4;
+    ctx.beginPath();
+    ctx.moveTo(lx, el.y + 8);
+    ctx.lineTo(lx, el.y + el.h - 8);
+    ctx.strokeStyle = col + '44';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+  // Meter bridge
+  ctx.fillStyle = col + '33';
+  ctx.fillRect(el.x + 6, el.y + 4, el.w - 12, 6);
+  splotText(ctx, el.label, cx, cy + 5, 'rgba(255,255,255,0.8)', 9, true);
+}
+
+function splotDrawAmpHead(ctx, el, isSel) {
+  const col = el.color;
+  splotBox(ctx, el.x, el.y, el.w, el.h, col, 0.22);
+  // Knobs
+  const cy = el.y + el.h/2;
+  [0.25, 0.45, 0.65, 0.82].forEach(pct => {
+    ctx.beginPath();
+    ctx.arc(el.x + el.w * pct, cy, 4, 0, Math.PI*2);
+    ctx.fillStyle = col + '55';
+    ctx.fill();
+    ctx.strokeStyle = col + 'aa';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+  splotText(ctx, el.label, el.x + el.w/2, el.y + el.h + 10, 'rgba(255,255,255,0.65)', 8, false);
+}
+
+function splotDrawDIBox(ctx, el, isSel) {
+  const col = el.color;
+  splotBox(ctx, el.x, el.y, el.w, el.h, col, 0.25);
+  ctx.fillStyle = col;
   ctx.font = '700 8px monospace';
   ctx.textAlign = 'center';
-  ctx.letterSpacing = '0px';
-  const lines = el.label.split('\n');
-  const startY = cy - (lines.length - 1) * 5;
-  ctx.fillText(lines[0], cx, startY + 4);
-  if (lines[1]) {
-    ctx.fillStyle = c;
-    ctx.font = '7px monospace';
-    ctx.fillText(lines[1], cx, startY + 14);
-  }
-}
-
-function splotDrawAmp(ctx, el, isSel) {
-  const c = el.color;
-  // Cabinet
-  ctx.fillStyle = '#1a1a1a';
-  splotRoundRect(ctx, el.x, el.y, el.w, el.h, 3);
-  ctx.fill();
-  ctx.strokeStyle = isSel ? c : c + '88';
-  ctx.lineWidth = 1.5;
-  splotRoundRect(ctx, el.x, el.y, el.w, el.h, 3);
-  ctx.stroke();
-
-  // Speaker grille
-  const gr = 4, gw = el.w - gr*2, gh = el.h - gr*2 - 12;
-  ctx.fillStyle = '#111';
-  ctx.strokeStyle = c + '44';
-  ctx.lineWidth = 0.8;
-  ctx.fillRect(el.x + gr, el.y + gr, gw, gh);
-  ctx.strokeRect(el.x + gr, el.y + gr, gw, gh);
-
-  // Speaker circles
-  const scx = el.x + el.w/2, scy = el.y + gr + gh/2;
-  if (el.w > 60) {
-    // 4x12 pattern
-    [[-0.28,-0.28],[0.28,-0.28],[-0.28,0.28],[0.28,0.28]].forEach(([dx,dy]) => {
-      ctx.beginPath();
-      ctx.arc(scx + dx*gw, scy + dy*gh, 7, 0, Math.PI*2);
-      ctx.strokeStyle = c + '66'; ctx.lineWidth = 1;
-      ctx.stroke();
-      ctx.beginPath(); ctx.arc(scx + dx*gw, scy + dy*gh, 3, 0, Math.PI*2);
-      ctx.fillStyle = c + '44'; ctx.fill();
-    });
-  } else {
-    ctx.beginPath(); ctx.arc(scx, scy, Math.min(gw,gh)*0.35, 0, Math.PI*2);
-    ctx.strokeStyle = c + '66'; ctx.lineWidth = 1; ctx.stroke();
-    ctx.beginPath(); ctx.arc(scx, scy, 4, 0, Math.PI*2);
-    ctx.fillStyle = c + '55'; ctx.fill();
-  }
-
-  // Controls strip
-  ctx.fillStyle = '#222';
-  ctx.fillRect(el.x + gr, el.y + el.h - 14, gw, 10);
-  for (let i = 0; i < 3; i++) {
-    ctx.beginPath();
-    ctx.arc(el.x + gr + 8 + i * 12, el.y + el.h - 9, 3, 0, Math.PI*2);
-    ctx.fillStyle = c + '88'; ctx.fill();
-  }
-
-  // Label
-  ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  ctx.font = '700 7px monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText(el.label.split('\n')[0], el.x + el.w/2, el.y + el.h + 11);
-  if (el.label.includes('\n')) {
-    ctx.fillStyle = c;
-    ctx.font = '6px monospace';
-    ctx.fillText(el.label.split('\n')[1], el.x + el.w/2, el.y + el.h + 19);
-  }
-}
-
-function splotDrawDI(ctx, el, isSel) {
-  const c = el.color;
-  ctx.fillStyle = '#111';
-  splotRoundRect(ctx, el.x, el.y, el.w, el.h, 2);
-  ctx.fill();
-  ctx.strokeStyle = isSel ? c : c + 'aa';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+  ctx.fillText('DI', el.x + el.w/2, el.y + el.h/2 + 3);
   // XLR symbol
-  ctx.strokeStyle = c;
-  ctx.lineWidth = 1.2;
-  const mx = el.x + el.w/2, my = el.y + el.h/2;
-  ctx.beginPath(); ctx.arc(mx, my, 5, 0, Math.PI*2); ctx.stroke();
-  for (let i = 0; i < 3; i++) {
-    const a = (i * Math.PI * 2/3) - Math.PI/2;
-    ctx.beginPath(); ctx.arc(mx + Math.cos(a)*3.5, my + Math.sin(a)*3.5, 1.5, 0, Math.PI*2);
-    ctx.fillStyle = c; ctx.fill();
-  }
-  ctx.fillStyle = 'rgba(255,255,255,0.6)';
-  ctx.font = '700 7px monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText('DI', el.x + el.w/2, el.y + el.h + 11);
+  ctx.strokeStyle = col + '88';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(el.x + el.w/2, el.y + el.h - 8, 4, 0, Math.PI*2);
+  ctx.stroke();
 }
 
 function splotDrawIEM(ctx, el, isSel) {
-  const c = el.color;
-  const cx = el.x + el.w/2, cy = el.y + el.h/2;
-  // Body pack
-  ctx.fillStyle = c + '22';
-  splotRoundRect(ctx, el.x, el.y, el.w, el.h, 4);
-  ctx.fill();
-  ctx.strokeStyle = isSel ? c : c + 'aa';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-  // Earphone cable
-  ctx.strokeStyle = c + '88';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(cx, el.y + 4);
-  ctx.bezierCurveTo(cx - 8, el.y - 6, cx + 8, el.y - 6, cx, el.y + 4);
-  ctx.stroke();
-  // Earphones
-  [cx - 6, cx + 6].forEach(ex => {
-    ctx.beginPath(); ctx.arc(ex, el.y - 4, 4, 0, Math.PI*2);
-    ctx.fillStyle = c + '55'; ctx.fill();
-    ctx.strokeStyle = c + 'cc'; ctx.lineWidth = 1; ctx.stroke();
-  });
-  ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  ctx.font = '700 6px monospace';
+  const col = el.color;
+  // Belt pack
+  splotBox(ctx, el.x, el.y, el.w, el.h, col, 0.25);
+  ctx.fillStyle = col + '88';
+  ctx.fillRect(el.x + 8, el.y + 6, el.w - 16, 6);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = '7px monospace';
   ctx.textAlign = 'center';
-  ctx.fillText('IEM', cx, el.y + el.h + 11);
-  if (el.label.includes('\n')) {
-    ctx.fillStyle = c;
-    ctx.font = '6px monospace';
-    ctx.fillText(el.label.split('\n').slice(-1)[0], cx, el.y + el.h + 19);
+  ctx.fillText('IEM', el.x + el.w/2, el.y + el.h/2 + 8);
+  splotText(ctx, el.label.split('\n')[1] || '', el.x + el.w/2, el.y + el.h + 10, 'rgba(255,255,255,0.6)', 8, false);
+}
+
+function splotDrawPedalboard(ctx, el, isSel) {
+  const col = el.color;
+  splotBox(ctx, el.x, el.y, el.w, el.h, col, 0.18);
+  // Pedal bumps
+  const n = Math.min(4, Math.floor(el.w / 14));
+  for (let i = 0; i < n; i++) {
+    const px = el.x + 8 + i * (el.w - 12) / n;
+    ctx.fillStyle = col + '55';
+    ctx.fillRect(px, el.y + 5, 10, el.h - 10);
+    ctx.strokeStyle = col + '99';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(px, el.y + 5, 10, el.h - 10);
+  }
+  splotText(ctx, el.label, el.x + el.w/2, el.y + el.h + 10, 'rgba(255,255,255,0.65)', 8, false);
+}
+
+function splotDrawPowerStrip(ctx, el, isSel) {
+  const col = el.color;
+  splotBox(ctx, el.x, el.y, el.w, el.h, col, 0.2);
+  for (let i = 0; i < 3; i++) {
+    const ox = el.x + 8 + i * (el.w - 8) / 3;
+    ctx.fillStyle = col + '66';
+    ctx.fillRect(ox, el.y + 5, 8, el.h - 10);
   }
 }
 
-// ── Utility ──
-function splotRoundRect(ctx, x, y, w, h, r) {
-  r = Math.min(r, w/2, h/2);
-  ctx.beginPath();
-  ctx.moveTo(x+r, y);
-  ctx.lineTo(x+w-r, y);
-  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-  ctx.lineTo(x+w, y+h-r);
-  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-  ctx.lineTo(x+r, y+h);
-  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-  ctx.lineTo(x, y+r);
-  ctx.quadraticCurveTo(x, y, x+r, y);
-  ctx.closePath();
+function splotDrawKeys(ctx, el, isSel) {
+  const col = el.color;
+  splotBox(ctx, el.x, el.y, el.w, el.h, col, 0.18);
+  // White keys
+  const wkW = el.w / 14;
+  for (let i = 0; i < 14; i++) {
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.fillRect(el.x + 4 + i * wkW, el.y + el.h * 0.35, wkW - 1, el.h * 0.55);
+  }
+  // Black keys
+  const bkPos = [1,2,4,5,6,8,9,11,12,13];
+  bkPos.forEach(i => {
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(el.x + 4 + i * wkW - wkW * 0.3, el.y + el.h * 0.35, wkW * 0.6, el.h * 0.35);
+  });
+  splotText(ctx, el.label, el.x + el.w/2, el.y + el.h + 10, 'rgba(255,255,255,0.7)', 8, true);
 }
 
-function splotGetElement(x, y) {
-  for (let i = SPLOT_ELEMENTS.length - 1; i >= 0; i--) {
-    const el = SPLOT_ELEMENTS[i];
-    if (x >= el.x - 6 && x <= el.x + el.w + 6 && y >= el.y - 6 && y <= el.y + el.h + 6) return el;
+// ── Hit testing ──
+function splotHitTest(mx, my) {
+  // Test in reverse order (top elements first)
+  for (let i = SPLOT_ELS.length - 1; i >= 0; i--) {
+    const el = SPLOT_ELS[i];
+    if (mx >= el.x && mx <= el.x + el.w && my >= el.y && my <= el.y + el.h) return el;
   }
   return null;
 }
 
-function splotCanvasCoords(e) {
-  const canvas = document.getElementById('splot-canvas');
-  const rect = canvas.getBoundingClientRect();
-  return {
-    x: (e.clientX - rect.left) * (canvas.width / rect.width),
-    y: (e.clientY - rect.top) * (canvas.height / rect.height)
-  };
+function splotResizeHandle(mx, my, el) {
+  if (!el) return null;
+  const handles = [
+    {id:'tl', x:el.x-3,      y:el.y-3},
+    {id:'tr', x:el.x+el.w+3, y:el.y-3},
+    {id:'bl', x:el.x-3,      y:el.y+el.h+3},
+    {id:'br', x:el.x+el.w+3, y:el.y+el.h+3},
+  ];
+  return handles.find(h => Math.abs(mx - h.x) < 8 && Math.abs(my - h.y) < 8) || null;
 }
 
-// ── Mouse ──
+function splotCanvasXY(e) {
+  const canvas = document.getElementById('splot-canvas');
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+}
+
+function splotSnapVal(v) {
+  return SPLOT_SNAP ? Math.round(v / SNAP_SIZE) * SNAP_SIZE : v;
+}
+
+// ── Mouse events ──
 function splotMouseDown(e) {
-  if (e.button !== 0) return;
-  const {x, y} = splotCanvasCoords(e);
-  const el = splotGetElement(x, y);
-  if (el) {
-    splotDragging = el;
-    splotDragOffX = x - el.x;
-    splotDragOffY = y - el.y;
-    splotSelected = el;
-    // Bring to front
-    SPLOT_ELEMENTS = [...SPLOT_ELEMENTS.filter(e => e.id !== el.id), el];
-    updateSplotInfoPanel(el);
-  } else {
-    splotSelected = null;
-    updateSplotInfoPanel(null);
+  const {x, y} = splotCanvasXY(e);
+  const canvas = document.getElementById('splot-canvas');
+  canvas.focus();
+
+  if (SPLOT_SEL) {
+    const selEl = SPLOT_ELS.find(el => el.id === SPLOT_SEL);
+    const handle = splotResizeHandle(x, y, selEl);
+    if (handle) {
+      SPLOT_RESIZE = {
+        el: selEl, handle: handle.id,
+        startX: x, startY: y,
+        origX: selEl.x, origY: selEl.y,
+        origW: selEl.w, origH: selEl.h
+      };
+      return;
+    }
   }
+
+  const hit = splotHitTest(x, y);
+  if (hit) {
+    SPLOT_SEL = hit.id;
+    SPLOT_DRAG = { el: hit, offX: x - hit.x, offY: y - hit.y };
+    // Bring to front
+    SPLOT_ELS = [...SPLOT_ELS.filter(el => el.id !== hit.id), hit];
+  } else {
+    SPLOT_SEL = null;
+  }
+  splotUpdateProps();
+  splotRAF();
 }
 
 function splotMouseMove(e) {
-  const {x, y} = splotCanvasCoords(e);
-  if (splotDragging) {
-    const canvas = document.getElementById('splot-canvas');
-    splotDragging.x = Math.max(0, Math.min(canvas.width - splotDragging.w, x - splotDragOffX));
-    splotDragging.y = Math.max(0, Math.min(canvas.height - splotDragging.h, y - splotDragOffY));
-    document.getElementById('splot-canvas').style.cursor = 'grabbing';
-  } else {
-    const hov = splotGetElement(x, y);
-    splotHover = hov || null;
-    const canvas = document.getElementById('splot-canvas');
-    canvas.style.cursor = hov ? 'grab' : 'default';
-    const tt = document.getElementById('splot-tooltip');
-    if (hov && tt) {
+  const {x, y} = splotCanvasXY(e);
+
+  if (SPLOT_RESIZE) {
+    const {el, handle, startX, startY, origX, origY, origW, origH} = SPLOT_RESIZE;
+    const dx = x - startX, dy = y - startY;
+    if (handle === 'br') {
+      el.w = Math.max(20, splotSnapVal(origW + dx));
+      el.h = Math.max(16, splotSnapVal(origH + dy));
+    } else if (handle === 'bl') {
+      const newW = Math.max(20, splotSnapVal(origW - dx));
+      el.x = splotSnapVal(origX + origW - newW);
+      el.w = newW;
+      el.h = Math.max(16, splotSnapVal(origH + dy));
+    } else if (handle === 'tr') {
+      el.w = Math.max(20, splotSnapVal(origW + dx));
+      const newH = Math.max(16, splotSnapVal(origH - dy));
+      el.y = splotSnapVal(origY + origH - newH);
+      el.h = newH;
+    } else if (handle === 'tl') {
+      const newW = Math.max(20, splotSnapVal(origW - dx));
+      const newH = Math.max(16, splotSnapVal(origH - dy));
+      el.x = splotSnapVal(origX + origW - newW);
+      el.y = splotSnapVal(origY + origH - newH);
+      el.w = newW; el.h = newH;
+    }
+    splotRAF();
+    return;
+  }
+
+  if (SPLOT_DRAG) {
+    const el = SPLOT_DRAG.el;
+    el.x = splotSnapVal(x - SPLOT_DRAG.offX);
+    el.y = splotSnapVal(y - SPLOT_DRAG.offY);
+    splotRAF();
+    return;
+  }
+
+  const prev = SPLOT_HOVER;
+  const hit = splotHitTest(x, y);
+  SPLOT_HOVER = hit ? hit.id : null;
+
+  // Tooltip
+  const tt = document.getElementById('splot-tooltip');
+  if (tt) {
+    if (hit) {
+      const def = SPLOT_DEFS[hit.type];
+      const chs = def ? def.channels.length : 0;
       tt.style.display = 'block';
-      tt.style.left = (e.offsetX + 14) + 'px';
-      tt.style.top = (e.offsetY - 8) + 'px';
-      tt.textContent = hov.label.replace('\n', ' — ') + ' · ' + hov.type.toUpperCase();
-    } else if (tt) {
+      tt.style.left = (x / SPLOT_W * 100) + '%';
+      tt.style.top  = Math.max(0, y - 32) + 'px';
+      tt.textContent = hit.label.replace('\n', ' — ') + (chs > 0 ? ` · ${chs} CH` : '');
+    } else {
       tt.style.display = 'none';
     }
   }
+
+  // Cursor
+  const canvas = document.getElementById('splot-canvas');
+  if (hit) {
+    const selEl = SPLOT_ELS.find(el => el.id === SPLOT_SEL);
+    canvas.style.cursor = splotResizeHandle(x, y, selEl) ? 'nwse-resize' : 'move';
+  } else {
+    canvas.style.cursor = 'default';
+  }
+
+  if (prev !== SPLOT_HOVER) splotRAF();
 }
 
 function splotMouseUp() {
-  splotDragging = null;
-  document.getElementById('splot-canvas').style.cursor = 'default';
-}
-
-function splotRightClick(e) {
-  const {x, y} = splotCanvasCoords(e);
-  const el = splotGetElement(x, y);
-  if (!el) return;
-  if (confirm(`Delete "${el.label.split('\n')[0]}"?`)) {
-    SPLOT_ELEMENTS = SPLOT_ELEMENTS.filter(e => e.id !== el.id);
-    if (splotSelected?.id === el.id) { splotSelected = null; updateSplotInfoPanel(null); }
-    updateSplotChannelList();
-  }
+  SPLOT_DRAG = null;
+  SPLOT_RESIZE = null;
 }
 
 function splotDblClick(e) {
-  const {x, y} = splotCanvasCoords(e);
-  const el = splotGetElement(x, y);
-  if (!el) return;
-  const cur = el.label.replace('\n', ' / ');
-  const v = prompt('Rename (use " / " to split into two lines):', cur);
-  if (v !== null) {
-    el.label = v.includes(' / ') ? v.replace(' / ', '\n') : v;
-    updateSplotInfoPanel(el);
-    updateSplotChannelList();
+  const {x, y} = splotCanvasXY(e);
+  const hit = splotHitTest(x, y);
+  if (!hit) return;
+  const cur = hit.label.replace('\n', ' / ');
+  const val = prompt('Rename element:', cur);
+  if (val !== null && val.trim()) {
+    hit.label = val.trim().replace(' / ', '\n');
+    splotUpdateProps();
+    splotRAF();
   }
 }
 
-// ── Info panel ──
-function updateSplotInfoPanel(el) {
-  const body = document.getElementById('splot-info-body');
-  if (!body) return;
-  if (!el) {
-    body.innerHTML = '<span style="color:var(--muted3)">Click any element to select.</span>';
-    return;
-  }
-  body.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid var(--border1)">
-        <div style="width:10px;height:10px;background:${el.color};border-radius:${el.type==='vocal'?'50%':'2px'};flex-shrink:0"></div>
-        <div style="font-weight:700;font-size:11px;color:var(--text)">${el.label.replace('\n',' ')}</div>
-      </div>
+function splotCtxMenu(e) {
+  const {x, y} = splotCanvasXY(e);
+  const hit = splotHitTest(x, y);
+  if (!hit) return;
+  SPLOT_SEL = hit.id;
+  splotUpdateProps();
+  splotRAF();
+  const action = prompt(
+    `Element: ${hit.label.replace('\n', ' ')}\n\n` +
+    `Actions:\n  r = rename\n  d = duplicate\n  del = delete\n\nType action:`, 'del'
+  );
+  if (!action) return;
+  if (action === 'del') splotDeleteSelected();
+  else if (action === 'd') splotDuplicate();
+  else if (action === 'r') splotDblClick(e);
+}
+
+function splotKeyDown(e) {
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    if (document.activeElement === document.getElementById('splot-canvas')) {
+      e.preventDefault();
+      splotDeleteSelected();
+    }
+  } else if (e.key === 'd' || e.key === 'D') {
+    splotDuplicate();
+  } else if (e.key === 'Escape') {
+    SPLOT_SEL = null;
+    splotUpdateProps();
+    splotRAF();
+  } else if (e.key === 'ArrowLeft')  { splotNudge(-SNAP_SIZE, 0); }
+  else if (e.key === 'ArrowRight') { splotNudge(SNAP_SIZE, 0); }
+  else if (e.key === 'ArrowUp')    { splotNudge(0, -SNAP_SIZE); }
+  else if (e.key === 'ArrowDown')  { splotNudge(0, SNAP_SIZE); }
+}
+
+function splotNudge(dx, dy) {
+  const el = SPLOT_ELS.find(e => e.id === SPLOT_SEL);
+  if (!el) return;
+  el.x += dx; el.y += dy;
+  splotRAF();
+}
+
+// ── Side panel: properties ──
+function splotUpdateProps() {
+  const el = SPLOT_ELS.find(e => e.id === SPLOT_SEL);
+  const panel = document.getElementById('splot-props');
+  if (!panel) return;
+  if (!el) { panel.innerHTML = '<span style="color:var(--muted3)">Select an element</span>'; return; }
+
+  const def = SPLOT_DEFS[el.type];
+  const chs = def ? def.channels : [];
+  const chLabel = chs.length > 0 ? (chs.length > 1 ? `CH ${el.ch}–${el.ch + chs.length - 1}` : `CH ${el.ch}`) : 'No inputs';
+
+  panel.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:6px">
       <div>
-        <div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">LABEL (use / to split lines)</div>
-        <input class="login-input" style="width:100%;font-size:10px" value="${el.label.replace('\n',' / ')}"
-          oninput="const s=SPLOT_ELEMENTS.find(e=>e.id==='${el.id}');if(s){s.label=this.value.includes(' / ')?this.value.replace(' / ','\n'):this.value;updateSplotChannelList();}">
+        <div style="font-size:8px;color:var(--muted3);margin-bottom:2px">NAME</div>
+        <input value="${el.label.replace('\n',' / ')}"
+          style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:3px 6px;font-family:var(--mono);font-size:10px"
+          onchange="splotRenameFromPanel(${el.id},this.value)">
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-        <div>
-          <div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">W (px)</div>
-          <input class="login-input" style="font-size:10px" type="number" value="${el.w}" min="20" max="300"
-            oninput="const s=SPLOT_ELEMENTS.find(e=>e.id==='${el.id}');if(s)s.w=+this.value;">
-        </div>
-        <div>
-          <div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">H (px)</div>
-          <input class="login-input" style="font-size:10px" type="number" value="${el.h}" min="20" max="300"
-            oninput="const s=SPLOT_ELEMENTS.find(e=>e.id==='${el.id}');if(s)s.h=+this.value;">
-        </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:9px">
+        <div><span style="color:var(--muted3)">Type</span><br><span style="color:var(--text)">${el.type.replace('_',' ').toUpperCase()}</span></div>
+        <div><span style="color:var(--muted3)">Inputs</span><br><span style="color:var(--accent)">${chLabel}</span></div>
+        <div><span style="color:var(--muted3)">Size</span><br><span style="color:var(--text)">${el.w}×${el.h}</span></div>
+        <div><span style="color:var(--muted3)">Position</span><br><span style="color:var(--text)">${el.x},${el.y}</span></div>
       </div>
-      <button class="btn-sm" style="color:var(--red3);border-color:var(--red2);font-size:9px"
-        onclick="SPLOT_ELEMENTS=SPLOT_ELEMENTS.filter(e=>e.id!=='${el.id}');splotSelected=null;updateSplotInfoPanel(null);updateSplotChannelList();">
-        ✕ Delete
-      </button>
+      ${chs.length > 0 ? `
+      <div>
+        <div style="font-size:8px;color:var(--muted3);margin-bottom:4px">CHANNELS</div>
+        ${chs.map((c,i) => `
+          <div style="display:grid;grid-template-columns:22px 1fr;gap:4px;padding:2px 0;border-bottom:1px solid var(--border1);font-size:9px;align-items:center">
+            <span style="color:var(--accent);font-weight:700">${el.ch + i}</span>
+            <span style="color:var(--muted2)">${c.src} · ${c.type} · ${c.stand}</span>
+          </div>`).join('')}
+      </div>` : ''}
+      <div style="display:flex;gap:4px;margin-top:4px">
+        <button class="btn-sm" onclick="splotDuplicate()" style="flex:1;font-size:9px">DUP</button>
+        <button class="btn-sm" onclick="splotDeleteSelected()" style="flex:1;font-size:9px;color:var(--red3)">DEL</button>
+      </div>
     </div>`;
 }
 
-// ── Channel list ──
-function updateSplotChannelList() {
-  const el = document.getElementById('splot-ch-list');
+function splotRenameFromPanel(id, val) {
+  const el = SPLOT_ELS.find(e => e.id === id);
+  if (el && val.trim()) { el.label = val.trim().replace(' / ', '\n'); splotRAF(); }
+}
+
+// ── Input list ──
+function splotUpdateInputList() {
+  const list = document.getElementById('splot-ch-list');
   const countEl = document.getElementById('splot-ch-count');
-  if (!el) return;
-  let ch = 1, rows = '';
-  SPLOT_ELEMENTS.forEach(e => {
-    const chs = SPLOT_CH_MAP[e.type] || [];
-    if (!chs.length) return;
-    chs.forEach(src => {
-      rows += `<div style="display:grid;grid-template-columns:24px 1fr;gap:8px;padding:4px 10px;border-bottom:1px solid var(--border1);align-items:center">
-        <span style="color:var(--accent);font-weight:700;font-family:var(--mono)">${ch++}</span>
-        <div>
-          <div style="color:var(--text);font-size:9px">${src}</div>
-          <div style="color:var(--muted3);font-size:8px">${e.label.split('\n')[0]}</div>
-        </div>
-      </div>`;
+  if (!list) return;
+
+  const rows = [];
+  let ch = 1;
+  SPLOT_ELS.forEach(el => {
+    const def = SPLOT_DEFS[el.type];
+    if (!def || !def.channels.length) return;
+    def.channels.forEach(c => {
+      rows.push({ch: ch++, src: c.src, type: c.type, stand: c.stand, elLabel: el.label.split('\n')[0], color: el.color});
     });
   });
-  el.innerHTML = rows || '<div style="padding:10px;color:var(--muted3)">No inputs yet.</div>';
-  if (countEl) countEl.textContent = (ch - 1) + ' ch';
+
+  if (countEl) countEl.textContent = rows.length + ' CH';
+
+  if (!rows.length) {
+    list.innerHTML = '<div style="color:var(--muted3);font-size:9px">Add elements to auto-generate.</div>';
+    return;
+  }
+
+  list.innerHTML = rows.map(r =>
+    `<div style="display:grid;grid-template-columns:22px 1fr;gap:4px;padding:3px 0;border-bottom:1px solid var(--border1);align-items:center">
+      <span style="font-size:9px;font-weight:700;color:${r.color}">${r.ch}</span>
+      <span style="font-size:9px;color:var(--muted2)">${r.src}<span style="color:var(--muted3);margin-left:4px">${r.type}</span></span>
+    </div>`
+  ).join('');
 }
 
 // ── Print ──
 function printStagePlot() {
   const canvas = document.getElementById('splot-canvas');
   if (!canvas) return;
+  // First redraw at high res
+  const origW = SPLOT_W, origH = SPLOT_H;
+  const scale = 2;
+  canvas.width = origW * scale; canvas.height = origH * scale;
+  SPLOT_W = origW * scale; SPLOT_H = origH * scale;
+  SPLOT_ELS.forEach(el => { el.x *= scale; el.y *= scale; el.w *= scale; el.h *= scale; });
+  splotDrawAll();
   const imgData = canvas.toDataURL('image/png', 1.0);
+  // Restore
+  SPLOT_ELS.forEach(el => { el.x /= scale; el.y /= scale; el.w /= scale; el.h /= scale; });
+  canvas.width = origW; canvas.height = origH;
+  SPLOT_W = origW; SPLOT_H = origH;
+  splotDrawAll();
+
   let ch = 1;
   const chRows = [];
-  SPLOT_ELEMENTS.forEach(e => {
-    const chs = SPLOT_CH_MAP[e.type] || [];
-    chs.forEach(src => {
-      chRows.push(`<tr><td><strong>${ch++}</strong></td><td>${src}</td><td>${e.label.replace('\n',' — ')}</td><td>${e.type.toUpperCase()}</td></tr>`);
+  SPLOT_ELS.forEach(el => {
+    const def = SPLOT_DEFS[el.type];
+    if (!def || !def.channels.length) return;
+    def.channels.forEach(c => {
+      chRows.push(`<tr><td><strong>${ch++}</strong></td><td>${c.src}</td><td>${el.label.replace('\n',' — ')}</td><td>${c.type}</td><td>${c.stand}</td></tr>`);
     });
   });
+
+  const sw = document.getElementById('splot-stage-w')?.value || 12;
+  const sd = document.getElementById('splot-stage-d')?.value || 8;
+
   const w = window.open('', '_blank');
   w.document.write(`<!DOCTYPE html><html><head><title>The Ginskeys — Stage Plot</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Courier New',monospace;padding:20px 28px;background:#fff;color:#000}
-    h1{font-size:22px;font-weight:900;letter-spacing:.1em;margin-bottom:4px}
-    .sub{font-size:10px;color:#555;letter-spacing:.06em;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #ccc}
-    .plot{display:block;width:100%;max-width:800px;border:1px solid #ccc;margin:0 auto 20px}
-    .note{font-size:9px;color:#666;text-align:center;margin-bottom:16px}
-    table{width:100%;border-collapse:collapse;font-size:10px}
-    th{background:#111;color:#fff;padding:6px 10px;text-align:left;letter-spacing:.08em;font-weight:700}
-    td{padding:5px 10px;border-bottom:1px solid #eee}
+    body{font-family:'Courier New',monospace;padding:16px 24px;background:#fff;color:#000;font-size:10px}
+    .hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid #000}
+    .hdr h1{font-size:20px;font-weight:900;letter-spacing:.1em}
+    .hdr .meta{font-size:9px;color:#555;text-align:right;line-height:1.8}
+    .plot{display:block;width:100%;border:1px solid #ccc;margin-bottom:12px}
+    .note{font-size:8px;color:#888;text-align:center;margin-bottom:12px}
+    table{width:100%;border-collapse:collapse}
+    th{background:#111;color:#fff;padding:5px 8px;text-align:left;letter-spacing:.08em;font-size:9px}
+    td{padding:4px 8px;border-bottom:1px solid #eee;font-size:9px}
     tr:nth-child(even) td{background:#f9f9f9}
-    @page{margin:12mm;size:A4 landscape}
+    @page{margin:10mm;size:A4 landscape}
   </style></head><body>
-  <h1>THE GINSKEYS — STAGE PLOT</h1>
-  <div class="sub">Hard Rock · 4 piece · Sines, Portugal · ${new Date().toLocaleDateString('pt-PT')} &nbsp;·&nbsp; SR = Stage Right (audience POV left) &nbsp;·&nbsp; SL = Stage Left (audience POV right)</div>
+  <div class="hdr">
+    <div><h1>THE GINSKEYS</h1><div style="font-size:10px;color:#555">STAGE PLOT · Hard Rock · 4 Piece · Sines, Portugal</div></div>
+    <div class="meta">
+      Stage: ${sw}m wide × ${sd}m deep<br>
+      ${new Date().toLocaleDateString('pt-PT')}<br>
+      SR = Stage Right (audience left) · SL = Stage Left (audience right)
+    </div>
+  </div>
   <img class="plot" src="${imgData}">
-  <div class="note">Audience at bottom. FOH console position marked. All positions approximate — confirm with production manager on day.</div>
-  ${chRows.length ? `<table><tr><th>CH</th><th>SOURCE</th><th>ELEMENT</th><th>TYPE</th></tr>${chRows.join('')}</table>` : ''}
+  <div class="note">Audience at bottom. All positions approximate — confirm with production manager on day of show.</div>
+  ${chRows.length ? `<table><tr><th>CH</th><th>SOURCE</th><th>ELEMENT</th><th>TYPE</th><th>STAND</th></tr>${chRows.join('')}</table>` : ''}
   </body></html>`);
   w.document.close();
-  setTimeout(() => w.print(), 700);
+  setTimeout(() => w.print(), 800);
 }
+
+
 // ── SETLIST ───────────────────────────────────────────
 function addSetlistSong() {
   const title = document.getElementById('sl-song-title').value.trim();
