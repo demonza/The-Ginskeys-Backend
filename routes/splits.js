@@ -78,43 +78,113 @@ module.exports = router;
 // Returns balance per member + recent transactions
 router.get('/member-accounts', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
   try {
-    // Get balances
+    // Get balances — one row per member (latest name wins)
     const { rows: balances } = await pool.query(`
-      SELECT member_key, member_name,
+      SELECT
+        member_key,
+        (array_agg(member_name ORDER BY created_at DESC))[1] AS member_name,
         COALESCE(SUM(CASE WHEN txn_type IN ('split_credit','deposit') THEN amount ELSE 0 END), 0) AS total_in,
         COALESCE(SUM(CASE WHEN txn_type = 'withdrawal' THEN amount ELSE 0 END), 0) AS total_out,
         COALESCE(SUM(CASE WHEN txn_type IN ('split_credit','deposit') THEN amount ELSE -amount END), 0) AS balance
       FROM member_account_txns
-      GROUP BY member_key, member_name
+      GROUP BY member_key
       ORDER BY member_key
     `);
 
-    // Get recent transactions (last 50)
+    // Get recent transactions with ledger link
     const { rows: txns } = await pool.query(`
-      SELECT * FROM member_account_txns
-      ORDER BY txn_date DESC, created_at DESC
-      LIMIT 50
+      SELECT m.*,
+        t.description AS ledger_description,
+        t.date        AS ledger_date
+      FROM member_account_txns m
+      LEFT JOIN transactions t ON t.id = m.ledger_txn_id
+      ORDER BY m.txn_date DESC, m.created_at DESC
+      LIMIT 100
     `);
 
-    res.json({ balances, txns });
+    // Band total balance from ledger
+    const { rows: totals } = await pool.query(`
+      SELECT COALESCE(SUM(amount_eur), 0) AS total_balance
+      FROM transactions
+    `);
+
+    res.json({ balances, txns, total_balance: parseFloat(totals[0].total_balance) });
   } catch (err) { next(err); }
 });
 
 // ── POST /api/splits/member-accounts/txn ──────────────────
 router.post('/member-accounts/txn', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
+  const client = await pool.connect();
   try {
-    const { member_key, member_name, amount, txn_type, description, txn_date, split_id } = req.body;
+    await client.query('BEGIN');
+    const { member_key, member_name, amount, txn_type, description, txn_date, split_id, ledger_txn_id } = req.body;
     if (!member_key || !amount || !txn_type) return res.status(400).json({ error: 'member_key, amount, txn_type required' });
-    const { rows } = await pool.query(`
+
+    const amt = Math.abs(parseFloat(amount));
+    const date = txn_date || new Date().toISOString().split('T')[0];
+    const desc = description || null;
+
+    // 1. Insert the member account transaction
+    const { rows } = await client.query(`
       INSERT INTO member_account_txns
-        (member_key, member_name, amount, txn_type, description, txn_date, split_id, created_by)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
-      [member_key, member_name || member_key, Math.abs(parseFloat(amount)),
-       txn_type, description || null, txn_date || new Date().toISOString().split('T')[0],
-       split_id || null, req.user.id]
+        (member_key, member_name, amount, txn_type, description, txn_date, split_id, ledger_txn_id, created_by)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
+      [member_key, member_name || member_key, amt, txn_type, desc, date,
+       split_id || null, ledger_txn_id || null, req.user.id]
     );
-    res.status(201).json(rows[0]);
-  } catch (err) { next(err); }
+
+    // 2. For withdrawals/deposits NOT from a split, mirror to the main ledger
+    // Split credits are already in the ledger as income transactions — no double-count
+    let newLedgerTxnId = ledger_txn_id || null;
+    if (!split_id && !ledger_txn_id && txn_type !== 'split_credit') {
+      // Find or create the default category for member transactions
+      let catId = null;
+      const catRes = await client.query(
+        `SELECT id FROM categories WHERE name = 'Divisão de Cachets' LIMIT 1`
+      );
+      if (catRes.rows[0]) {
+        catId = catRes.rows[0].id;
+      } else {
+        const newCat = await client.query(
+          `INSERT INTO categories (id, name, type) VALUES (gen_random_uuid(), 'Divisão de Cachets', 'expense') RETURNING id`
+        );
+        catId = newCat.rows[0].id;
+      }
+
+      // Mirror as a ledger transaction so it appears in the main balance
+      // withdrawal = expense (negative), deposit = income (positive)
+      const ledgerAmt = txn_type === 'withdrawal' ? -amt : amt;
+      const ledgerRes = await client.query(`
+        INSERT INTO transactions
+          (id, date, type, amount, amount_eur, currency, description, source_dest, category_id, notes, created_by)
+        VALUES (gen_random_uuid(), $1, $2, $3, $3, 'EUR', $4, $5, $6, $7, $8)
+        RETURNING id`,
+        [date,
+         txn_type === 'withdrawal' ? 'expense' : 'income',
+         ledgerAmt,
+         desc || (txn_type === 'withdrawal' ? 'Levantamento — ' : 'Depósito — ') + (member_name || member_key),
+         member_name || member_key,
+         catId,
+         'member_account:' + member_key,
+         req.user.id]
+      );
+      newLedgerTxnId = ledgerRes.rows[0].id;
+
+      // Update the member txn with the ledger link
+      await client.query(
+        `UPDATE member_account_txns SET ledger_txn_id = $1 WHERE id = $2`,
+        [newLedgerTxnId, rows[0].id]
+      );
+    }
+
+    await client.query('COMMIT');
+    res.status(201).json({ ...rows[0], ledger_txn_id: newLedgerTxnId });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    next(err);
+  } finally {
+    client.release();
+  }
 });
 
 module.exports = router;
