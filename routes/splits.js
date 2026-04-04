@@ -75,10 +75,31 @@ router.delete('/:id', requireAuth, requirePerm('deleteTxn'), async (req, res, ne
 
 module.exports = router;
 // ── GET /api/splits/member-accounts ───────────────────────
-// Returns balance per member + recent transactions
+// Returns balance per member + recent transactions.
+// Defensive: checks whether ledger_txn_id column exists before joining.
 router.get('/member-accounts', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
   try {
-    // Get balances — one row per member (latest name wins)
+    // Check if ledger_txn_id column exists (migrate_v5 may not have run yet)
+    const colCheck = await pool.query(`
+      SELECT 1 FROM information_schema.columns
+      WHERE table_name = 'member_account_txns' AND column_name = 'ledger_txn_id'
+    `);
+    const hasLedgerCol = colCheck.rows.length > 0;
+
+    // Check if the table exists at all
+    const tableCheck = await pool.query(`
+      SELECT 1 FROM information_schema.tables
+      WHERE table_name = 'member_account_txns'
+    `);
+    if (tableCheck.rows.length === 0) {
+      // Table not created yet — return empty state
+      const { rows: totals } = await pool.query(
+        `SELECT COALESCE(SUM(amount_eur), 0) AS total_balance FROM transactions`
+      );
+      return res.json({ balances: [], txns: [], total_balance: parseFloat(totals[0].total_balance) });
+    }
+
+    // Get balances — one row per member
     const { rows: balances } = await pool.query(`
       SELECT
         member_key,
@@ -91,21 +112,31 @@ router.get('/member-accounts', requireAuth, requirePerm('viewLedger'), async (re
       ORDER BY member_key
     `);
 
-    // Get recent transactions with ledger link
-    const { rows: txns } = await pool.query(`
-      SELECT m.*,
-        t.description AS ledger_description,
-        t.date        AS ledger_date
-      FROM member_account_txns m
-      LEFT JOIN transactions t ON t.id = m.ledger_txn_id
-      ORDER BY m.txn_date DESC, m.created_at DESC
-      LIMIT 100
-    `);
+    // Get recent transactions — join ledger only if column exists
+    let txns = [];
+    if (hasLedgerCol) {
+      const { rows } = await pool.query(`
+        SELECT m.*,
+          t.description AS ledger_description,
+          t.date        AS ledger_date
+        FROM member_account_txns m
+        LEFT JOIN transactions t ON t.id = m.ledger_txn_id
+        ORDER BY m.txn_date DESC, m.created_at DESC
+        LIMIT 100
+      `);
+      txns = rows;
+    } else {
+      const { rows } = await pool.query(`
+        SELECT * FROM member_account_txns
+        ORDER BY txn_date DESC, created_at DESC
+        LIMIT 100
+      `);
+      txns = rows;
+    }
 
     // Band total balance from ledger
     const { rows: totals } = await pool.query(`
-      SELECT COALESCE(SUM(amount_eur), 0) AS total_balance
-      FROM transactions
+      SELECT COALESCE(SUM(amount_eur), 0) AS total_balance FROM transactions
     `);
 
     res.json({ balances, txns, total_balance: parseFloat(totals[0].total_balance) });
@@ -125,13 +156,33 @@ router.post('/member-accounts/txn', requireAuth, requirePerm('addTxn'), async (r
     const desc = description || null;
 
     // 1. Insert the member account transaction
-    const { rows } = await client.query(`
-      INSERT INTO member_account_txns
-        (member_key, member_name, amount, txn_type, description, txn_date, split_id, ledger_txn_id, created_by)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
-      [member_key, member_name || member_key, amt, txn_type, desc, date,
-       split_id || null, ledger_txn_id || null, req.user.id]
-    );
+    // Check if ledger_txn_id column exists (added in migrate_v5)
+    const colChk = await client.query(`
+      SELECT 1 FROM information_schema.columns
+      WHERE table_name = 'member_account_txns' AND column_name = 'ledger_txn_id'
+    `);
+    const hasLedgerCol = colChk.rows.length > 0;
+
+    let rows;
+    if (hasLedgerCol) {
+      const result = await client.query(`
+        INSERT INTO member_account_txns
+          (member_key, member_name, amount, txn_type, description, txn_date, split_id, ledger_txn_id, created_by)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
+        [member_key, member_name || member_key, amt, txn_type, desc, date,
+         split_id || null, ledger_txn_id || null, req.user.id]
+      );
+      rows = result.rows;
+    } else {
+      const result = await client.query(`
+        INSERT INTO member_account_txns
+          (member_key, member_name, amount, txn_type, description, txn_date, split_id, created_by)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
+        [member_key, member_name || member_key, amt, txn_type, desc, date,
+         split_id || null, req.user.id]
+      );
+      rows = result.rows;
+    }
 
     // 2. For withdrawals/deposits NOT from a split, mirror to the main ledger
     // Split credits are already in the ledger as income transactions — no double-count
@@ -170,11 +221,13 @@ router.post('/member-accounts/txn', requireAuth, requirePerm('addTxn'), async (r
       );
       newLedgerTxnId = ledgerRes.rows[0].id;
 
-      // Update the member txn with the ledger link
-      await client.query(
-        `UPDATE member_account_txns SET ledger_txn_id = $1 WHERE id = $2`,
-        [newLedgerTxnId, rows[0].id]
-      );
+      // Update the member txn with the ledger link (only if column exists)
+      if (hasLedgerCol) {
+        await client.query(
+          `UPDATE member_account_txns SET ledger_txn_id = $1 WHERE id = $2`,
+          [newLedgerTxnId, rows[0].id]
+        );
+      }
     }
 
     await client.query('COMMIT');
