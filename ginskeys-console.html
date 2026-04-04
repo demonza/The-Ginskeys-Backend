@@ -1439,6 +1439,19 @@ tr:hover .edit-btn{display:inline}
           </select>
         </div>
       </div>
+        <div class="form-field" style="grid-column:span 2">
+          <label style="display:flex;align-items:center;gap:6px">
+            From Member Account
+            <span style="font-size:9px;color:var(--muted3);font-weight:400">(optional — deducts from member balance)</span>
+          </label>
+          <select class="form-select" id="txn-member-account">
+            <option value="">— Band account / no deduction —</option>
+            <option value="fabio">Fábio</option>
+            <option value="pedro">Pedro</option>
+            <option value="manuel">Manuel</option>
+            <option value="tiago">Tiago</option>
+          </select>
+        </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
         <button class="btn-sm ghost" onclick="closeModal()">Cancel</button>
         <button class="btn-sm primary" onclick="submitTxn()"><span data-i18n="btn_save_txn">Save Transaction</span></button>
@@ -1527,6 +1540,13 @@ tr:hover .edit-btn{display:inline}
             <option value="true">Yes ✓</option>
             <option value="false">No — pending</option>
           </select>
+        </div>
+        <div class="form-field" style="grid-column:span 2">
+          <label style="display:flex;align-items:center;gap:6px">
+            Member Account
+            <span style="font-size:9px;color:var(--muted3);font-weight:400">(linked at creation — read only)</span>
+          </label>
+          <div id="edit-txn-member-display" style="font-size:11px;color:var(--text);padding:6px 8px;background:var(--bg4);border-radius:2px;border:1px solid var(--border2)">—</div>
         </div>
       </div>
     </div>
@@ -3213,7 +3233,6 @@ tr:hover .edit-btn{display:inline}
           <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
             <span>Member</span>
             <select id="mw-member" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
-              <option value="band_fund">Band Fund</option>
               <option value="fabio">Fábio</option>
               <option value="pedro">Pedro</option>
               <option value="manuel">Manuel</option>
@@ -3249,7 +3268,6 @@ tr:hover .edit-btn{display:inline}
           <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
             <span>Member</span>
             <select id="md-member" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
-              <option value="band_fund">Band Fund</option>
               <option value="fabio">Fábio</option>
               <option value="pedro">Pedro</option>
               <option value="manuel">Manuel</option>
@@ -4154,221 +4172,6 @@ function renderSplitHistory() {
 
 // ══════════════════════════════════════════════════════════
 // MEMBER ACCOUNTS ENGINE
-// ══════════════════════════════════════════════════════════
-
-var MEMBER_ACCOUNTS_DATA = { balances: [], txns: [] };
-
-var MEMBER_DEFS = [
-  { key: 'fabio',     name: 'Fábio',     color: 'var(--accent)' },
-  { key: 'pedro',     name: 'Pedro',     color: 'var(--blue2)' },
-  { key: 'manuel',    name: 'Manuel',    color: 'var(--green3)' },
-  { key: 'tiago',     name: 'Tiago',     color: 'var(--purple2)' },
-  { key: 'band_fund', name: 'Band Fund', color: 'var(--amber2)' },
-];
-
-async function loadMemberAccounts() {
-  if (!API_BASE || !SESSION?.token) return;
-  try {
-    MEMBER_ACCOUNTS_DATA = await apiGet('/splits/member-accounts');
-    renderMemberAccounts();
-  } catch(e) {
-    console.warn('loadMemberAccounts:', e.message);
-  }
-}
-
-function renderMemberAccounts() {
-  var grid = document.getElementById('member-accounts-grid');
-  if (!grid) return;
-
-  var balMap = {};
-  (MEMBER_ACCOUNTS_DATA.balances || []).forEach(function(b) {
-    balMap[b.member_key] = b;
-  });
-
-  grid.innerHTML = MEMBER_DEFS.map(function(m) {
-    var b = balMap[m.key] || { balance: 0, total_in: 0, total_out: 0 };
-    var bal = parseFloat(b.balance || 0);
-    var totalIn = parseFloat(b.total_in || 0);
-    var totalOut = parseFloat(b.total_out || 0);
-    var balColor = bal >= 0 ? 'var(--green3)' : 'var(--red3)';
-    return '<div style="background:var(--bg3);border:1px solid var(--border2);border-left:3px solid ' + m.color + ';border-radius:2px;padding:12px;text-align:center">' +
-      '<div style="font-size:9px;color:' + m.color + ';letter-spacing:.1em;margin-bottom:6px;font-weight:700">' + m.name.toUpperCase() + '</div>' +
-      '<div style="font-family:var(--display);font-size:22px;font-weight:700;color:' + balColor + '">' +
-        (bal >= 0 ? '+' : '') + '€' + Math.abs(bal).toFixed(2) +
-      '</div>' +
-      '<div style="font-size:8px;color:var(--muted);margin-top:4px">BALANCE</div>' +
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px;font-size:9px">' +
-        '<div style="color:var(--green3)">€' + totalIn.toFixed(2) + '<br><span style="color:var(--muted);font-size:8px">IN</span></div>' +
-        '<div style="color:var(--red3)">€' + totalOut.toFixed(2) + '<br><span style="color:var(--muted);font-size:8px">OUT</span></div>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-
-  // Render transaction history
-  var txnsEl = document.getElementById('member-txn-rows');
-  if (!txnsEl) return;
-  var txns = MEMBER_ACCOUNTS_DATA.txns || [];
-  if (!txns.length) {
-    txnsEl.innerHTML = '<div style="padding:12px;color:var(--muted3);font-size:10px;text-align:center">No transactions yet. Save a gig split to auto-credit member accounts.</div>';
-    return;
-  }
-
-  // Running balances per member
-  var runBal = {};
-  // Build forward order for running balance calc
-  var fwd = txns.slice().reverse();
-  var runMap = {};
-  fwd.forEach(function(t) {
-    if (!runMap[t.member_key]) runMap[t.member_key] = 0;
-    if (t.txn_type === 'withdrawal') runMap[t.member_key] -= parseFloat(t.amount);
-    else runMap[t.member_key] += parseFloat(t.amount);
-    t._running = runMap[t.member_key];
-  });
-
-  var typeColors = { split_credit: 'var(--green3)', withdrawal: 'var(--red3)', deposit: 'var(--blue2)' };
-  var typeLabels = { split_credit: 'GIG SPLIT', withdrawal: 'WITHDRAWAL', deposit: 'DEPOSIT' };
-
-  txnsEl.innerHTML = txns.map(function(t) {
-    var def = MEMBER_DEFS.find(function(m) { return m.key === t.member_key; }) || { color: 'var(--muted)', name: t.member_name };
-    var amt = parseFloat(t.amount);
-    var isOut = t.txn_type === 'withdrawal';
-    var runBal = parseFloat(t._running || 0);
-    return '<div style="display:grid;grid-template-columns:90px 80px 1fr 80px 80px 90px;gap:8px;padding:6px 10px;border-bottom:1px solid var(--border1);align-items:center;font-size:10px">' +
-      '<div style="color:var(--muted2)">' + (t.txn_date || '').toString().slice(0,10) + '</div>' +
-      '<div style="color:' + def.color + ';font-weight:700">' + (def.name) + '</div>' +
-      '<div style="color:var(--text)">' + (t.description || '—') + '</div>' +
-      '<div style="text-align:right;color:' + (isOut ? 'var(--red3)' : 'var(--green3)') + ';font-weight:700">' +
-        (isOut ? '-' : '+') + '€' + amt.toFixed(2) +
-      '</div>' +
-      '<div style="text-align:right;color:' + (runBal >= 0 ? 'var(--text)' : 'var(--red3)') + '">€' + runBal.toFixed(2) + '</div>' +
-      '<div style="font-size:8px;color:' + typeColors[t.txn_type] + ';letter-spacing:.06em">' + (typeLabels[t.txn_type] || t.txn_type) + '</div>' +
-    '</div>';
-  }).join('');
-}
-
-function showMemberWithdrawModal() {
-  var m = document.getElementById('member-withdraw-modal');
-  if (!m) return;
-  m.style.display = 'flex';
-  document.getElementById('mw-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('mw-amount').value = '';
-  document.getElementById('mw-desc').value = '';
-  document.getElementById('mw-status').textContent = '';
-}
-
-function showMemberDepositModal() {
-  var m = document.getElementById('member-deposit-modal');
-  if (!m) return;
-  m.style.display = 'flex';
-  document.getElementById('md-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('md-amount').value = '';
-  document.getElementById('md-desc').value = '';
-  document.getElementById('md-status').textContent = '';
-}
-
-function closeMemberModal(id) {
-  var m = document.getElementById(id);
-  if (m) m.style.display = 'none';
-}
-
-async function saveMemberTransaction(type) {
-  var isWithdraw = type === 'withdrawal';
-  var prefix = isWithdraw ? 'mw' : 'md';
-  var memberKey = document.getElementById(prefix + '-member').value;
-  var amount = document.getElementById(prefix + '-amount').value;
-  var date = document.getElementById(prefix + '-date').value;
-  var desc = document.getElementById(prefix + '-desc').value;
-  var statusEl = document.getElementById(prefix + '-status');
-
-  if (!amount || parseFloat(amount) <= 0) {
-    statusEl.textContent = 'Enter a valid amount';
-    return;
-  }
-
-  var def = MEMBER_DEFS.find(function(m) { return m.key === memberKey; });
-  statusEl.textContent = 'Saving…';
-
-  try {
-    await apiPost('/splits/member-accounts/txn', {
-      member_key: memberKey,
-      member_name: def ? def.name : memberKey,
-      amount: parseFloat(amount),
-      txn_type: type,
-      description: desc || (isWithdraw ? 'Withdrawal' : 'Deposit'),
-      txn_date: date
-    });
-    closeMemberModal(isWithdraw ? 'member-withdraw-modal' : 'member-deposit-modal');
-    await loadMemberAccounts();
-    showToast((isWithdraw ? 'Withdrawal' : 'Deposit') + ' logged for ' + (def ? def.name : memberKey), isWithdraw ? 'warn' : 'ok');
-  } catch(e) {
-    statusEl.textContent = '✗ ' + e.message;
-  }
-}
-
-// Auto-post member split credits when a gig split is saved
-var _origSaveSplit = null;
-document.addEventListener('DOMContentLoaded', function() {
-  // Close member modals on backdrop click
-  ['member-withdraw-modal','member-deposit-modal'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.addEventListener('click', function(e) {
-      if (e.target === el) closeMemberModal(id);
-    });
-  });
-});
-
-// Hook into saveSplit to auto-credit member accounts
-// Called after a split is saved successfully
-async function postSplitToMemberAccounts(splitData, splitId) {
-  if (!splitData || !splitData.members) return;
-  var gig_date = splitData.gig_date || new Date().toISOString().split('T')[0];
-  var gigName = splitData.gig_name || 'Gig';
-
-  // Credit each member
-  for (var i = 0; i < splitData.members.length; i++) {
-    var m = splitData.members[i];
-    var memberName = m.name || m.member_name;
-    // Find member key
-    var def = MEMBER_DEFS.find(function(d) {
-      return d.name.toLowerCase() === memberName.toLowerCase() ||
-             d.key === memberName.toLowerCase();
-    });
-    var key = def ? def.key : memberName.toLowerCase().replace(/\s+/g, '_');
-    try {
-      await apiPost('/splits/member-accounts/txn', {
-        member_key: key,
-        member_name: memberName,
-        amount: parseFloat(m.net_eur || m.base_share || 0),
-        txn_type: 'split_credit',
-        description: gigName,
-        txn_date: gig_date,
-        split_id: splitId
-      });
-    } catch(e) { console.warn('Member credit failed for', memberName, e.message); }
-  }
-
-  // Credit band fund
-  if (splitData.band_fund_eur && parseFloat(splitData.band_fund_eur) > 0) {
-    try {
-      await apiPost('/splits/member-accounts/txn', {
-        member_key: 'band_fund',
-        member_name: 'Band Fund',
-        amount: parseFloat(splitData.band_fund_eur),
-        txn_type: 'split_credit',
-        description: gigName,
-        txn_date: gig_date,
-        split_id: splitId
-      });
-    } catch(e) { console.warn('Band fund credit failed:', e.message); }
-  }
-
-  await loadMemberAccounts();
-}
-
-
-// ══════════════════════════════════════════════════════════════════
-// MEMBER ACCOUNTS ENGINE
-// ══════════════════════════════════════════════════════════════════
 
 var MEMBER_ACCOUNTS_DATA = { balances: [], txns: [], total_balance: 0 };
 
@@ -4406,13 +4209,13 @@ function renderMemberAccounts() {
     sumEl.innerHTML =
       '<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:10px;padding:8px 12px;' +
       'background:var(--bg4);border-radius:2px;margin-bottom:8px;border-left:3px solid var(--amber2)">' +
-        '<span style="color:var(--muted);font-size:9px;letter-spacing:.08em">BAND BALANCE</span>' +
+        '<span style="color:var(--muted);font-size:9px;letter-spacing:.08em">TOTAL BAND BALANCE</span>' +
         '<span style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--text)">€' + totalBandBalance.toFixed(2) + '</span>' +
         '<span style="color:var(--border2)">|</span>' +
-        '<span style="color:var(--muted);font-size:9px">IN MEMBER ACCOUNTS</span>' +
+        '<span style="color:var(--muted);font-size:9px">OWED TO MEMBERS</span>' +
         '<span style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--amber2)">€' + totalMemberBalances.toFixed(2) + '</span>' +
         '<span style="color:var(--border2)">|</span>' +
-        '<span style="color:var(--muted);font-size:9px">UNALLOCATED</span>' +
+        '<span style="color:var(--muted);font-size:9px">NOT YET SPLIT</span>' +
         '<span style="font-family:var(--display);font-size:16px;font-weight:700;color:' + (unallocated >= 0 ? 'var(--green3)' : 'var(--red3)') + '">' +
           (unallocated >= 0 ? '' : '-') + '€' + Math.abs(unallocated).toFixed(2) +
         '</span>' +
@@ -6821,10 +6624,15 @@ function renderLedgerRows(data,tbodyId,full=false){
         ${canEdit?`<button class="edit-btn" onclick="openEditTxn(${realIdx})">✎ Edit</button>`:''}
         ${canDel?`<button class="edit-btn del" onclick="confirmDeleteTxn(${realIdx})">✕</button>`:''}
       </td>`:'';
+    const MCOL={ fabio: 'var(--accent)', pedro: 'var(--blue2)', manuel: 'var(--green3)', tiago: 'var(--purple2)' };
+    const MNAM={ fabio: 'Fábio', pedro: 'Pedro', manuel: 'Manuel', tiago: 'Tiago' };
+    const memberBadge = r.member_key
+      ? `<span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:1px;background:${MCOL[r.member_key]||'var(--muted)'}22;color:${MCOL[r.member_key]||'var(--muted)'};letter-spacing:.06em;margin-left:5px;vertical-align:middle">${MNAM[r.member_key]||r.member_key}</span>`
+      : '';
     return`<tr onclick="openTxnDrawer(${realIdx})" style="cursor:pointer" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
       <td class="date-cell">${r.date.slice(5)}</td>
       ${full?`<td class="date-cell" style="color:var(--muted);font-size:8px">${r.id}</td>`:''}
-      <td class="desc-cell">${r.desc}</td>
+      <td class="desc-cell">${r.desc}${memberBadge}</td>
       <td><span class="badge ${r.type}">${r.type.toUpperCase()}</span></td>
       <td class="cat-cell">${r.cat}</td>
       <td><div class="tag-list">${(r.tags||[]).slice(0,2).map(tagBadge).join('')}</div></td>
@@ -8022,6 +7830,9 @@ function mapApiTxn(rows) {
   const mapped = sorted.map((t, i) => {
     const amt = t.type === 'income' ? parseFloat(t.amount) : -parseFloat(t.amount);
     running = parseFloat((running + amt).toFixed(2));
+    // Extract member_key from notes field if present
+    const mk = t.notes && typeof t.notes === 'string' && t.notes.startsWith('member_account:')
+      ? t.notes.split(':')[1] : null;
     return {
       id:          t.id || `TXN-${String(i+1).padStart(3,'0')}`,
       date:        t.date,
@@ -8033,6 +7844,8 @@ function mapApiTxn(rows) {
       balance:     running,
       reconciled:  t.reconciled ?? true,
       tour_id:     t.tour_id || null,
+      member_key:  mk,
+      notes:       t.notes || null,
     };
   });
   // Most recent first for ledger view
@@ -8753,9 +8566,11 @@ async function submitTxn(){
   if (API_BASE) {
     // ── API MODE ─────────────────────────────────────────
     btn.textContent = 'Saving…'; btn.disabled = true;
+    const memberKey = document.getElementById('txn-member-account')?.value || '';
     try {
       const data = await apiPost('/transactions', {
-        date, type, description: desc, amount: Math.abs(amt), currency: 'EUR'
+        date, type, description: desc, amount: Math.abs(amt), currency: 'EUR',
+        notes: memberKey ? 'member_account:' + memberKey : undefined,
       });
       // Map API response to local shape and prepend
       const signed = type === 'expense' ? -Math.abs(amt) : Math.abs(amt);
@@ -8763,9 +8578,36 @@ async function submitTxn(){
       const newBal = parseFloat(((prev?.balance || 0) + signed).toFixed(2));
       LEDGER_DATA.unshift({
         id: data.id, date, desc: data.description, type,
-        cat, tags: [], amount: signed, balance: newBal, reconciled: false
+        cat, tags: [], amount: signed, balance: newBal, reconciled: false,
+        member_key: memberKey || null,
       });
-      auditLog('TXN_ADD', 'Saved via API: ' + desc);
+
+      // If a member account was selected, mirror as a withdrawal from that account
+      if (memberKey) {
+        const MEMBER_NAMES = { fabio: 'Fábio', pedro: 'Pedro', manuel: 'Manuel', tiago: 'Tiago' };
+        try {
+          await apiPost('/splits/member-accounts/txn', {
+            member_key: memberKey,
+            member_name: MEMBER_NAMES[memberKey] || memberKey,
+            amount: Math.abs(amt),
+            txn_type: 'withdrawal',
+            description: desc,
+            txn_date: date,
+            ledger_txn_id: data.id,
+          });
+          showToast('Ledger + ' + (MEMBER_NAMES[memberKey] || memberKey) + "'s account updated", 'ok');
+          loadMemberAccounts();
+        } catch(memberErr) {
+          console.warn('Member account deduction failed:', memberErr.message);
+          showToast('Ledger saved — member account update failed', 'warn');
+        }
+      }
+
+      // Reset the member selector
+      const memberSel = document.getElementById('txn-member-account');
+      if (memberSel) memberSel.value = '';
+
+      auditLog('TXN_ADD', 'Saved via API: ' + desc + (memberKey ? ' [from ' + memberKey + ']' : ''));
     } catch(err){
       alert('Failed to save: ' + (err.message || 'Unknown error'));
       btn.textContent = 'Save Transaction'; btn.disabled = false;
@@ -8868,6 +8710,21 @@ function openEditTxn(idx){
   document.getElementById('edit-txn-cat').value=t.cat;
   document.getElementById('edit-txn-tags').value=(t.tags||[]).join(', ');
   document.getElementById('edit-txn-reconciled').value=String(t.reconciled!==false);
+
+  // Show linked member account (read-only)
+  const memberDisplay = document.getElementById('edit-txn-member-display');
+  if (memberDisplay) {
+    const MEMBER_NAMES = { fabio: 'Fábio', pedro: 'Pedro', manuel: 'Manuel', tiago: 'Tiago' };
+    const mk = t.member_key || (t.notes && t.notes.startsWith('member_account:') ? t.notes.split(':')[1] : null);
+    if (mk && MEMBER_NAMES[mk]) {
+      memberDisplay.textContent = MEMBER_NAMES[mk] + ' — deducted from member account';
+      memberDisplay.style.color = 'var(--accent)';
+    } else {
+      memberDisplay.textContent = '— Band account (no member deduction)';
+      memberDisplay.style.color = 'var(--muted3)';
+    }
+  }
+
   // Show/hide delete button
   const delBtn=document.querySelector('#edit-txn-modal .btn-sm.ghost');
   if(delBtn) delBtn.style.display=can('deleteTransaction')?'':'none';
