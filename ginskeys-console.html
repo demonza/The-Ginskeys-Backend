@@ -7371,7 +7371,7 @@ function invExportSummary() {
         '<td>'+(inv.issued||'—')+'</td>'+
         '<td class="'+eff+'">'+dueStr+'</td>'+
         '<td class="'+eff+'">'+(INV_STATUS_LABELS[eff]||eff)+'</td>'+
-        '<td>'+(inv.paidMethod?inv.paidMethod+' ':'')++(inv.notes||'')+'</td>'+
+        '<td>'+(inv.paidMethod?inv.paidMethod+' ':'')+(inv.notes||'')+'</td>'+
       '</tr>';
     }).join('')+
     '</table></body></html>';
@@ -9585,7 +9585,7 @@ function updateFinancialKpis(){
   // Only set a loading placeholder if member data hasn't arrived yet
   const balanceEl=document.getElementById('kpi-total-balance');
   const balanceChangeEl=document.getElementById('kpi-balance-change');
-  if(balanceEl && (!MEMBER_ACCOUNTS_DATA || !MEMBER_ACCOUNTS_DATA.balances || !MEMBER_ACCOUNTS_DATA.balances.length)){
+  if(balanceEl && (typeof MEMBER_ACCOUNTS_DATA === 'undefined' || !MEMBER_ACCOUNTS_DATA || !MEMBER_ACCOUNTS_DATA.balances || !MEMBER_ACCOUNTS_DATA.balances.length)){
     balanceEl.textContent = '—';
   }
   // Always trigger the member breakdown update (it will set the real value when ready)
