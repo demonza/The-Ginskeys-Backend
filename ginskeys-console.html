@@ -10101,13 +10101,14 @@ function toActiveCcy(eurAmount) {
 // ── Date formatting — strips T00:00:00.000Z from ISO strings ──
 function fmtDate(dateStr) {
   if (!dateStr) return '—';
-  // Already a clean YYYY-MM-DD? Return as-is
-  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+  const s = String(dateStr);
+  // Already clean YYYY-MM-DD? Return as-is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
   // ISO string with time component? Strip it
-  if (typeof dateStr === 'string' && dateStr.includes('T')) return dateStr.slice(0, 10);
+  if (s.includes('T')) return s.slice(0, 10);
   // Date object?
   if (dateStr instanceof Date && !isNaN(dateStr)) return dateStr.toISOString().slice(0, 10);
-  return String(dateStr);
+  return s;
 }
 
 function fmtMoney(eurAmount, opts = {}) {
@@ -10789,7 +10790,7 @@ function mapApiTxn(rows) {
       ? t.notes.split(':')[1] : null;
     return {
       id:          t.id || `TXN-${String(i+1).padStart(3,'0')}`,
-      date:        t.date,
+      date:        fmtDate(t.date),
       desc:        t.description,
       type:        t.type,
       cat:         t.category || 'Outros',
@@ -15127,7 +15128,7 @@ function openBookingDrawer(id) {
       <div class="drawer-info-row"><span>Location</span><span>${b.location || '—'}</span></div>
       <div class="drawer-info-row"><span>Contact</span><span>${b.contact_name || '—'}</span></div>
       <div class="drawer-info-row"><span>Email</span><span style="color:var(--blue2)">${b.contact_email ? `<a href="mailto:${b.contact_email}" style="color:var(--blue2);text-decoration:none">${b.contact_email}</a>` : '—'}</span></div>
-      <div class="drawer-info-row"><span>Gig Date</span><span>${b.date || '—'}</span></div>
+      <div class="drawer-info-row"><span>Gig Date</span><span>${fmtDate(b.date)}</span></div>
     </div>
 
     ${b.notes ? `<div class="drawer-note">${b.notes}</div>` : ''}
@@ -15310,7 +15311,7 @@ function openTxnDrawer(idx) {
     <div class="drawer-section">
       <div class="drawer-section-label">Transaction Details</div>
       <div class="drawer-info-row"><span>ID</span><span style="color:var(--muted3)">${t.id}</span></div>
-      <div class="drawer-info-row"><span>Date</span><span>${t.date}</span></div>
+      <div class="drawer-info-row"><span>Date</span><span>${fmtDate(t.date)}</span></div>
       <div class="drawer-info-row"><span>Description</span><span>${t.desc}</span></div>
       <div class="drawer-info-row"><span>Category</span><span>${t.cat}</span></div>
       <div class="drawer-info-row"><span>Tags</span><span>${(t.tags||[]).join(', ') || '—'}</span></div>
@@ -16453,7 +16454,7 @@ function printSplitsReport() {
   <div class="section">
     <div class="section-title">Gig-by-Gig Breakdown</div>
     <table><thead><tr><th>Event</th><th>Date</th><th style="text-align:right">Gross</th><th style="text-align:right">Band Fund</th><th style="text-align:right">Per Member</th><th>Members</th></tr></thead><tbody>
-    ${SPLITS_DATA.map(sp=>`<tr><td style="font-weight:700">${sp.name||sp.id||'—'}</td><td>${sp.date||'—'}</td><td style="text-align:right;color:#166534">€${parseFloat(sp.gross_eur||0).toLocaleString('pt-PT',{minimumFractionDigits:2})}</td><td style="text-align:right;color:#92400e">€${parseFloat(sp.band_fund_eur||0).toLocaleString('pt-PT',{minimumFractionDigits:2})}</td><td style="text-align:right;color:#1e3a8a;font-weight:700">€${parseFloat(sp.per_member_eur||0).toLocaleString('pt-PT',{minimumFractionDigits:2})}</td><td style="font-size:9px;color:#666">${sp.members?.map(m=>m.name||m).join(', ')||'All members'}</td></tr>`).join('')}
+    ${SPLITS_DATA.map(sp=>`<tr><td style="font-weight:700">${sp.name||sp.id||'—'}</td><td>${fmtDate(sp.date)}</td><td style="text-align:right;color:#166534">€${parseFloat(sp.gross_eur||0).toLocaleString('pt-PT',{minimumFractionDigits:2})}</td><td style="text-align:right;color:#92400e">€${parseFloat(sp.band_fund_eur||0).toLocaleString('pt-PT',{minimumFractionDigits:2})}</td><td style="text-align:right;color:#1e3a8a;font-weight:700">€${parseFloat(sp.per_member_eur||0).toLocaleString('pt-PT',{minimumFractionDigits:2})}</td><td style="font-size:9px;color:#666">${sp.members?.map(m=>m.name||m).join(', ')||'All members'}</td></tr>`).join('')}
     </tbody></table>
   </div>
   <div class="footer"><div>The Ginskeys — Revenue Distribution Report</div><div>${d} · Confidential</div></div>
