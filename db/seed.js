@@ -168,12 +168,15 @@ async function seed() {
 
     await client.query('COMMIT');
     console.log('✅ Seed complete.');
-    console.log('');
-    console.log('Login credentials:');
-    console.log('  tiago@ginskeys.com  /  ' + adminPassword);
-    console.log('  fabio@ginskeys.com  /  GK!Change2026');
-    console.log('  pedro@ginskeys.com  /  GK!Change2026');
-    console.log('  manel@ginskeys.com  /  GK!Change2026');
+    // FIX: only log credentials in development
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('');
+      console.log('Login credentials:');
+      console.log('  tiago@ginskeys.com  /  ' + adminPassword);
+      console.log('  fabio@ginskeys.com  /  GK!Change2026');
+      console.log('  pedro@ginskeys.com  /  GK!Change2026');
+      console.log('  manel@ginskeys.com  /  GK!Change2026');
+    }
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('❌ Seed failed:', err.message);
