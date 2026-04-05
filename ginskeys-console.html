@@ -2157,6 +2157,7 @@ tr:hover .edit-btn{display:inline}
     <div class="tb-nav-sep"></div>
     <!-- LIVE -->
     <div class="tb-tab" data-view="booking" onclick="switchView('booking',this)" id="tab-booking">◎ Booking <span class="tab-badge" id="booking-badge" style="display:none">0</span></div>
+    <div class="tb-tab" data-view="invoices" onclick="switchView('invoices',this)" id="tab-invoices">⎙ Invoices <span class="tab-badge" id="invoices-overdue-badge" style="display:none;background:var(--red3)">0</span></div>
     <div class="tb-tab" data-view="tours" onclick="switchView('tours',this)">↗ Tours</div>
     <div class="tb-tab" data-view="production" onclick="switchView('production',this)" id="tab-production">🎚 Production</div>
     <div class="tb-nav-sep"></div>
@@ -3149,6 +3150,123 @@ tr:hover .edit-btn{display:inline}
 <!-- ═══════════════════════════════════════════════════════
      RELEASES VIEW
 ════════════════════════════════════════════════════════ -->
+<!-- ══ INVOICES VIEW ═══════════════════════════════════ -->
+<div id="view-invoices" class="view new-view">
+  <div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">
+
+    <!-- Banner -->
+    <div style="flex-shrink:0;background:linear-gradient(90deg,rgba(0,230,118,.06) 0%,transparent 100%);border-left:3px solid var(--green3);padding:12px 16px;display:grid;grid-template-columns:1fr repeat(5,auto);gap:16px;align-items:center">
+      <div>
+        <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--green3);letter-spacing:.08em">INVOICE TRACKER</div>
+        <div style="font-size:9px;color:var(--muted2);margin-top:2px">All issued invoices — status, follow-up, payment tracking</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--text)" id="inv-banner-total">0</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">TOTAL</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--amber2)" id="inv-banner-outstanding">€0</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">OUTSTANDING</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--red3)" id="inv-banner-overdue">€0</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">OVERDUE</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green3)" id="inv-banner-collected">€0</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">COLLECTED</div>
+      </div>
+      <div style="padding:0 12px;border-left:1px solid var(--border2)">
+        <button class="btn-sm" onclick="openInvoiceModal()" style="color:var(--green3);border-color:var(--green3);white-space:nowrap">+ New Invoice</button>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">FILTER</div>
+      <button class="btn-sm inv-filter-btn active" onclick="invFilter('all',this)">All</button>
+      <button class="btn-sm inv-filter-btn" onclick="invFilter('draft',this)" style="color:var(--muted2)">Draft</button>
+      <button class="btn-sm inv-filter-btn" onclick="invFilter('sent',this)" style="color:var(--blue2)">Sent</button>
+      <button class="btn-sm inv-filter-btn" onclick="invFilter('overdue',this)" style="color:var(--red3)">Overdue</button>
+      <button class="btn-sm inv-filter-btn" onclick="invFilter('paid',this)" style="color:var(--green3)">Paid</button>
+      <div style="flex:1"></div>
+      <button class="btn-sm" onclick="invExportSummary()" style="color:var(--muted2)">⎙ Export Summary</button>
+    </div>
+
+    <!-- Invoice table -->
+    <div class="panel" style="flex:1;min-height:0;overflow-y:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:10px">
+        <thead style="position:sticky;top:0;z-index:1">
+          <tr style="background:var(--bg4);font-size:8px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">
+            <th style="padding:8px 10px;text-align:left">Invoice #</th>
+            <th style="padding:8px 10px;text-align:left">Client</th>
+            <th style="padding:8px 10px;text-align:left">Show / Service</th>
+            <th style="padding:8px 10px;text-align:right">Amount</th>
+            <th style="padding:8px 10px;text-align:left">Issued</th>
+            <th style="padding:8px 10px;text-align:left">Due</th>
+            <th style="padding:8px 10px;text-align:center">Status</th>
+            <th style="padding:8px 10px;text-align:left">Notes</th>
+            <th style="padding:8px 10px;text-align:right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="inv-tracker-tbody">
+          <tr><td colspan="9" style="padding:32px;text-align:center;color:var(--muted3)">
+            No invoices yet. Generate one from the Booking tab.
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ INVOICE STATUS MODAL ════════════════════════════ -->
+<div id="inv-status-modal" class="overlay-bg" onclick="if(event.target===this)closeInvStatusModal()">
+  <div class="overlay-box" style="width:440px">
+    <div class="overlay-hdr">
+      <span class="overlay-title" id="inv-status-modal-title">Update Invoice</span>
+      <button class="overlay-close" onclick="closeInvStatusModal()">✕</button>
+    </div>
+    <div class="overlay-body" style="display:flex;flex-direction:column;gap:12px">
+      <input type="hidden" id="inv-status-modal-id">
+      <div class="form-field">
+        <label>Status</label>
+        <select class="form-select" id="inv-status-select">
+          <option value="draft">Draft</option>
+          <option value="sent">Sent</option>
+          <option value="paid">Paid ✓</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="form-field" id="inv-paid-date-field">
+        <label>Payment Date</label>
+        <input class="form-input" id="inv-paid-date" type="date">
+      </div>
+      <div class="form-field">
+        <label>Payment Method</label>
+        <select class="form-select" id="inv-paid-method">
+          <option value="">—</option>
+          <option value="transfer">Bank Transfer</option>
+          <option value="cash">Cash</option>
+          <option value="mbway">MBWay</option>
+          <option value="check">Cheque</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Internal Notes</label>
+        <input class="form-input" id="inv-status-notes" placeholder="e.g. Paid in full, ref. TRF2026...">
+      </div>
+    </div>
+    <div class="overlay-hdr" style="justify-content:space-between;border-top:1px solid var(--border);border-bottom:none">
+      <button class="btn-sm ghost" style="color:var(--red3);border-color:var(--red2)" onclick="invDelete(document.getElementById('inv-status-modal-id').value)">Delete</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-sm ghost" onclick="closeInvStatusModal()">Cancel</button>
+        <button class="btn-sm primary" onclick="invSaveStatus()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="view-releases" class="view new-view">
   <div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">
 
@@ -5371,6 +5489,23 @@ function printInvoice() {
     '</body></html>';
 
   _invoiceNum++;
+
+  // Save to invoice tracker before printing
+  invRegister({
+    id:          'INV-' + Date.now(),
+    number:      invNum,
+    clientName:  clientName,
+    clientEmail: clientEmail,
+    venue:       venue,
+    showDate:    showDate,
+    description: description,
+    total:       total,
+    ivaRate:     ivaRate,
+    issued:      new Date().toISOString().slice(0,10),
+    paymentDays: 30,
+    notes:       notes,
+  });
+
   var w = window.open('', '_blank');
   w.document.write(html);
   w.document.close();
@@ -6912,6 +7047,338 @@ window.renderSetlistDisplay = function() {
   if (typeof _origRenderSetlistDisplay === 'function') _origRenderSetlistDisplay();
   setTimeout(setlistAnalyticsRender, 50);
 };
+
+
+// ══════════════════════════════════════════════════════════
+// INVOICE TRACKER ENGINE
+// ══════════════════════════════════════════════════════════
+
+var INVOICE_DATA = [];
+var INV_FILTER   = 'all';
+var STORAGE_INVOICES = 'gk_invoices';
+
+function invoiceTrackerLoad() {
+  try {
+    var raw = localStorage.getItem(STORAGE_INVOICES);
+    INVOICE_DATA = raw ? JSON.parse(raw) : [];
+  } catch(e) { INVOICE_DATA = []; }
+  invoiceTrackerRender();
+  invUpdateBanner();
+  invUpdateOverdueBadge();
+}
+
+function invoiceTrackerSave() {
+  try { localStorage.setItem(STORAGE_INVOICES, JSON.stringify(INVOICE_DATA)); } catch(e) {}
+}
+
+// ── Called from printInvoice() to register the invoice ──
+function invRegister(data) {
+  // data: { id, number, clientName, clientEmail, venue, showDate, total, ivaRate, issued, paymentDays, notes }
+  var dueDate = '';
+  if (data.issued && data.paymentDays) {
+    var d = new Date(data.issued);
+    d.setDate(d.getDate() + parseInt(data.paymentDays || 30));
+    dueDate = d.toISOString().slice(0, 10);
+  }
+  var inv = {
+    id:            data.id || ('INV-' + Date.now()),
+    number:        data.number,
+    clientName:    data.clientName,
+    clientEmail:   data.clientEmail || '',
+    venue:         data.venue || '',
+    showDate:      data.showDate || '',
+    description:   data.description || '',
+    total:         parseFloat(data.total) || 0,
+    ivaRate:       parseFloat(data.ivaRate) || 0,
+    issued:        data.issued || new Date().toISOString().slice(0, 10),
+    due:           dueDate,
+    status:        'sent',   // auto-set to sent since we just printed it
+    paidDate:      '',
+    paidMethod:    '',
+    notes:         data.notes || '',
+    createdAt:     Date.now(),
+  };
+  // Remove duplicate if same invoice number already exists (reprint)
+  INVOICE_DATA = INVOICE_DATA.filter(function(x) { return x.number !== inv.number; });
+  INVOICE_DATA.unshift(inv);
+  invoiceTrackerSave();
+  invoiceTrackerRender();
+  invUpdateBanner();
+  invUpdateOverdueBadge();
+}
+
+// ── Status helpers ──
+function invIsOverdue(inv) {
+  if (inv.status === 'paid' || inv.status === 'cancelled') return false;
+  if (!inv.due) return false;
+  return new Date(inv.due) < new Date();
+}
+
+function invEffectiveStatus(inv) {
+  if (inv.status === 'paid')      return 'paid';
+  if (inv.status === 'cancelled') return 'cancelled';
+  if (invIsOverdue(inv))          return 'overdue';
+  return inv.status || 'sent';
+}
+
+var INV_STATUS_STYLES = {
+  draft:     { color: 'var(--muted2)',  bg: 'rgba(255,255,255,.06)', label: 'Draft' },
+  sent:      { color: 'var(--blue2)',   bg: 'rgba(41,121,255,.12)',  label: 'Sent' },
+  overdue:   { color: 'var(--red3)',    bg: 'rgba(255,60,30,.12)',   label: 'Overdue' },
+  paid:      { color: 'var(--green3)',  bg: 'rgba(0,230,118,.12)',   label: 'Paid ✓' },
+  cancelled: { color: 'var(--muted3)', bg: 'rgba(255,255,255,.04)', label: 'Cancelled' },
+};
+
+// ── Banner ──
+function invUpdateBanner() {
+  var now = new Date();
+  var total       = INVOICE_DATA.length;
+  var outstanding = INVOICE_DATA.filter(function(i){ return i.status!=='paid'&&i.status!=='cancelled'; }).reduce(function(s,i){ return s+i.total; },0);
+  var overdue     = INVOICE_DATA.filter(function(i){ return invIsOverdue(i); }).reduce(function(s,i){ return s+i.total; },0);
+  var collected   = INVOICE_DATA.filter(function(i){ return i.status==='paid'; }).reduce(function(s,i){ return s+i.total; },0);
+
+  var fmt = function(v){ return '\u20ac\u00a0'+v.toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var set = function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
+  set('inv-banner-total',       total);
+  set('inv-banner-outstanding', fmt(outstanding));
+  set('inv-banner-overdue',     fmt(overdue));
+  set('inv-banner-collected',   fmt(collected));
+}
+
+function invUpdateOverdueBadge() {
+  var count = INVOICE_DATA.filter(function(i){ return invIsOverdue(i); }).length;
+  var badge = document.getElementById('invoices-overdue-badge');
+  if (badge) {
+    badge.style.display = count > 0 ? 'inline-block' : 'none';
+    badge.textContent = count;
+  }
+}
+
+// ── Filter ──
+function invFilter(f, btn) {
+  INV_FILTER = f;
+  document.querySelectorAll('.inv-filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  invoiceTrackerRender();
+}
+
+// ── Render table ──
+function invoiceTrackerRender() {
+  var tbody = document.getElementById('inv-tracker-tbody');
+  if (!tbody) return;
+
+  var data = INVOICE_DATA.filter(function(inv) {
+    if (INV_FILTER === 'all') return true;
+    if (INV_FILTER === 'overdue') return invIsOverdue(inv);
+    return inv.status === INV_FILTER;
+  });
+
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="9" style="padding:32px;text-align:center;color:var(--muted3)">' +
+      (INV_FILTER === 'all' ? 'No invoices yet. Generate one from the Booking tab.' :
+       'No ' + INV_FILTER + ' invoices.') + '</td></tr>';
+    return;
+  }
+
+  var fmt = function(v){ return '\u20ac\u00a0'+v.toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+
+  tbody.innerHTML = data.map(function(inv) {
+    var eff  = invEffectiveStatus(inv);
+    var sty  = INV_STATUS_STYLES[eff] || INV_STATUS_STYLES.sent;
+    var isOD = eff === 'overdue';
+
+    // Days overdue or days until due
+    var dueLabel = '';
+    if (inv.due) {
+      var daysLeft = Math.round((new Date(inv.due) - new Date()) / 86400000);
+      if (eff === 'paid') {
+        dueLabel = inv.paidDate ? 'Paid ' + inv.paidDate : 'Paid';
+      } else if (isOD) {
+        dueLabel = '<span style="color:var(--red3);font-weight:700">' + Math.abs(daysLeft) + 'd overdue</span>';
+      } else {
+        dueLabel = '<span style="color:' + (daysLeft <= 7 ? 'var(--amber2)' : 'var(--muted3)') + '">' +
+          (daysLeft === 0 ? 'Due today' : daysLeft + 'd left') + '</span>';
+      }
+    }
+
+    var rowBg = isOD ? 'background:rgba(255,60,30,.04)' : '';
+
+    return '<tr style="border-bottom:1px solid var(--border1);cursor:pointer;' + rowBg + '" ' +
+      'onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'' + (isOD?'rgba(255,60,30,.04)':'') + '\'" ' +
+      'onclick="invOpenStatusModal(\'' + inv.id + '\')">' +
+
+      '<td style="padding:8px 10px;font-family:var(--mono);font-size:9px;color:var(--muted2);white-space:nowrap">' + (inv.number || '—') + '</td>' +
+
+      '<td style="padding:8px 10px">' +
+        '<div style="font-weight:700;color:var(--text)">' + (inv.clientName || '—') + '</div>' +
+        (inv.clientEmail ? '<div style="font-size:9px;color:var(--muted3)">' + inv.clientEmail + '</div>' : '') +
+      '</td>' +
+
+      '<td style="padding:8px 10px">' +
+        '<div style="color:var(--muted2)">' + (inv.venue || inv.description || '—') + '</div>' +
+        (inv.showDate ? '<div style="font-size:9px;color:var(--muted3)">' + inv.showDate + '</div>' : '') +
+      '</td>' +
+
+      '<td style="padding:8px 10px;text-align:right;font-weight:700;color:var(--text);white-space:nowrap">' +
+        fmt(inv.total) +
+        (inv.ivaRate > 0 ? '<div style="font-size:8px;color:var(--muted3)">IVA ' + inv.ivaRate + '%</div>' : '') +
+      '</td>' +
+
+      '<td style="padding:8px 10px;font-size:9px;color:var(--muted3);white-space:nowrap">' + (inv.issued || '—') + '</td>' +
+
+      '<td style="padding:8px 10px;font-size:9px;white-space:nowrap">' + (dueLabel || (inv.due || '—')) + '</td>' +
+
+      '<td style="padding:8px 10px;text-align:center">' +
+        '<span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:2px;background:' + sty.bg + ';color:' + sty.color + '">' +
+          sty.label + '</span>' +
+      '</td>' +
+
+      '<td style="padding:8px 10px;font-size:9px;color:var(--muted3);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' +
+        (inv.notes || '') + '</td>' +
+
+      '<td style="padding:8px 10px;text-align:right;white-space:nowrap" onclick="event.stopPropagation()">' +
+        '<div style="display:flex;gap:4px;justify-content:flex-end">' +
+          (inv.status !== 'paid' ? '<button onclick="invMarkPaid(\'' + inv.id + '\')" style="background:transparent;border:1px solid var(--green3);color:var(--green3);font-size:9px;padding:2px 7px;cursor:pointer;font-family:var(--mono)">✓ Paid</button>' : '') +
+          '<button onclick="invOpenStatusModal(\'' + inv.id + '\')" style="background:transparent;border:1px solid var(--border2);color:var(--muted3);font-size:9px;padding:2px 7px;cursor:pointer;font-family:var(--mono)">✎</button>' +
+        '</div>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+// ── Quick mark paid ──
+function invMarkPaid(id) {
+  var inv = INVOICE_DATA.find(function(i){ return i.id === id; });
+  if (!inv) return;
+  inv.status    = 'paid';
+  inv.paidDate  = new Date().toISOString().slice(0, 10);
+  invoiceTrackerSave();
+  invoiceTrackerRender();
+  invUpdateBanner();
+  invUpdateOverdueBadge();
+  showToast('Invoice ' + inv.number + ' marked as paid ✓', 'ok');
+}
+
+// ── Status modal ──
+function invOpenStatusModal(id) {
+  var inv = INVOICE_DATA.find(function(i){ return i.id === id; });
+  if (!inv) return;
+  document.getElementById('inv-status-modal-id').value = id;
+  document.getElementById('inv-status-modal-title').textContent = 'Invoice ' + (inv.number || id) + ' — ' + (inv.clientName || '');
+  document.getElementById('inv-status-select').value  = inv.status || 'sent';
+  document.getElementById('inv-paid-date').value      = inv.paidDate || new Date().toISOString().slice(0,10);
+  document.getElementById('inv-paid-method').value   = inv.paidMethod || '';
+  document.getElementById('inv-status-notes').value  = inv.notes || '';
+  invStatusTogglePaidFields();
+  document.getElementById('inv-status-modal').classList.add('open');
+}
+
+function closeInvStatusModal() {
+  document.getElementById('inv-status-modal').classList.remove('open');
+}
+
+function invStatusTogglePaidFields() {
+  var sel = document.getElementById('inv-status-select')?.value;
+  var paidField = document.getElementById('inv-paid-date-field');
+  if (paidField) paidField.style.display = sel === 'paid' ? '' : 'none';
+}
+
+// Hook status select change
+document.addEventListener('DOMContentLoaded', function() {
+  var sel = document.getElementById('inv-status-select');
+  if (sel) sel.addEventListener('change', invStatusTogglePaidFields);
+});
+
+function invSaveStatus() {
+  var id     = document.getElementById('inv-status-modal-id').value;
+  var inv    = INVOICE_DATA.find(function(i){ return i.id === id; });
+  if (!inv) { closeInvStatusModal(); return; }
+
+  inv.status     = document.getElementById('inv-status-select').value;
+  inv.paidDate   = document.getElementById('inv-paid-date').value || '';
+  inv.paidMethod = document.getElementById('inv-paid-method').value || '';
+  inv.notes      = document.getElementById('inv-status-notes').value || '';
+
+  invoiceTrackerSave();
+  invoiceTrackerRender();
+  invUpdateBanner();
+  invUpdateOverdueBadge();
+  closeInvStatusModal();
+  showToast('Invoice updated', 'ok');
+}
+
+function invDelete(id) {
+  var inv = INVOICE_DATA.find(function(i){ return i.id === id; });
+  if (!inv) return;
+  if (!confirm('Delete invoice ' + (inv.number || id) + '?')) return;
+  INVOICE_DATA = INVOICE_DATA.filter(function(i){ return i.id !== id; });
+  invoiceTrackerSave();
+  invoiceTrackerRender();
+  invUpdateBanner();
+  invUpdateOverdueBadge();
+  closeInvStatusModal();
+  showToast('Invoice deleted', 'warn');
+}
+
+// ── Export summary PDF ──
+function invExportSummary() {
+  var today  = new Date().toLocaleDateString('pt-PT',{day:'2-digit',month:'long',year:'numeric'});
+  var fmt    = function(v){ return '\u20ac '+v.toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var data   = INV_FILTER==='all' ? INVOICE_DATA : INVOICE_DATA.filter(function(i){
+    if(INV_FILTER==='overdue') return invIsOverdue(i);
+    return i.status===INV_FILTER;
+  });
+
+  var totalOut  = data.filter(function(i){return i.status!=='paid'&&i.status!=='cancelled';}).reduce(function(s,i){return s+i.total;},0);
+  var totalPaid = data.filter(function(i){return i.status==='paid';}).reduce(function(s,i){return s+i.total;},0);
+  var totalOD   = data.filter(function(i){return invIsOverdue(i);}).reduce(function(s,i){return s+i.total;},0);
+
+  var INV_STATUS_LABELS = {draft:'Draft',sent:'Sent',paid:'Paid',overdue:'Overdue',cancelled:'Cancelled'};
+
+  var doc = '<!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8"><title>Invoice Summary</title><style>'+
+    '*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:10px;color:#1a1a1a;padding:20px 28px}'+
+    'h1{font-size:16px;font-weight:700;margin-bottom:2px}.sub{font-size:10px;color:#777;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #111}'+
+    '.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}'+
+    '.sum-card{background:#f8f8f8;padding:10px 12px;border-radius:3px;text-align:center}'+
+    '.sum-label{font-size:8px;text-transform:uppercase;color:#666;letter-spacing:.1em;margin-bottom:4px}'+
+    '.sum-val{font-size:16px;font-weight:700}'+
+    'table{width:100%;border-collapse:collapse}'+
+    'th{background:#111;color:#fff;padding:6px 8px;text-align:left;font-size:8px;letter-spacing:.08em;text-transform:uppercase}'+
+    'th:nth-child(4){text-align:right}'+
+    'td{padding:5px 8px;border-bottom:1px solid #eee;font-size:10px}'+
+    'td:nth-child(4){text-align:right;font-weight:700}'+
+    '.paid{color:#166534}.overdue{color:#dc2626;font-weight:700}.sent{color:#1d4ed8}.draft{color:#666}'+
+    '@page{margin:10mm;size:A4 landscape}'+
+    '</style></head><body>'+
+    '<h1>THE GINSKEYS — INVOICE SUMMARY</h1>'+
+    '<div class="sub">'+today+' &nbsp;·&nbsp; '+data.length+' invoices &nbsp;·&nbsp; Filter: '+(INV_FILTER||'all')+'</div>'+
+    '<div class="summary">'+
+      '<div class="sum-card"><div class="sum-label">Outstanding</div><div class="sum-val" style="color:#92400e">'+fmt(totalOut)+'</div></div>'+
+      '<div class="sum-card"><div class="sum-label">Overdue</div><div class="sum-val" style="color:#dc2626">'+fmt(totalOD)+'</div></div>'+
+      '<div class="sum-card"><div class="sum-label">Collected</div><div class="sum-val" style="color:#166534">'+fmt(totalPaid)+'</div></div>'+
+      '<div class="sum-card"><div class="sum-label">Total Issued</div><div class="sum-val">'+fmt(totalOut+totalPaid)+'</div></div>'+
+    '</div>'+
+    '<table><tr><th>Invoice #</th><th>Client</th><th>Show / Service</th><th>Amount</th><th>Issued</th><th>Due</th><th>Status</th><th>Payment Notes</th></tr>'+
+    data.map(function(inv){
+      var eff=invEffectiveStatus(inv);
+      var daysLeft = inv.due ? Math.round((new Date(inv.due)-new Date())/86400000) : null;
+      var dueStr = inv.due ? (eff==='paid'?(inv.paidDate||'Paid'):eff==='overdue'?Math.abs(daysLeft)+'d overdue':daysLeft+'d left') : '—';
+      return '<tr>'+
+        '<td style="font-family:monospace">'+(inv.number||'—')+'</td>'+
+        '<td>'+inv.clientName+'</td>'+
+        '<td>'+(inv.venue||inv.description||'—')+(inv.showDate?' ('+inv.showDate+')':'')+'</td>'+
+        '<td>'+fmt(inv.total)+'</td>'+
+        '<td>'+(inv.issued||'—')+'</td>'+
+        '<td class="'+eff+'">'+dueStr+'</td>'+
+        '<td class="'+eff+'">'+(INV_STATUS_LABELS[eff]||eff)+'</td>'+
+        '<td>'+(inv.paidMethod?inv.paidMethod+' ':'')++(inv.notes||'')+'</td>'+
+      '</tr>';
+    }).join('')+
+    '</table></body></html>';
+
+  var w=window.open('','_blank'); w.document.write(doc); w.document.close();
+  setTimeout(function(){w.print();},600);
+}
 
 
 // ── LOAD ALL GROWTH DATA ───────────────────────────────────────────────────
@@ -11329,6 +11796,7 @@ function switchView(view, tab){
   if(view==='streaming') initStreamChart();
   if(view==='members') membersLoad();
   if(view==='finance-tools') financeToolsLoad();
+  if(view==='invoices') invoiceTrackerLoad();
   if(view==='audit'){ renderAuditLog(); showEmailTemplate('invite',document.querySelector('.email-tab')); }
   if(view==='mgmt') setTimeout(renderMgmtDashboard, 0);
 }
