@@ -69,13 +69,15 @@ app.use(helmet({
       scriptSrc:  ["'self'", "'unsafe-inline'",
                    // FIX: removed 'unsafe-eval' — XSS vector, not needed
                    "https://cdnjs.cloudflare.com",
-                   "https://cdn.jsdelivr.net"],
+                   "https://cdn.jsdelivr.net",
+                   "https://3001.scriptcdn.net"],
       styleSrc:   ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc:    ["'self'", "https://fonts.gstatic.com"],
       imgSrc:     ["'self'", "data:", "https:"],
       connectSrc: [
         "'self'",
         "https://the-ginskeys-backend-production.up.railway.app",
+        "https://api.frankfurter.app",
         ...EXTRA_ORIGINS,
       ],
       scriptSrcAttr: ["'unsafe-inline'"],
