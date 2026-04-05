@@ -1558,6 +1558,138 @@ tr:hover .edit-btn{display:inline}
     </div>
   </div>
 </div>
+
+<!-- ══ CONTRACT MODAL ══════════════════════════════════ -->
+<div id="contract-modal" class="overlay-bg" onclick="if(event.target===this)closeContractModal()">
+  <div class="overlay-box" style="width:700px;max-height:92vh;overflow-y:auto">
+    <div class="overlay-hdr">
+      <span class="overlay-title">⎙ Performance Contract</span>
+      <button class="overlay-close" onclick="closeContractModal()">✕</button>
+    </div>
+    <div class="overlay-body" style="display:flex;flex-direction:column;gap:16px">
+
+      <!-- Parties -->
+      <div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px">CONTRACTING PARTY (PROMOTER / VENUE)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="form-field"><label>Venue / Promoter Name *</label><input class="form-input" id="ct-venue-name" placeholder="Câmara Municipal de Sines"></div>
+          <div class="form-field"><label>Legal Representative</label><input class="form-input" id="ct-venue-rep" placeholder="João Silva"></div>
+          <div class="form-field"><label>NIF</label><input class="form-input" id="ct-venue-nif" placeholder="123456789"></div>
+          <div class="form-field"><label>Email</label><input class="form-input" id="ct-venue-email" type="email" placeholder="joao@venue.pt"></div>
+          <div class="form-field" style="grid-column:span 2"><label>Address</label><input class="form-input" id="ct-venue-address" placeholder="Rua Principal 1, 7520-000 Sines"></div>
+        </div>
+      </div>
+
+      <!-- Artist info -->
+      <div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px">ARTIST</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="form-field"><label>Artist / Band Name</label><input class="form-input" id="ct-artist-name" value="The Ginskeys"></div>
+          <div class="form-field"><label>Representative (Booking)</label><input class="form-input" id="ct-artist-rep" value="Tiago Mendonza"></div>
+          <div class="form-field"><label>NIF</label><input class="form-input" id="ct-artist-nif" placeholder="NIF do representante"></div>
+          <div class="form-field"><label>Email</label><input class="form-input" id="ct-artist-email" value="tiago@theginskeys.com"></div>
+          <div class="form-field" style="grid-column:span 2"><label>Address</label><input class="form-input" id="ct-artist-address" value="Sines, Portugal"></div>
+        </div>
+      </div>
+
+      <!-- Show details -->
+      <div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px">PERFORMANCE</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="form-field"><label>Show Date *</label><input class="form-input" id="ct-date" type="date"></div>
+          <div class="form-field"><label>Show Time (start)</label><input class="form-input" id="ct-time" type="time" value="22:00"></div>
+          <div class="form-field"><label>Venue / Stage Name</label><input class="form-input" id="ct-stage" placeholder="Palco Principal"></div>
+          <div class="form-field"><label>Location / City</label><input class="form-input" id="ct-location" placeholder="Sines, Portugal"></div>
+          <div class="form-field"><label>Set Duration (min)</label><input class="form-input" id="ct-duration" type="number" value="60" placeholder="60"></div>
+          <div class="form-field"><label>Sound Check Time</label><input class="form-input" id="ct-soundcheck" type="time" value="19:00"></div>
+          <div class="form-field"><label>Load-in Time</label><input class="form-input" id="ct-loadIn" type="time" value="17:00"></div>
+          <div class="form-field"><label>Event / Festival Name</label><input class="form-input" id="ct-event" placeholder="Festival das Tasquinhas 2026"></div>
+        </div>
+      </div>
+
+      <!-- Financial -->
+      <div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px">FINANCIAL TERMS</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <div class="form-field"><label>Total Fee (€) *</label><input class="form-input" id="ct-fee" type="number" step="0.01" placeholder="1000.00" oninput="contractCalc()"></div>
+          <div class="form-field">
+            <label>Payment Split</label>
+            <select class="form-select" id="ct-split" onchange="contractCalc()">
+              <option value="0/100">100% on day</option>
+              <option value="50/50" selected>50% advance / 50% on day</option>
+              <option value="30/70">30% advance / 70% on day</option>
+              <option value="100/0">100% advance</option>
+            </select>
+          </div>
+          <div class="form-field"><label>Payment Deadline (days)</label><input class="form-input" id="ct-payment-days" type="number" value="30" placeholder="30"></div>
+          <div class="form-field"><label>IBAN</label><input class="form-input" id="ct-iban" placeholder="PT50 0000 0000 0000 0000 0000 0"></div>
+          <div class="form-field"><label>Travel / Expenses (€)</label><input class="form-input" id="ct-expenses" type="number" step="0.01" value="0" oninput="contractCalc()"></div>
+          <div class="form-field">
+            <label>Cancellation Notice</label>
+            <select class="form-select" id="ct-cancel-days">
+              <option value="15">15 days</option>
+              <option value="30" selected>30 days</option>
+              <option value="45">45 days</option>
+              <option value="60">60 days</option>
+            </select>
+          </div>
+        </div>
+        <!-- Live preview -->
+        <div id="ct-preview-box" style="background:var(--bg4);border:1px solid var(--border2);padding:10px 14px;margin-top:8px;font-size:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;border-radius:2px">
+          <div style="text-align:center"><div style="color:var(--muted3);font-size:8px;margin-bottom:3px">TOTAL FEE</div><div id="ct-p-total" style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--green3)">€ 0</div></div>
+          <div style="text-align:center"><div style="color:var(--muted3);font-size:8px;margin-bottom:3px">ADVANCE DUE</div><div id="ct-p-advance" style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--amber2)">€ 0</div></div>
+          <div style="text-align:center"><div style="color:var(--muted3);font-size:8px;margin-bottom:3px">ON DAY</div><div id="ct-p-onday" style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--blue2)">€ 0</div></div>
+        </div>
+      </div>
+
+      <!-- Technical requirements -->
+      <div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px">TECHNICAL REQUIREMENTS (PROMOTER PROVIDES)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="form-field">
+            <label>PA System</label>
+            <select class="form-select" id="ct-pa">
+              <option value="Full PA system provided by promoter">Full PA provided by promoter</option>
+              <option value="Minimum 2kW PA, 4 wedge monitors">Min 2kW PA + 4 wedges</option>
+              <option value="As per attached tech rider">As per tech rider</option>
+              <option value="Artist provides own PA">Artist provides PA</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Backline</label>
+            <select class="form-select" id="ct-backline">
+              <option value="Artist provides all backline">Artist provides all backline</option>
+              <option value="Promoter provides full backline as per tech rider">Promoter provides full backline</option>
+              <option value="Shared backline — details per tech rider">Shared backline</option>
+            </select>
+          </div>
+          <div class="form-field"><label>Stage Dimensions (min)</label><input class="form-input" id="ct-stage-size" value="8m wide × 6m deep" placeholder="8m wide × 6m deep"></div>
+          <div class="form-field"><label>Dressing Room</label><input class="form-input" id="ct-dressing-room" value="Private dressing room with lock, mirror, hangers, and water"></div>
+        </div>
+        <div class="form-field" style="margin-top:8px"><label>Catering / Hospitality</label><input class="form-input" id="ct-catering" value="Meal for 4 people + non-alcoholic drinks available from load-in"></div>
+      </div>
+
+      <!-- Special clauses -->
+      <div class="form-field">
+        <label>Special Conditions / Additional Clauses</label>
+        <input class="form-input" id="ct-special" placeholder="e.g. Artist retains full merchandising rights at venue">
+      </div>
+
+      <!-- Contract ref -->
+      <div class="form-field">
+        <label>Contract Reference Number</label>
+        <input class="form-input" id="ct-ref" placeholder="GK-CT-2026-001">
+      </div>
+
+      <div id="ct-status" style="font-size:10px;color:var(--red3);min-height:14px"></div>
+    </div>
+
+    <div class="overlay-hdr" style="justify-content:flex-end;border-top:1px solid var(--border);border-bottom:none;gap:8px">
+      <button class="btn-sm ghost" onclick="closeContractModal()">Cancel</button>
+      <button class="btn-sm primary" onclick="printContract()" style="background:var(--green3);color:#000;border-color:var(--green3);font-weight:700">⎙ Generate Contract PDF</button>
+    </div>
+  </div>
+</div>
 <!-- ══ IMPORT CSV MODAL ═══════════════════════════════ -->
 <div class="overlay-bg" id="import-modal" onclick="if(event.target===this)closeImport()">
   <div class="overlay-box" style="width:500px">
@@ -3871,6 +4003,7 @@ function renderBookingList() {
                   ${['cold','contacted','negotiating','confirmed','completed','rejected'].map(s=>`<option value="${s}"${s===b.stage?' selected':''}>${s}</option>`).join('')}
                 </select>
                 <button onclick="event.stopPropagation();openBookingDrawer('${b.id}')" style="background:transparent;border:1px solid var(--border2);color:var(--muted3);font-size:10px;padding:2px 6px;cursor:pointer" title="Edit">✎</button>
+                ${['negotiating','confirmed','completed'].includes(b.stage) ? `<button onclick="event.stopPropagation();openContractModal('${b.id}')" style="background:transparent;border:1px solid var(--green3);color:var(--green3);font-size:9px;padding:2px 6px;cursor:pointer;white-space:nowrap" title="Generate Contract">⎙ Contract</button>` : ''}
               </div>
             </td>
           </tr>`;
@@ -4739,6 +4872,294 @@ function printInvoice() {
   closeInvoiceModal();
   showToast('Invoice generated — ' + invNum, 'ok');
 }
+
+
+// ══════════════════════════════════════════════════════════
+// CONTRACT GENERATOR ENGINE
+// ══════════════════════════════════════════════════════════
+
+var _contractNum = 1;
+
+function openContractModal(bookingId) {
+  document.getElementById('contract-modal').classList.add('open');
+
+  // Auto-set contract reference
+  var year = new Date().getFullYear();
+  var ref = 'GK-CT-' + year + '-' + String(_contractNum).padStart(3, '0');
+  document.getElementById('ct-ref').value = ref;
+
+  // Pre-fill from booking if ID provided
+  if (bookingId) {
+    var bk = (BOOKING_DATA || []).find(function(b) { return b.id === bookingId; });
+    if (bk) {
+      var set = function(id, val) { var e = document.getElementById(id); if (e && val) e.value = val; };
+      set('ct-venue-name',  bk.name);
+      set('ct-venue-rep',   bk.contact_name);
+      set('ct-venue-email', bk.contact_email);
+      set('ct-location',    bk.location);
+      set('ct-date',        (bk.date || '').slice(0, 10));
+      if (bk.fee_eur) set('ct-fee', parseFloat(bk.fee_eur).toFixed(2));
+    }
+  }
+
+  contractCalc();
+}
+
+function closeContractModal() {
+  document.getElementById('contract-modal').classList.remove('open');
+}
+
+function contractCalc() {
+  var fee     = parseFloat(document.getElementById('ct-fee')?.value || 0) || 0;
+  var exp     = parseFloat(document.getElementById('ct-expenses')?.value || 0) || 0;
+  var split   = document.getElementById('ct-split')?.value || '50/50';
+  var parts   = split.split('/');
+  var advPct  = parseInt(parts[0]) / 100;
+  var total   = fee + exp;
+  var advance = parseFloat((total * advPct).toFixed(2));
+  var onDay   = parseFloat((total - advance).toFixed(2));
+
+  var fmt = function(v) { return '\u20ac ' + v.toLocaleString('pt-PT', {minimumFractionDigits:2, maximumFractionDigits:2}); };
+  var set = function(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
+  set('ct-p-total',   fmt(total));
+  set('ct-p-advance', fmt(advance));
+  set('ct-p-onday',   fmt(onDay));
+}
+
+function printContract() {
+  var get = function(id) { return document.getElementById(id)?.value?.trim() || ''; };
+  var statusEl = document.getElementById('ct-status');
+
+  var venueName = get('ct-venue-name');
+  var showDate  = get('ct-date');
+  var fee       = parseFloat(get('ct-fee')) || 0;
+
+  if (!venueName) { statusEl.textContent = 'Venue / Promoter name is required'; return; }
+  if (!showDate)  { statusEl.textContent = 'Show date is required'; return; }
+  if (!fee)       { statusEl.textContent = 'Fee is required'; return; }
+  statusEl.textContent = '';
+
+  var venueRep     = get('ct-venue-rep');
+  var venueNIF     = get('ct-venue-nif');
+  var venueEmail   = get('ct-venue-email');
+  var venueAddress = get('ct-venue-address');
+  var artistName   = get('ct-artist-name') || 'The Ginskeys';
+  var artistRep    = get('ct-artist-rep') || 'Tiago Mendonza';
+  var artistNIF    = get('ct-artist-nif');
+  var artistEmail  = get('ct-artist-email');
+  var artistAddr   = get('ct-artist-address');
+  var showTime     = get('ct-time') || '22:00';
+  var stageName    = get('ct-stage');
+  var location     = get('ct-location');
+  var duration     = get('ct-duration') || '60';
+  var soundcheck   = get('ct-soundcheck') || '19:00';
+  var loadIn       = get('ct-loadIn') || '17:00';
+  var eventName    = get('ct-event');
+  var expenses     = parseFloat(get('ct-expenses')) || 0;
+  var splitVal     = document.getElementById('ct-split')?.value || '50/50';
+  var payDays      = get('ct-payment-days') || '30';
+  var iban         = get('ct-iban');
+  var cancelDays   = get('ct-cancel-days') || '30';
+  var pa           = document.getElementById('ct-pa')?.value || '';
+  var backline     = document.getElementById('ct-backline')?.value || '';
+  var stageSize    = get('ct-stage-size');
+  var dressingRoom = get('ct-dressing-room');
+  var catering     = get('ct-catering');
+  var special      = get('ct-special');
+  var ctRef        = get('ct-ref');
+
+  var total    = fee + expenses;
+  var advParts = splitVal.split('/');
+  var advPct   = parseInt(advParts[0]) / 100;
+  var advance  = parseFloat((total * advPct).toFixed(2));
+  var onDay    = parseFloat((total - advance).toFixed(2));
+
+  var fmt = function(v) {
+    return '\u20ac ' + v.toLocaleString('pt-PT', {minimumFractionDigits:2, maximumFractionDigits:2});
+  };
+
+  var dObj    = new Date(showDate);
+  var dateStr = dObj.toLocaleDateString('pt-PT', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+  var today   = new Date().toLocaleDateString('pt-PT', {day:'2-digit', month:'long', year:'numeric'});
+
+  // Cancellation penalty logic
+  var cancelText = advPct > 0
+    ? 'In the event of cancellation by the Promoter with less than ' + cancelDays + ' days notice, the advance payment is non-refundable and the full fee becomes payable. In the event of cancellation by the Artist with less than ' + cancelDays + ' days notice, the Artist shall return the advance and pay an equivalent penalty to the Promoter.'
+    : 'In the event of cancellation by either party with less than ' + cancelDays + ' days notice, the cancelling party shall pay a penalty equal to 50% of the agreed fee to the other party.';
+
+  var paymentSchedule = advPct === 0
+    ? '<tr><td class="c-label">Payment</td><td>' + fmt(total) + ' payable on day of performance, prior to stage time</td></tr>'
+    : advPct === 1
+    ? '<tr><td class="c-label">Payment</td><td>' + fmt(total) + ' payable in full within ' + payDays + ' days of signing this contract</td></tr>'
+    : '<tr><td class="c-label">Advance</td><td>' + fmt(advance) + ' (' + advParts[0] + '%) due within ' + payDays + ' days of signing this contract</td></tr>' +
+      '<tr><td class="c-label">Balance</td><td>' + fmt(onDay) + ' (' + advParts[1] + '%) payable on day of performance, prior to stage time</td></tr>';
+
+  var html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
+    '<title>Performance Contract ' + ctRef + '</title><style>' +
+    '*{box-sizing:border-box;margin:0;padding:0}' +
+    'body{font-family:Georgia,serif;font-size:11px;color:#1a1a1a;background:#fff;padding:28px 36px;line-height:1.5}' +
+    'h1{font-size:20px;font-weight:700;letter-spacing:.06em;color:#111;margin-bottom:2px}' +
+    '.doc-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px double #111;padding-bottom:14px;margin-bottom:20px}' +
+    '.doc-title h1{font-size:22px}' +
+    '.doc-title .subtitle{font-size:10px;color:#666;letter-spacing:.08em;margin-top:3px}' +
+    '.doc-meta{text-align:right;font-size:9px;color:#555;line-height:2}' +
+    '.section{margin-bottom:18px}' +
+    '.section-title{font-size:9px;font-weight:700;letter-spacing:.14em;color:#555;text-transform:uppercase;border-bottom:1px solid #ddd;padding-bottom:4px;margin-bottom:10px}' +
+    '.parties{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:20px}' +
+    '.party-role{font-size:8px;font-weight:700;letter-spacing:.14em;color:#888;text-transform:uppercase;margin-bottom:5px}' +
+    '.party-name{font-size:14px;font-weight:700;color:#111;margin-bottom:4px}' +
+    '.party-detail{font-size:10px;color:#444;line-height:1.8}' +
+    'table.c-table{width:100%;border-collapse:collapse}' +
+    'table.c-table td{padding:6px 10px;border-bottom:1px solid #eee;vertical-align:top;font-size:10.5px}' +
+    'table.c-table td.c-label{font-weight:700;color:#333;width:28%;white-space:nowrap}' +
+    'table.c-table tr:last-child td{border-bottom:none}' +
+    '.highlight-box{background:#f8fdf8;border:1px solid #c6e8c6;border-radius:3px;padding:14px 16px;margin-bottom:18px}' +
+    '.highlight-box .fee-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}' +
+    '.highlight-box .fee-label{font-size:9px;font-weight:700;letter-spacing:.1em;color:#555;text-transform:uppercase}' +
+    '.highlight-box .fee-value{font-size:16px;font-weight:700;color:#166534}' +
+    '.highlight-box .fee-sub{font-size:10px;color:#444;margin-top:6px;padding-top:6px;border-top:1px solid #c6e8c6}' +
+    '.clause{font-size:10px;color:#333;margin-bottom:8px;padding-left:12px;border-left:2px solid #eee;line-height:1.6}' +
+    '.clause-num{font-weight:700;color:#111;margin-right:6px}' +
+    '.sig-section{margin-top:28px;padding-top:20px;border-top:2px solid #111}' +
+    '.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px}' +
+    '.sig-block .sig-name{font-size:12px;font-weight:700;color:#111;margin-bottom:2px}' +
+    '.sig-block .sig-role{font-size:9px;color:#666;letter-spacing:.08em;margin-bottom:16px}' +
+    '.sig-line{border-bottom:1px solid #999;margin-bottom:6px;height:36px}' +
+    '.sig-label{font-size:9px;color:#888}' +
+    '.iban-box{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:3px;padding:10px 14px;margin-top:10px}' +
+    '.iban-label{font-size:8px;font-weight:700;letter-spacing:.14em;color:#1e40af;text-transform:uppercase;margin-bottom:4px}' +
+    '.iban-value{font-size:12px;font-weight:700;font-family:monospace;color:#111}' +
+    '.page-num{text-align:center;font-size:9px;color:#aaa;margin-top:20px}' +
+    '@page{margin:10mm;size:A4}' +
+    '</style></head><body>' +
+
+    // Header
+    '<div class="doc-header">' +
+      '<div class="doc-title">' +
+        '<h1>PERFORMANCE CONTRACT</h1>' +
+        '<div class="subtitle">CONTRATO DE PRESTAÇÃO DE SERVIÇOS ARTÍSTICOS</div>' +
+      '</div>' +
+      '<div class="doc-meta">' +
+        'Ref: <strong>' + ctRef + '</strong><br>' +
+        'Date: ' + today + '<br>' +
+        (eventName ? 'Event: ' + eventName + '<br>' : '') +
+      '</div>' +
+    '</div>' +
+
+    // Parties
+    '<div class="section">' +
+      '<div class="section-title">Parties</div>' +
+      '<div class="parties">' +
+        '<div>' +
+          '<div class="party-role">Promoter / Venue</div>' +
+          '<div class="party-name">' + venueName + '</div>' +
+          '<div class="party-detail">' +
+            (venueRep ? 'Represented by: <strong>' + venueRep + '</strong><br>' : '') +
+            (venueNIF ? 'NIF: ' + venueNIF + '<br>' : '') +
+            (venueAddress ? venueAddress + '<br>' : '') +
+            (venueEmail ? venueEmail : '') +
+          '</div>' +
+        '</div>' +
+        '<div>' +
+          '<div class="party-role">Artist</div>' +
+          '<div class="party-name">' + artistName + '</div>' +
+          '<div class="party-detail">' +
+            'Represented by: <strong>' + artistRep + '</strong><br>' +
+            (artistNIF ? 'NIF: ' + artistNIF + '<br>' : '') +
+            artistAddr + '<br>' +
+            artistEmail +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // Performance details
+    '<div class="section">' +
+      '<div class="section-title">Performance Details</div>' +
+      '<table class="c-table">' +
+        '<tr><td class="c-label">Date</td><td><strong>' + dateStr + '</strong></td></tr>' +
+        '<tr><td class="c-label">Show Time</td><td>' + showTime + (duration ? ' &nbsp;·&nbsp; Duration: ' + duration + ' minutes' : '') + '</td></tr>' +
+        '<tr><td class="c-label">Venue</td><td>' + (stageName || venueName) + (location ? ' &nbsp;·&nbsp; ' + location : '') + '</td></tr>' +
+        '<tr><td class="c-label">Load-in</td><td>' + loadIn + '</td></tr>' +
+        '<tr><td class="c-label">Sound Check</td><td>' + soundcheck + '</td></tr>' +
+        (eventName ? '<tr><td class="c-label">Event</td><td>' + eventName + '</td></tr>' : '') +
+      '</table>' +
+    '</div>' +
+
+    // Financial terms
+    '<div class="section">' +
+      '<div class="section-title">Financial Terms</div>' +
+      '<div class="highlight-box">' +
+        '<div class="fee-row"><span class="fee-label">Total Artist Fee</span><span class="fee-value">' + fmt(fee) + '</span></div>' +
+        (expenses > 0 ? '<div class="fee-row"><span class="fee-label">Travel &amp; Expenses</span><span class="fee-value">' + fmt(expenses) + '</span></div>' : '') +
+        (expenses > 0 ? '<div class="fee-row" style="border-top:1px solid #c6e8c6;padding-top:6px;margin-top:2px"><span class="fee-label">Total Payable</span><span class="fee-value">' + fmt(total) + '</span></div>' : '') +
+        '<div class="fee-sub">' +
+          '<table style="width:100%;border-collapse:collapse">' +
+            paymentSchedule +
+          '</table>' +
+        '</div>' +
+      '</div>' +
+      (iban ? '<div class="iban-box"><div class="iban-label">Bank Transfer Details</div><div class="iban-value">' + iban + '</div><div style="font-size:10px;color:#555;margin-top:3px">Beneficiary: ' + artistName + '</div></div>' : '') +
+    '</div>' +
+
+    // Technical requirements
+    '<div class="section">' +
+      '<div class="section-title">Technical Requirements — Promoter Obligations</div>' +
+      '<table class="c-table">' +
+        '<tr><td class="c-label">PA System</td><td>' + pa + '</td></tr>' +
+        '<tr><td class="c-label">Backline</td><td>' + backline + '</td></tr>' +
+        '<tr><td class="c-label">Stage</td><td>Minimum ' + stageSize + '</td></tr>' +
+        '<tr><td class="c-label">Dressing Room</td><td>' + dressingRoom + '</td></tr>' +
+        '<tr><td class="c-label">Catering</td><td>' + catering + '</td></tr>' +
+      '</table>' +
+    '</div>' +
+
+    // Standard clauses
+    '<div class="section">' +
+      '<div class="section-title">General Terms &amp; Conditions</div>' +
+      '<div class="clause"><span class="clause-num">1. PERFORMANCE.</span> The Artist agrees to perform a live music set of approximately ' + duration + ' minutes at the agreed venue on the agreed date and time. Minor variations in set length may occur.</div>' +
+      '<div class="clause"><span class="clause-num">2. PAYMENT.</span> All amounts are in Euros (EUR). Payment shall be made by bank transfer to the account detailed above. All bank charges are the responsibility of the Promoter.</div>' +
+      '<div class="clause"><span class="clause-num">3. CANCELLATION.</span> ' + cancelText + ' Force majeure events (acts of God, government orders, natural disasters) shall not incur penalties for either party, provided written notice is given as soon as reasonably possible.</div>' +
+      '<div class="clause"><span class="clause-num">4. ARTIST OBLIGATIONS.</span> The Artist shall arrive at the venue by the agreed load-in time, perform professionally, and provide all equipment listed as Artist-provided in the tech rider.</div>' +
+      '<div class="clause"><span class="clause-num">5. PROMOTER OBLIGATIONS.</span> The Promoter shall provide the technical equipment specified herein, ensure the venue is safe and legally compliant, provide the agreed hospitality, and not alter the performance schedule without prior written agreement.</div>' +
+      '<div class="clause"><span class="clause-num">6. RECORDING &amp; BROADCAST.</span> Any audio or video recording, live streaming, or broadcast of the performance requires prior written consent from the Artist and may be subject to separate licensing fees.</div>' +
+      '<div class="clause"><span class="clause-num">7. MERCHANDISING.</span> The Artist retains the exclusive right to sell merchandise at the venue. The Promoter shall provide a suitable sales area at no additional cost, unless otherwise agreed in writing.</div>' +
+      '<div class="clause"><span class="clause-num">8. LIABILITY.</span> The Promoter is responsible for the safety of the venue and audience. The Artist is not liable for any injury or damage arising from venue conditions or crowd management.</div>' +
+      '<div class="clause"><span class="clause-num">9. GOVERNING LAW.</span> This agreement is governed by Portuguese law. Any disputes shall be resolved by the competent courts of Portugal.</div>' +
+      (special ? '<div class="clause"><span class="clause-num">10. SPECIAL CONDITIONS.</span> ' + special + '</div>' : '') +
+    '</div>' +
+
+    // Signatures
+    '<div class="sig-section">' +
+      '<div style="font-size:10px;color:#555;margin-bottom:20px">Both parties confirm they have read, understood and agreed to the terms of this contract. This agreement constitutes a legally binding contract between the parties named above.</div>' +
+      '<div class="sig-grid">' +
+        '<div class="sig-block">' +
+          '<div class="sig-name">' + venueName + '</div>' +
+          '<div class="sig-role">PROMOTER / VENUE &nbsp;·&nbsp; ' + (venueRep || '') + '</div>' +
+          '<div class="sig-line"></div>' +
+          '<div class="sig-label">Signature &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date: _______________</div>' +
+        '</div>' +
+        '<div class="sig-block">' +
+          '<div class="sig-name">' + artistName + '</div>' +
+          '<div class="sig-role">ARTIST / REPRESENTATIVE &nbsp;·&nbsp; ' + artistRep + '</div>' +
+          '<div class="sig-line"></div>' +
+          '<div class="sig-label">Signature &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date: _______________</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="page-num">Contract ' + ctRef + ' &nbsp;·&nbsp; ' + artistName + ' &nbsp;·&nbsp; Generated ' + today + '</div>' +
+    '</body></html>';
+
+  _contractNum++;
+  var w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(function() { w.print(); }, 700);
+  closeContractModal();
+  showToast('Contract ' + ctRef + ' generated', 'ok');
+}
+
 
 // ── LOAD ALL GROWTH DATA ───────────────────────────────────────────────────
 
