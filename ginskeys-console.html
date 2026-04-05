@@ -6733,7 +6733,7 @@ function setlistAnalyticsRender() {
       return '<div style="display:grid;grid-template-columns:18px 1fr 80px 32px;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border1)">'+
         '<span style="font-size:9px;color:var(--muted3);text-align:right">'+rank+'.</span>'+
         '<div>'+
-          '<div style="font-size:10px;color:var(--text);font-weight:'++(rank<=3?'700':'400')+'">'+entry[0]+'</div>'+
+          '<div style="font-size:10px;color:var(--text);font-weight:'+(rank<=3?'700':'400')+'">'+entry[0]+'</div>'+
           '<div style="background:var(--bg4);border-radius:1px;height:3px;margin-top:3px;overflow:hidden">'+
             '<div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:1px"></div>'+
           '</div>'+
@@ -12097,7 +12097,7 @@ function setRiderStatus(msg, color) {
 
 function populateRiderShowPicker() {
   var picker = document.getElementById('rider-show-picker');
-  if (!picker || !PROD_SHOWS) return;
+  if (!picker || typeof PROD_SHOWS === 'undefined' || !PROD_SHOWS) return;
   var current = _riderCurrentShowId;
   picker.innerHTML = '<option value="">' + t('rider_global_template') + '</option>';
   (PROD_SHOWS || [])
