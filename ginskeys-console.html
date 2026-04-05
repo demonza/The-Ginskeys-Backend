@@ -1690,6 +1690,131 @@ tr:hover .edit-btn{display:inline}
     </div>
   </div>
 </div>
+
+<!-- ══ REHEARSAL MODAL ════════════════════════════════ -->
+<div id="rehearsal-modal" class="overlay-bg" onclick="if(event.target===this)closeRehearsalModal()">
+  <div class="overlay-box" style="width:500px">
+    <div class="overlay-hdr">
+      <span class="overlay-title">● Log Rehearsal</span>
+      <button class="overlay-close" onclick="closeRehearsalModal()">✕</button>
+    </div>
+    <div class="overlay-body" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-field"><label>Date *</label><input class="form-input" id="reh-date" type="date"></div>
+        <div class="form-field"><label>Location</label><input class="form-input" id="reh-location" placeholder="Sala de ensaio, Sines"></div>
+        <div class="form-field" style="grid-column:span 2"><label>Focus / Objective</label><input class="form-input" id="reh-focus" placeholder="New songs, setlist run, pre-show prep…"></div>
+        <div class="form-field"><label>Duration (h)</label><input class="form-input" id="reh-duration" type="number" step="0.5" min="0.5" value="2" placeholder="2"></div>
+        <div class="form-field"><label>Next rehearsal date</label><input class="form-input" id="reh-next" type="date"></div>
+      </div>
+      <div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:8px">ATTENDANCE</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:10px">
+            <input type="checkbox" id="reh-att-fabio" checked> <span style="color:var(--accent)">Fábio</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:10px">
+            <input type="checkbox" id="reh-att-pedro" checked> <span style="color:var(--blue2)">Pedro</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:10px">
+            <input type="checkbox" id="reh-att-manuel" checked> <span style="color:var(--green3)">Manuel</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:10px">
+            <input type="checkbox" id="reh-att-tiago" checked> <span style="color:var(--purple2)">Tiago</span>
+          </label>
+        </div>
+      </div>
+      <div class="form-field"><label>Notes</label>
+        <textarea class="form-input" id="reh-notes" rows="3" style="resize:vertical" placeholder="What was covered, issues, songs worked on…"></textarea>
+      </div>
+    </div>
+    <div class="overlay-hdr" style="justify-content:flex-end;border-top:1px solid var(--border);border-bottom:none;gap:8px">
+      <button class="btn-sm ghost" onclick="closeRehearsalModal()">Cancel</button>
+      <button class="btn-sm primary" onclick="saveRehearsal()">Save Rehearsal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ VOTE / DECISION MODAL ══════════════════════════ -->
+<div id="vote-modal" class="overlay-bg" onclick="if(event.target===this)closeVoteModal()">
+  <div class="overlay-box" style="width:520px">
+    <div class="overlay-hdr">
+      <span class="overlay-title">◈ Log Band Decision</span>
+      <button class="overlay-close" onclick="closeVoteModal()">✕</button>
+    </div>
+    <div class="overlay-body" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-field"><label>Date *</label><input class="form-input" id="vote-date" type="date"></div>
+        <div class="form-field">
+          <label>Category</label>
+          <select class="form-select" id="vote-category">
+            <option value="financial">Financial</option>
+            <option value="creative">Creative / Artistic</option>
+            <option value="booking">Booking / Shows</option>
+            <option value="lineup">Lineup / Personnel</option>
+            <option value="equipment">Equipment</option>
+            <option value="strategy">Strategy / Direction</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-field" style="grid-column:span 2">
+          <label>Decision / Topic *</label>
+          <input class="form-input" id="vote-topic" placeholder="e.g. Record EP in July at Studio X for €2,000">
+        </div>
+      </div>
+      <div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:8px">VOTES</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+          <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+            <span style="font-size:9px;color:var(--accent);font-weight:700">Fábio</span>
+            <select id="vote-v-fabio" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:3px 6px;width:100%" onchange="voteUpdate()">
+              <option value="yes">✓ Yes</option>
+              <option value="no">✗ No</option>
+              <option value="abstain">— Abstain</option>
+              <option value="absent">Absent</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+            <span style="font-size:9px;color:var(--blue2);font-weight:700">Pedro</span>
+            <select id="vote-v-pedro" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:3px 6px;width:100%" onchange="voteUpdate()">
+              <option value="yes">✓ Yes</option>
+              <option value="no">✗ No</option>
+              <option value="abstain">— Abstain</option>
+              <option value="absent">Absent</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+            <span style="font-size:9px;color:var(--green3);font-weight:700">Manuel</span>
+            <select id="vote-v-manuel" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:3px 6px;width:100%" onchange="voteUpdate()">
+              <option value="yes">✓ Yes</option>
+              <option value="no">✗ No</option>
+              <option value="abstain">— Abstain</option>
+              <option value="absent">Absent</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+            <span style="font-size:9px;color:var(--purple2);font-weight:700">Tiago</span>
+            <select id="vote-v-tiago" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:3px 6px;width:100%" onchange="voteUpdate()">
+              <option value="yes">✓ Yes</option>
+              <option value="no">✗ No</option>
+              <option value="abstain">— Abstain</option>
+              <option value="absent">Absent</option>
+            </select>
+          </div>
+        </div>
+        <div id="vote-result-preview" style="margin-top:10px;padding:8px 12px;background:var(--bg4);border-radius:2px;font-size:10px;color:var(--muted2)">
+          Result: —
+        </div>
+      </div>
+      <div class="form-field"><label>Notes / Context</label>
+        <textarea class="form-input" id="vote-notes" rows="2" style="resize:vertical" placeholder="Background, alternatives considered, implementation notes…"></textarea>
+      </div>
+    </div>
+    <div class="overlay-hdr" style="justify-content:flex-end;border-top:1px solid var(--border);border-bottom:none;gap:8px">
+      <button class="btn-sm ghost" onclick="closeVoteModal()">Cancel</button>
+      <button class="btn-sm primary" onclick="saveVote()">Save Decision</button>
+    </div>
+  </div>
+</div>
 <!-- ══ IMPORT CSV MODAL ═══════════════════════════════ -->
 <div class="overlay-bg" id="import-modal" onclick="if(event.target===this)closeImport()">
   <div class="overlay-box" style="width:500px">
@@ -2028,6 +2153,7 @@ tr:hover .edit-btn{display:inline}
     <div class="tb-tab" data-view="dashboard" onclick="switchView('dashboard',this)">$ Financials</div>
     <div class="tb-tab" data-view="ledger" onclick="switchView('ledger',this)">≡ Ledger</div>
     <div class="tb-tab" data-view="splits" onclick="switchView('splits',this)" id="tab-splits">÷ Splits</div>
+    <div class="tb-tab" data-view="members" onclick="switchView('members',this)" id="tab-members">◈ Members</div>
     <div class="tb-nav-sep"></div>
     <!-- LIVE -->
     <div class="tb-tab" data-view="booking" onclick="switchView('booking',this)" id="tab-booking">◎ Booking <span class="tab-badge" id="booking-badge" style="display:none">0</span></div>
@@ -3687,6 +3813,248 @@ tr:hover .edit-btn{display:inline}
      AI BOOKING AGENT VIEW
 ════════════════════════════════════════════════════════ -->
 
+<!-- ══ MEMBERS VIEW ════════════════════════════════════ -->
+<div id="view-members" class="view new-view">
+  <div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:10px;min-height:0;overflow-y:auto">
+
+    <!-- Banner -->
+    <div style="flex-shrink:0;background:linear-gradient(90deg,rgba(170,0,255,.08) 0%,transparent 100%);border-left:3px solid var(--purple2);padding:12px 16px;display:grid;grid-template-columns:1fr repeat(4,auto);gap:16px;align-items:center">
+      <div>
+        <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--purple2);letter-spacing:.08em">BAND MEMBERS</div>
+        <div style="font-size:9px;color:var(--muted2);margin-top:2px">Fábio · Pedro · Manuel · Tiago</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green3)" id="mem-banner-rehearsals">0</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">REHEARSALS</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--amber2)" id="mem-banner-decisions">0</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">DECISIONS</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--blue2)" id="mem-banner-attendance">—</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">AVG ATTENDANCE</div>
+      </div>
+      <div style="padding:0 12px;border-left:1px solid var(--border2)">
+        <button class="btn-sm" onclick="membersExportPDF()" style="color:var(--purple2);border-color:var(--purple2);white-space:nowrap">⎙ Export</button>
+      </div>
+    </div>
+
+    <!-- Member cards -->
+    <div style="flex-shrink:0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <div class="panel" style="padding:14px;border-top:3px solid var(--accent)">
+        <div style="font-size:9px;font-weight:700;color:var(--accent);letter-spacing:.1em;margin-bottom:6px">FÁBIO</div>
+        <div style="font-size:10px;color:var(--muted2);line-height:2">
+          <div>Lead Guitar + Lead Vocals</div>
+          <div style="color:var(--muted3)">Stage Right</div>
+          <div id="mem-card-attendance-fabio" style="color:var(--green3);margin-top:4px">— rehearsals</div>
+        </div>
+      </div>
+      <div class="panel" style="padding:14px;border-top:3px solid var(--blue2)">
+        <div style="font-size:9px;font-weight:700;color:var(--blue2);letter-spacing:.1em;margin-bottom:6px">PEDRO</div>
+        <div style="font-size:10px;color:var(--muted2);line-height:2">
+          <div>Bass</div>
+          <div style="color:var(--muted3)">Stage Left</div>
+          <div id="mem-card-attendance-pedro" style="color:var(--green3);margin-top:4px">— rehearsals</div>
+        </div>
+      </div>
+      <div class="panel" style="padding:14px;border-top:3px solid var(--green3)">
+        <div style="font-size:9px;font-weight:700;color:var(--green3);letter-spacing:.1em;margin-bottom:6px">MANUEL</div>
+        <div style="font-size:10px;color:var(--muted2);line-height:2">
+          <div>Drums</div>
+          <div style="color:var(--muted3)">Centre Rear</div>
+          <div id="mem-card-attendance-manuel" style="color:var(--green3);margin-top:4px">— rehearsals</div>
+        </div>
+      </div>
+      <div class="panel" style="padding:14px;border-top:3px solid var(--purple2)">
+        <div style="font-size:9px;font-weight:700;color:var(--purple2);letter-spacing:.1em;margin-bottom:6px">TIAGO</div>
+        <div style="font-size:10px;color:var(--muted2);line-height:2">
+          <div>Rhythm Guitar + BG Vocals</div>
+          <div style="color:var(--muted3)">Stage Right</div>
+          <div id="mem-card-attendance-tiago" style="color:var(--green3);margin-top:4px">— rehearsals</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Three panels -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;flex:1;min-height:0">
+
+      <!-- REHEARSAL SCHEDULER -->
+      <div class="panel" style="display:flex;flex-direction:column;min-height:0">
+        <div class="panel-header" style="flex-shrink:0">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Rehearsal Log</div>
+          <button class="btn-sm" onclick="openRehearsalModal()" style="font-size:9px">+ Log</button>
+        </div>
+        <div class="panel-body" style="flex:1;overflow-y:auto;padding:0">
+          <div id="rehearsal-list" style="display:flex;flex-direction:column">
+            <div style="padding:12px;color:var(--muted3);font-size:10px;text-align:center">No rehearsals logged yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VOTING / DECISION LOG -->
+      <div class="panel" style="display:flex;flex-direction:column;min-height:0">
+        <div class="panel-header" style="flex-shrink:0">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Band Decisions</div>
+          <button class="btn-sm" onclick="openVoteModal()" style="font-size:9px">+ Log</button>
+        </div>
+        <div class="panel-body" style="flex:1;overflow-y:auto;padding:0">
+          <div id="decisions-list" style="display:flex;flex-direction:column">
+            <div style="padding:12px;color:var(--muted3);font-size:10px;text-align:center">No decisions logged yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BAND AGREEMENT -->
+      <div class="panel" style="display:flex;flex-direction:column;min-height:0">
+        <div class="panel-header" style="flex-shrink:0">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Band Agreement</div>
+          <button class="btn-sm" onclick="membersExportAgreement()" style="font-size:9px;color:var(--accent);border-color:var(--accent)">⎙ PDF</button>
+        </div>
+        <div class="panel-body" style="flex:1;overflow-y:auto">
+
+          <div style="display:flex;flex-direction:column;gap:12px">
+
+            <!-- Profit share -->
+            <div>
+              <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px">PROFIT SHARE</div>
+              <div id="agree-splits-display" style="display:flex;flex-direction:column;gap:4px">
+                <div style="display:grid;grid-template-columns:1fr auto;align-items:center;font-size:10px;padding:4px 0;border-bottom:1px solid var(--border1)">
+                  <span style="color:var(--accent)">Fábio</span>
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <input id="agree-split-fabio" type="number" min="0" max="100" value="25" style="width:48px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:2px 4px;font-family:var(--mono);font-size:10px;text-align:right" oninput="agreeSplitUpdate()">
+                    <span style="color:var(--muted3)">%</span>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr auto;align-items:center;font-size:10px;padding:4px 0;border-bottom:1px solid var(--border1)">
+                  <span style="color:var(--blue2)">Pedro</span>
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <input id="agree-split-pedro" type="number" min="0" max="100" value="25" style="width:48px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:2px 4px;font-family:var(--mono);font-size:10px;text-align:right" oninput="agreeSplitUpdate()">
+                    <span style="color:var(--muted3)">%</span>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr auto;align-items:center;font-size:10px;padding:4px 0;border-bottom:1px solid var(--border1)">
+                  <span style="color:var(--green3)">Manuel</span>
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <input id="agree-split-manuel" type="number" min="0" max="100" value="25" style="width:48px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:2px 4px;font-family:var(--mono);font-size:10px;text-align:right" oninput="agreeSplitUpdate()">
+                    <span style="color:var(--muted3)">%</span>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr auto;align-items:center;font-size:10px;padding:4px 0;border-bottom:1px solid var(--border1)">
+                  <span style="color:var(--purple2)">Tiago</span>
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <input id="agree-split-tiago" type="number" min="0" max="100" value="25" style="width:48px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:2px 4px;font-family:var(--mono);font-size:10px;text-align:right" oninput="agreeSplitUpdate()">
+                    <span style="color:var(--muted3)">%</span>
+                  </div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:9px;padding-top:4px">
+                  <span style="color:var(--muted3)">Total</span>
+                  <span id="agree-split-total" style="color:var(--green3);font-weight:700">100%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Roles -->
+            <div>
+              <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px">ROLES & RESPONSIBILITIES</div>
+              <div style="display:flex;flex-direction:column;gap:4px;font-size:10px">
+                <div style="display:grid;grid-template-columns:80px 1fr;gap:6px;padding:3px 0;border-bottom:1px solid var(--border1)">
+                  <span style="color:var(--muted3)">Booking</span>
+                  <select id="agree-role-booking" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:1px 4px">
+                    <option value="tiago" selected>Tiago</option>
+                    <option value="fabio">Fábio</option>
+                    <option value="pedro">Pedro</option>
+                    <option value="manuel">Manuel</option>
+                    <option value="shared">Shared</option>
+                  </select>
+                </div>
+                <div style="display:grid;grid-template-columns:80px 1fr;gap:6px;padding:3px 0;border-bottom:1px solid var(--border1)">
+                  <span style="color:var(--muted3)">Social media</span>
+                  <select id="agree-role-social" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:1px 4px">
+                    <option value="tiago" selected>Tiago</option>
+                    <option value="fabio">Fábio</option>
+                    <option value="pedro">Pedro</option>
+                    <option value="manuel">Manuel</option>
+                    <option value="shared">Shared</option>
+                  </select>
+                </div>
+                <div style="display:grid;grid-template-columns:80px 1fr;gap:6px;padding:3px 0;border-bottom:1px solid var(--border1)">
+                  <span style="color:var(--muted3)">Finances</span>
+                  <select id="agree-role-finances" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:1px 4px">
+                    <option value="tiago" selected>Tiago</option>
+                    <option value="fabio">Fábio</option>
+                    <option value="pedro">Pedro</option>
+                    <option value="manuel">Manuel</option>
+                    <option value="shared">Shared</option>
+                  </select>
+                </div>
+                <div style="display:grid;grid-template-columns:80px 1fr;gap:6px;padding:3px 0;border-bottom:1px solid var(--border1)">
+                  <span style="color:var(--muted3)">Production</span>
+                  <select id="agree-role-production" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:1px 4px">
+                    <option value="tiago" selected>Tiago</option>
+                    <option value="fabio">Fábio</option>
+                    <option value="pedro">Pedro</option>
+                    <option value="manuel">Manuel</option>
+                    <option value="shared">Shared</option>
+                  </select>
+                </div>
+                <div style="display:grid;grid-template-columns:80px 1fr;gap:6px;padding:3px 0">
+                  <span style="color:var(--muted3)">Songwriting</span>
+                  <select id="agree-role-songwriting" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:1px 4px">
+                    <option value="shared" selected>Shared</option>
+                    <option value="fabio">Fábio</option>
+                    <option value="tiago">Tiago</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Decision rules -->
+            <div>
+              <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px">DECISION RULES</div>
+              <div style="display:flex;flex-direction:column;gap:4px;font-size:10px">
+                <div style="display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border1)">
+                  <span style="color:var(--muted2)">Quorum for major decisions</span>
+                  <select id="agree-quorum" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:1px 4px">
+                    <option value="unanimous">Unanimous</option>
+                    <option value="3/4" selected>3 of 4</option>
+                    <option value="majority">Majority (2+)</option>
+                  </select>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border1)">
+                  <span style="color:var(--muted2)">Tie-breaking vote</span>
+                  <select id="agree-tiebreak" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:1px 4px">
+                    <option value="tiago" selected>Tiago</option>
+                    <option value="fabio">Fábio</option>
+                    <option value="pedro">Pedro</option>
+                    <option value="manuel">Manuel</option>
+                    <option value="none">No tie-break</option>
+                  </select>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px;padding:3px 0">
+                  <span style="color:var(--muted2)">Band fund contribution</span>
+                  <div style="display:flex;align-items:center;gap:4px">
+                    <input id="agree-band-fund" type="number" min="0" max="30" value="10" style="width:40px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:2px 4px;font-family:var(--mono);font-size:10px;text-align:right">
+                    <span style="color:var(--muted3);font-size:9px">% per gig</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div>
+              <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px">NOTES / ADDITIONAL TERMS</div>
+              <textarea id="agree-notes" style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--muted2);font-size:9px;padding:6px 8px;resize:vertical;min-height:60px;font-family:var(--mono)" placeholder="e.g. Original songs credited to the full band. New members require unanimous vote..."></textarea>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <div id="view-agent" class="view new-view">
   <div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">
 
@@ -5290,6 +5658,297 @@ function printContract() {
 }
 
 
+
+
+
+// ══════════════════════════════════════════════════════════
+// MEMBERS ENGINE
+// ══════════════════════════════════════════════════════════
+
+var REHEARSAL_DATA = [];
+var DECISION_DATA  = [];
+
+var MEMBER_COLORS_M = { fabio:'#ff3c1e', pedro:'#2979ff', manuel:'#00e676', tiago:'#aa00ff' };
+var MEMBER_NAMES_M  = { fabio:'Fábio', pedro:'Pedro', manuel:'Manuel', tiago:'Tiago', shared:'Shared', none:'None' };
+var STORAGE_REHEARSALS = 'gk_rehearsals';
+var STORAGE_DECISIONS  = 'gk_decisions';
+var STORAGE_AGREEMENT  = 'gk_agreement';
+
+function membersLoad() {
+  try { var r = localStorage.getItem(STORAGE_REHEARSALS); REHEARSAL_DATA = r ? JSON.parse(r) : []; } catch(e) { REHEARSAL_DATA = []; }
+  try { var d = localStorage.getItem(STORAGE_DECISIONS);  DECISION_DATA  = d ? JSON.parse(d)  : []; } catch(e) { DECISION_DATA  = []; }
+  membersLoadAgreement();
+  renderRehearsals();
+  renderDecisions();
+  membersUpdateBanner();
+}
+
+function membersSave() {
+  try { localStorage.setItem(STORAGE_REHEARSALS, JSON.stringify(REHEARSAL_DATA)); } catch(e) {}
+  try { localStorage.setItem(STORAGE_DECISIONS,  JSON.stringify(DECISION_DATA));  } catch(e) {}
+}
+
+function membersLoadAgreement() {
+  try {
+    var a = localStorage.getItem(STORAGE_AGREEMENT);
+    if (!a) { agreeSplitUpdate(); return; }
+    var obj = JSON.parse(a);
+    var set = function(id, v) { var e = document.getElementById(id); if (e && v !== undefined) e.value = v; };
+    set('agree-split-fabio',  obj.splits && obj.splits.fabio);
+    set('agree-split-pedro',  obj.splits && obj.splits.pedro);
+    set('agree-split-manuel', obj.splits && obj.splits.manuel);
+    set('agree-split-tiago',  obj.splits && obj.splits.tiago);
+    set('agree-role-booking',     obj.roles && obj.roles.booking);
+    set('agree-role-social',      obj.roles && obj.roles.social);
+    set('agree-role-finances',    obj.roles && obj.roles.finances);
+    set('agree-role-production',  obj.roles && obj.roles.production);
+    set('agree-role-songwriting', obj.roles && obj.roles.songwriting);
+    set('agree-quorum',    obj.rules && obj.rules.quorum);
+    set('agree-tiebreak',  obj.rules && obj.rules.tiebreak);
+    set('agree-band-fund', obj.rules && obj.rules.bandFund);
+    set('agree-notes',     obj.notes);
+  } catch(e) {}
+  agreeSplitUpdate();
+}
+
+function membersSaveAgreement() {
+  var get = function(id) { var e = document.getElementById(id); return e ? e.value : null; };
+  var obj = {
+    splits: { fabio:get('agree-split-fabio'), pedro:get('agree-split-pedro'), manuel:get('agree-split-manuel'), tiago:get('agree-split-tiago') },
+    roles:  { booking:get('agree-role-booking'), social:get('agree-role-social'), finances:get('agree-role-finances'), production:get('agree-role-production'), songwriting:get('agree-role-songwriting') },
+    rules:  { quorum:get('agree-quorum'), tiebreak:get('agree-tiebreak'), bandFund:get('agree-band-fund') },
+    notes:  get('agree-notes')
+  };
+  try { localStorage.setItem(STORAGE_AGREEMENT, JSON.stringify(obj)); } catch(e) {}
+}
+
+function agreeSplitUpdate() {
+  var total = ['fabio','pedro','manuel','tiago'].reduce(function(s,k){
+    return s + (parseFloat(document.getElementById('agree-split-'+k) && document.getElementById('agree-split-'+k).value || 0));
+  },0);
+  var el = document.getElementById('agree-split-total');
+  if (el) { el.textContent = total.toFixed(0)+'%'; el.style.color = total===100?'var(--green3)':'var(--red3)'; }
+  membersSaveAgreement();
+}
+
+function membersUpdateBanner() {
+  var set = function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
+  set('mem-banner-rehearsals', REHEARSAL_DATA.length);
+  set('mem-banner-decisions',  DECISION_DATA.length);
+  if (REHEARSAL_DATA.length > 0) {
+    var totalAtt = REHEARSAL_DATA.reduce(function(s,r){ return s+Object.values(r.attendance||{}).filter(Boolean).length; },0);
+    set('mem-banner-attendance', (totalAtt/REHEARSAL_DATA.length).toFixed(1)+'/4');
+  }
+  ['fabio','pedro','manuel','tiago'].forEach(function(k){
+    var count = REHEARSAL_DATA.filter(function(r){ return r.attendance && r.attendance[k]; }).length;
+    var el = document.getElementById('mem-card-attendance-'+k);
+    if (el) {
+      el.textContent = count+' / '+REHEARSAL_DATA.length+' rehearsals';
+      el.style.color = (REHEARSAL_DATA.length>0 && count<REHEARSAL_DATA.length) ? 'var(--amber2)' : 'var(--green3)';
+    }
+  });
+}
+
+// ── Rehearsal ──
+function openRehearsalModal() {
+  var d=document.getElementById('reh-date'); if(d&&!d.value) d.value=new Date().toISOString().slice(0,10);
+  document.getElementById('rehearsal-modal').classList.add('open');
+}
+function closeRehearsalModal() { document.getElementById('rehearsal-modal').classList.remove('open'); }
+
+function saveRehearsal() {
+  var get=function(id){ var e=document.getElementById(id); return e?e.value.trim():''; };
+  var date=get('reh-date');
+  if (!date) { showToast('Date required','err'); return; }
+  var r = {
+    id: Date.now(), date:date, location:get('reh-location'), focus:get('reh-focus'),
+    duration:parseFloat(get('reh-duration'))||2, next:get('reh-next'), notes:get('reh-notes'),
+    attendance:{
+      fabio:  !!(document.getElementById('reh-att-fabio')  && document.getElementById('reh-att-fabio').checked),
+      pedro:  !!(document.getElementById('reh-att-pedro')  && document.getElementById('reh-att-pedro').checked),
+      manuel: !!(document.getElementById('reh-att-manuel') && document.getElementById('reh-att-manuel').checked),
+      tiago:  !!(document.getElementById('reh-att-tiago')  && document.getElementById('reh-att-tiago').checked),
+    }
+  };
+  REHEARSAL_DATA.unshift(r);
+  membersSave(); renderRehearsals(); membersUpdateBanner(); closeRehearsalModal();
+  showToast('Rehearsal logged','ok');
+  ['reh-date','reh-location','reh-focus','reh-next','reh-notes'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
+  var dur=document.getElementById('reh-duration'); if(dur) dur.value='2';
+  ['fabio','pedro','manuel','tiago'].forEach(function(k){ var cb=document.getElementById('reh-att-'+k); if(cb) cb.checked=true; });
+}
+
+function deleteRehearsal(id) {
+  if (!confirm('Delete this rehearsal?')) return;
+  REHEARSAL_DATA=REHEARSAL_DATA.filter(function(r){ return r.id!==id; });
+  membersSave(); renderRehearsals(); membersUpdateBanner();
+}
+
+function renderRehearsals() {
+  var el=document.getElementById('rehearsal-list'); if(!el) return;
+  if (!REHEARSAL_DATA.length) { el.innerHTML='<div style="padding:12px;color:var(--muted3);font-size:10px;text-align:center">No rehearsals logged yet.</div>'; return; }
+  el.innerHTML=REHEARSAL_DATA.map(function(r){
+    var present=Object.entries(r.attendance||{}).filter(function(e){ return e[1]; });
+    var absent =Object.entries(r.attendance||{}).filter(function(e){ return !e[1]; });
+    var dateStr=new Date(r.date).toLocaleDateString('pt-PT',{day:'2-digit',month:'short',year:'numeric'});
+    return '<div style="padding:10px 12px;border-bottom:1px solid var(--border1)">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">'+
+        '<div><div style="font-size:10px;font-weight:700;color:var(--text)">'+dateStr+(r.focus?' — '+r.focus:'')+'</div>'+
+        '<div style="font-size:9px;color:var(--muted3);margin-top:1px">'+(r.location||'—')+' · '+(r.duration||2)+'h</div></div>'+
+        '<button onclick="deleteRehearsal('+r.id+')" style="background:none;border:none;color:var(--muted3);cursor:pointer;font-size:11px;padding:0">✕</button>'+
+      '</div>'+
+      '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:'+(r.notes?'4px':'0')+'">'+
+        present.map(function(e){ return '<span style="font-size:8px;padding:1px 6px;border-radius:1px;background:'+(MEMBER_COLORS_M[e[0]]||'#888')+'22;color:'+(MEMBER_COLORS_M[e[0]]||'#888')+'">'+MEMBER_NAMES_M[e[0]]+'</span>'; }).join('')+
+        absent.map(function(e){ return '<span style="font-size:8px;padding:1px 6px;border-radius:1px;background:rgba(255,255,255,.04);color:var(--muted3);text-decoration:line-through">'+MEMBER_NAMES_M[e[0]]+'</span>'; }).join('')+
+      '</div>'+
+      (r.notes?'<div style="font-size:9px;color:var(--muted3);font-style:italic">'+r.notes+'</div>':'')+
+      (r.next?'<div style="font-size:8px;color:var(--amber2);margin-top:3px">Next: '+new Date(r.next).toLocaleDateString('pt-PT')+'</div>':'')+
+    '</div>';
+  }).join('');
+}
+
+// ── Voting ──
+function openVoteModal() {
+  var d=document.getElementById('vote-date'); if(d&&!d.value) d.value=new Date().toISOString().slice(0,10);
+  ['fabio','pedro','manuel','tiago'].forEach(function(k){ var e=document.getElementById('vote-v-'+k); if(e) e.value='yes'; });
+  voteUpdate();
+  document.getElementById('vote-modal').classList.add('open');
+}
+function closeVoteModal() { document.getElementById('vote-modal').classList.remove('open'); }
+
+function voteUpdate() {
+  var votes={yes:0,no:0,abstain:0,absent:0};
+  ['fabio','pedro','manuel','tiago'].forEach(function(k){ var v=document.getElementById('vote-v-'+k); if(v) votes[v.value]=(votes[v.value]||0)+1; });
+  var quorum=document.getElementById('agree-quorum') && document.getElementById('agree-quorum').value || '3/4';
+  var required=quorum==='unanimous'?4:quorum==='majority'?2:3;
+  var passed=votes.yes>=required;
+  var p=document.getElementById('vote-result-preview');
+  if(p) p.innerHTML='<span style="color:'+(passed?'var(--green3)':'var(--red3)')+';font-weight:700">'+(passed?'✓ PASSED':'✗ FAILED')+'</span>'+
+    ' &nbsp;·&nbsp; Yes: '+votes.yes+' &nbsp; No: '+votes.no+
+    (votes.abstain?' &nbsp; Abstain: '+votes.abstain:'')+
+    (votes.absent?' &nbsp; Absent: '+votes.absent:'')+
+    ' &nbsp;·&nbsp; Quorum: '+quorum;
+}
+
+function saveVote() {
+  var get=function(id){ var e=document.getElementById(id); return e?e.value.trim():''; };
+  var topic=get('vote-topic'), date=get('vote-date');
+  if (!topic||!date) { showToast('Topic and date required','err'); return; }
+  var votes={};
+  ['fabio','pedro','manuel','tiago'].forEach(function(k){ votes[k]=document.getElementById('vote-v-'+k) && document.getElementById('vote-v-'+k).value||'yes'; });
+  var yesCount=Object.values(votes).filter(function(v){ return v==='yes'; }).length;
+  var quorum=document.getElementById('agree-quorum') && document.getElementById('agree-quorum').value||'3/4';
+  var required=quorum==='unanimous'?4:quorum==='majority'?2:3;
+  var d={ id:Date.now(), date:date, topic:topic, category:get('vote-category'), votes:votes, passed:yesCount>=required, quorum:quorum, notes:get('vote-notes') };
+  DECISION_DATA.unshift(d);
+  membersSave(); renderDecisions(); membersUpdateBanner(); closeVoteModal();
+  showToast('Decision logged — '+(d.passed?'PASSED':'FAILED'), d.passed?'ok':'warn');
+  ['vote-date','vote-topic','vote-notes'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
+}
+
+function deleteDecision(id) {
+  if (!confirm('Delete this decision?')) return;
+  DECISION_DATA=DECISION_DATA.filter(function(d){ return d.id!==id; });
+  membersSave(); renderDecisions(); membersUpdateBanner();
+}
+
+function renderDecisions() {
+  var el=document.getElementById('decisions-list'); if(!el) return;
+  if (!DECISION_DATA.length) { el.innerHTML='<div style="padding:12px;color:var(--muted3);font-size:10px;text-align:center">No decisions logged yet.</div>'; return; }
+  var CAT={financial:'var(--green3)',creative:'var(--purple2)',booking:'var(--accent)',lineup:'var(--red3)',equipment:'var(--blue2)',strategy:'var(--amber2)',other:'var(--muted2)'};
+  el.innerHTML=DECISION_DATA.map(function(d){
+    var dateStr=new Date(d.date).toLocaleDateString('pt-PT',{day:'2-digit',month:'short',year:'numeric'});
+    var catCol=CAT[d.category]||'var(--muted2)';
+    return '<div style="padding:10px 12px;border-bottom:1px solid var(--border1)">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">'+
+        '<div style="flex:1;padding-right:8px">'+
+          '<div style="font-size:10px;font-weight:700;color:var(--text)">'+d.topic+'</div>'+
+          '<div style="font-size:9px;color:var(--muted3);margin-top:1px">'+dateStr+' &nbsp;·&nbsp; <span style="color:'+catCol+'">'+(d.category||'other')+'</span></div>'+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:6px">'+
+          '<span style="font-size:9px;font-weight:700;color:'+(d.passed?'var(--green3)':'var(--red3)')+'">'+
+            (d.passed?'✓ PASSED':'✗ FAILED')+'</span>'+
+          '<button onclick="deleteDecision('+d.id+')" style="background:none;border:none;color:var(--muted3);cursor:pointer;font-size:11px;padding:0">✕</button>'+
+        '</div>'+
+      '</div>'+
+      '<div style="display:flex;gap:4px;flex-wrap:wrap;'+(d.notes?'margin-bottom:4px':'')+'">'+
+        ['fabio','pedro','manuel','tiago'].map(function(k){
+          var v=d.votes&&d.votes[k]||'yes';
+          var vCol=v==='yes'?'var(--green3)':v==='no'?'var(--red3)':'var(--muted3)';
+          var vLabel=v==='yes'?'✓':v==='no'?'✗':v==='abstain'?'—':'?';
+          return '<span style="font-size:8px;padding:1px 6px;border-radius:1px;background:'+(MEMBER_COLORS_M[k]||'#888')+'18;color:'+(MEMBER_COLORS_M[k]||'#888')+'">'+
+            MEMBER_NAMES_M[k]+' <span style="color:'+vCol+'">'+vLabel+'</span></span>';
+        }).join('')+
+      '</div>'+
+      (d.notes?'<div style="font-size:9px;color:var(--muted3);font-style:italic">'+d.notes+'</div>':'')+
+    '</div>';
+  }).join('');
+}
+
+// ── Agreement PDF ──
+function membersExportAgreement() {
+  membersSaveAgreement();
+  var get=function(id){ var e=document.getElementById(id); return e?e.value.trim():''; };
+  var splits={fabio:get('agree-split-fabio')+'%',pedro:get('agree-split-pedro')+'%',manuel:get('agree-split-manuel')+'%',tiago:get('agree-split-tiago')+'%'};
+  var rolemap={booking:get('agree-role-booking'),social:get('agree-role-social'),finances:get('agree-role-finances'),production:get('agree-role-production'),songwriting:get('agree-role-songwriting')};
+  var roles={}; Object.keys(rolemap).forEach(function(k){ roles[k]=MEMBER_NAMES_M[rolemap[k]]||rolemap[k]; });
+  var quorum=get('agree-quorum'), tiebreak=MEMBER_NAMES_M[get('agree-tiebreak')]||get('agree-tiebreak');
+  var bandFund=get('agree-band-fund')+'%', notes=get('agree-notes');
+  var today=new Date().toLocaleDateString('pt-PT',{day:'2-digit',month:'long',year:'numeric'});
+
+  var doc='<!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8"><title>Acordo de Banda</title><style>'+
+    '*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;font-size:11px;color:#1a1a1a;background:#fff;padding:28px 36px;line-height:1.6}'+
+    'h1{font-size:22px;font-weight:700;letter-spacing:.06em;color:#111;margin-bottom:4px}.sub{font-size:12px;color:#555;font-style:italic;margin-bottom:24px}'+
+    '.sec{margin-bottom:22px}.sec h2{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#555;border-bottom:1px solid #ddd;padding-bottom:4px;margin-bottom:12px}'+
+    'table{width:100%;border-collapse:collapse;font-size:11px}td{padding:7px 12px;border-bottom:1px solid #eee}td.l{font-weight:700;color:#333;width:40%}td.v{color:#111}tr:last-child td{border-bottom:none}'+
+    '.m-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-bottom:12px}.m-cell{background:#f8f8f8;padding:10px;text-align:center}'+
+    '.m-cell .n{font-size:13px;font-weight:700;margin-bottom:3px}.m-cell .s{font-size:20px;font-weight:700;color:#166534}'+
+    '.sig{margin-top:32px;padding-top:20px;border-top:2px solid #111}'+
+    '.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:16px}'+
+    '.sb .sn{font-size:11px;font-weight:700;margin-bottom:2px}.sl{border-bottom:1px solid #aaa;height:30px;margin-bottom:4px}.slb{font-size:8.5px;color:#888}'+
+    '@page{margin:10mm;size:A4}'+
+    '</style></head><body>'+
+    '<h1>THE GINSKEYS</h1>'+
+    '<div class="sub">Acordo de Banda / Band Agreement &nbsp;·&nbsp; Hard Rock &nbsp;·&nbsp; Sines, Portugal &nbsp;·&nbsp; '+today+'</div>'+
+    '<div class="sec"><h2>Repartição de Lucros / Profit Share</h2>'+
+      '<div class="m-row">'+['fabio','pedro','manuel','tiago'].map(function(k){
+        return '<div class="m-cell"><div class="n" style="color:'+MEMBER_COLORS_M[k]+'">'+MEMBER_NAMES_M[k]+'</div><div class="s">'+splits[k]+'</div></div>';
+      }).join('')+'</div>'+
+      '<p style="font-size:10px;color:#555">Repartição do rendimento líquido após fundo de banda ('+bandFund+' por espetáculo) e despesas acordadas. / Net income split after band fund ('+bandFund+' per show) and agreed expenses.</p>'+
+    '</div>'+
+    '<div class="sec"><h2>Responsabilidades / Responsibilities</h2><table>'+
+      '<tr><td class="l">Reservas / Booking</td><td class="v">'+roles.booking+'</td></tr>'+
+      '<tr><td class="l">Redes Sociais / Social Media</td><td class="v">'+roles.social+'</td></tr>'+
+      '<tr><td class="l">Finanças / Finances</td><td class="v">'+roles.finances+'</td></tr>'+
+      '<tr><td class="l">Produção / Production</td><td class="v">'+roles.production+'</td></tr>'+
+      '<tr><td class="l">Composição / Songwriting</td><td class="v">'+roles.songwriting+'</td></tr>'+
+    '</table></div>'+
+    '<div class="sec"><h2>Regras de Decisão / Decision Rules</h2><table>'+
+      '<tr><td class="l">Quórum</td><td class="v">'+quorum+'</td></tr>'+
+      '<tr><td class="l">Voto de desempate / Tie-break</td><td class="v">'+tiebreak+'</td></tr>'+
+      '<tr><td class="l">Fundo de banda / Band fund</td><td class="v">'+bandFund+' por espetáculo</td></tr>'+
+    '</table></div>'+
+    (REHEARSAL_DATA.length>0?
+      '<div class="sec"><h2>Assiduidade / Attendance — '+REHEARSAL_DATA.length+' Ensaios</h2><table>'+
+        ['fabio','pedro','manuel','tiago'].map(function(k){
+          var count=REHEARSAL_DATA.filter(function(r){ return r.attendance&&r.attendance[k]; }).length;
+          var pct=REHEARSAL_DATA.length>0?Math.round(count/REHEARSAL_DATA.length*100):0;
+          return '<tr><td class="l" style="color:'+MEMBER_COLORS_M[k]+'">'+MEMBER_NAMES_M[k]+'</td><td class="v">'+count+' / '+REHEARSAL_DATA.length+' ('+pct+'%)</td></tr>';
+        }).join('')+
+      '</table></div>':'')+
+    (notes?'<div class="sec"><h2>Condições Adicionais</h2><div style="font-size:10px;color:#444;background:#f8f8f8;padding:12px;border-left:3px solid #ccc;font-style:italic">'+notes+'</div></div>':'')+
+    '<div class="sig"><p style="font-size:10px;color:#444;margin-bottom:0">Os membros confirmam a aceitação dos termos deste acordo. / Members confirm acceptance of these terms.</p>'+
+      '<div class="sg">'+['fabio','pedro','manuel','tiago'].map(function(k){
+        return '<div class="sb"><div class="sn" style="color:'+MEMBER_COLORS_M[k]+'">'+MEMBER_NAMES_M[k]+'</div><div class="sl"></div><div class="slb">Assinatura / Date</div></div>';
+      }).join('')+'</div>'+
+    '</div>'+
+    '</body></html>';
+
+  var w=window.open('','_blank'); w.document.write(doc); w.document.close();
+  setTimeout(function(){ w.print(); },600);
+}
+
+function membersExportPDF() { membersExportAgreement(); }
 
 
 // ── LOAD ALL GROWTH DATA ───────────────────────────────────────────────────
@@ -9638,6 +10297,7 @@ function switchView(view, tab){
   }
   if(tab) tab.classList.add('active');
   if(view==='streaming') initStreamChart();
+  if(view==='members') membersLoad();
   if(view==='audit'){ renderAuditLog(); showEmailTemplate('invite',document.querySelector('.email-tab')); }
   if(view==='mgmt') setTimeout(renderMgmtDashboard, 0);
 }
