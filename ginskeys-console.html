@@ -3845,7 +3845,7 @@ tr:hover .edit-btn{display:inline}
       <div class="panel" style="padding:14px;border-top:3px solid var(--accent)">
         <div style="font-size:9px;font-weight:700;color:var(--accent);letter-spacing:.1em;margin-bottom:6px">FÁBIO</div>
         <div style="font-size:10px;color:var(--muted2);line-height:2">
-          <div>Lead Guitar + Lead Vocals</div>
+          <div>Lead Vocals</div>
           <div style="color:var(--muted3)">Stage Right</div>
           <div id="mem-card-attendance-fabio" style="color:var(--green3);margin-top:4px">— rehearsals</div>
         </div>
@@ -3853,7 +3853,7 @@ tr:hover .edit-btn{display:inline}
       <div class="panel" style="padding:14px;border-top:3px solid var(--blue2)">
         <div style="font-size:9px;font-weight:700;color:var(--blue2);letter-spacing:.1em;margin-bottom:6px">PEDRO</div>
         <div style="font-size:10px;color:var(--muted2);line-height:2">
-          <div>Bass</div>
+          <div>Bass + BG Vocals</div>
           <div style="color:var(--muted3)">Stage Left</div>
           <div id="mem-card-attendance-pedro" style="color:var(--green3);margin-top:4px">— rehearsals</div>
         </div>
@@ -3869,7 +3869,7 @@ tr:hover .edit-btn{display:inline}
       <div class="panel" style="padding:14px;border-top:3px solid var(--purple2)">
         <div style="font-size:9px;font-weight:700;color:var(--purple2);letter-spacing:.1em;margin-bottom:6px">TIAGO</div>
         <div style="font-size:10px;color:var(--muted2);line-height:2">
-          <div>Rhythm Guitar + BG Vocals</div>
+          <div>Guitar + BG Vocals</div>
           <div style="color:var(--muted3)">Stage Right</div>
           <div id="mem-card-attendance-tiago" style="color:var(--green3);margin-top:4px">— rehearsals</div>
         </div>
@@ -4003,6 +4003,8 @@ tr:hover .edit-btn{display:inline}
                   <select id="agree-role-songwriting" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:1px 4px">
                     <option value="shared" selected>Shared</option>
                     <option value="fabio">Fábio</option>
+                    <option value="pedro">Pedro</option>
+                    <option value="manuel">Manuel</option>
                     <option value="tiago">Tiago</option>
                   </select>
                 </div>
@@ -6701,12 +6703,12 @@ function _initAll_old_1() {
                 </tr>
                 <tr style="border-bottom:1px solid var(--border1)">
                   <td style="padding:8px 10px;font-weight:700;color:var(--accent)">FÁBIO</td>
-                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_fabio_role">Lead Guitar + Lead Vocals</span></td>
+                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_fabio_role">Lead Vocals</span></td>
                   <td style="padding:8px 10px;color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_fabio_pos">Centre / Stage Right</span></td>
                 </tr>
                 <tr style="border-bottom:1px solid var(--border1)">
                   <td style="padding:8px 10px;font-weight:700;color:var(--accent)">PEDRO</td>
-                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_pedro_role">Bass</span></td>
+                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_pedro_role">Bass + BG Vocals</span></td>
                   <td style="padding:8px 10px;color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_pedro_pos">Stage Left</span></td>
                 </tr>
                 <tr style="border-bottom:1px solid var(--border1)">
@@ -6716,7 +6718,7 @@ function _initAll_old_1() {
                 </tr>
                 <tr>
                   <td style="padding:8px 10px;font-weight:700;color:var(--accent)">TIAGO</td>
-                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_tiago_role">Rhythm Guitar + BG Vocals</span></td>
+                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_tiago_role">Guitar + BG Vocals</span></td>
                   <td style="padding:8px 10px;color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_tiago_pos">Stage Right</span></td>
                 </tr>
               </table>
@@ -11437,10 +11439,10 @@ function copyRiderText() {
     'Hard Rock · 4 piece · Sines, Portugal',
     '',
     'BAND LINEUP:',
-    'Fábio — Lead Guitar + Lead Vocals (Centre/SR)',
+    'Fábio — Lead Vocals (Centre/SR)',
     'Pedro — Bass (Stage Left)',
     'Manuel — Drums (Centre Rear)',
-    'Tiago — Rhythm Guitar + BG Vocals (SR)',
+    'Tiago — Guitar + BG Vocals (SR)',
     '',
     'TOTAL INPUTS: 15 channels (see input list)',
     'MONITORS: 4 separate mixes required',
@@ -11477,9 +11479,9 @@ const SNAP_SIZE = 10;
 // ── Element definitions: type → { label, w, h, color, channels, symbol } ──
 const SPLOT_DEFS = {
   vocal_lead:    { label:'VOC 1\nFábio', w:52, h:52, color:'#ff3c1e', channels:[{src:'Lead Vocal',type:'MIC',stand:'Tall'}] },
-  vocal_bg:      { label:'VOC 2\nTiago', w:52, h:52, color:'#ff7043', channels:[{src:'BG Vocal',type:'MIC',stand:'Tall'}] },
-  guitar_amp:    { label:'GTR\nFábio', w:60, h:60, color:'#aa00ff', channels:[{src:'Guitar Amp',type:'MIC',stand:'Short'},{src:'Guitar DI',type:'DI',stand:'-'}] },
-  bass_amp:      { label:'BASS\nPedro', w:60, h:60, color:'#2979ff', channels:[{src:'Bass DI',type:'DI',stand:'-'},{src:'Bass Amp',type:'MIC',stand:'Short'}] },
+  vocal_bg:      { label:'VOC 2\nPedro', w:52, h:52, color:'#ff7043', channels:[{src:'BG Vocal',type:'MIC',stand:'Tall'}] },
+  guitar_amp:    { label:'GTR\nTiago', w:60, h:60, color:'#aa00ff', channels:[{src:'Guitar Amp',type:'MIC',stand:'Short'},{src:'Guitar DI',type:'DI',stand:'-'}] },
+  bass_amp:      { label:'BASS + BG\nPedro', w:60, h:60, color:'#2979ff', channels:[{src:'Bass DI',type:'DI',stand:'-'},{src:'Bass Amp',type:'MIC',stand:'Short'}] },
   keys:          { label:'KEYS', w:80, h:44, color:'#00bcd4', channels:[{src:'Keys L',type:'DI',stand:'-'},{src:'Keys R',type:'DI',stand:'-'}] },
   drums:         { label:'DRUMS\nManuel', w:110, h:90, color:'#ff8f00', channels:[
     {src:'Kick',type:'MIC',stand:'None'},{src:'Snare Top',type:'MIC',stand:'Short'},
