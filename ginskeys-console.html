@@ -2217,7 +2217,7 @@ tr:hover .edit-btn{display:inline}
 
 <!-- ══ KPI STRIP ═════════════════════════════════════ -->
 <div id="export-report-bar" style="display:none;justify-content:flex-end;padding:4px 10px;background:var(--bg0);border-bottom:1px solid var(--border);flex-shrink:0">
-  <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printFinancialsReport()">⎙ Export Financial Report</button>
+  <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="downloadFinancialPDF()">⎙ Export Financial Report (PDF)</button>
 </div>
 <div class="kpi-strip" style="grid-template-columns:repeat(8,1fr)">
   <div class="kpi-card green">
@@ -16508,6 +16508,39 @@ function printStreamingReport() {
 }
 
 // ── FINANCIALS REPORT (ENHANCED — charts + investment recommendations) ────────
+// ── Backend-generated Financial PDF ───────────────────
+async function downloadFinancialPDF() {
+  if (!API_BASE || !SESSION?.token) {
+    showToast('Not connected to API — cannot generate report', 'err');
+    return;
+  }
+  try {
+    showToast('Generating financial report...', 'ok');
+    const res = await fetch(API_BASE + '/reports/financial', {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer ' + SESSION.token },
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Report generation failed');
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ginskeys-financial-report-' + new Date().toISOString().slice(0, 10) + '.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Report downloaded', 'ok');
+  } catch (e) {
+    showToast('Report failed: ' + e.message, 'err');
+    // Fallback to client-side print
+    printFinancialsReport();
+  }
+}
+
 function printFinancialsReport() {
   const fi = getFinancialIntelligence();
   const d  = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
