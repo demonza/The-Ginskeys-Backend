@@ -4934,9 +4934,9 @@ function printContract() {
   var showDate  = get('ct-date');
   var fee       = parseFloat(get('ct-fee')) || 0;
 
-  if (!venueName) { statusEl.textContent = 'Venue / Promoter name is required'; return; }
-  if (!showDate)  { statusEl.textContent = 'Show date is required'; return; }
-  if (!fee)       { statusEl.textContent = 'Fee is required'; return; }
+  if (!venueName) { statusEl.textContent = 'Nome do promotor/local obrigat\u00f3rio'; return; }
+  if (!showDate)  { statusEl.textContent = 'Data do espet\u00e1culo obrigat\u00f3ria'; return; }
+  if (!fee)       { statusEl.textContent = 'Cach\u00ea obrigat\u00f3rio'; return; }
   statusEl.textContent = '';
 
   var venueRep     = get('ct-venue-rep');
@@ -4975,97 +4975,163 @@ function printContract() {
   var onDay    = parseFloat((total - advance).toFixed(2));
 
   var fmt = function(v) {
-    return '\u20ac ' + v.toLocaleString('pt-PT', {minimumFractionDigits:2, maximumFractionDigits:2});
+    return '\u20ac\u00a0' + v.toLocaleString('pt-PT', {minimumFractionDigits:2, maximumFractionDigits:2});
   };
 
-  var dObj    = new Date(showDate);
-  var dateStr = dObj.toLocaleDateString('pt-PT', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
-  var today   = new Date().toLocaleDateString('pt-PT', {day:'2-digit', month:'long', year:'numeric'});
+  var dObj   = new Date(showDate);
+  var datePT = dObj.toLocaleDateString('pt-PT', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+  var dateEN = dObj.toLocaleDateString('en-GB',  {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+  var today  = new Date().toLocaleDateString('pt-PT', {day:'2-digit', month:'long', year:'numeric'});
 
-  // Cancellation penalty logic
-  var cancelText = advPct > 0
-    ? 'In the event of cancellation by the Promoter with less than ' + cancelDays + ' days notice, the advance payment is non-refundable and the full fee becomes payable. In the event of cancellation by the Artist with less than ' + cancelDays + ' days notice, the Artist shall return the advance and pay an equivalent penalty to the Promoter.'
-    : 'In the event of cancellation by either party with less than ' + cancelDays + ' days notice, the cancelling party shall pay a penalty equal to 50% of the agreed fee to the other party.';
+  // Payment schedule
+  var payRows;
+  if (advPct === 0) {
+    payRows = row(fmt(total) + ' pag\u00e1vel no dia da atua\u00e7\u00e3o, antes da subida ao palco',
+                  fmt(total) + ' payable on the day of performance, prior to stage time');
+  } else if (advPct === 1) {
+    payRows = row(fmt(total) + ' pag\u00e1vel na totalidade no prazo de ' + payDays + ' dias ap\u00f3s assinatura',
+                  fmt(total) + ' payable in full within ' + payDays + ' days of signing');
+  } else {
+    payRows = row('<strong>Adiantamento (' + advParts[0] + '%):</strong> ' + fmt(advance) + ' \u2014 no prazo de ' + payDays + ' dias ap\u00f3s assinatura',
+                  '<strong>Advance (' + advParts[0] + '%):</strong> ' + fmt(advance) + ' \u2014 within ' + payDays + ' days of signing') +
+              row('<strong>Saldo (' + advParts[1] + '%):</strong> ' + fmt(onDay) + ' \u2014 pag\u00e1vel no dia da atua\u00e7\u00e3o, antes da subida ao palco',
+                  '<strong>Balance (' + advParts[1] + '%):</strong> ' + fmt(onDay) + ' \u2014 payable on the day of performance, prior to stage time');
+  }
 
-  var paymentSchedule = advPct === 0
-    ? '<tr><td class="c-label">Payment</td><td>' + fmt(total) + ' payable on day of performance, prior to stage time</td></tr>'
-    : advPct === 1
-    ? '<tr><td class="c-label">Payment</td><td>' + fmt(total) + ' payable in full within ' + payDays + ' days of signing this contract</td></tr>'
-    : '<tr><td class="c-label">Advance</td><td>' + fmt(advance) + ' (' + advParts[0] + '%) due within ' + payDays + ' days of signing this contract</td></tr>' +
-      '<tr><td class="c-label">Balance</td><td>' + fmt(onDay) + ' (' + advParts[1] + '%) payable on day of performance, prior to stage time</td></tr>';
+  // Cancellation clause
+  var cancelPT, cancelEN;
+  if (advPct > 0) {
+    cancelPT = 'Em caso de cancelamento pelo Promotor com menos de ' + cancelDays + ' dias de aviso pr\u00e9vio, o adiantamento n\u00e3o ser\u00e1 reembolsado e o cach\u00ea total torna-se imediatamente exig\u00edvel. Em caso de cancelamento pelo Artista com menos de ' + cancelDays + ' dias de aviso pr\u00e9vio, o Artista devolve o adiantamento e paga uma penaliza\u00e7\u00e3o equivalente ao Promotor. Casos de for\u00e7a maior est\u00e3o isentos mediante aviso escrito com a brevidade poss\u00edvel.';
+    cancelEN = 'If cancelled by the Promoter with less than ' + cancelDays + ' days notice, the advance is non-refundable and the full fee becomes immediately payable. If cancelled by the Artist with less than ' + cancelDays + ' days notice, the Artist returns the advance and pays an equivalent penalty. Force majeure events are exempt provided written notice is given as soon as possible.';
+  } else {
+    cancelPT = 'Em caso de cancelamento por qualquer das partes com menos de ' + cancelDays + ' dias de aviso pr\u00e9vio, a parte cancelante paga uma penaliza\u00e7\u00e3o equivalente a 50% do cach\u00ea acordado. Casos de for\u00e7a maior est\u00e3o isentos mediante aviso escrito com a brevidade poss\u00edvel.';
+    cancelEN = 'If cancelled by either party with less than ' + cancelDays + ' days notice, the cancelling party pays a penalty equal to 50% of the agreed fee. Force majeure events are exempt provided written notice is given as soon as possible.';
+  }
 
-  var html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
-    '<title>Performance Contract ' + ctRef + '</title><style>' +
+  // Helper: bilingual two-column row — PT primary (left/bold), EN secondary (right/italic/muted)
+  function row(pt, en) {
+    return '<tr>' +
+      '<td class="c-pt">' + pt + '</td>' +
+      '<td class="c-en">' + en + '</td>' +
+    '</tr>';
+  }
+
+  // Helper: section title PT / EN
+  function sec(pt, en) {
+    return '<div class="section-title"><span class="pt">' + pt + '</span><span class="sep"> &nbsp;/&nbsp; </span><span class="en">' + en + '</span></div>';
+  }
+
+  var html = '<!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8">' +
+    '<title>Contrato ' + ctRef + ' \u2014 ' + artistName + '</title><style>' +
     '*{box-sizing:border-box;margin:0;padding:0}' +
-    'body{font-family:Georgia,serif;font-size:11px;color:#1a1a1a;background:#fff;padding:28px 36px;line-height:1.5}' +
-    'h1{font-size:20px;font-weight:700;letter-spacing:.06em;color:#111;margin-bottom:2px}' +
-    '.doc-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px double #111;padding-bottom:14px;margin-bottom:20px}' +
-    '.doc-title h1{font-size:22px}' +
-    '.doc-title .subtitle{font-size:10px;color:#666;letter-spacing:.08em;margin-top:3px}' +
-    '.doc-meta{text-align:right;font-size:9px;color:#555;line-height:2}' +
-    '.section{margin-bottom:18px}' +
-    '.section-title{font-size:9px;font-weight:700;letter-spacing:.14em;color:#555;text-transform:uppercase;border-bottom:1px solid #ddd;padding-bottom:4px;margin-bottom:10px}' +
-    '.parties{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:20px}' +
-    '.party-role{font-size:8px;font-weight:700;letter-spacing:.14em;color:#888;text-transform:uppercase;margin-bottom:5px}' +
+    'body{font-family:Georgia,serif;font-size:10.5px;color:#1a1a1a;background:#fff;padding:24px 32px;line-height:1.5}' +
+
+    '.doc-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px double #111;padding-bottom:12px;margin-bottom:18px}' +
+    '.doc-title .main-pt{font-size:22px;font-weight:700;letter-spacing:.06em;color:#111}' +
+    '.doc-title .main-en{font-size:13px;color:#666;font-style:italic;margin-top:2px;letter-spacing:.04em}' +
+    '.doc-meta{text-align:right;font-size:9px;color:#555;line-height:2.1}' +
+
+    '.section{margin-bottom:16px}' +
+    '.section-title{font-size:8.5px;font-weight:700;letter-spacing:.12em;border-bottom:1px solid #ccc;padding-bottom:4px;margin-bottom:10px;text-transform:uppercase}' +
+    '.section-title .pt{color:#111}' +
+    '.section-title .sep{color:#bbb}' +
+    '.section-title .en{color:#888;font-style:italic;font-weight:400;letter-spacing:.06em;text-transform:none}' +
+
+    '.parties{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:18px}' +
+    '.party-role{font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px}' +
+    '.party-role .pt{color:#555}' +
+    '.party-role .en{color:#aaa;font-style:italic;font-weight:400}' +
     '.party-name{font-size:14px;font-weight:700;color:#111;margin-bottom:4px}' +
-    '.party-detail{font-size:10px;color:#444;line-height:1.8}' +
-    'table.c-table{width:100%;border-collapse:collapse}' +
-    'table.c-table td{padding:6px 10px;border-bottom:1px solid #eee;vertical-align:top;font-size:10.5px}' +
-    'table.c-table td.c-label{font-weight:700;color:#333;width:28%;white-space:nowrap}' +
-    'table.c-table tr:last-child td{border-bottom:none}' +
-    '.highlight-box{background:#f8fdf8;border:1px solid #c6e8c6;border-radius:3px;padding:14px 16px;margin-bottom:18px}' +
-    '.highlight-box .fee-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}' +
-    '.highlight-box .fee-label{font-size:9px;font-weight:700;letter-spacing:.1em;color:#555;text-transform:uppercase}' +
-    '.highlight-box .fee-value{font-size:16px;font-weight:700;color:#166534}' +
-    '.highlight-box .fee-sub{font-size:10px;color:#444;margin-top:6px;padding-top:6px;border-top:1px solid #c6e8c6}' +
-    '.clause{font-size:10px;color:#333;margin-bottom:8px;padding-left:12px;border-left:2px solid #eee;line-height:1.6}' +
-    '.clause-num{font-weight:700;color:#111;margin-right:6px}' +
-    '.sig-section{margin-top:28px;padding-top:20px;border-top:2px solid #111}' +
-    '.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px}' +
-    '.sig-block .sig-name{font-size:12px;font-weight:700;color:#111;margin-bottom:2px}' +
-    '.sig-block .sig-role{font-size:9px;color:#666;letter-spacing:.08em;margin-bottom:16px}' +
-    '.sig-line{border-bottom:1px solid #999;margin-bottom:6px;height:36px}' +
-    '.sig-label{font-size:9px;color:#888}' +
+    '.party-detail{font-size:10px;color:#333;line-height:1.9}' +
+
+    // Two-column bilingual table
+    '.bi-table{width:100%;border-collapse:collapse;margin-bottom:4px}' +
+    '.bi-table .col-header-pt{background:#111;color:#fff;padding:5px 10px;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;width:55%}' +
+    '.bi-table .col-header-en{background:#444;color:#ddd;padding:5px 10px;font-size:8.5px;letter-spacing:.08em;font-style:italic;width:45%}' +
+    '.bi-table td.c-pt{padding:6px 10px;vertical-align:top;width:55%;border-bottom:1px solid #eee;border-right:2px solid #ddd;font-size:10.5px;color:#1a1a1a;font-weight:400}' +
+    '.bi-table td.c-en{padding:6px 10px;vertical-align:top;width:45%;border-bottom:1px solid #eee;font-size:9.5px;color:#666;font-style:italic}' +
+    '.bi-table tr:last-child td{border-bottom:none}' +
+
+    // Financial box
+    '.fee-box{border:1px solid #c6e8c6;border-radius:3px;overflow:hidden;margin-bottom:14px}' +
+    '.fee-box-header{background:#166534;color:#fff;padding:8px 14px;display:flex;justify-content:space-between;align-items:baseline}' +
+    '.fee-box-header .label-pt{font-size:11px;font-weight:700;letter-spacing:.06em}' +
+    '.fee-box-header .label-en{font-size:9px;font-style:italic;color:#a7f3d0}' +
+    '.fee-box-header .amount{font-size:20px;font-weight:700;font-family:Georgia,serif}' +
+    '.fee-box-body{padding:12px 14px;background:#f8fdf8}' +
+    '.fee-row-item{display:grid;grid-template-columns:55% 45%;border-bottom:1px solid #d1fae5;padding:5px 0}' +
+    '.fee-row-item:last-child{border-bottom:none}' +
+    '.fee-row-item .pt-val{font-size:10.5px;color:#1a1a1a}' +
+    '.fee-row-item .en-val{font-size:9.5px;color:#777;font-style:italic}' +
+
     '.iban-box{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:3px;padding:10px 14px;margin-top:10px}' +
-    '.iban-label{font-size:8px;font-weight:700;letter-spacing:.14em;color:#1e40af;text-transform:uppercase;margin-bottom:4px}' +
-    '.iban-value{font-size:12px;font-weight:700;font-family:monospace;color:#111}' +
-    '.page-num{text-align:center;font-size:9px;color:#aaa;margin-top:20px}' +
-    '@page{margin:10mm;size:A4}' +
+    '.iban-label-pt{font-size:9px;font-weight:700;letter-spacing:.1em;color:#1e40af;text-transform:uppercase;margin-bottom:1px}' +
+    '.iban-label-en{font-size:8.5px;color:#60a5fa;font-style:italic;margin-bottom:5px}' +
+    '.iban-value{font-size:13px;font-weight:700;font-family:monospace;color:#111;letter-spacing:.04em}' +
+
+    // Clauses
+    '.clauses-wrapper{border:1px solid #e5e5e5;border-radius:3px;overflow:hidden;margin-bottom:16px}' +
+    '.clauses-col-header{display:grid;grid-template-columns:55% 45%;background:#111}' +
+    '.clauses-col-header div{padding:5px 10px;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:#fff}' +
+    '.clauses-col-header div:first-child{border-right:2px solid #333}' +
+    '.clauses-col-header div:last-child{font-style:italic;color:#aaa;font-weight:400;letter-spacing:.06em;text-transform:none}' +
+    '.clause-row{display:grid;grid-template-columns:55% 45%;border-bottom:1px solid #eee}' +
+    '.clause-row:last-child{border-bottom:none}' +
+    '.clause-pt{padding:8px 10px;font-size:10.5px;color:#1a1a1a;border-right:2px solid #ddd;line-height:1.55}' +
+    '.clause-en{padding:8px 10px;font-size:9.5px;color:#666;font-style:italic;line-height:1.55}' +
+    '.clause-num-pt{font-weight:700;color:#111;font-style:normal;margin-right:4px}' +
+    '.clause-num-en{font-weight:700;color:#888;font-style:normal;margin-right:4px}' +
+
+    // Signatures
+    '.sig-section{margin-top:24px;padding-top:18px;border-top:2px solid #111}' +
+    '.sig-intro{display:grid;grid-template-columns:55% 45%;gap:0;font-size:9.5px;margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:12px}' +
+    '.sig-intro .pt{color:#1a1a1a;padding-right:14px;border-right:2px solid #ddd}' +
+    '.sig-intro .en{color:#888;font-style:italic;padding-left:14px;font-size:9px}' +
+    '.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px}' +
+    '.sig-block .sig-name{font-size:12px;font-weight:700;color:#111;margin-bottom:2px}' +
+    '.sig-block .sig-role-pt{font-size:9px;color:#333;letter-spacing:.06em;font-weight:700;text-transform:uppercase}' +
+    '.sig-block .sig-role-en{font-size:8.5px;color:#999;font-style:italic;margin-bottom:16px}' +
+    '.sig-line{border-bottom:1px solid #999;margin-bottom:5px;height:32px}' +
+    '.sig-label-pt{font-size:9px;color:#444;font-weight:700}' +
+    '.sig-label-en{font-size:8.5px;color:#aaa;font-style:italic}' +
+
+    '.footer{text-align:center;font-size:8.5px;color:#bbb;margin-top:18px;padding-top:10px;border-top:1px solid #eee}' +
+    '@page{margin:9mm;size:A4}' +
     '</style></head><body>' +
 
-    // Header
+    // ── HEADER ──
     '<div class="doc-header">' +
       '<div class="doc-title">' +
-        '<h1>PERFORMANCE CONTRACT</h1>' +
-        '<div class="subtitle">CONTRATO DE PRESTAÇÃO DE SERVIÇOS ARTÍSTICOS</div>' +
+        '<div class="main-pt">CONTRATO DE PRESTA\u00c7\u00c3O DE SERVI\u00c7OS ART\u00cdSTICOS</div>' +
+        '<div class="main-en">Performance Contract</div>' +
       '</div>' +
       '<div class="doc-meta">' +
-        'Ref: <strong>' + ctRef + '</strong><br>' +
-        'Date: ' + today + '<br>' +
-        (eventName ? 'Event: ' + eventName + '<br>' : '') +
+        'Ref.: <strong>' + ctRef + '</strong><br>' +
+        'Data / <em>Date</em>: ' + today + '<br>' +
+        (eventName ? 'Evento / <em>Event</em>: ' + eventName + '<br>' : '') +
       '</div>' +
     '</div>' +
 
-    // Parties
+    // ── PARTIES ──
     '<div class="section">' +
-      '<div class="section-title">Parties</div>' +
+      sec('Partes Contratantes', 'Parties to this Agreement') +
       '<div class="parties">' +
         '<div>' +
-          '<div class="party-role">Promoter / Venue</div>' +
+          '<div class="party-role"><span class="pt">Promotor / Local</span> <span class="en">/ Promoter &amp; Venue</span></div>' +
           '<div class="party-name">' + venueName + '</div>' +
           '<div class="party-detail">' +
-            (venueRep ? 'Represented by: <strong>' + venueRep + '</strong><br>' : '') +
-            (venueNIF ? 'NIF: ' + venueNIF + '<br>' : '') +
+            (venueRep ? 'Representado por / <em>Represented by</em>: <strong>' + venueRep + '</strong><br>' : '') +
+            (venueNIF ? 'NIF: <strong>' + venueNIF + '</strong><br>' : '') +
             (venueAddress ? venueAddress + '<br>' : '') +
-            (venueEmail ? venueEmail : '') +
+            (venueEmail || '') +
           '</div>' +
         '</div>' +
         '<div>' +
-          '<div class="party-role">Artist</div>' +
+          '<div class="party-role"><span class="pt">Artista</span> <span class="en">/ Artist</span></div>' +
           '<div class="party-name">' + artistName + '</div>' +
           '<div class="party-detail">' +
-            'Represented by: <strong>' + artistRep + '</strong><br>' +
-            (artistNIF ? 'NIF: ' + artistNIF + '<br>' : '') +
+            'Representado por / <em>Represented by</em>: <strong>' + artistRep + '</strong><br>' +
+            (artistNIF ? 'NIF: <strong>' + artistNIF + '</strong><br>' : '') +
             artistAddr + '<br>' +
             artistEmail +
           '</div>' +
@@ -5073,82 +5139,145 @@ function printContract() {
       '</div>' +
     '</div>' +
 
-    // Performance details
+    // ── PERFORMANCE DETAILS ──
     '<div class="section">' +
-      '<div class="section-title">Performance Details</div>' +
-      '<table class="c-table">' +
-        '<tr><td class="c-label">Date</td><td><strong>' + dateStr + '</strong></td></tr>' +
-        '<tr><td class="c-label">Show Time</td><td>' + showTime + (duration ? ' &nbsp;·&nbsp; Duration: ' + duration + ' minutes' : '') + '</td></tr>' +
-        '<tr><td class="c-label">Venue</td><td>' + (stageName || venueName) + (location ? ' &nbsp;·&nbsp; ' + location : '') + '</td></tr>' +
-        '<tr><td class="c-label">Load-in</td><td>' + loadIn + '</td></tr>' +
-        '<tr><td class="c-label">Sound Check</td><td>' + soundcheck + '</td></tr>' +
-        (eventName ? '<tr><td class="c-label">Event</td><td>' + eventName + '</td></tr>' : '') +
+      sec('Detalhes da Atua\u00e7\u00e3o', 'Performance Details') +
+      '<table class="bi-table">' +
+        '<tr><th class="col-header-pt">Portugu\u00eas</th><th class="col-header-en">English</th></tr>' +
+        row('<strong>Data:</strong> ' + datePT, '<strong>Date:</strong> ' + dateEN) +
+        row('<strong>Hora de in\u00edcio:</strong> ' + showTime + (duration ? ' &nbsp;\u00b7&nbsp; Dura\u00e7\u00e3o: ' + duration + ' min' : ''),
+            '<strong>Show time:</strong> ' + showTime + (duration ? ' &nbsp;\u00b7&nbsp; Duration: ' + duration + ' min' : '')) +
+        row('<strong>Local / Palco:</strong> ' + (stageName || venueName) + (location ? ', ' + location : ''),
+            '<strong>Venue / Stage:</strong> ' + (stageName || venueName) + (location ? ', ' + location : '')) +
+        row('<strong>Carga / Montagem:</strong> ' + loadIn, '<strong>Load-in:</strong> ' + loadIn) +
+        row('<strong>Passagem de som:</strong> ' + soundcheck, '<strong>Sound check:</strong> ' + soundcheck) +
+        (eventName ? row('<strong>Evento:</strong> ' + eventName, '<strong>Event:</strong> ' + eventName) : '') +
       '</table>' +
     '</div>' +
 
-    // Financial terms
+    // ── FINANCIAL TERMS ──
     '<div class="section">' +
-      '<div class="section-title">Financial Terms</div>' +
-      '<div class="highlight-box">' +
-        '<div class="fee-row"><span class="fee-label">Total Artist Fee</span><span class="fee-value">' + fmt(fee) + '</span></div>' +
-        (expenses > 0 ? '<div class="fee-row"><span class="fee-label">Travel &amp; Expenses</span><span class="fee-value">' + fmt(expenses) + '</span></div>' : '') +
-        (expenses > 0 ? '<div class="fee-row" style="border-top:1px solid #c6e8c6;padding-top:6px;margin-top:2px"><span class="fee-label">Total Payable</span><span class="fee-value">' + fmt(total) + '</span></div>' : '') +
-        '<div class="fee-sub">' +
-          '<table style="width:100%;border-collapse:collapse">' +
-            paymentSchedule +
-          '</table>' +
+      sec('Condi\u00e7\u00f5es Financeiras', 'Financial Terms') +
+      '<div class="fee-box">' +
+        '<div class="fee-box-header">' +
+          '<div><div class="label-pt">Cach\u00ea Art\u00edstico Total</div><div class="label-en">Total Artist Fee</div></div>' +
+          '<div class="amount">' + fmt(fee) + (expenses > 0 ? ' + ' + fmt(expenses) + ' desl.' : '') + '</div>' +
+        '</div>' +
+        '<div class="fee-box-body">' +
+          (expenses > 0 ?
+            '<div class="fee-row-item"><div class="pt-val"><strong>Cach\u00ea:</strong> ' + fmt(fee) + '</div><div class="en-val">Artist fee: ' + fmt(fee) + '</div></div>' +
+            '<div class="fee-row-item"><div class="pt-val"><strong>Deslocamento e despesas:</strong> ' + fmt(expenses) + '</div><div class="en-val">Travel &amp; expenses: ' + fmt(expenses) + '</div></div>' +
+            '<div class="fee-row-item"><div class="pt-val" style="font-weight:700">Total a pagar: ' + fmt(total) + '</div><div class="en-val">Total payable: ' + fmt(total) + '</div></div>'
+            : '') +
+          '<div style="border-top:1px solid #c6e8c6;padding-top:8px;margin-top:' + (expenses > 0 ? '8' : '0') + 'px">' +
+            '<table class="bi-table" style="margin:0">' +
+              payRows +
+            '</table>' +
+          '</div>' +
         '</div>' +
       '</div>' +
-      (iban ? '<div class="iban-box"><div class="iban-label">Bank Transfer Details</div><div class="iban-value">' + iban + '</div><div style="font-size:10px;color:#555;margin-top:3px">Beneficiary: ' + artistName + '</div></div>' : '') +
+      (iban ?
+        '<div class="iban-box">' +
+          '<div class="iban-label-pt">Dados para Pagamento</div>' +
+          '<div class="iban-label-en">Bank Transfer Details</div>' +
+          '<div class="iban-value">' + iban + '</div>' +
+          '<div style="font-size:10px;color:#555;margin-top:3px">Benefici\u00e1rio / <em>Beneficiary</em>: <strong>' + artistName + '</strong></div>' +
+        '</div>'
+      : '') +
     '</div>' +
 
-    // Technical requirements
+    // ── TECHNICAL REQUIREMENTS ──
     '<div class="section">' +
-      '<div class="section-title">Technical Requirements — Promoter Obligations</div>' +
-      '<table class="c-table">' +
-        '<tr><td class="c-label">PA System</td><td>' + pa + '</td></tr>' +
-        '<tr><td class="c-label">Backline</td><td>' + backline + '</td></tr>' +
-        '<tr><td class="c-label">Stage</td><td>Minimum ' + stageSize + '</td></tr>' +
-        '<tr><td class="c-label">Dressing Room</td><td>' + dressingRoom + '</td></tr>' +
-        '<tr><td class="c-label">Catering</td><td>' + catering + '</td></tr>' +
+      sec('Requisitos T\u00e9cnicos \u2014 Obriga\u00e7\u00f5es do Promotor', 'Technical Requirements \u2014 Promoter Obligations') +
+      '<table class="bi-table">' +
+        '<tr><th class="col-header-pt">Portugu\u00eas</th><th class="col-header-en">English</th></tr>' +
+        row('<strong>Sistema de som:</strong> ' + pa, '<strong>PA System:</strong> ' + pa) +
+        row('<strong>Backline:</strong> ' + backline, '<strong>Backline:</strong> ' + backline) +
+        row('<strong>Palco:</strong> M\u00ednimo ' + stageSize, '<strong>Stage:</strong> Minimum ' + stageSize) +
+        row('<strong>Camarim:</strong> ' + dressingRoom, '<strong>Dressing room:</strong> ' + dressingRoom) +
+        row('<strong>Catering:</strong> ' + catering, '<strong>Catering:</strong> ' + catering) +
       '</table>' +
     '</div>' +
 
-    // Standard clauses
+    // ── CLAUSES ──
     '<div class="section">' +
-      '<div class="section-title">General Terms &amp; Conditions</div>' +
-      '<div class="clause"><span class="clause-num">1. PERFORMANCE.</span> The Artist agrees to perform a live music set of approximately ' + duration + ' minutes at the agreed venue on the agreed date and time. Minor variations in set length may occur.</div>' +
-      '<div class="clause"><span class="clause-num">2. PAYMENT.</span> All amounts are in Euros (EUR). Payment shall be made by bank transfer to the account detailed above. All bank charges are the responsibility of the Promoter.</div>' +
-      '<div class="clause"><span class="clause-num">3. CANCELLATION.</span> ' + cancelText + ' Force majeure events (acts of God, government orders, natural disasters) shall not incur penalties for either party, provided written notice is given as soon as reasonably possible.</div>' +
-      '<div class="clause"><span class="clause-num">4. ARTIST OBLIGATIONS.</span> The Artist shall arrive at the venue by the agreed load-in time, perform professionally, and provide all equipment listed as Artist-provided in the tech rider.</div>' +
-      '<div class="clause"><span class="clause-num">5. PROMOTER OBLIGATIONS.</span> The Promoter shall provide the technical equipment specified herein, ensure the venue is safe and legally compliant, provide the agreed hospitality, and not alter the performance schedule without prior written agreement.</div>' +
-      '<div class="clause"><span class="clause-num">6. RECORDING &amp; BROADCAST.</span> Any audio or video recording, live streaming, or broadcast of the performance requires prior written consent from the Artist and may be subject to separate licensing fees.</div>' +
-      '<div class="clause"><span class="clause-num">7. MERCHANDISING.</span> The Artist retains the exclusive right to sell merchandise at the venue. The Promoter shall provide a suitable sales area at no additional cost, unless otherwise agreed in writing.</div>' +
-      '<div class="clause"><span class="clause-num">8. LIABILITY.</span> The Promoter is responsible for the safety of the venue and audience. The Artist is not liable for any injury or damage arising from venue conditions or crowd management.</div>' +
-      '<div class="clause"><span class="clause-num">9. GOVERNING LAW.</span> This agreement is governed by Portuguese law. Any disputes shall be resolved by the competent courts of Portugal.</div>' +
-      (special ? '<div class="clause"><span class="clause-num">10. SPECIAL CONDITIONS.</span> ' + special + '</div>' : '') +
+      '<div class="clauses-wrapper">' +
+        '<div class="clauses-col-header"><div>Condi\u00e7\u00f5es Gerais</div><div>General Terms &amp; Conditions</div></div>' +
+
+        '<div class="clause-row">' +
+          '<div class="clause-pt"><span class="clause-num-pt">1. ATUA\u00c7\u00c3O.</span> O Artista compromete-se a realizar uma atua\u00e7\u00e3o ao vivo de aproximadamente ' + duration + ' minutos no local acordado, na data e hora acordadas. Varia\u00e7\u00f5es menores na dura\u00e7\u00e3o s\u00e3o admiss\u00edveis.</div>' +
+          '<div class="clause-en"><span class="clause-num-en">1. PERFORMANCE.</span> The Artist agrees to perform a live set of approximately ' + duration + ' minutes at the agreed venue on the agreed date and time. Minor variations in set length may occur.</div>' +
+        '</div>' +
+
+        '<div class="clause-row">' +
+          '<div class="clause-pt"><span class="clause-num-pt">2. PAGAMENTO.</span> Todos os valores s\u00e3o em Euros (EUR). Os pagamentos ser\u00e3o efetuados por transfer\u00eancia banc\u00e1ria para o IBAN indicado. Todos os custos banc\u00e1rios s\u00e3o da responsabilidade do Promotor.</div>' +
+          '<div class="clause-en"><span class="clause-num-en">2. PAYMENT.</span> All amounts are in Euros (EUR). Payments shall be made by bank transfer to the IBAN above. All bank charges are the Promoter\u2019s responsibility.</div>' +
+        '</div>' +
+
+        '<div class="clause-row">' +
+          '<div class="clause-pt"><span class="clause-num-pt">3. CANCELAMENTO.</span> ' + cancelPT + '</div>' +
+          '<div class="clause-en"><span class="clause-num-en">3. CANCELLATION.</span> ' + cancelEN + '</div>' +
+        '</div>' +
+
+        '<div class="clause-row">' +
+          '<div class="clause-pt"><span class="clause-num-pt">4. OBRIGA\u00c7\u00d5ES DO ARTISTA.</span> O Artista comparecer\u00e1 at\u00e9 \u00e0 hora de carga acordada, atuar\u00e1 de forma profissional e fornecer\u00e1 todo o equipamento da sua responsabilidade conforme o rider t\u00e9cnico.</div>' +
+          '<div class="clause-en"><span class="clause-num-en">4. ARTIST OBLIGATIONS.</span> The Artist shall arrive by the agreed load-in time, perform professionally, and provide all Artist-supplied equipment per the technical rider.</div>' +
+        '</div>' +
+
+        '<div class="clause-row">' +
+          '<div class="clause-pt"><span class="clause-num-pt">5. OBRIGA\u00c7\u00d5ES DO PROMOTOR.</span> O Promotor disponibilizar\u00e1 o equipamento t\u00e9cnico especificado, garantir\u00e1 a seguran\u00e7a e conformidade legal do local, providenciar\u00e1 a hospitalidade acordada e n\u00e3o alterar\u00e1 o programa sem acordo pr\u00e9vio por escrito.</div>' +
+          '<div class="clause-en"><span class="clause-num-en">5. PROMOTER OBLIGATIONS.</span> The Promoter shall provide the technical equipment specified, ensure the venue is safe and legally compliant, provide the agreed hospitality, and not alter the schedule without prior written agreement.</div>' +
+        '</div>' +
+
+        '<div class="clause-row">' +
+          '<div class="clause-pt"><span class="clause-num-pt">6. GRAVA\u00c7\u00c3O E TRANSMISS\u00c3O.</span> Qualquer grava\u00e7\u00e3o de \u00e1udio/v\u00eddeo, transmiss\u00e3o em direto ou difus\u00e3o da atua\u00e7\u00e3o requer autoriza\u00e7\u00e3o escrita pr\u00e9via do Artista e poder\u00e1 estar sujeita a licenciamento adicional.</div>' +
+          '<div class="clause-en"><span class="clause-num-en">6. RECORDING &amp; BROADCAST.</span> Any audio/video recording, live streaming or broadcast requires prior written consent from the Artist and may be subject to separate licensing fees.</div>' +
+        '</div>' +
+
+        '<div class="clause-row">' +
+          '<div class="clause-pt"><span class="clause-num-pt">7. MERCHANDISING.</span> O Artista mant\u00e9m o direito exclusivo de venda de merchandising no local. O Promotor disponibilizar\u00e1 uma \u00e1rea adequada para venda sem custo adicional, salvo acordo escrito em contr\u00e1rio.</div>' +
+          '<div class="clause-en"><span class="clause-num-en">7. MERCHANDISING.</span> The Artist retains the exclusive right to sell merchandise at the venue. The Promoter shall provide a suitable sales area at no additional cost, unless otherwise agreed in writing.</div>' +
+        '</div>' +
+
+        '<div class="clause-row">' +
+          '<div class="clause-pt"><span class="clause-num-pt">8. RESPONSABILIDADE.</span> O Promotor \u00e9 respons\u00e1vel pela seguran\u00e7a do local e gest\u00e3o do p\u00fablico. O Artista n\u00e3o \u00e9 respons\u00e1vel por danos ou les\u00f5es decorrentes de condi\u00e7\u00f5es do local fora do seu controlo.</div>' +
+          '<div class="clause-en"><span class="clause-num-en">8. LIABILITY.</span> The Promoter is responsible for venue safety and audience management. The Artist is not liable for injury or damage arising from venue conditions beyond the Artist\u2019s control.</div>' +
+        '</div>' +
+
+        '<div class="clause-row">' +
+          '<div class="clause-pt"><span class="clause-num-pt">9. LEI APLIC\u00c1VEL.</span> Este contrato \u00e9 regido pela lei portuguesa. Quaisquer lit\u00edgios ser\u00e3o resolvidos pelos tribunais competentes de Portugal.' + (special ? ' <strong>Condi\u00e7\u00f5es especiais:</strong> ' + special : '') + '</div>' +
+          '<div class="clause-en"><span class="clause-num-en">9. GOVERNING LAW.</span> This agreement is governed by Portuguese law. Any disputes shall be resolved by the competent courts of Portugal.' + (special ? ' <strong>Special conditions:</strong> ' + special : '') + '</div>' +
+        '</div>' +
+      '</div>' +
     '</div>' +
 
-    // Signatures
+    // ── SIGNATURES ──
     '<div class="sig-section">' +
-      '<div style="font-size:10px;color:#555;margin-bottom:20px">Both parties confirm they have read, understood and agreed to the terms of this contract. This agreement constitutes a legally binding contract between the parties named above.</div>' +
+      '<div class="sig-intro">' +
+        '<div class="pt">Ambas as partes confirmam que leram, compreenderam e concordaram com os termos deste contrato. Este acordo constitui um contrato juridicamente vinculativo entre as partes acima identificadas.</div>' +
+        '<div class="en">Both parties confirm they have read, understood and agreed to the terms of this contract. This agreement constitutes a legally binding contract between the parties named above.</div>' +
+      '</div>' +
       '<div class="sig-grid">' +
         '<div class="sig-block">' +
           '<div class="sig-name">' + venueName + '</div>' +
-          '<div class="sig-role">PROMOTER / VENUE &nbsp;·&nbsp; ' + (venueRep || '') + '</div>' +
+          '<div class="sig-role-pt">Promotor / Local</div>' +
+          '<div class="sig-role-en">' + (venueRep || 'Promoter / Venue') + '</div>' +
           '<div class="sig-line"></div>' +
-          '<div class="sig-label">Signature &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date: _______________</div>' +
+          '<div class="sig-label-pt">Assinatura &nbsp;&nbsp;&nbsp;&nbsp; Data: _______________</div>' +
+          '<div class="sig-label-en">Signature &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date: _______________</div>' +
         '</div>' +
         '<div class="sig-block">' +
           '<div class="sig-name">' + artistName + '</div>' +
-          '<div class="sig-role">ARTIST / REPRESENTATIVE &nbsp;·&nbsp; ' + artistRep + '</div>' +
+          '<div class="sig-role-pt">Artista / Representante</div>' +
+          '<div class="sig-role-en">' + artistRep + '</div>' +
           '<div class="sig-line"></div>' +
-          '<div class="sig-label">Signature &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date: _______________</div>' +
+          '<div class="sig-label-pt">Assinatura &nbsp;&nbsp;&nbsp;&nbsp; Data: _______________</div>' +
+          '<div class="sig-label-en">Signature &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date: _______________</div>' +
         '</div>' +
       '</div>' +
     '</div>' +
 
-    '<div class="page-num">Contract ' + ctRef + ' &nbsp;·&nbsp; ' + artistName + ' &nbsp;·&nbsp; Generated ' + today + '</div>' +
+    '<div class="footer">Contrato / Contract ' + ctRef + ' &nbsp;\u00b7&nbsp; ' + artistName + ' &nbsp;\u00b7&nbsp; Emitido / Issued ' + today + '</div>' +
     '</body></html>';
 
   _contractNum++;
@@ -5157,8 +5286,10 @@ function printContract() {
   w.document.close();
   setTimeout(function() { w.print(); }, 700);
   closeContractModal();
-  showToast('Contract ' + ctRef + ' generated', 'ok');
+  showToast('Contrato ' + ctRef + ' gerado', 'ok');
 }
+
+
 
 
 // ── LOAD ALL GROWTH DATA ───────────────────────────────────────────────────
