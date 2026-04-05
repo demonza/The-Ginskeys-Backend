@@ -10,9 +10,33 @@ const { writeAudit } = require('../middleware/audit');
 const STAGES = ['idea','recorded','mixed','mastered','artwork','submitted','scheduled','released'];
 const TYPES  = ['single','ep','album','live','remix'];
 
+// ── Auto-ensure social_media column exists ──────────
+// Runs once on first request, creates the column if missing.
+// This replaces the need to manually run migrate_v5.
+let _socialMediaColReady = false;
+
+async function ensureSocialMediaColumn() {
+  if (_socialMediaColReady) return;
+  try {
+    const { rows } = await pool.query(`
+      SELECT 1 FROM information_schema.columns
+      WHERE table_name = 'releases' AND column_name = 'social_media'
+    `);
+    if (rows.length === 0) {
+      await pool.query(`ALTER TABLE releases ADD COLUMN social_media BOOLEAN NOT NULL DEFAULT false`);
+      console.log('✅ Auto-created releases.social_media column');
+    }
+    _socialMediaColReady = true;
+  } catch (err) {
+    console.error('Failed to ensure social_media column:', err.message);
+    // Don't cache the failure — try again next request
+  }
+}
+
 // GET /api/releases
 router.get('/', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
   try {
+    await ensureSocialMediaColumn();
     const { rows } = await pool.query(
       `SELECT r.*, array_agg(t.title ORDER BY t.position) FILTER (WHERE t.id IS NOT NULL) AS tracks
        FROM releases r
@@ -26,6 +50,7 @@ router.get('/', requireAuth, requirePerm('viewLedger'), async (req, res, next) =
 // POST /api/releases
 router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
   try {
+    await ensureSocialMediaColumn();
     const { title, type='single', stage='idea', release_date, spotify_url,
             artwork_done=false, video_done=false, press_pitched=false,
             spotify_pitched=false, social_media=false, notes, tracks=[] } = req.body;
@@ -34,8 +59,6 @@ router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
     if (!STAGES.includes(stage)) return res.status(400).json({ error: 'invalid stage. Valid: ' + STAGES.join(', ') });
 
     const id = uuid();
-    // FIX: removed runtime information_schema check — migrate_v5 must be run
-    // If the column doesn't exist, the query will fail with a clear Postgres error
     const { rows } = await pool.query(
       `INSERT INTO releases (id,title,type,stage,release_date,spotify_url,artwork_done,
          video_done,press_pitched,spotify_pitched,social_media,notes,created_by)
@@ -61,12 +84,10 @@ router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
 // PUT /api/releases/:id
 router.put('/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
   try {
+    await ensureSocialMediaColumn();
     const { title, type, stage, release_date, spotify_url, artwork_done,
             video_done, press_pitched, spotify_pitched, social_media, notes } = req.body;
 
-    // FIX: for booleans, COALESCE doesn't work because false is a valid non-null value.
-    // We need to explicitly check if the field was sent (not undefined) and pass the
-    // actual boolean, or pass null to keep the old value via COALESCE.
     function boolParam(val) {
       return val === undefined ? null : !!val;
     }
