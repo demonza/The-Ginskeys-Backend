@@ -2222,7 +2222,7 @@ tr:hover .edit-btn{display:inline}
 <div class="kpi-strip" style="grid-template-columns:repeat(8,1fr)">
   <div class="kpi-card green">
     <div class="kpi-label" data-i18n="kpi_balance">Total Balance</div>
-    <div class="kpi-value green" id="kpi-total-balance">€ 1,626.65</div>
+    <div class="kpi-value green" id="kpi-total-balance">—</div>
     <div class="kpi-sub up" id="kpi-balance-change">+€0 vs last txn</div>
 
   </div>
@@ -3237,14 +3237,14 @@ tr:hover .edit-btn{display:inline}
       <input type="hidden" id="inv-status-modal-id">
       <div class="form-field">
         <label>Status</label>
-        <select class="form-select" id="inv-status-select">
+        <select class="form-select" id="inv-status-select" onchange="invStatusTogglePaidFields()">
           <option value="draft">Draft</option>
           <option value="sent">Sent</option>
           <option value="paid">Paid ✓</option>
           <option value="cancelled">Cancelled</option>
         </select>
       </div>
-      <div class="form-field" id="inv-paid-date-field">
+      <div class="form-field" id="inv-paid-date-field" style="display:none">
         <label>Payment Date</label>
         <input class="form-input" id="inv-paid-date" type="date">
       </div>
@@ -3688,100 +3688,6 @@ tr:hover .edit-btn{display:inline}
 
 
     <!-- ── MEMBER ACCOUNTS ENGINE ───────────────────────────── -->
-    <div style="flex-shrink:0" id="member-accounts-panel">
-      <div style="font-family:var(--display);font-size:11px;font-weight:700;color:var(--amber2);letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:12px">
-        MEMBER ACCOUNTS
-        <span style="font-size:9px;color:var(--muted2);font-family:var(--mono);font-weight:400;letter-spacing:.04em">Live balances · auto-updated from gig splits</span>
-        <button class="btn-sm" onclick="loadMemberAccounts()" style="margin-left:auto">↺ Refresh</button>
-        <button class="btn-sm" onclick="showMemberWithdrawModal()" style="color:var(--red3);border-color:var(--red3)">↓ Log Withdrawal</button>
-        <button class="btn-sm" onclick="showMemberDepositModal()" style="color:var(--green3);border-color:var(--green3)">↑ Log Deposit</button>
-      </div>
-      <div id="member-accounts-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px">
-        <!-- Populated by loadMemberAccounts() -->
-        <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:12px;text-align:center;animation:pulse .8s infinite alternate">
-          <div style="font-size:9px;color:var(--muted);letter-spacing:.1em">Loading…</div>
-        </div>
-      </div>
-      <div id="member-txn-history" style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px;max-height:180px;overflow-y:auto">
-        <div style="padding:6px 10px;font-size:9px;color:var(--muted);letter-spacing:.08em;border-bottom:1px solid var(--border1);position:sticky;top:0;background:var(--bg3);display:grid;grid-template-columns:90px 80px 1fr 80px 80px 90px;gap:8px">
-          <span>DATE</span><span>MEMBER</span><span>DESCRIPTION</span><span style="text-align:right">AMOUNT</span><span style="text-align:right">BALANCE</span><span>TYPE</span>
-        </div>
-        <div id="member-txn-rows" style="font-size:10px"></div>
-      </div>
-    </div>
-
-    <!-- Member Withdrawal Modal -->
-    <div id="member-withdraw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:8000;align-items:center;justify-content:center">
-      <div style="background:var(--bg2);border:1px solid var(--red3);border-radius:3px;padding:24px;min-width:360px;font-family:var(--mono)">
-        <div style="font-size:13px;font-weight:700;color:var(--red3);letter-spacing:.1em;margin-bottom:16px">LOG WITHDRAWAL</div>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--muted2)">
-          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
-            <span>Member</span>
-            <select id="mw-member" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
-              <option value="band_fund">Band Fund</option>
-              <option value="fabio">Fábio</option>
-              <option value="pedro">Pedro</option>
-              <option value="manuel">Manuel</option>
-              <option value="tiago">Tiago</option>
-            </select>
-          </div>
-          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
-            <span>Amount (€)</span>
-            <input id="mw-amount" type="number" min="0.01" step="0.01" placeholder="0.00" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
-          </div>
-          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
-            <span>Date</span>
-            <input id="mw-date" type="date" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
-          </div>
-          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
-            <span>Description</span>
-            <input id="mw-desc" type="text" placeholder="e.g. Fuel reimbursement" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
-          </div>
-          <div id="mw-status" style="font-size:10px;color:var(--red3);min-height:14px"></div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
-          <button class="btn-sm" onclick="closeMemberModal('member-withdraw-modal')">Cancel</button>
-          <button class="btn-sm" onclick="saveMemberTransaction('withdrawal')" style="background:var(--red3);color:#000;font-weight:700;border-color:var(--red3)">Confirm Withdrawal</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Member Deposit Modal -->
-    <div id="member-deposit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:8000;align-items:center;justify-content:center">
-      <div style="background:var(--bg2);border:1px solid var(--green3);border-radius:3px;padding:24px;min-width:360px;font-family:var(--mono)">
-        <div style="font-size:13px;font-weight:700;color:var(--green3);letter-spacing:.1em;margin-bottom:16px">LOG DEPOSIT / EXPENSE REPAYMENT</div>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--muted2)">
-          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
-            <span>Member</span>
-            <select id="md-member" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
-              <option value="band_fund">Band Fund</option>
-              <option value="fabio">Fábio</option>
-              <option value="pedro">Pedro</option>
-              <option value="manuel">Manuel</option>
-              <option value="tiago">Tiago</option>
-            </select>
-          </div>
-          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
-            <span>Amount (€)</span>
-            <input id="md-amount" type="number" min="0.01" step="0.01" placeholder="0.00" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
-          </div>
-          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
-            <span>Date</span>
-            <input id="md-date" type="date" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
-          </div>
-          <div style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px">
-            <span>Description</span>
-            <input id="md-desc" type="text" placeholder="e.g. Equipment sale, royalties" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px">
-          </div>
-          <div id="md-status" style="font-size:10px;color:var(--green3);min-height:14px"></div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
-          <button class="btn-sm" onclick="closeMemberModal('member-deposit-modal')">Cancel</button>
-          <button class="btn-sm" onclick="saveMemberTransaction('deposit')" style="background:var(--green3);color:#000;font-weight:700;border-color:var(--green3)">Confirm Deposit</button>
-        </div>
-      </div>
-    </div>
-
 
     <!-- ── MEMBER ACCOUNTS ENGINE ───────────────────────────── -->
     <div style="flex-shrink:0" id="member-accounts-panel">
@@ -4199,9 +4105,9 @@ tr:hover .edit-btn{display:inline}
       <div style="flex-shrink:0;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">TAX YEAR</div>
         <select id="irs-year" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:11px;padding:4px 10px;font-family:var(--mono)" onchange="irsRender()">
-          <option value="2025" selected>2025</option>
+          <option value="2026" selected>2026</option>
+          <option value="2025">2025</option>
           <option value="2024">2024</option>
-          <option value="2026">2026</option>
         </select>
         <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-left:8px">MEMBER</div>
         <select id="irs-member" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:11px;padding:4px 10px;font-family:var(--mono)" onchange="irsRender()">
@@ -4241,9 +4147,9 @@ tr:hover .edit-btn{display:inline}
       <div style="flex-shrink:0;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">YEAR</div>
         <select id="budget-year" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:11px;padding:4px 10px;font-family:var(--mono)" onchange="budgetRender()">
-          <option value="2025" selected>2025</option>
+          <option value="2026" selected>2026</option>
+          <option value="2025">2025</option>
           <option value="2024">2024</option>
-          <option value="2026">2026</option>
         </select>
         <div style="flex:1"></div>
         <button class="btn-sm" onclick="budgetSetTargets()" style="color:var(--blue2);border-color:var(--blue2)">✎ Set Targets</button>
@@ -6338,156 +6244,7 @@ var CAT_PT = {
   'Live':       'Espetáculos / Cachês',
 };
 
-function irsRender() {
-  var year    = parseInt(document.getElementById('irs-year')?.value || 2025);
-  var member  = document.getElementById('irs-member')?.value || 'all';
-  var grid    = document.getElementById('irs-grid');
-  var bandDiv = document.getElementById('irs-band-total');
-  var catDiv  = document.getElementById('irs-category-breakdown');
-  if (!grid) return;
 
-  // Filter ledger by year
-  var entries = (LEDGER_DATA || []).filter(function(e) {
-    return new Date(e.date).getFullYear() === year;
-  });
-
-  // Total band revenue and expenses from ledger
-  var bandIncome  = entries.filter(function(e){ return e.amount > 0; }).reduce(function(s,e){ return s+e.amount; },0);
-  var bandExpenses = entries.filter(function(e){ return e.amount < 0; }).reduce(function(s,e){ return s+Math.abs(e.amount); },0);
-  var bandNet = bandIncome - bandExpenses;
-
-  // Per-member income from splits
-  var memberIncome = { fabio:0, pedro:0, manuel:0, tiago:0 };
-  var memberGigs   = { fabio:0, pedro:0, manuel:0, tiago:0 };
-  (SPLITS_DATA || []).forEach(function(s) {
-    if (s.gig_date && new Date(s.gig_date).getFullYear() !== year) return;
-    var perM = parseFloat(s.per_member_eur || 0);
-    if (perM > 0) {
-      Object.keys(memberIncome).forEach(function(k) {
-        memberIncome[k] += perM;
-        memberGigs[k]++;
-      });
-    }
-  });
-
-  // Expenses by category
-  var expByCat = {};
-  entries.filter(function(e){ return e.amount < 0; }).forEach(function(e) {
-    var cat = e.cat || 'Outros';
-    expByCat[cat] = (expByCat[cat] || 0) + Math.abs(e.amount);
-  });
-
-  var fmtE = function(v) { return '\u20ac\u00a0' + Math.abs(v).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}); };
-
-  // Member share of band expenses (equal split for now)
-  var memberExpShare = bandExpenses / 4;
-
-  var members = member === 'all' ? ['fabio','pedro','manuel','tiago'] : [member];
-
-  grid.style.gridTemplateColumns = members.length === 1 ? '1fr' : 'repeat(2,1fr)';
-
-  grid.innerHTML = members.map(function(mk) {
-    var inc   = memberIncome[mk] || 0;
-    var gigs  = memberGigs[mk] || 0;
-    var exp   = memberExpShare;
-    var net   = inc - exp;
-    var col   = MEMBER_COLORS_FT[mk];
-    var name  = MEMBER_NAMES_FT[mk];
-
-    // Deductible expenses (member's share of deductible categories)
-    var deductible = 0;
-    DEDUCTIBLE_CATS.forEach(function(cat) {
-      deductible += (expByCat[cat] || 0) / 4;
-    });
-    var taxableIncome = Math.max(0, inc - deductible);
-    // Portuguese IRS Cat B — simplified regime: 75% coefficient on services
-    var coefficient = 0.75;
-    var taxableBase = taxableIncome * coefficient;
-    // Estimated IRS at ~28.5% marginal (simplified - actual depends on total income)
-    var estimatedTax = taxableBase * 0.285;
-
-    return '<div class="panel" style="border-top:3px solid ' + col + ';padding:14px">' +
-      '<div style="font-size:10px;font-weight:700;color:' + col + ';letter-spacing:.1em;margin-bottom:12px">' + name.toUpperCase() + ' — ' + year + '</div>' +
-
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;font-size:10px;border:1px solid var(--border2);border-radius:2px;overflow:hidden;margin-bottom:12px">' +
-        '<div style="padding:8px 10px;border-bottom:1px solid var(--border2);border-right:1px solid var(--border2)">' +
-          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">RENDIMENTO BRUTO / Gross Income</div>' +
-          '<div style="font-size:16px;font-weight:700;color:var(--green3)">' + fmtE(inc) + '</div>' +
-          '<div style="font-size:9px;color:var(--muted3);margin-top:2px">' + gigs + ' espetáculos</div>' +
-        '</div>' +
-        '<div style="padding:8px 10px;border-bottom:1px solid var(--border2)">' +
-          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">DESPESAS DEDUTÍVEIS / Deductible Exp.</div>' +
-          '<div style="font-size:16px;font-weight:700;color:var(--red3)">-' + fmtE(deductible) + '</div>' +
-          '<div style="font-size:9px;color:var(--muted3);margin-top:2px">quota-parte band</div>' +
-        '</div>' +
-        '<div style="padding:8px 10px;border-right:1px solid var(--border2)">' +
-          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">RENDIMENTO LÍQUIDO / Net</div>' +
-          '<div style="font-size:15px;font-weight:700;color:var(--text)">' + fmtE(net) + '</div>' +
-        '</div>' +
-        '<div style="padding:8px 10px">' +
-          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">BASE TRIBUTÁVEL (75%) / Taxable Base</div>' +
-          '<div style="font-size:15px;font-weight:700;color:var(--amber2)">' + fmtE(taxableBase) + '</div>' +
-        '</div>' +
-      '</div>' +
-
-      '<div style="background:var(--bg4);border-radius:2px;padding:10px 12px;font-size:10px">' +
-        '<div style="display:flex;justify-content:space-between;margin-bottom:6px">' +
-          '<span style="color:var(--muted2)">IRS estimado (28,5%) / Est. tax</span>' +
-          '<span style="font-weight:700;color:var(--amber2)">' + fmtE(estimatedTax) + '</span>' +
-        '</div>' +
-        '<div style="font-size:8px;color:var(--muted3);line-height:1.6">' +
-          'Coeficiente Cat. B serviços: 0,75 · Regime simplificado · ' +
-          'Declare em <strong>Anexo B</strong> da Mod. 3 · ' +
-          'Prazo: 30 Jun ' + (year+1) +
-        '</div>' +
-      '</div>' +
-
-      '<button onclick="irsPrintMember(\'' + mk + '\',' + year + ')" style="margin-top:10px;width:100%;background:transparent;border:1px solid var(--border2);color:var(--muted2);font-size:9px;padding:5px;cursor:pointer;font-family:var(--mono)">⎙ Export PDF — ' + name + '</button>' +
-    '</div>';
-  }).join('');
-
-  // Band total summary
-  if (bandDiv) {
-    bandDiv.innerHTML = '<div class="panel" style="padding:12px">' +
-      '<div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:10px">RESUMO DA BANDA ' + year + ' / BAND TOTAL</div>' +
-      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">' +
-        '<div><div style="font-size:8px;color:var(--muted3)">Receita total</div><div style="font-size:16px;font-weight:700;color:var(--green3)">' + fmtE(bandIncome) + '</div></div>' +
-        '<div><div style="font-size:8px;color:var(--muted3)">Despesas totais</div><div style="font-size:16px;font-weight:700;color:var(--red3)">-' + fmtE(bandExpenses) + '</div></div>' +
-        '<div><div style="font-size:8px;color:var(--muted3)">Resultado líquido</div><div style="font-size:16px;font-weight:700;color:' + (bandNet>=0?'var(--text)':'var(--red3)') + '">' + fmtE(bandNet) + '</div></div>' +
-        '<div><div style="font-size:8px;color:var(--muted3)">Por membro</div><div style="font-size:16px;font-weight:700;color:var(--amber2)">' + fmtE(bandNet/4) + '</div></div>' +
-      '</div>' +
-    '</div>';
-  }
-
-  // Category breakdown
-  if (catDiv) {
-    var rows = Object.entries(expByCat).sort(function(a,b){ return b[1]-a[1]; });
-    catDiv.innerHTML = '<div class="panel" style="padding:12px">' +
-      '<div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:10px">DESPESAS POR CATEGORIA ' + year + ' / EXPENSES BY CATEGORY</div>' +
-      (rows.length ? rows.map(function(r) {
-        var pct = bandExpenses > 0 ? (r[1]/bandExpenses*100).toFixed(0) : 0;
-        var isDeductible = DEDUCTIBLE_CATS.indexOf(r[0]) !== -1;
-        return '<div style="display:grid;grid-template-columns:160px 1fr 70px 60px;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border1);font-size:10px">' +
-          '<div style="color:var(--muted2)">' + (CAT_PT[r[0]] || r[0]) + '</div>' +
-          '<div style="background:var(--bg4);border-radius:1px;height:4px;overflow:hidden">' +
-            '<div style="height:100%;width:' + pct + '%;background:' + (isDeductible?'var(--green3)':'var(--red3)') + ';border-radius:1px"></div>' +
-          '</div>' +
-          '<div style="text-align:right;color:var(--text)">' + fmtE(r[1]) + '</div>' +
-          '<div style="text-align:right">' +
-            (isDeductible ? '<span style="font-size:8px;color:var(--green3);padding:1px 4px;border:1px solid var(--green3);border-radius:1px">DED.</span>' :
-                            '<span style="font-size:8px;color:var(--muted3)">—</span>') +
-          '</div>' +
-        '</div>';
-      }).join('') : '<div style="color:var(--muted3);font-size:10px;padding:8px 0">No expenses recorded for ' + year + '.</div>') +
-    '</div>';
-  }
-}
-
-function irsRender() {
-  var year   = parseInt(document.getElementById('irs-year')?.value || 2025);
-  var member = document.getElementById('irs-member')?.value || 'all';
-  _irsRenderCore(year, member);
-}
 
 function _irsRenderCore(year, member) {
   var grid    = document.getElementById('irs-grid');
@@ -7362,11 +7119,7 @@ function invStatusTogglePaidFields() {
   if (paidField) paidField.style.display = sel === 'paid' ? '' : 'none';
 }
 
-// Hook status select change
-document.addEventListener('DOMContentLoaded', function() {
-  var sel = document.getElementById('inv-status-select');
-  if (sel) sel.addEventListener('change', invStatusTogglePaidFields);
-});
+// invStatusTogglePaidFields triggered via onchange on the select element directly
 
 function invSaveStatus() {
   var id     = document.getElementById('inv-status-modal-id').value;
@@ -10250,7 +10003,7 @@ function renderFullAlerts(){
   if(!el)return;
   el.innerHTML=`
     <div class="alert-card warn"><div class="alert-card-title">Streaming — No trend data yet</div><div class="alert-card-body">CDBaby reports 2,200 Spotify streams total. Connect Spotify for Artists to enable MoM trend alerts.</div><div class="alert-ts">2026-03-19 · Setup required</div></div>
-    <div class="alert-card warn"><div class="alert-card-title">Cash Runway Warning</div><div class="alert-card-body" id="alert-runway-body">At current burn rate, runway is being calculated — see Dashboard KPI strip.</div><div class="alert-ts">Auto-calculated · Triggered by: cash-runway rule</div></div>
+    <div class="alert-card warn"><div class="alert-card-title">Cash Runway Warning</div><div class="alert-card-body" id="alert-runway-body-dynamic">At current burn rate, runway is being calculated — see Dashboard KPI strip.</div><div class="alert-ts">Auto-calculated · Triggered by: cash-runway rule</div></div>
     <div class="alert-card info"><div class="alert-card-title">Distrokid charge — March 2026</div><div class="alert-card-body">Distribution renewal €27.40 on 2026-03-18. Verify coverage includes all active releases.</div><div class="alert-ts">2026-03-18 · Informational</div></div>
     <div class="alert-card info"><div class="alert-card-title">Spotify streams flat</div><div class="alert-card-body">2,200 streams total (all-time) from CDBaby dashboard. No MoM data yet — connect Spotify for Artists for trends.</div><div class="alert-ts">2026-03-19 · Data gap</div></div>
   `;
@@ -11034,7 +10787,10 @@ function mapApiTxn(rows) {
     };
   });
   // Most recent first for ledger view
-  return mapped.reverse();
+  const result = mapped.reverse();
+  // Store anchor balance for recalcBalances
+  if (result.length) window._ledgerAnchorBalance = result[0].balance;
+  return result;
 }
 
 async function loadLedgerFromApi() {
@@ -11843,7 +11599,7 @@ async function submitTxn(){
 
 // ─── SWITCH VIEW (with permission check) ─────────────
 function switchView(view, tab){
-  const permMap={mgmt:'viewDashboard',dashboard:'viewDashboard',ledger:'viewLedger',tours:'viewTours',streaming:'viewStreaming',access:'viewAccess',audit:'viewAudit',alerts:'viewAlerts',settings:'viewSettings'};
+  const permMap={mgmt:'viewDashboard',dashboard:'viewDashboard',ledger:'viewLedger',tours:'viewTours',streaming:'viewStreaming',access:'viewAccess',audit:'viewAudit',alerts:'viewAlerts',settings:'viewSettings',members:'viewDashboard','finance-tools':'viewDashboard',invoices:'viewDashboard'};
   const perm=permMap[view];
   if(SESSION && perm && !can(perm)){
     alert('Your role ('+SESSION.role+') does not have permission to view this section.');
@@ -11994,11 +11750,13 @@ function deleteCurrentTxn(){
 }
 
 function recalcBalances(){
-  // Sort ascending by date, recompute running balance
+  // Sort ascending by date, recompute running balance from scratch
   const sorted=[...LEDGER_DATA].sort((a,b)=>a.date.localeCompare(b.date));
+  // Use 0 as starting balance — running balance is computed from net movement
   const totalMov=sorted.reduce((s,t)=>s+t.amount,0);
-  const TARGET=1626.65;
-  let running=parseFloat((TARGET-totalMov).toFixed(2));
+  // Anchor to latest known balance from API if available, else compute from net
+  const anchor = (window._ledgerAnchorBalance !== undefined) ? window._ledgerAnchorBalance : 0;
+  let running=parseFloat((anchor-totalMov).toFixed(2));
   sorted.forEach(t=>{ running=parseFloat((running+t.amount).toFixed(2)); t.balance=running; });
   // Restore reverse order for display
   LEDGER_DATA.sort((a,b)=>b.date.localeCompare(a.date)||b.balance-a.balance);
