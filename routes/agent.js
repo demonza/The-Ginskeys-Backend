@@ -11,6 +11,13 @@ const { writeAudit } = require('../middleware/audit');
 // ── CONSTANTS ────────────────────────────────────────
 const VALID_TONES = ['professional', 'casual', 'energetic'];
 const VALID_LANGUAGES = ['english', 'portuguese'];
+// FIX: map frontend display labels to API values
+const LANGUAGE_MAP = {
+  'english': 'english',
+  'portuguese': 'portuguese',
+  'português': 'portuguese',
+  'inglês': 'english',
+};
 const AI_TIMEOUT_MS = 30_000;  // FIX: 30s timeout on AI calls (was unlimited)
 const AI_MAX_RETRIES = 2;      // FIX: retry once on transient failures
 
@@ -281,6 +288,19 @@ function sanitisePromptInput(text, maxLength = 500) {
     .trim();
 }
 
+// Normalise language input from frontend (may send "Português" instead of "portuguese")
+function normaliseLanguage(lang) {
+  if (!lang) return 'english';
+  return LANGUAGE_MAP[lang.toLowerCase().trim()] || null;
+}
+
+// Normalise tone input
+function normaliseTone(tone) {
+  if (!tone) return 'professional';
+  const t = tone.toLowerCase().trim();
+  return VALID_TONES.includes(t) ? t : null;
+}
+
 
 // ── GET /api/agent/venues ────────────────────────────
 router.get('/venues', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
@@ -308,14 +328,16 @@ router.post('/pitch', requireAuth, requirePerm('addTxn'), async (req, res, next)
       return res.status(429).json({ error: 'AI rate limit exceeded. Max 20 generations per hour.' });
     }
 
-    const { venue_id, tone = 'professional', language = 'english',
+    const { venue_id, tone: rawTone = 'professional', language: rawLang = 'english',
             proposed_date, additional_context = '' } = req.body;
 
-    // FIX: validate tone and language inputs
-    if (!VALID_TONES.includes(tone))
+    // FIX: normalise inputs (frontend may send display labels like "Português")
+    const tone = normaliseTone(rawTone);
+    const language = normaliseLanguage(rawLang);
+    if (!tone)
       return res.status(400).json({ error: 'tone must be one of: ' + VALID_TONES.join(', ') });
-    if (!VALID_LANGUAGES.includes(language))
-      return res.status(400).json({ error: 'language must be one of: ' + VALID_LANGUAGES.join(', ') });
+    if (!language)
+      return res.status(400).json({ error: 'language must be one of: english, portuguese (or Português, Inglês)' });
 
     const venue = VENUE_DATABASE.find(v => v.id === venue_id);
     if (!venue) return res.status(404).json({ error: 'Venue not found' });
@@ -375,13 +397,14 @@ router.post('/followup', requireAuth, requirePerm('addTxn'), async (req, res, ne
       return res.status(429).json({ error: 'AI rate limit exceeded. Max 20 generations per hour.' });
     }
 
-    const { booking_id, followup_number = 1, language = 'english' } = req.body;
+    const { booking_id, followup_number = 1, language: rawLang = 'english' } = req.body;
 
     // FIX: validate inputs
     if (!booking_id)
       return res.status(400).json({ error: 'booking_id required' });
-    if (!VALID_LANGUAGES.includes(language))
-      return res.status(400).json({ error: 'language must be one of: ' + VALID_LANGUAGES.join(', ') });
+    const language = normaliseLanguage(rawLang);
+    if (!language)
+      return res.status(400).json({ error: 'language must be one of: english, portuguese (or Português, Inglês)' });
 
     const followupNum = parseInt(followup_number);
     if (!isFinite(followupNum) || followupNum < 1 || followupNum > 3)
@@ -425,15 +448,17 @@ router.post('/followup', requireAuth, requirePerm('addTxn'), async (req, res, ne
 router.post('/batch', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
   try {
     // FIX: AI rate limiting — batch counts as N calls
-    const { venue_ids, tone = 'professional', language = 'english', proposed_month } = req.body;
+    const { venue_ids, tone: rawTone = 'professional', language: rawLang = 'english', proposed_month } = req.body;
     if (!venue_ids?.length) return res.status(400).json({ error: 'venue_ids required' });
     if (venue_ids.length > 10) return res.status(400).json({ error: 'Max 10 venues per batch' });
 
-    // FIX: validate inputs
-    if (!VALID_TONES.includes(tone))
+    // FIX: normalise inputs
+    const tone = normaliseTone(rawTone);
+    const language = normaliseLanguage(rawLang);
+    if (!tone)
       return res.status(400).json({ error: 'tone must be one of: ' + VALID_TONES.join(', ') });
-    if (!VALID_LANGUAGES.includes(language))
-      return res.status(400).json({ error: 'language must be one of: ' + VALID_LANGUAGES.join(', ') });
+    if (!language)
+      return res.status(400).json({ error: 'language must be one of: english, portuguese (or Português, Inglês)' });
 
     // Check rate limit for the whole batch
     const rateLimitRecord = aiUsage.get(req.user.id);
