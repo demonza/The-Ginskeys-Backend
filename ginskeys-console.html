@@ -4532,7 +4532,7 @@ function renderBookingList() {
             <td style="padding:7px 10px;color:var(--muted3)">${b.location||'—'}</td>
             <td style="padding:7px 10px"><span style="color:${STAGE_COLORS[b.stage]||'var(--muted2)'};font-weight:700;font-size:9px;text-transform:uppercase">${b.stage}</span></td>
             <td style="padding:7px 10px;text-align:right;color:var(--green3)">${b.fee_eur?'€'+parseFloat(b.fee_eur).toLocaleString('pt-PT'):'—'}</td>
-            <td style="padding:7px 10px;color:${overdue?'var(--red3)':'var(--muted3)'}">${b.follow_up_date||'-'}${overdue?' ⚠':''}</td>
+            <td style="padding:7px 10px;color:${overdue?'var(--red3)':'var(--muted3)'}">${fmtDate(b.follow_up_date)}${overdue?' ⚠':''}</td>
             <td style="padding:7px 10px" onclick="event.stopPropagation()">
               <div style="display:flex;gap:4px;align-items:center">
                 <select style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:2px 4px" onchange="updateBookingStage('${b.id}',this.value)">
@@ -4602,7 +4602,7 @@ function renderReleasesList() {
         <div style="font-weight:700;color:var(--text);font-size:11px">${r.title} <span style="font-size:9px;color:var(--muted3);font-weight:400;text-transform:uppercase">${r.type}</span></div>
         <div style="display:flex;gap:8px;margin-top:4px">
           <span style="font-size:9px;color:${RELEASE_STAGE_COLORS[r.stage]};font-weight:700;text-transform:uppercase">${r.stage}</span>
-          ${r.release_date?`<span style="font-size:9px;color:var(--muted3)">${r.release_date}</span>`:''}
+          ${r.release_date?`<span style="font-size:9px;color:var(--muted3)">${fmtDate(r.release_date)}</span>`:''}
           <span style="font-size:9px;color:var(--muted3)">${doneCount}/5 tasks</span>
         </div>
         <div style="display:flex;gap:6px;margin-top:4px">
@@ -4651,7 +4651,7 @@ function renderReleasesList() {
           </div>
           <div style="text-align:right">
             <div style="font-size:10px;font-weight:700;color:${color}">${isPast?'Live':'In '+daysOut+'d'}</div>
-            <div style="font-size:8px;color:var(--muted3)">${r.release_date}</div>
+            <div style="font-size:8px;color:var(--muted3)">${fmtDate(r.release_date)}</div>
           </div>
         </div>`;
       }).join('');
@@ -4937,7 +4937,7 @@ function renderSplitHistory() {
   if (!SPLITS_DATA.length) { el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted3);font-size:10px">No splits saved yet.</div>'; return; }
   el.innerHTML=SPLITS_DATA.map((s,i)=>`
     <div onclick="openSplitsDrawer(${i})" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:12px;padding:9px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:10px;cursor:pointer;transition:background .1s">
-      <div><div style="font-weight:700;color:var(--text)">${s.gig_name}</div><div style="font-size:9px;color:var(--muted3)">${s.gig_date||'—'} · ${s.member_count||'?'} members</div></div>
+      <div><div style="font-weight:700;color:var(--text)">${s.gig_name}</div><div style="font-size:9px;color:var(--muted3)">${fmtDate(s.gig_date)||'—'} · ${s.member_count||'?'} members</div></div>
       <div style="text-align:right;color:var(--text)">€${parseFloat(s.gross_eur||0).toFixed(2)}</div>
       <div style="text-align:right;color:var(--red3)">-€${parseFloat(s.total_expenses_eur||0).toFixed(2)}</div>
       <div style="text-align:right;color:var(--amber2)">fund €${parseFloat(s.band_fund_eur||0).toFixed(2)}</div>
@@ -7520,7 +7520,7 @@ async function loadFollowupContacts() {
       <div class="venue-type">${b.stage.toUpperCase()} · ${b.type}</div>
       <div class="venue-name">${b.name}</div>
       <div class="venue-city">${b.location||'—'}</div>
-      ${b.follow_up_date?`<div class="venue-fee" style="color:var(--amber2)">Follow up: ${b.follow_up_date}</div>`:''}
+      ${b.follow_up_date?`<div class="venue-fee" style="color:var(--amber2)">Follow up: ${fmtDate(b.follow_up_date)}</div>`:''}
     </div>`).join('');
 }
 
@@ -7653,7 +7653,7 @@ function renderReleaseCalendar() {
         <div style="font-weight:700;font-size:10px;color:var(--text)">${r.title}</div>
         <div style="font-size:8px;color:${isPast?'var(--muted)':daysUntil<14?'var(--accent)':'var(--green3)'}">${isPast?'RELEASED':daysUntil+'d'}</div>
       </div>
-      <div style="font-size:8px;color:var(--muted3);margin-top:2px">${r.release_date} · ${r.type.toUpperCase()} · ${r.stage.toUpperCase()}</div>
+      <div style="font-size:8px;color:var(--muted3);margin-top:2px">${fmtDate(r.release_date)} · ${r.type.toUpperCase()} · ${r.stage.toUpperCase()}</div>
       ${pitchOverdue?`<div style="font-size:8px;color:var(--red3);margin-top:2px">⚠ Press pitch deadline passed — send EPK now</div>`:''}
     </div>`;
   }).join('');
@@ -10098,6 +10098,18 @@ function toActiveCcy(eurAmount) {
   return eurAmount * FX_RATES[ACTIVE_CCY];
 }
 
+// ── Date formatting — strips T00:00:00.000Z from ISO strings ──
+function fmtDate(dateStr) {
+  if (!dateStr) return '—';
+  // Already a clean YYYY-MM-DD? Return as-is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+  // ISO string with time component? Strip it
+  if (typeof dateStr === 'string' && dateStr.includes('T')) return dateStr.slice(0, 10);
+  // Date object?
+  if (dateStr instanceof Date && !isNaN(dateStr)) return dateStr.toISOString().slice(0, 10);
+  return String(dateStr);
+}
+
 function fmtMoney(eurAmount, opts = {}) {
   const converted = toActiveCcy(eurAmount);
   const sym = CCY_SYMBOLS[ACTIVE_CCY];
@@ -10120,18 +10132,22 @@ function fmtMoneyShort(eurAmount) {
   return sign + sym + abs.toFixed(0);
 }
 
-// ── LIVE FX RATES (fetched on load, fallback to static) ──────
+// ── LIVE FX RATES (fetched via backend proxy to avoid CORS) ──────
 const FX_FALLBACK = { EUR: 1, USD: 1.08, GBP: 0.86 };
 // ── LANGUAGE ─────────────────────────────────────────────
 let ACTIVE_LANG = localStorage.getItem('gk_lang') || 'en';
 async function fetchLiveFx() {
   try {
-    const r = await fetch('https://api.frankfurter.app/latest?base=EUR&symbols=USD,GBP');
-    if (!r.ok) return;
+    // Use backend proxy — Frankfurter blocks browser CORS from Railway
+    const base = API_BASE || '';
+    const r = await fetch(base + '/fx/latest');
+    if (!r.ok) throw new Error('FX proxy returned ' + r.status);
     const d = await r.json();
-    FX_RATES.USD = d.rates.USD;
-    FX_RATES.GBP = d.rates.GBP;
-    console.log('[GKS] Live FX loaded:', FX_RATES);
+    if (d.ok && d.rates) {
+      if (d.rates.USD) FX_RATES.USD = d.rates.USD;
+      if (d.rates.GBP) FX_RATES.GBP = d.rates.GBP;
+      console.log('[GKS] Live FX loaded via proxy:', FX_RATES, '(source: ' + d.source + ')');
+    }
   } catch(e) {
     console.warn('[GKS] FX fetch failed, using fallback rates');
   }
@@ -12424,7 +12440,7 @@ function renderShowsList() {
       <div style="display:flex;justify-content:space-between;align-items:start">
         <div>
           <div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--text)">${s.venue_name||'Show'}</div>
-          <div style="font-size:9px;color:var(--muted3);margin-top:2px">${s.show_date}${s.venue_address?' · '+s.venue_address:''}</div>
+          <div style="font-size:9px;color:var(--muted3);margin-top:2px">${fmtDate(s.show_date)}${s.venue_address?' · '+s.venue_address:''}</div>
         </div>
         <div style="display:flex;gap:6px;align-items:center">
           <span style="font-size:8px;padding:2px 8px;border-radius:1px;background:${isPast?'var(--bg4)':'rgba(255,60,30,.1)'};color:${isPast?'var(--muted)':'var(--accent)'}">${isPast?'PAST':'UPCOMING'}</span>
@@ -14303,7 +14319,7 @@ function mgmtPriorityActions() {
     .forEach(b => actions.push({
       urgency: 'danger', icon: '📞',
       label: `Follow up: ${b.name}`,
-      detail: `${b.stage.toUpperCase()} since ${b.follow_up_date}`,
+      detail: `${b.stage.toUpperCase()} since ${fmtDate(b.follow_up_date)}`,
       action: () => switchView('booking', document.querySelector('[data-view=booking]'))
     }));
 
@@ -14327,7 +14343,7 @@ function mgmtPriorityActions() {
   }).forEach(r => actions.push({
     urgency: 'danger', icon: '⚠',
     label: `${r.title}: pitch window passed`,
-    detail: `Release ${r.release_date} — send EPK to Spotify NOW`,
+    detail: `Release ${fmtDate(r.release_date)} — send EPK to Spotify NOW`,
     action: () => switchView('releases', document.querySelector('[data-view=releases]'))
   }));
 
@@ -14442,7 +14458,7 @@ function mgmtReleasesPipeline() {
       ${stageBar(r.stage)}
       <div style="display:flex;gap:5px;margin-top:5px">
         ${[{l:'Art',d:r.artwork_done},{l:'Vid',d:r.video_done},{l:'Press',d:r.press_pitched},{l:'Spot',d:r.spotify_pitched},{l:'Social',d:r.social_media}].map(c=>`<span style="font-size:8px;padding:1px 5px;border-radius:1px;background:${c.d?'rgba(0,230,118,.12)':'rgba(255,255,255,.04)'};color:${c.d?'var(--green3)':'var(--muted3)'}">${c.l}</span>`).join('')}
-        ${r.release_date?`<span style="font-size:8px;color:var(--muted3);margin-left:auto">${r.release_date}</span>`:''}
+        ${r.release_date?`<span style="font-size:8px;color:var(--muted3);margin-left:auto">${fmtDate(r.release_date)}</span>`:''}
       </div>
     </div>`).join('');
 }
@@ -14474,7 +14490,7 @@ function mgmtBookingPipeline() {
         ${b.location?`<span>${b.location}</span>`:''}
         ${b.fee_eur?`<span style="color:var(--amber2)">€${b.fee_eur}</span>`:''}
         ${isOverdue?`<span style="color:var(--amber2)">⚠ follow-up overdue</span>`:''}
-        ${b.follow_up_date&&!isOverdue?`<span>follow-up: ${b.follow_up_date}</span>`:''}
+        ${b.follow_up_date&&!isOverdue?`<span>follow-up: ${fmtDate(b.follow_up_date)}</span>`:''}
       </div>
     </div>`; }).join('');
 }
@@ -14502,7 +14518,7 @@ function mgmtShowSchedule() {
         <div style="font-size:10px;font-weight:700;color:${isPast?'var(--muted2)':'var(--text)'}">${s.venue_name||'Show'}</div>
         <div style="font-size:8px;color:var(--muted3)">${s.show_time||''} ${s.set_length_min?'· '+s.set_length_min+'min':''}</div>
       </div>
-      <div style="font-size:8px;color:var(--muted3)">${s.show_date}</div>
+      <div style="font-size:8px;color:var(--muted3)">${fmtDate(s.show_date)}</div>
     </div>`; }).join('');
 }
 
@@ -15099,7 +15115,7 @@ function openBookingDrawer(id) {
         <div class="drawer-stat-lbl">Fee</div>
       </div>
       <div class="drawer-stat">
-        <div class="drawer-stat-val" style="color:${overdue?'var(--red3)':'var(--muted2)'}">${b.follow_up_date || '—'}</div>
+        <div class="drawer-stat-val" style="color:${overdue?'var(--red3)':'var(--muted2)'}">${fmtDate(b.follow_up_date)}</div>
         <div class="drawer-stat-lbl">${overdue ? '⚠ Overdue' : 'Follow-up'}</div>
       </div>
     </div>
@@ -15214,7 +15230,7 @@ function openReleaseDrawer(id) {
     <div class="drawer-section">
       <div class="drawer-section-label">Details</div>
       <div class="drawer-info-row"><span>Title</span><span>${r.title}</span></div>
-      <div class="drawer-info-row"><span>Release Date</span><span>${r.release_date || '—'}</span></div>
+      <div class="drawer-info-row"><span>Release Date</span><span>${fmtDate(r.release_date) || '—'}</span></div>
       ${r.spotify_url ? `<div class="drawer-info-row"><span>Spotify</span><span><a href="${r.spotify_url}" target="_blank" style="color:var(--green3);text-decoration:none">▶ Open</a></span></div>` : ''}
       ${r.notes ? `<div class="drawer-note" style="margin-top:8px">${r.notes}</div>` : ''}
     </div>
@@ -15851,7 +15867,7 @@ function printBookingReport() {
       <tbody>
         ${upcoming.map(b => `
         <tr>
-          <td style="white-space:nowrap">${b.date}</td>
+          <td style="white-space:nowrap">${fmtDate(b.date)}</td>
           <td class="venue-cell">${b.name}</td>
           <td>${b.location||'—'}</td>
           <td>${b.contact_name||'—'}${b.contact_email?'<br><span style="font-size:8px;color:#666">'+b.contact_email+'</span>':''}</td>
@@ -15922,11 +15938,11 @@ function printBookingReport() {
           </div>
           <div class="booking-field">
             <div class="booking-field-lbl">Show Date</div>
-            <div class="booking-field-val">${b.date||'TBC'}</div>
+            <div class="booking-field-val">${fmtDate(b.date)||'TBC'}</div>
           </div>
           <div class="booking-field">
             <div class="booking-field-lbl">Follow-up</div>
-            <div class="booking-field-val" style="color:${overdue?'#dc2626':'#111'}">${b.follow_up_date||'—'}${overdue?' ⚠ OVERDUE':''}</div>
+            <div class="booking-field-val" style="color:${overdue?'#dc2626':'#111'}">${fmtDate(b.follow_up_date)}${overdue?' ⚠ OVERDUE':''}</div>
           </div>
           ${b.notes ? `<div class="booking-notes"><strong>Notes</strong><br>${b.notes}</div>` : ''}
         </div>
@@ -15993,7 +16009,7 @@ function openPressDrawer(id) {
       <div class="drawer-info-row"><span>Email</span><span>${p.contact_email ? `<a href="mailto:${p.contact_email}" style="color:var(--blue2);text-decoration:none">${p.contact_email}</a>` : '—'}</span></div>
       <div class="drawer-info-row"><span>Location</span><span>${p.location||'—'}</span></div>
       <div class="drawer-info-row"><span>Release Pitched</span><span>${p.pitched_release||'—'}</span></div>
-      <div class="drawer-info-row"><span>Follow-up Date</span><span>${p.follow_up_date||'—'}</span></div>
+      <div class="drawer-info-row"><span>Follow-up Date</span><span>${fmtDate(p.follow_up_date)}</span></div>
     </div>
 
     ${p.notes ? `<div class="drawer-note">${p.notes}</div>` : ''}
@@ -16088,7 +16104,7 @@ function openSplitsDrawer(idOrIdx) {
     <div class="drawer-section">
       <div class="drawer-section-label">Gig Details</div>
       <div class="drawer-info-row"><span>Event</span><span style="font-weight:700">${s.gig_name||s.name||s.id||'—'}</span></div>
-      <div class="drawer-info-row"><span>Date</span><span>${s.gig_date||s.date||'—'}</span></div>
+      <div class="drawer-info-row"><span>Date</span><span>${fmtDate(s.gig_date)||s.date||'—'}</span></div>
       <div class="drawer-info-row"><span>Gross</span><span style="color:var(--green3)">${fmtMoney(net)}</span></div>
       <div class="drawer-info-row"><span>Band Fund (${net > 0 ? ((fund/net)*100).toFixed(0) : 0}%)</span><span style="color:var(--accent)">${fmtMoney(fund)}</span></div>
       <div class="drawer-info-row"><span>Per Member (${members.length||4})</span><span style="color:var(--amber2)">${fmtMoney(perMember)}</span></div>
@@ -16357,7 +16373,7 @@ function printPressReport() {
     return `<div class="section">
       <div class="section-title">${stageLbl[stage]} <span style="font-size:11px;color:#888">(${grp.length})</span></div>
       <table><thead><tr><th>Outlet</th><th>Type</th><th>Contact</th><th>Release Pitched</th><th>Follow-up</th><th style="text-align:right">Est. Value</th></tr></thead><tbody>
-      ${grp.map(p=>`<tr><td style="font-weight:700">${p.outlet||'—'}</td><td><span class="badge ${stCls[stage]||'badge-grey'}">${p.type||'press'}</span></td><td>${p.contact_name||'—'}${p.contact_email?'<br><span style="font-size:8px;color:#888">'+p.contact_email+'</span>':''}</td><td style="color:#666">${p.pitched_release||'—'}</td><td style="color:#666">${p.follow_up_date||'—'}</td><td style="text-align:right;color:#166534;font-weight:700">${p.estimated_value_eur?'€'+parseFloat(p.estimated_value_eur).toLocaleString('pt-PT'):'—'}</td></tr>`).join('')}
+      ${grp.map(p=>`<tr><td style="font-weight:700">${p.outlet||'—'}</td><td><span class="badge ${stCls[stage]||'badge-grey'}">${p.type||'press'}</span></td><td>${p.contact_name||'—'}${p.contact_email?'<br><span style="font-size:8px;color:#888">'+p.contact_email+'</span>':''}</td><td style="color:#666">${p.pitched_release||'—'}</td><td style="color:#666">${fmtDate(p.follow_up_date)}</td><td style="text-align:right;color:#166534;font-weight:700">${p.estimated_value_eur?'€'+parseFloat(p.estimated_value_eur).toLocaleString('pt-PT'):'—'}</td></tr>`).join('')}
       </tbody></table>
     </div>`;
   }).join('')}
@@ -16402,7 +16418,7 @@ function printReleasesReport() {
     return `<div class="section">
       <div class="section-title">${stageLbl[stage]} <span style="font-size:11px;color:#888">(${grp.length})</span></div>
       <table><thead><tr><th>Title</th><th>Type</th><th>Release Date</th><th>Checklist</th>${stage!=='idea'?'<th>Notes</th>':''}</tr></thead><tbody>
-      ${grp.map(r=>`<tr><td style="font-weight:700">${r.title}</td><td><span class="badge ${stCls[stage]||'badge-grey'}">${r.type}</span></td><td>${r.release_date||'TBC'}</td><td style="font-size:9px;color:#666">${checks(r)}</td>${stage!=='idea'?`<td style="font-size:9px;color:#666">${r.notes||'—'}</td>`:''}</tr>`).join('')}
+      ${grp.map(r=>`<tr><td style="font-weight:700">${r.title}</td><td><span class="badge ${stCls[stage]||'badge-grey'}">${r.type}</span></td><td>${fmtDate(r.release_date)||'TBC'}</td><td style="font-size:9px;color:#666">${checks(r)}</td>${stage!=='idea'?`<td style="font-size:9px;color:#666">${r.notes||'—'}</td>`:''}</tr>`).join('')}
       </tbody></table>
     </div>`;
   }).join('')}
