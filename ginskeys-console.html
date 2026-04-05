@@ -6392,10 +6392,103 @@ function _irsRenderCore(year, member) {
 function irsRender() { _irsRenderCore(parseInt(document.getElementById('irs-year')?.value||2025), document.getElementById('irs-member')?.value||'all'); }
 
 function irsPrintSelected() {
-  var year = parseInt(document.getElementById('irs-year')?.value||2025);
+  var year   = parseInt(document.getElementById('irs-year')?.value||2025);
   var member = document.getElementById('irs-member')?.value||'all';
-  var members = member==='all' ? ['fabio','pedro','manuel','tiago'] : [member];
-  members.forEach(function(mk){ irsPrintMember(mk, year); });
+  if (member !== 'all') { irsPrintMember(member, year); return; }
+  // All members — build one document with all 4 sections, separated by page breaks
+  irsPrintAll(year);
+}
+
+function irsPrintAll(year) {
+  var fmtE = function(v){ return '€ '+Math.abs(v).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var today = new Date().toLocaleDateString('pt-PT',{day:'2-digit',month:'long',year:'numeric'});
+
+  var entries = (LEDGER_DATA||[]).filter(function(e){ return new Date(e.date).getFullYear()===year; });
+  var bandExpenses = entries.filter(function(e){return e.amount<0;}).reduce(function(s,e){return s+Math.abs(e.amount);},0);
+  var expByCat={};
+  entries.filter(function(e){return e.amount<0;}).forEach(function(e){ var c=e.cat||'Outros'; expByCat[c]=(expByCat[c]||0)+Math.abs(e.amount); });
+
+  var memberIncome={fabio:0,pedro:0,manuel:0,tiago:0};
+  var memberGigs={fabio:0,pedro:0,manuel:0,tiago:0};
+  (SPLITS_DATA||[]).forEach(function(s){
+    if (s.gig_date&&new Date(s.gig_date).getFullYear()!==year) return;
+    var p=parseFloat(s.per_member_eur||0);
+    if(p>0){ Object.keys(memberIncome).forEach(function(k){ memberIncome[k]+=p; memberGigs[k]++; }); }
+  });
+  var splitsInYear=(SPLITS_DATA||[]).filter(function(s){return !s.gig_date||new Date(s.gig_date).getFullYear()===year;});
+
+  function memberSection(mk) {
+    var name = MEMBER_NAMES_FT[mk];
+    var inc  = memberIncome[mk]||0;
+    var gigs = memberGigs[mk]||0;
+    var deductible=0;
+    DEDUCTIBLE_CATS.forEach(function(cat){ deductible+=(expByCat[cat]||0)/4; });
+    var net=inc-deductible;
+    var taxableBase=Math.max(0,net)*0.75;
+    var estimatedTax=taxableBase*0.285;
+
+    return '<div class="member-section">'+
+      '<div class="member-header">'+name.toUpperCase()+' — Resumo de Rendimentos Artísticos '+year+'</div>'+
+      '<div class="highlight">'+
+        '<div class="hi-grid">'+
+          '<div><div class="hi-label">Rendimento Bruto</div><div class="hi-val green">'+fmtE(inc)+'</div><div class="hi-sub">'+gigs+' espetáculos</div></div>'+
+          '<div><div class="hi-label">Despesas Dedução</div><div class="hi-val red">-'+fmtE(deductible)+'</div><div class="hi-sub">quota-parte banda</div></div>'+
+          '<div><div class="hi-label">Base Tributável (×0,75)</div><div class="hi-val amber">'+fmtE(taxableBase)+'</div></div>'+
+          '<div><div class="hi-label">IRS Estimado (28,5%)</div><div class="hi-val red">'+fmtE(estimatedTax)+'</div></div>'+
+        '</div>'+
+      '</div>'+
+      '<h3>Rendimentos por Espetáculo</h3>'+
+      '<table>'+
+        '<tr><th>Espetáculo</th><th>Data</th><th style="text-align:right">Valor</th></tr>'+
+        splitsInYear.map(function(s){
+          return '<tr><td>'+(s.gig_name||'—')+'</td><td>'+(s.gig_date||'—')+'</td><td style="text-align:right">'+fmtE(parseFloat(s.per_member_eur||0))+'</td></tr>';
+        }).join('')+
+        '<tr class="total"><td><strong>TOTAL</strong></td><td>'+gigs+' espetáculos</td><td style="text-align:right"><strong>'+fmtE(inc)+'</strong></td></tr>'+
+      '</table>'+
+      '<h3>Cálculo IRS / Tax Calculation</h3>'+
+      '<table>'+
+        '<tr><td class="l">Rendimento bruto</td><td class="v">'+fmtE(inc)+'</td></tr>'+
+        '<tr><td class="l">Despesas deduíveis (quota-parte)</td><td class="v">-'+fmtE(deductible)+'</td></tr>'+
+        '<tr><td class="l">Rendimento líquido</td><td class="v">'+fmtE(net)+'</td></tr>'+
+        '<tr><td class="l">Coeficiente Cat. B (0,75)</td><td class="v">×0,75</td></tr>'+
+        '<tr><td class="l">Base tributável</td><td class="v">'+fmtE(taxableBase)+'</td></tr>'+
+        '<tr class="total"><td class="l"><strong>IRS ESTIMADO (28,5%)</strong></td><td class="v"><strong>'+fmtE(estimatedTax)+'</strong></td></tr>'+
+      '</table>'+
+      '<div class="note">Regime simplificado · Categoria B · Declare em Anexo B da Mod. 3 · Prazo: 30 Jun '+(year+1)+'</div>'+
+    '</div>';
+  }
+
+  var doc = '<!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8"><title>Resumo IRS '+year+' — The Ginskeys</title><style>'+
+    '*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:11px;color:#1a1a1a;padding:20px 28px}'+
+    '.doc-header{border-bottom:3px double #111;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-end}'+
+    '.doc-header h1{font-size:18px;font-weight:700}.doc-header .meta{font-size:9px;color:#666;text-align:right;line-height:1.8}'+
+    '.warning{background:#fffbf0;border-left:3px solid #f59e0b;padding:7px 12px;font-size:9px;color:#92400e;margin-bottom:14px}'+
+    '.member-section{page-break-after:always;padding-bottom:20px}'+
+    '.member-section:last-child{page-break-after:auto}'+
+    '.member-header{font-size:14px;font-weight:700;letter-spacing:.06em;border-bottom:2px solid #111;padding-bottom:6px;margin-bottom:12px}'+
+    '.highlight{background:#f8fdf8;border:1px solid #c6e8c6;border-radius:3px;padding:12px 16px;margin-bottom:14px}'+
+    '.hi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;text-align:center}'+
+    '.hi-label{font-size:8px;text-transform:uppercase;color:#555;letter-spacing:.08em;margin-bottom:4px}'+
+    '.hi-val{font-size:16px;font-weight:700}.hi-sub{font-size:9px;color:#888;margin-top:2px}'+
+    '.green{color:#166534}.red{color:#dc2626}.amber{color:#92400e}'+
+    'h3{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#555;border-bottom:1px solid #ddd;padding-bottom:3px;margin:12px 0 8px}'+
+    'table{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:10px}'+
+    'th{background:#111;color:#fff;padding:5px 8px;text-align:left;font-size:9px;letter-spacing:.06em}'+
+    'td{padding:5px 8px;border-bottom:1px solid #eee}td.l{font-weight:700;color:#333;width:60%}td.v{text-align:right}'+
+    'tr.total td{border-top:2px solid #111;font-weight:700}'+
+    '.note{font-size:9px;color:#666;background:#f8f8f8;padding:8px 10px;border-left:3px solid #ccc;font-style:italic}'+
+    '@page{margin:10mm;size:A4}'+
+    '</style></head><body>'+
+    '<div class="doc-header">'+
+      '<div><h1>THE GINSKEYS — RESUMO IRS '+year+'</h1><div style="font-size:11px;color:#555">Hard Rock · Sines, Portugal · Categoria B</div></div>'+
+      '<div class="meta">Emitido: '+today+'<br>4 membros · Regime simplificado<br><em>Documento orientativo</em></div>'+
+    '</div>'+
+    '<div class="warning">⚠ Documento auxiliar para preparação da declaração IRS Mod. 3 Anexo B. Não substitui aconselhamento fiscal profissional. Valores estimados com base nos dados registados.</div>'+
+    ['fabio','pedro','manuel','tiago'].map(memberSection).join('')+
+    '</body></html>';
+
+  var w=window.open('','_blank'); w.document.write(doc); w.document.close();
+  setTimeout(function(){w.print();},700);
 }
 
 function irsPrintMember(mk, year) {
