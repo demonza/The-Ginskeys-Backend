@@ -1548,6 +1548,15 @@ tr:hover .edit-btn{display:inline}
         <input class="form-input" id="inv-notes" value="Pagamento por transferência bancária no prazo de 30 dias. Obrigado pela preferência.">
       </div>
 
+      <!-- Ledger option -->
+      <div style="background:var(--bg4);border:1px solid var(--border2);border-radius:2px;padding:10px 12px;display:flex;align-items:center;gap:10px">
+        <input type="checkbox" id="inv-post-ledger" checked style="cursor:pointer">
+        <div>
+          <label for="inv-post-ledger" style="font-size:10px;color:var(--text);cursor:pointer;font-weight:700">Post to Ledger as Income</label>
+          <div style="font-size:9px;color:var(--muted3);margin-top:2px">Automatically adds this invoice total as an income transaction in the Ledger when generated</div>
+        </div>
+      </div>
+
       <div id="inv-status" style="font-size:10px;color:var(--red3);min-height:14px"></div>
     </div>
 
@@ -3033,9 +3042,6 @@ tr:hover .edit-btn{display:inline}
       <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
         <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--amber2)" id="bk-banner-conversion">0%</div>
         <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">CONVERSION</div>
-      </div>
-      <div style="padding:0 12px;border-left:1px solid var(--border2)">
-        <button class="btn-sm" onclick="openInvoiceModal()" style="color:var(--green3);border-color:var(--green3);white-space:nowrap">⎙ New Invoice</button>
       </div>
     </div>
 
@@ -4627,7 +4633,10 @@ function renderBookingList() {
                   ${['cold','contacted','negotiating','confirmed','completed','rejected'].map(s=>`<option value="${s}"${s===b.stage?' selected':''}>${s}</option>`).join('')}
                 </select>
                 <button onclick="event.stopPropagation();openBookingDrawer('${b.id}')" style="background:transparent;border:1px solid var(--border2);color:var(--muted3);font-size:10px;padding:2px 6px;cursor:pointer" title="Edit">✎</button>
-                ${['negotiating','confirmed','completed'].includes(b.stage) ? `<button onclick="event.stopPropagation();openContractModal('${b.id}')" style="background:transparent;border:1px solid var(--green3);color:var(--green3);font-size:9px;padding:2px 6px;cursor:pointer;white-space:nowrap" title="Generate Contract">⎙ Contract</button>` : ''}
+                ${['negotiating','confirmed','completed'].includes(b.stage) ? `
+                <button onclick="event.stopPropagation();openContractModal('${b.id}')" style="background:transparent;border:1px solid var(--green3);color:var(--green3);font-size:9px;padding:2px 6px;cursor:pointer;white-space:nowrap" title="Generate Contract">⎙ Contract</button>
+                <button onclick="event.stopPropagation();openInvoiceFromBooking('${b.id}')" style="background:transparent;border:1px solid var(--amber2);color:var(--amber2);font-size:9px;padding:2px 6px;cursor:pointer;white-space:nowrap" title="New Invoice">⎙ Invoice</button>
+              ` : ''}
               </div>
             </td>
           </tr>`;
@@ -5252,9 +5261,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 var _invoiceNum = 1;
 
-function openInvoiceModal() {
+function openInvoiceModal(bookingId) {
+  // Clear form first
+  ['inv-client-name','inv-client-contact','inv-client-nif','inv-client-email',
+   'inv-client-address','inv-show-date','inv-venue','inv-description',
+   'inv-duration','inv-fee','inv-expenses','inv-notes'].forEach(function(id){
+    var e = document.getElementById(id); if(e) e.value = '';
+  });
   document.getElementById('invoice-modal').classList.add('open');
-  // Set default invoice number based on current year + count
+  // Set default invoice number
   var year = new Date().getFullYear();
   var existing = (SPLITS_DATA || []).length + _invoiceNum;
   var padded = String(existing).padStart(3, '0');
@@ -5262,48 +5277,70 @@ function openInvoiceModal() {
   // Default show date to today
   var d = document.getElementById('inv-show-date');
   if (d && !d.value) d.value = new Date().toISOString().split('T')[0];
+  // If called from a specific booking, auto-fill immediately
+  if (bookingId) invoiceAutoFill(bookingId);
   invoiceCalc();
+}
+
+function openInvoiceFromBooking(bookingId) {
+  openInvoiceModal(bookingId);
 }
 
 function closeInvoiceModal() {
   document.getElementById('invoice-modal').classList.remove('open');
 }
 
-function invoiceAutoFill() {
-  // Pull from the next upcoming show
-  var upcoming = (PROD_SHOWS || [])
-    .filter(function(s) { return new Date(s.show_date) >= new Date(); })
-    .sort(function(a,b) { return new Date(a.show_date) - new Date(b.show_date); });
-  var show = upcoming[0] || PROD_SHOWS[0];
+function invoiceAutoFill(bookingId) {
+  var set = function(id, val) { var e = document.getElementById(id); if (e && val) e.value = val; };
 
-  if (show) {
-    var d = document.getElementById('inv-show-date');
-    if (d) d.value = (show.show_date || '').slice(0,10);
-    var v = document.getElementById('inv-venue');
-    if (v && show.venue_name) v.value = show.venue_name;
-    var dur = document.getElementById('inv-duration');
-    if (dur && show.set_length_min) dur.value = show.set_length_min + ' min';
-    var desc = document.getElementById('inv-description');
-    if (desc) desc.value = 'Prestação de serviços artísticos — concerto ao vivo da banda The Ginskeys' +
-      (show.venue_name ? ' em ' + show.venue_name : '');
+  // If a specific booking is provided, use it directly
+  var bk = bookingId ? (BOOKING_DATA || []).find(function(b) { return b.id === bookingId; }) : null;
+
+  // Fall back to first confirmed booking
+  if (!bk) {
+    var confirmed = (BOOKING_DATA || []).filter(function(b) { return b.stage === 'confirmed' || b.stage === 'completed'; });
+    bk = confirmed[0] || null;
   }
 
-  // Pull from booking contacts if a confirmed booking matches
-  var confirmed = (BOOKING_DATA || []).filter(function(b) { return b.stage === 'confirmed' || b.stage === 'completed'; });
-  if (confirmed.length) {
-    var bk = confirmed[0];
-    var cn = document.getElementById('inv-client-name');
-    if (cn && !cn.value && bk.name) cn.value = bk.name;
-    var ce = document.getElementById('inv-client-email');
-    if (ce && !ce.value && bk.contact_email) ce.value = bk.contact_email;
-    var cc = document.getElementById('inv-client-contact');
-    if (cc && !cc.value && bk.contact_name) cc.value = bk.contact_name;
-    var fee = document.getElementById('inv-fee');
-    if (fee && !fee.value && bk.fee_eur) fee.value = parseFloat(bk.fee_eur).toFixed(2);
+  if (bk) {
+    set('inv-client-name',    bk.name);
+    set('inv-client-contact', bk.contact_name);
+    set('inv-client-email',   bk.contact_email);
+    set('inv-venue',          bk.location || bk.name);
+    if (bk.fee_eur) set('inv-fee', parseFloat(bk.fee_eur).toFixed(2));
+    if (bk.date)    set('inv-show-date', (bk.date || '').slice(0,10));
+
+    // Try to find a matching production show for this booking
+    var matchShow = (PROD_SHOWS || []).find(function(s) {
+      return s.booking_id === bk.id ||
+        (bk.name && s.venue_name && s.venue_name.toLowerCase().includes(bk.name.toLowerCase().split(' ')[0]));
+    });
+    if (matchShow) {
+      if (matchShow.show_date) set('inv-show-date', matchShow.show_date.slice(0,10));
+      if (matchShow.venue_name) set('inv-venue', matchShow.venue_name);
+      if (matchShow.set_length_min) set('inv-duration', matchShow.set_length_min + ' min');
+    }
+
+    var venueName = document.getElementById('inv-venue')?.value || bk.name || '';
+    set('inv-description', 'Prestação de serviços artísticos — concerto ao vivo da banda The Ginskeys' +
+      (venueName ? ' em ' + venueName : ''));
+  } else {
+    // No booking found — use next upcoming show
+    var upcoming = (PROD_SHOWS || [])
+      .filter(function(s) { return new Date(s.show_date) >= new Date(); })
+      .sort(function(a,b) { return new Date(a.show_date) - new Date(b.show_date); });
+    var show = upcoming[0];
+    if (show) {
+      set('inv-show-date', (show.show_date || '').slice(0,10));
+      set('inv-venue',     show.venue_name);
+      if (show.set_length_min) set('inv-duration', show.set_length_min + ' min');
+      set('inv-description', 'Prestação de serviços artísticos — concerto ao vivo da banda The Ginskeys' +
+        (show.venue_name ? ' em ' + show.venue_name : ''));
+    }
   }
 
   invoiceCalc();
-  showToast('Auto-filled from upcoming show & booking data', 'ok');
+  showToast('Auto-filled' + (bk ? ' from booking: ' + (bk.name || '') : ' from show data'), 'ok');
 }
 
 function invoiceCalc() {
@@ -5491,8 +5528,9 @@ function printInvoice() {
   _invoiceNum++;
 
   // Save to invoice tracker before printing
+  var invId = 'INV-' + Date.now();
   invRegister({
-    id:          'INV-' + Date.now(),
+    id:          invId,
     number:      invNum,
     clientName:  clientName,
     clientEmail: clientEmail,
@@ -5505,6 +5543,37 @@ function printInvoice() {
     paymentDays: 30,
     notes:       notes,
   });
+
+  // Post to ledger if checkbox is checked
+  var postToLedger = document.getElementById('inv-post-ledger');
+  if (postToLedger && postToLedger.checked && API_BASE && SESSION?.token) {
+    var ledgerDesc = 'Fatura ' + invNum + ' — ' + clientName + (venue ? ' / ' + venue : '');
+    apiPost('/transactions', {
+      date:        showDate || new Date().toISOString().slice(0,10),
+      type:        'income',
+      description: ledgerDesc,
+      amount:      Math.abs(total),
+      currency:    'EUR',
+      category:    'Espetáculo',
+      notes:       'invoice_id:' + invId,
+    }).then(function(data) {
+      // Add to local LEDGER_DATA
+      var signed = Math.abs(total);
+      var prev   = LEDGER_DATA[0];
+      var newBal = parseFloat(((prev ? prev.balance : 0) + signed).toFixed(2));
+      LEDGER_DATA.unshift({
+        id: data.id, date: showDate || new Date().toISOString().slice(0,10),
+        desc: ledgerDesc, type: 'income', cat: 'Espetáculo',
+        tags: ['invoice'], amount: signed, balance: newBal, reconciled: false,
+        notes: 'invoice_id:' + invId,
+      });
+      refreshLedger();
+      updateFinancialKpis();
+      showToast('Ledger updated — ' + fmtMoney(total) + ' income posted', 'ok');
+    }).catch(function(err) {
+      console.warn('Ledger post failed:', err.message);
+    });
+  }
 
   var w = window.open('', '_blank');
   w.document.write(html);
@@ -7257,6 +7326,16 @@ function invMarkPaid(id) {
   invUpdateBanner();
   invUpdateOverdueBadge();
   showToast('Invoice ' + inv.number + ' marked as paid ✓', 'ok');
+  // Update matching ledger entry reconciliation status if it exists
+  if (LEDGER_DATA) {
+    var ledgerEntry = LEDGER_DATA.find(function(e) {
+      return e.notes && e.notes.indexOf('invoice_id:' + id) !== -1;
+    });
+    if (ledgerEntry) {
+      ledgerEntry.reconciled = true;
+      refreshLedger();
+    }
+  }
 }
 
 // ── Status modal ──
