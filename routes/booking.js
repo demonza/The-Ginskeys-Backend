@@ -54,6 +54,7 @@ router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
             stage='cold', fee_eur, date, notes, follow_up_date } = req.body;
     if (!name) return res.status(400).json({ error: 'name is required' });
     if (!STAGES.includes(stage)) return res.status(400).json({ error: 'invalid stage' });
+    if (!VALID_TYPES.includes(type)) return res.status(400).json({ error: 'invalid type. Valid: ' + VALID_TYPES.join(', ') });
 
     const { rows } = await pool.query(
       `INSERT INTO booking_contacts

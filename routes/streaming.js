@@ -35,13 +35,21 @@ router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
     if (!VALID_PLATFORMS.includes(platform))
       return res.status(400).json({ error: 'invalid platform. Valid: ' + VALID_PLATFORMS.join(', ') });
 
+    // FIX: validate numeric inputs
+    const streamCount = parseInt(streams);
+    const revenueVal = parseFloat(revenue_eur);
+    if (!isFinite(streamCount) || streamCount < 0)
+      return res.status(400).json({ error: 'streams must be a non-negative integer' });
+    if (!isFinite(revenueVal) || revenueVal < 0)
+      return res.status(400).json({ error: 'revenue_eur must be a non-negative number' });
+
     const { rows } = await pool.query(
       `INSERT INTO streaming_snapshots (platform, period, streams, revenue_eur)
        VALUES ($1, $2, $3, $4)
        ON CONFLICT (platform, period)
        DO UPDATE SET streams = EXCLUDED.streams, revenue_eur = EXCLUDED.revenue_eur
        RETURNING *`,
-      [platform, period, parseInt(streams), parseFloat(revenue_eur)]
+      [platform, period, streamCount, revenueVal]
     );
     await writeAudit(req, 'STREAMING_UPDATE', {
       entityType: 'streaming_snapshot',

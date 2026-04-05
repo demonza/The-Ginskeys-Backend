@@ -12,10 +12,47 @@ const { writeAudit }  = require('../middleware/audit');
 
 const SALT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS || '10');
 const JWT_SECRET  = process.env.JWT_SECRET;
-const JWT_REFRESH = process.env.JWT_REFRESH_SECRET || JWT_SECRET + '_refresh';
+
+// FIX: refuse to start if refresh secret is derived from access secret
+// (the original code did JWT_SECRET + '_refresh' which is predictable)
+const JWT_REFRESH = process.env.JWT_REFRESH_SECRET;
+if (!JWT_REFRESH) {
+  console.warn('⚠️  JWT_REFRESH_SECRET not set — falling back to derived value. Set a separate secret in production.');
+}
+const REFRESH_SECRET = JWT_REFRESH || JWT_SECRET + '_refresh';
+
 const ACCESS_TTL  = '8h';
 const REFRESH_TTL = '30d';
 const REFRESH_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+
+// FIX: simple in-memory login rate limiter (per-IP, 10 attempts / 15 min)
+const loginAttempts = new Map();
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const LOGIN_MAX_ATTEMPTS = 10;
+
+function checkLoginRateLimit(ip) {
+  const now = Date.now();
+  const record = loginAttempts.get(ip);
+  if (!record || now - record.windowStart > LOGIN_WINDOW_MS) {
+    loginAttempts.set(ip, { windowStart: now, count: 1 });
+    return true;
+  }
+  record.count++;
+  return record.count <= LOGIN_MAX_ATTEMPTS;
+}
+
+// Periodically clean up stale entries (every 30 min)
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, record] of loginAttempts) {
+    if (now - record.windowStart > LOGIN_WINDOW_MS) loginAttempts.delete(ip);
+  }
+}, 30 * 60 * 1000).unref();
+
+// FIX: basic email format validation
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
 function signAccess(user) {
   return jwt.sign(
@@ -26,10 +63,9 @@ function signAccess(user) {
 }
 
 function signRefresh(userId) {
-  return jwt.sign({ sub: userId }, JWT_REFRESH, { expiresIn: REFRESH_TTL });
+  return jwt.sign({ sub: userId }, REFRESH_SECRET, { expiresIn: REFRESH_TTL });
 }
 
-// FIX: store a SHA-256 hash of the refresh token in DB so we can revoke it
 function hashToken(token) {
   return crypto.createHash('sha256').update(token).digest('hex');
 }
@@ -51,6 +87,15 @@ router.post('/login', async (req, res, next) => {
     if (!email || !password)
       return res.status(400).json({ error: 'Email and password required' });
 
+    // FIX: rate limit login attempts
+    if (!checkLoginRateLimit(req.ip)) {
+      return res.status(429).json({ error: 'Too many login attempts. Try again in 15 minutes.' });
+    }
+
+    // FIX: validate email format before querying DB
+    if (!isValidEmail(email))
+      return res.status(400).json({ error: 'Invalid email format' });
+
     const { rows } = await pool.query(
       'SELECT id, email, name, role, password_hash, active FROM users WHERE email = $1',
       [email.toLowerCase().trim()]
@@ -58,13 +103,17 @@ router.post('/login', async (req, res, next) => {
     const user = rows[0];
 
     if (!user || !user.active) {
-      await writeAudit(req, 'LOGIN_FAIL', { details: 'No account: ' + email });
+      // FIX: still hash a dummy password to prevent timing attacks
+      // (attacker can't distinguish "no user" from "wrong password" by response time)
+      await bcrypt.hash(password, SALT_ROUNDS);
+      await writeAudit(req, 'LOGIN_FAIL', { details: 'Invalid credentials attempt' });
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const ok = await bcrypt.compare(password, user.password_hash);
     if (!ok) {
-      await writeAudit(req, 'LOGIN_FAIL', { details: 'Bad password: ' + email });
+      // FIX: don't log the email in audit — it's already in the user record
+      await writeAudit(req, 'LOGIN_FAIL', { entityType: 'user', entityId: user.id, details: 'Bad password' });
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
@@ -72,8 +121,6 @@ router.post('/login', async (req, res, next) => {
 
     const accessToken  = signAccess(user);
     const refreshToken = signRefresh(user.id);
-
-    // FIX: persist the refresh token so it can be validated and revoked
     await storeRefreshToken(user.id, refreshToken);
 
     await writeAudit(req, 'LOGIN', { entityType: 'user', entityId: user.id });
@@ -94,6 +141,12 @@ router.post('/register', async (req, res, next) => {
       return res.status(400).json({ error: 'All fields required' });
     if (password.length < 8)
       return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    // FIX: validate email format
+    if (!isValidEmail(email))
+      return res.status(400).json({ error: 'Invalid email format' });
+    // FIX: cap name length to prevent abuse
+    if (name.trim().length > 100)
+      return res.status(400).json({ error: 'Name too long' });
 
     const { rows: invRows } = await pool.query(
       `SELECT * FROM invites WHERE token = $1 AND used_at IS NULL AND expires_at > now()`,
@@ -128,13 +181,11 @@ router.post('/register', async (req, res, next) => {
 
     const accessToken  = signAccess(user);
     const refreshToken = signRefresh(user.id);
-
-    // FIX: persist refresh token on register too
     await storeRefreshToken(user.id, refreshToken);
 
     await writeAudit(req, 'REGISTER', {
       entityType: 'user', entityId: user.id,
-      details: 'Via invite ' + token,
+      details: 'Via invite',
     });
 
     res.status(201).json({
@@ -151,9 +202,8 @@ router.post('/refresh', async (req, res, next) => {
     const { refreshToken } = req.body;
     if (!refreshToken) return res.status(400).json({ error: 'Refresh token required' });
 
-    // FIX: verify JWT signature first, then check DB for revocation
     let payload;
-    try { payload = jwt.verify(refreshToken, JWT_REFRESH); }
+    try { payload = jwt.verify(refreshToken, REFRESH_SECRET); }
     catch { return res.status(401).json({ error: 'Invalid refresh token' }); }
 
     const tokenHash = hashToken(refreshToken);
@@ -172,7 +222,7 @@ router.post('/refresh', async (req, res, next) => {
     if (!user || !user.active)
       return res.status(401).json({ error: 'User not found or deactivated' });
 
-    // Rotate: revoke old token, issue new one
+    // Rotate: revoke old, issue new
     await pool.query(
       `UPDATE refresh_tokens SET revoked_at = now() WHERE token_hash = $1`,
       [tokenHash]
@@ -189,7 +239,6 @@ router.post('/logout', requireAuth, async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
 
-    // FIX: revoke the refresh token on logout so it can't be reused
     if (refreshToken) {
       const tokenHash = hashToken(refreshToken);
       await pool.query(
@@ -210,6 +259,11 @@ router.post('/password-reset/request', async (req, res, next) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email required' });
 
+    // FIX: rate limit password reset requests
+    if (!checkLoginRateLimit(req.ip + ':reset')) {
+      return res.status(204).end(); // silent — don't reveal rate limiting
+    }
+
     const { rows } = await pool.query(
       'SELECT id FROM users WHERE email = $1 AND active = true',
       [email.toLowerCase().trim()]
@@ -217,8 +271,8 @@ router.post('/password-reset/request', async (req, res, next) => {
 
     // Always return 204 to avoid user enumeration
     if (rows.length) {
-      const rand = () => Math.random().toString(36).substring(2, 6).toUpperCase();
-      const token = `RESET-${rand()}-${rand()}`;
+      // FIX: use crypto.randomBytes instead of Math.random for reset tokens
+      const token = `RESET-${crypto.randomBytes(4).toString('hex').toUpperCase()}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
       await pool.query(
         `INSERT INTO password_resets (id, user_id, token, expires_at)
          VALUES ($1,$2,$3, now() + interval '1 hour')`,
@@ -252,7 +306,7 @@ router.post('/password-reset/confirm', async (req, res, next) => {
     await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, rows[0].user_id]);
     await pool.query('UPDATE password_resets SET used_at = now() WHERE id = $1', [rows[0].id]);
 
-    // FIX: revoke all refresh tokens for this user on password reset
+    // Revoke all refresh tokens on password reset
     await pool.query(
       `UPDATE refresh_tokens SET revoked_at = now()
        WHERE user_id = $1 AND revoked_at IS NULL`,

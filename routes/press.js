@@ -79,6 +79,7 @@ router.delete('/:id', requireAuth, requirePerm('deleteTxn'), async (req, res, ne
   try {
     const { rows } = await pool.query('DELETE FROM press_contacts WHERE id=$1 RETURNING id',[req.params.id]);
     if (!rows[0]) return res.status(404).json({ error: 'Not found' });
+    await writeAudit(req,'PRESS_DELETE',{entityType:'press',entityId:req.params.id});
     res.status(204).end();
   } catch (err) { next(err); }
 });

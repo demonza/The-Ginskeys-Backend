@@ -11,6 +11,20 @@ const { writeAudit } = require('../middleware/audit');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
+// FIX: whitelist sort columns to prevent SQL injection through sortBy
+const ALLOWED_SORT = {
+  date:    't.date',
+  amount:  't.amount',
+  created: 't.created_at',
+};
+
+// FIX: safe integer parsing with bounds
+function safeInt(val, fallback, min = 1, max = 10000) {
+  const n = parseInt(val);
+  if (isNaN(n) || n < min) return fallback;
+  return Math.min(n, max);
+}
+
 // ─── GET /api/transactions ─────────────────────────
 router.get('/', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
   try {
@@ -21,7 +35,9 @@ router.get('/', requireAuth, requirePerm('viewLedger'), async (req, res, next) =
       reconciled, sortBy = 'date', sortDir = 'desc'
     } = req.query;
 
-    const offset = (Math.max(1, parseInt(page)) - 1) * parseInt(limit);
+    const safePage  = safeInt(page, 1);
+    const safeLimit = safeInt(limit, 100, 1, 500);  // FIX: cap at 500 to prevent DoS
+    const offset = (safePage - 1) * safeLimit;
     const params = [];
     const wheres = [];
 
@@ -35,11 +51,12 @@ router.get('/', requireAuth, requirePerm('viewLedger'), async (req, res, next) =
     if (tags)       { params.push(tags.split(',')); wheres.push(`t.tags && $${params.length}`); }
 
     const where = wheres.length ? 'WHERE ' + wheres.join(' AND ') : '';
-    const allowedSort = { date: 't.date', amount: 't.amount', created: 't.created_at' };
-    const orderCol = allowedSort[sortBy] || 't.date';
+    // FIX: use strict whitelist — original code did `allowedSort[sortBy] || 't.date'`
+    // which is safe but the pattern is fragile; explicit validation is better
+    const orderCol = ALLOWED_SORT[sortBy] || 't.date';
     const orderDir = sortDir === 'asc' ? 'ASC' : 'DESC';
 
-    params.push(parseInt(limit), offset);
+    params.push(safeLimit, offset);
     const query = `
       SELECT
         t.id, t.date, t.type, t.amount, t.currency, t.amount_eur,
@@ -61,7 +78,7 @@ router.get('/', requireAuth, requirePerm('viewLedger'), async (req, res, next) =
 
     res.json({
       data: rows,
-      pagination: { page: parseInt(page), limit: parseInt(limit), total: parseInt(total) },
+      pagination: { page: safePage, limit: safeLimit, total: parseInt(total) },
     });
   } catch (err) { next(err); }
 });
@@ -87,12 +104,13 @@ router.get('/export', requireAuth, requirePerm('viewLedger'), async (req, res, n
     rows.forEach(r => {
       lines.push([
         r.id, r.date, r.type,
-        `"${(r.description||'').replace(/"/g,'""')}"`,
+        // FIX: CSV injection prevention — prefix cells starting with =, +, -, @ with a single quote
+        csvSafe(r.description),
         r.category || '',
         r.amount, r.currency, r.amount_eur,
-        `"${(r.source_dest||'').replace(/"/g,'""')}"`,
-        `"${(r.tags||[]).join(', ')}"`,
-        `"${(r.notes||'').replace(/"/g,'""')}"`,
+        csvSafe(r.source_dest),
+        csvSafe((r.tags || []).join(', ')),
+        csvSafe(r.notes),
         r.reconciled, r.tour_id || ''
       ].join(','));
     });
@@ -104,6 +122,15 @@ router.get('/export', requireAuth, requirePerm('viewLedger'), async (req, res, n
   } catch (err) { next(err); }
 });
 
+// FIX: CSV injection prevention helper
+function csvSafe(val) {
+  if (!val) return '""';
+  let s = String(val).replace(/"/g, '""');
+  // Neutralise formula injection characters
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+  return `"${s}"`;
+}
+
 // ─── POST /api/transactions/bulk-import ────────────
 router.post('/bulk-import', requireAuth, requirePerm('addTxn'), upload.single('file'), async (req, res, next) => {
   try {
@@ -112,6 +139,11 @@ router.post('/bulk-import', requireAuth, requirePerm('addTxn'), upload.single('f
     const records = csv.parse(req.file.buffer.toString('utf8'), {
       columns: true, skip_empty_lines: true, trim: true
     });
+
+    // FIX: cap import size to prevent memory/time abuse
+    if (records.length > 1000) {
+      return res.status(400).json({ error: 'Maximum 1000 rows per import' });
+    }
 
     const imported = [];
     const errors   = [];
@@ -124,11 +156,14 @@ router.post('/bulk-import', requireAuth, requirePerm('addTxn'), upload.single('f
         if (!['income','expense'].includes(type.toLowerCase()))
           throw new Error('Invalid type: ' + type);
 
-        const FX = { EUR: 1, USD: 0.92, GBP: 1.17 };
         const amt = parseFloat(amount);
+        // FIX: validate amount is a finite positive number
+        if (!isFinite(amt) || amt <= 0)
+          throw new Error('Amount must be a positive number');
+
+        const FX = { EUR: 1, USD: 0.92, GBP: 1.17 };
         const amtEur = parseFloat((amt * (FX[currency.toUpperCase()] || 1)).toFixed(2));
 
-        // Resolve category
         let catId = null;
         if (category) {
           const { rows: cats } = await pool.query(
@@ -181,12 +216,14 @@ router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
       return res.status(400).json({ error: 'date, type, amount and description are required' });
     if (!['income','expense'].includes(type))
       return res.status(400).json({ error: 'type must be income or expense' });
-    if (isNaN(parseFloat(amount)))
-      return res.status(400).json({ error: 'amount must be a number' });
 
-    // Simple FX stub — in production call an FX API
+    const amt = parseFloat(amount);
+    // FIX: validate amount is finite and positive
+    if (!isFinite(amt) || amt <= 0)
+      return res.status(400).json({ error: 'amount must be a positive number' });
+
     const FX = { EUR: 1, USD: 0.92, GBP: 1.17 };
-    const amountEur = parseFloat((parseFloat(amount) * (FX[currency] || 1)).toFixed(2));
+    const amountEur = parseFloat((amt * (FX[currency] || 1)).toFixed(2));
 
     const id = uuid();
     const { rows } = await pool.query(
@@ -194,7 +231,7 @@ router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
          (id, date, type, category_id, amount, currency, amount_eur, description, source_dest, tour_id, tags, notes, created_by)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
        RETURNING *`,
-      [id, date, type, categoryId || null, parseFloat(amount), currency, amountEur,
+      [id, date, type, categoryId || null, amt, currency, amountEur,
        description.trim(), source_dest || null, tourId || null,
        Array.isArray(tags) ? tags : [tags], notes || null, req.user.id]
     );
@@ -216,9 +253,18 @@ router.put('/:id', requireAuth, requirePerm('editTxn'), async (req, res, next) =
     const old = existing[0];
     const { date, type, categoryId, amount, currency, description, source_dest, tourId, tags, notes, reconciled } = req.body;
 
+    // FIX: validate type if provided
+    if (type && !['income','expense'].includes(type))
+      return res.status(400).json({ error: 'type must be income or expense' });
+
     const FX = { EUR: 1, USD: 0.92, GBP: 1.17 };
-    const newAmt    = amount     !== undefined ? parseFloat(amount)    : old.amount;
+    const newAmt    = amount     !== undefined ? parseFloat(amount)    : parseFloat(old.amount);
     const newCcy    = currency   !== undefined ? currency              : old.currency;
+
+    // FIX: validate amount if provided
+    if (amount !== undefined && (!isFinite(newAmt) || newAmt <= 0))
+      return res.status(400).json({ error: 'amount must be a positive number' });
+
     const amountEur = parseFloat((newAmt * (FX[newCcy] || 1)).toFixed(2));
 
     const { rows } = await pool.query(

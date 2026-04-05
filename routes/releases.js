@@ -30,6 +30,9 @@ router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
             artwork_done=false, video_done=false, press_pitched=false,
             spotify_pitched=false, social_media=false, notes, tracks=[] } = req.body;
     if (!title) return res.status(400).json({ error: 'title required' });
+    // FIX: validate type and stage
+    if (!TYPES.includes(type)) return res.status(400).json({ error: 'invalid type. Valid: ' + TYPES.join(', ') });
+    if (!STAGES.includes(stage)) return res.status(400).json({ error: 'invalid stage. Valid: ' + STAGES.join(', ') });
 
     const id = uuid();
     // Check if social_media column exists (added in migrate_v5)

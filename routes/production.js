@@ -185,7 +185,7 @@ router.post('/checklist/seed', requireAuth, requirePerm('addTxn'), async (req, r
       {phase:'soundcheck',position:7, task:'Monitor mixes — each member confirms',       owner:'All',    due_offset_hours:0},
       {phase:'soundcheck',position:8, task:'Full band run — one song',                   owner:'All',    due_offset_hours:0},
       {phase:'soundcheck',position:9, task:'FOH mix tweaks — walk the room',             owner:'Tiago',  due_offset_hours:0},
-      {phase:'soundcheck',position:10,'task':'Save FOH scene (if digital console)',      owner:'Tiago',  due_offset_hours:0},
+      {phase:'soundcheck',position:10, task:'Save FOH scene (if digital console)',      owner:'Tiago',  due_offset_hours:0},
       // SHOW DAY
       {phase:'show_day',position:1,  task:'Back-stage / green room confirmed',           owner:'Tiago',  due_offset_hours:0},
       {phase:'show_day',position:2,  task:'All band members present 30min before show',  owner:'All',    due_offset_hours:0},
