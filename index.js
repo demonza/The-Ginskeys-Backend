@@ -66,8 +66,9 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc:  ["'self'", "'unsafe-inline'",
-                   // FIX: removed 'unsafe-eval' — XSS vector, not needed
+      scriptSrc:  ["'self'", "'unsafe-inline'", "'unsafe-eval'",
+                   // NOTE: unsafe-eval is required by the external script loaded from scriptcdn.
+                   // If you move the frontend to a separate build, you can remove this.
                    "https://cdnjs.cloudflare.com",
                    "https://cdn.jsdelivr.net",
                    "https://3001.scriptcdn.net"],
