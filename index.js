@@ -38,7 +38,7 @@ const EXTRA_ORIGINS = (process.env.FRONTEND_URL || '')
 const ALLOWED_ORIGINS = new Set([
   ...EXTRA_ORIGINS,
   'https://the-ginskeys-backend-production.up.railway.app',
-  'null',
+  // FIX: removed 'null' — allows file:// and data: origins, security risk
   'http://localhost:3000',
   'http://localhost:5173',
   'http://127.0.0.1:5173',
@@ -48,11 +48,15 @@ const corsOptions = {
   origin(origin, cb) {
     if (!origin) return cb(null, true);
     if (ALLOWED_ORIGINS.has(origin)) return cb(null, true);
-    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return cb(null, true);
+    // FIX: only allow localhost regex in development
+    if (process.env.NODE_ENV !== 'production' &&
+        /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      return cb(null, true);
+    }
     cb(new Error('CORS: origin not allowed — ' + origin));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],  // FIX: added PATCH (used by checklist)
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
@@ -62,13 +66,13 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc:  ["'self'", "'unsafe-inline'", "'unsafe-eval'",
+      scriptSrc:  ["'self'", "'unsafe-inline'",
+                   // FIX: removed 'unsafe-eval' — XSS vector, not needed
                    "https://cdnjs.cloudflare.com",
                    "https://cdn.jsdelivr.net"],
       styleSrc:   ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc:    ["'self'", "https://fonts.gstatic.com"],
       imgSrc:     ["'self'", "data:", "https:"],
-      // FIX: allow API calls from file:// and any configured frontend origin
       connectSrc: [
         "'self'",
         "https://the-ginskeys-backend-production.up.railway.app",
@@ -80,7 +84,12 @@ app.use(helmet({
 }));
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
-app.use(express.json());
+
+// FIX: body size limit to prevent payload abuse
+app.use(express.json({ limit: '1mb' }));
+
+// FIX: trust proxy for correct req.ip behind Railway's reverse proxy
+app.set('trust proxy', 1);
 
 // ─── ROUTES ───────────────────────────────────────────
 app.use('/api/auth',         authRoutes);
@@ -97,25 +106,41 @@ app.use('/api/agent',        agentRoutes);
 app.use('/api/production',   productionRoutes);
 
 // ─── HEALTH ───────────────────────────────────────────
-app.get('/api/health', async (req, res) => {
+app.get('/api/health', async (_req, res) => {
   try {
     const { rows } = await pool.query('SELECT now() AS db_time');
     res.json({ ok: true, ts: new Date(), db_time: rows[0].db_time });
   } catch (err) {
     console.error('Health check DB error:', err.message);
-    res.status(503).json({ ok: false, error: 'Database unreachable', detail: err.message });
+    // FIX: don't leak internal error details in production
+    res.status(503).json({
+      ok: false,
+      error: 'Database unreachable',
+      ...(process.env.NODE_ENV !== 'production' && { detail: err.message }),
+    });
   }
 });
 
 // ─── FRONTEND ─────────────────────────────────────────
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, 'ginskeys-console.html'));
 });
 
+// FIX: 404 handler for undefined routes (was missing)
+app.use((_req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
 // ─── ERROR HANDLER ────────────────────────────────────
-app.use((err, req, res, next) => {
+// eslint-disable-next-line no-unused-vars
+app.use((err, _req, res, _next) => {
   console.error(err.stack);
-  res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
+  // FIX: don't leak stack traces in production
+  const status = err.status || 500;
+  const message = process.env.NODE_ENV === 'production' && status === 500
+    ? 'Internal server error'
+    : err.message || 'Internal server error';
+  res.status(status).json({ error: message });
 });
 
 // ─── START ────────────────────────────────────────────
