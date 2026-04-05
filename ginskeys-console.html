@@ -14975,6 +14975,46 @@ function mgmtBandHealthScore() {
         </div>
       </div>
     </div>`;
+
+  // ── Update SYS ticker with Focus Areas + Priority Actions ──────────────
+  updateSysTicker(dims, total, grade, topPriority, secondPriority);
+}
+
+function updateSysTicker(dims, total, grade, topPriority, secondPriority) {
+  const ticker = document.getElementById('ticker');
+  if (!ticker) return;
+
+  const items = [];
+
+  // Grade summary — colour based on score
+  const gradeClass = total >= 45 ? 'warn' : 'danger';
+  items.push({ cls: gradeClass, text: `Band Health: ${grade} (${total}/100)` });
+
+  // Top 2 focus areas from health score — weakest dimensions
+  const focusCls1 = (topPriority.score / topPriority.max) < 0.2 ? 'danger' : 'warn';
+  items.push({ cls: focusCls1, text: `#1 ${topPriority.icon} ${topPriority.label}: ${topPriority.advice}` });
+
+  const focusCls2 = (secondPriority.score / secondPriority.max) < 0.2 ? 'danger' : 'warn';
+  items.push({ cls: focusCls2, text: `#2 ${secondPriority.icon} ${secondPriority.label}: ${secondPriority.advice}` });
+
+  // Priority Actions (from mgmtPriorityActions data if available)
+  if (window._mgmtActions && window._mgmtActions.length) {
+    window._mgmtActions.slice(0, 5).forEach(a => {
+      items.push({ cls: a.urgency === 'danger' ? 'danger' : a.urgency === 'warn' ? 'warn' : 'ok', text: `${a.icon} ${a.label}` });
+    });
+  }
+
+  // Runway — always show
+  const fi = getFinancialIntelligence();
+  const runwayLabel = fi.runwayMonths === Infinity ? '∞' : fi.runwayMonths.toFixed(1) + ' mo';
+  const runwayCls = fi.runwayMonths < 6 ? 'danger' : fi.runwayMonths < 12 ? 'warn' : 'ok';
+  items.push({ cls: runwayCls, text: `Cash runway: ${runwayLabel} at op. burn` });
+
+  // Build ticker HTML — duplicate for seamless loop
+  const inner = items.map(i =>
+    `<div class="ticker-sep">•</div><div class="ticker-item ${i.cls}">⚠ ${i.text}</div>`
+  ).join('');
+  ticker.innerHTML = inner + inner;
 }
 
 
