@@ -2166,6 +2166,7 @@ tr:hover .edit-btn{display:inline}
     <div class="tb-tab" data-view="streaming" onclick="switchView('streaming',this)">▶ Streaming</div>
     <div class="tb-nav-sep"></div>
     <!-- ADMIN -->
+    <div class="tb-tab" data-view="finance-tools" onclick="switchView('finance-tools',this)" id="tab-finance-tools">⊟ Finance Tools</div>
     <div class="tb-tab" data-view="access" onclick="switchView('access',this)" id="tab-access">⊕ Access</div>
     <div class="tb-tab" data-view="audit" onclick="switchView('audit',this)" id="tab-audit">⊞ Audit Log</div>
     <div class="tb-tab" data-view="settings" onclick="switchView('settings',this)">⚙ Settings</div>
@@ -4053,6 +4054,141 @@ tr:hover .edit-btn{display:inline}
         </div>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- ══ FINANCE TOOLS VIEW ══════════════════════════════ -->
+<div id="view-finance-tools" class="view new-view">
+  <div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:10px;min-height:0;overflow-y:auto">
+
+    <!-- Sub-tabs -->
+    <div style="flex-shrink:0;display:flex;gap:0;border-bottom:1px solid var(--border2)">
+      <button class="prod-tab pt-active" onclick="switchFTTab('irs',this)" id="ft-tab-irs">⊟ IRS / Tax Summary</button>
+      <button class="prod-tab" onclick="switchFTTab('budget',this)" id="ft-tab-budget">◎ Budget vs Actual</button>
+    </div>
+
+    <!-- ══ IRS TAB ══ -->
+    <div id="ft-irs" style="flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">
+
+      <!-- Controls -->
+      <div style="flex-shrink:0;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">TAX YEAR</div>
+        <select id="irs-year" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:11px;padding:4px 10px;font-family:var(--mono)" onchange="irsRender()">
+          <option value="2025" selected>2025</option>
+          <option value="2024">2024</option>
+          <option value="2026">2026</option>
+        </select>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-left:8px">MEMBER</div>
+        <select id="irs-member" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:11px;padding:4px 10px;font-family:var(--mono)" onchange="irsRender()">
+          <option value="all">All Members</option>
+          <option value="fabio">Fábio</option>
+          <option value="pedro">Pedro</option>
+          <option value="manuel">Manuel</option>
+          <option value="tiago">Tiago</option>
+        </select>
+        <div style="flex:1"></div>
+        <button class="btn-sm" onclick="irsPrintSelected()" style="color:var(--green3);border-color:var(--green3)">⎙ Export PDF</button>
+      </div>
+
+      <!-- Disclaimer -->
+      <div style="flex-shrink:0;background:rgba(255,143,0,.08);border-left:3px solid var(--amber2);padding:8px 12px;font-size:9px;color:var(--amber2);border-radius:0 2px 2px 0">
+        ⚠ Este resumo é apenas orientativo. Consulte um contabilista ou o Portal das Finanças para a sua declaração Mod. 3 / Anexo B.
+        <span style="color:var(--muted3)"> / For guidance only — consult an accountant for your official IRS filing.</span>
+      </div>
+
+      <!-- Member summaries grid -->
+      <div id="irs-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;flex-shrink:0">
+        <div style="padding:20px;text-align:center;color:var(--muted3);font-size:10px;grid-column:span 2">Loading…</div>
+      </div>
+
+      <!-- Band total -->
+      <div id="irs-band-total" style="flex-shrink:0"></div>
+
+      <!-- Category breakdown -->
+      <div id="irs-category-breakdown" style="flex-shrink:0"></div>
+
+    </div>
+
+    <!-- ══ BUDGET TAB ══ -->
+    <div id="ft-budget" style="flex:1;display:none;flex-direction:column;gap:10px;min-height:0">
+
+      <!-- Controls -->
+      <div style="flex-shrink:0;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">YEAR</div>
+        <select id="budget-year" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:11px;padding:4px 10px;font-family:var(--mono)" onchange="budgetRender()">
+          <option value="2025" selected>2025</option>
+          <option value="2024">2024</option>
+          <option value="2026">2026</option>
+        </select>
+        <div style="flex:1"></div>
+        <button class="btn-sm" onclick="budgetSetTargets()" style="color:var(--blue2);border-color:var(--blue2)">✎ Set Targets</button>
+        <button class="btn-sm" onclick="budgetExportPDF()" style="color:var(--green3);border-color:var(--green3)">⎙ Export</button>
+      </div>
+
+      <!-- Annual targets summary -->
+      <div id="budget-annual-summary" style="flex-shrink:0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px"></div>
+
+      <!-- Show-by-show table -->
+      <div class="panel" style="flex:1;min-height:0;overflow-y:auto">
+        <div class="panel-header" style="flex-shrink:0">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Show Budget vs Actual</div>
+        </div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px" id="budget-table">
+            <thead>
+              <tr style="background:var(--bg4);font-size:8px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">
+                <th style="padding:7px 10px;text-align:left">Show</th>
+                <th style="padding:7px 10px;text-align:right">Budget Fee</th>
+                <th style="padding:7px 10px;text-align:right">Actual Fee</th>
+                <th style="padding:7px 10px;text-align:right">Variance</th>
+                <th style="padding:7px 10px;text-align:right">Budget Exp.</th>
+                <th style="padding:7px 10px;text-align:right">Actual Exp.</th>
+                <th style="padding:7px 10px;text-align:right">Budget Net</th>
+                <th style="padding:7px 10px;text-align:right">Actual Net</th>
+                <th style="padding:7px 10px;text-align:right">Margin</th>
+              </tr>
+            </thead>
+            <tbody id="budget-tbody">
+              <tr><td colspan="9" style="padding:20px;text-align:center;color:var(--muted3)">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Monthly breakdown -->
+      <div class="panel" style="flex-shrink:0">
+        <div class="panel-header">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Monthly Budget vs Actual</div>
+        </div>
+        <div id="budget-monthly" style="padding:10px 12px"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ BUDGET TARGETS MODAL ══════════════════════════ -->
+<div id="budget-targets-modal" class="overlay-bg" onclick="if(event.target===this)closeBudgetTargets()">
+  <div class="overlay-box" style="width:480px">
+    <div class="overlay-hdr">
+      <span class="overlay-title">✎ Annual Budget Targets</span>
+      <button class="overlay-close" onclick="closeBudgetTargets()">✕</button>
+    </div>
+    <div class="overlay-body" style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:9px;color:var(--muted2)">Set targets for <span id="bt-year-label">2025</span>. These are compared against actual ledger data.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-field"><label>Target Annual Revenue (€)</label><input class="form-input" id="bt-revenue" type="number" placeholder="10000"></div>
+        <div class="form-field"><label>Target Annual Expenses (€)</label><input class="form-input" id="bt-expenses" type="number" placeholder="3000"></div>
+        <div class="form-field"><label>Target Gig Count</label><input class="form-input" id="bt-gigs" type="number" placeholder="12"></div>
+        <div class="form-field"><label>Target Avg Fee per Gig (€)</label><input class="form-input" id="bt-avg-fee" type="number" placeholder="800"></div>
+        <div class="form-field"><label>Target Net Income (€)</label><input class="form-input" id="bt-net" type="number" placeholder="7000"></div>
+        <div class="form-field"><label>Band Fund Target (€)</label><input class="form-input" id="bt-fund" type="number" placeholder="1200"></div>
+      </div>
+    </div>
+    <div class="overlay-hdr" style="justify-content:flex-end;border-top:1px solid var(--border);border-bottom:none;gap:8px">
+      <button class="btn-sm ghost" onclick="closeBudgetTargets()">Cancel</button>
+      <button class="btn-sm primary" onclick="saveBudgetTargets()">Save Targets</button>
     </div>
   </div>
 </div>
@@ -5953,6 +6089,738 @@ function membersExportAgreement() {
 function membersExportPDF() { membersExportAgreement(); }
 
 
+// ══════════════════════════════════════════════════════════
+// FINANCE TOOLS ENGINE — IRS + BUDGET VS ACTUAL
+// ══════════════════════════════════════════════════════════
+
+var BUDGET_TARGETS = {};
+var STORAGE_BUDGET = 'gk_budget_targets';
+
+function switchFTTab(tab, btn) {
+  ['irs','budget'].forEach(function(t) {
+    var el = document.getElementById('ft-' + t);
+    if (el) { el.style.display = t === tab ? 'flex' : 'none'; }
+  });
+  document.querySelectorAll('#view-finance-tools .prod-tab').forEach(function(b) { b.classList.remove('pt-active'); });
+  if (btn) btn.classList.add('pt-active');
+  if (tab === 'irs') irsRender();
+  if (tab === 'budget') budgetRender();
+}
+
+function financeToolsLoad() {
+  try { var b = localStorage.getItem(STORAGE_BUDGET); BUDGET_TARGETS = b ? JSON.parse(b) : {}; } catch(e) { BUDGET_TARGETS = {}; }
+  irsRender();
+}
+
+// ══ IRS / TAX SUMMARY ══════════════════════════════════
+
+var MEMBER_COLORS_FT = { fabio:'var(--accent)', pedro:'var(--blue2)', manuel:'var(--green3)', tiago:'var(--purple2)' };
+var MEMBER_NAMES_FT  = { fabio:'Fábio', pedro:'Pedro', manuel:'Manuel', tiago:'Tiago' };
+
+// Portuguese Mod.3 Anexo B deductible categories
+var DEDUCTIBLE_CATS = ['Transporte','Equipamento','Estúdio','Distribuição','Marketing','Impostos','Artwork'];
+var CAT_PT = {
+  'Espetáculo': 'Espetáculos / Cachês',
+  'Crédito':    'Créditos / Prémios',
+  'Doações':    'Doações',
+  'Outros':     'Outros rendimentos',
+  'Transporte': 'Deslocações e transportes',
+  'Equipamento':'Instrumentos e equipamento',
+  'Estúdio':    'Estúdio e gravação',
+  'Distribuição':'Distribuição musical',
+  'Marketing':  'Publicidade / Marketing',
+  'Impostos':   'Impostos pagos',
+  'Artwork':    'Arte gráfica / Design',
+  'Live':       'Espetáculos / Cachês',
+};
+
+function irsRender() {
+  var year    = parseInt(document.getElementById('irs-year')?.value || 2025);
+  var member  = document.getElementById('irs-member')?.value || 'all';
+  var grid    = document.getElementById('irs-grid');
+  var bandDiv = document.getElementById('irs-band-total');
+  var catDiv  = document.getElementById('irs-category-breakdown');
+  if (!grid) return;
+
+  // Filter ledger by year
+  var entries = (LEDGER_DATA || []).filter(function(e) {
+    return new Date(e.date).getFullYear() === year;
+  });
+
+  // Total band revenue and expenses from ledger
+  var bandIncome  = entries.filter(function(e){ return e.amount > 0; }).reduce(function(s,e){ return s+e.amount; },0);
+  var bandExpenses = entries.filter(function(e){ return e.amount < 0; }).reduce(function(s,e){ return s+Math.abs(e.amount); },0);
+  var bandNet = bandIncome - bandExpenses;
+
+  // Per-member income from splits
+  var memberIncome = { fabio:0, pedro:0, manuel:0, tiago:0 };
+  var memberGigs   = { fabio:0, pedro:0, manuel:0, tiago:0 };
+  (SPLITS_DATA || []).forEach(function(s) {
+    if (s.gig_date && new Date(s.gig_date).getFullYear() !== year) return;
+    var perM = parseFloat(s.per_member_eur || 0);
+    if (perM > 0) {
+      Object.keys(memberIncome).forEach(function(k) {
+        memberIncome[k] += perM;
+        memberGigs[k]++;
+      });
+    }
+  });
+
+  // Expenses by category
+  var expByCat = {};
+  entries.filter(function(e){ return e.amount < 0; }).forEach(function(e) {
+    var cat = e.cat || 'Outros';
+    expByCat[cat] = (expByCat[cat] || 0) + Math.abs(e.amount);
+  });
+
+  var fmtE = function(v) { return '\u20ac\u00a0' + Math.abs(v).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+
+  // Member share of band expenses (equal split for now)
+  var memberExpShare = bandExpenses / 4;
+
+  var members = member === 'all' ? ['fabio','pedro','manuel','tiago'] : [member];
+
+  grid.style.gridTemplateColumns = members.length === 1 ? '1fr' : 'repeat(2,1fr)';
+
+  grid.innerHTML = members.map(function(mk) {
+    var inc   = memberIncome[mk] || 0;
+    var gigs  = memberGigs[mk] || 0;
+    var exp   = memberExpShare;
+    var net   = inc - exp;
+    var col   = MEMBER_COLORS_FT[mk];
+    var name  = MEMBER_NAMES_FT[mk];
+
+    // Deductible expenses (member's share of deductible categories)
+    var deductible = 0;
+    DEDUCTIBLE_CATS.forEach(function(cat) {
+      deductible += (expByCat[cat] || 0) / 4;
+    });
+    var taxableIncome = Math.max(0, inc - deductible);
+    // Portuguese IRS Cat B — simplified regime: 75% coefficient on services
+    var coefficient = 0.75;
+    var taxableBase = taxableIncome * coefficient;
+    // Estimated IRS at ~28.5% marginal (simplified - actual depends on total income)
+    var estimatedTax = taxableBase * 0.285;
+
+    return '<div class="panel" style="border-top:3px solid ' + col + ';padding:14px">' +
+      '<div style="font-size:10px;font-weight:700;color:' + col + ';letter-spacing:.1em;margin-bottom:12px">' + name.toUpperCase() + ' — ' + year + '</div>' +
+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;font-size:10px;border:1px solid var(--border2);border-radius:2px;overflow:hidden;margin-bottom:12px">' +
+        '<div style="padding:8px 10px;border-bottom:1px solid var(--border2);border-right:1px solid var(--border2)">' +
+          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">RENDIMENTO BRUTO / Gross Income</div>' +
+          '<div style="font-size:16px;font-weight:700;color:var(--green3)">' + fmtE(inc) + '</div>' +
+          '<div style="font-size:9px;color:var(--muted3);margin-top:2px">' + gigs + ' espetáculos</div>' +
+        '</div>' +
+        '<div style="padding:8px 10px;border-bottom:1px solid var(--border2)">' +
+          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">DESPESAS DEDUTÍVEIS / Deductible Exp.</div>' +
+          '<div style="font-size:16px;font-weight:700;color:var(--red3)">-' + fmtE(deductible) + '</div>' +
+          '<div style="font-size:9px;color:var(--muted3);margin-top:2px">quota-parte band</div>' +
+        '</div>' +
+        '<div style="padding:8px 10px;border-right:1px solid var(--border2)">' +
+          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">RENDIMENTO LÍQUIDO / Net</div>' +
+          '<div style="font-size:15px;font-weight:700;color:var(--text)">' + fmtE(net) + '</div>' +
+        '</div>' +
+        '<div style="padding:8px 10px">' +
+          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">BASE TRIBUTÁVEL (75%) / Taxable Base</div>' +
+          '<div style="font-size:15px;font-weight:700;color:var(--amber2)">' + fmtE(taxableBase) + '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div style="background:var(--bg4);border-radius:2px;padding:10px 12px;font-size:10px">' +
+        '<div style="display:flex;justify-content:space-between;margin-bottom:6px">' +
+          '<span style="color:var(--muted2)">IRS estimado (28,5%) / Est. tax</span>' +
+          '<span style="font-weight:700;color:var(--amber2)">' + fmtE(estimatedTax) + '</span>' +
+        '</div>' +
+        '<div style="font-size:8px;color:var(--muted3);line-height:1.6">' +
+          'Coeficiente Cat. B serviços: 0,75 · Regime simplificado · ' +
+          'Declare em <strong>Anexo B</strong> da Mod. 3 · ' +
+          'Prazo: 30 Jun ' + (year+1) +
+        '</div>' +
+      '</div>' +
+
+      '<button onclick="irsPrintMember(\'' + mk + '\',' + year + ')" style="margin-top:10px;width:100%;background:transparent;border:1px solid var(--border2);color:var(--muted2);font-size:9px;padding:5px;cursor:pointer;font-family:var(--mono)">⎙ Export PDF — ' + name + '</button>' +
+    '</div>';
+  }).join('');
+
+  // Band total summary
+  if (bandDiv) {
+    bandDiv.innerHTML = '<div class="panel" style="padding:12px">' +
+      '<div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:10px">RESUMO DA BANDA ' + year + ' / BAND TOTAL</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">' +
+        '<div><div style="font-size:8px;color:var(--muted3)">Receita total</div><div style="font-size:16px;font-weight:700;color:var(--green3)">' + fmtE(bandIncome) + '</div></div>' +
+        '<div><div style="font-size:8px;color:var(--muted3)">Despesas totais</div><div style="font-size:16px;font-weight:700;color:var(--red3)">-' + fmtE(bandExpenses) + '</div></div>' +
+        '<div><div style="font-size:8px;color:var(--muted3)">Resultado líquido</div><div style="font-size:16px;font-weight:700;color:' + (bandNet>=0?'var(--text)':'var(--red3)') + '">' + fmtE(bandNet) + '</div></div>' +
+        '<div><div style="font-size:8px;color:var(--muted3)">Por membro</div><div style="font-size:16px;font-weight:700;color:var(--amber2)">' + fmtE(bandNet/4) + '</div></div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  // Category breakdown
+  if (catDiv) {
+    var rows = Object.entries(expByCat).sort(function(a,b){ return b[1]-a[1]; });
+    catDiv.innerHTML = '<div class="panel" style="padding:12px">' +
+      '<div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:10px">DESPESAS POR CATEGORIA ' + year + ' / EXPENSES BY CATEGORY</div>' +
+      (rows.length ? rows.map(function(r) {
+        var pct = bandExpenses > 0 ? (r[1]/bandExpenses*100).toFixed(0) : 0;
+        var isDeductible = DEDUCTIBLE_CATS.indexOf(r[0]) !== -1;
+        return '<div style="display:grid;grid-template-columns:160px 1fr 70px 60px;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border1);font-size:10px">' +
+          '<div style="color:var(--muted2)">' + (CAT_PT[r[0]] || r[0]) + '</div>' +
+          '<div style="background:var(--bg4);border-radius:1px;height:4px;overflow:hidden">' +
+            '<div style="height:100%;width:' + pct + '%;background:' + (isDeductible?'var(--green3)':'var(--red3)') + ';border-radius:1px"></div>' +
+          '</div>' +
+          '<div style="text-align:right;color:var(--text)">' + fmtE(r[1]) + '</div>' +
+          '<div style="text-align:right">' +
+            (isDeductible ? '<span style="font-size:8px;color:var(--green3);padding:1px 4px;border:1px solid var(--green3);border-radius:1px">DED.</span>' :
+                            '<span style="font-size:8px;color:var(--muted3)">—</span>') +
+          '</div>' +
+        '</div>';
+      }).join('') : '<div style="color:var(--muted3);font-size:10px;padding:8px 0">No expenses recorded for ' + year + '.</div>') +
+    '</div>';
+  }
+}
+
+function irsRender() {
+  var year   = parseInt(document.getElementById('irs-year')?.value || 2025);
+  var member = document.getElementById('irs-member')?.value || 'all';
+  _irsRenderCore(year, member);
+}
+
+function _irsRenderCore(year, member) {
+  var grid    = document.getElementById('irs-grid');
+  var bandDiv = document.getElementById('irs-band-total');
+  var catDiv  = document.getElementById('irs-category-breakdown');
+  if (!grid) return;
+  var fmtE = function(v) { return '\u20ac\u00a0' + Math.abs(v).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+
+  var entries = (LEDGER_DATA||[]).filter(function(e){ return new Date(e.date).getFullYear()===year; });
+  var bandIncome   = entries.filter(function(e){ return e.amount>0; }).reduce(function(s,e){ return s+e.amount; },0);
+  var bandExpenses = entries.filter(function(e){ return e.amount<0; }).reduce(function(s,e){ return s+Math.abs(e.amount); },0);
+  var bandNet = bandIncome - bandExpenses;
+
+  var memberIncome = {fabio:0,pedro:0,manuel:0,tiago:0};
+  var memberGigs   = {fabio:0,pedro:0,manuel:0,tiago:0};
+  (SPLITS_DATA||[]).forEach(function(s) {
+    if (s.gig_date && new Date(s.gig_date).getFullYear()!==year) return;
+    var perM = parseFloat(s.per_member_eur||0);
+    if (perM>0) { Object.keys(memberIncome).forEach(function(k){ memberIncome[k]+=perM; memberGigs[k]++; }); }
+  });
+
+  var expByCat = {};
+  entries.filter(function(e){ return e.amount<0; }).forEach(function(e){
+    var cat=e.cat||'Outros'; expByCat[cat]=(expByCat[cat]||0)+Math.abs(e.amount);
+  });
+
+  var members = member==='all' ? ['fabio','pedro','manuel','tiago'] : [member];
+  grid.style.gridTemplateColumns = members.length===1 ? '1fr' : 'repeat(2,1fr)';
+
+  grid.innerHTML = members.map(function(mk) {
+    var inc=memberIncome[mk]||0, gigs=memberGigs[mk]||0;
+    var deductible=0;
+    DEDUCTIBLE_CATS.forEach(function(cat){ deductible+=(expByCat[cat]||0)/4; });
+    var net=inc-deductible;
+    var taxableBase=Math.max(0,net)*0.75;
+    var estimatedTax=taxableBase*0.285;
+    var col=MEMBER_COLORS_FT[mk], name=MEMBER_NAMES_FT[mk];
+
+    return '<div class="panel" style="border-top:3px solid '+col+';padding:14px">'+
+      '<div style="font-size:10px;font-weight:700;color:'+col+';letter-spacing:.1em;margin-bottom:12px">'+name.toUpperCase()+' — '+year+'</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;font-size:10px;border:1px solid var(--border2);border-radius:2px;overflow:hidden;margin-bottom:12px">'+
+        '<div style="padding:8px 10px;border-bottom:1px solid var(--border2);border-right:1px solid var(--border2)">'+
+          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">RENDIMENTO BRUTO / Gross Income</div>'+
+          '<div style="font-size:16px;font-weight:700;color:var(--green3)">'+fmtE(inc)+'</div>'+
+          '<div style="font-size:9px;color:var(--muted3);margin-top:2px">'+gigs+' espetáculos</div>'+
+        '</div>'+
+        '<div style="padding:8px 10px;border-bottom:1px solid var(--border2)">'+
+          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">DESPESAS DEDUTÍVEIS / Deductible</div>'+
+          '<div style="font-size:16px;font-weight:700;color:var(--red3)">-'+fmtE(deductible)+'</div>'+
+          '<div style="font-size:9px;color:var(--muted3)">quota-parte banda</div>'+
+        '</div>'+
+        '<div style="padding:8px 10px;border-right:1px solid var(--border2)">'+
+          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">RENDIMENTO LÍQUIDO / Net</div>'+
+          '<div style="font-size:15px;font-weight:700;color:var(--text)">'+fmtE(net)+'</div>'+
+        '</div>'+
+        '<div style="padding:8px 10px">'+
+          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">BASE TRIBUTÁVEL (75%) / Taxable</div>'+
+          '<div style="font-size:15px;font-weight:700;color:var(--amber2)">'+fmtE(taxableBase)+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="background:var(--bg4);border-radius:2px;padding:10px 12px;font-size:10px">'+
+        '<div style="display:flex;justify-content:space-between;margin-bottom:6px">'+
+          '<span style="color:var(--muted2)">IRS estimado (28,5%) / Est. tax</span>'+
+          '<span style="font-weight:700;color:var(--amber2)">'+fmtE(estimatedTax)+'</span>'+
+        '</div>'+
+        '<div style="font-size:8px;color:var(--muted3);line-height:1.6">'+
+          'Coeficiente Cat. B serviços: 0,75 &nbsp;·&nbsp; Regime simplificado &nbsp;·&nbsp; '+
+          'Declare em <strong>Anexo B</strong> da Mod. 3 &nbsp;·&nbsp; Prazo: 30 Jun '+(year+1)+
+        '</div>'+
+      '</div>'+
+      '<button onclick="irsPrintMember(\''+mk+'\','+year+')" style="margin-top:10px;width:100%;background:transparent;border:1px solid var(--border2);color:var(--muted2);font-size:9px;padding:5px;cursor:pointer;font-family:var(--mono)">⎙ PDF — '+name+'</button>'+
+    '</div>';
+  }).join('');
+
+  if (bandDiv) {
+    bandDiv.innerHTML='<div class="panel" style="padding:12px;margin-top:0">'+
+      '<div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:10px">BANDA — RESUMO '+year+'</div>'+
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">'+
+        '<div><div style="font-size:8px;color:var(--muted3)">Receita total</div><div style="font-size:16px;font-weight:700;color:var(--green3)">'+fmtE(bandIncome)+'</div></div>'+
+        '<div><div style="font-size:8px;color:var(--muted3)">Despesas totais</div><div style="font-size:16px;font-weight:700;color:var(--red3)">-'+fmtE(bandExpenses)+'</div></div>'+
+        '<div><div style="font-size:8px;color:var(--muted3)">Resultado líquido</div><div style="font-size:16px;font-weight:700;color:'+(bandNet>=0?'var(--text)':'var(--red3)')+'" >'+fmtE(bandNet)+'</div></div>'+
+        '<div><div style="font-size:8px;color:var(--muted3)">Por membro</div><div style="font-size:16px;font-weight:700;color:var(--amber2)">'+fmtE(bandNet/4)+'</div></div>'+
+      '</div></div>';
+  }
+
+  if (catDiv) {
+    var rows=Object.entries(expByCat).sort(function(a,b){return b[1]-a[1];});
+    catDiv.innerHTML='<div class="panel" style="padding:12px;margin-top:0">'+
+      '<div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:10px">DESPESAS POR CATEGORIA '+year+'</div>'+
+      (rows.length?rows.map(function(r){
+        var pct=bandExpenses>0?(r[1]/bandExpenses*100).toFixed(0):0;
+        var isDed=DEDUCTIBLE_CATS.indexOf(r[0])!==-1;
+        return '<div style="display:grid;grid-template-columns:160px 1fr 70px 60px;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border1);font-size:10px">'+
+          '<div style="color:var(--muted2)">'+(CAT_PT[r[0]]||r[0])+'</div>'+
+          '<div style="background:var(--bg4);border-radius:1px;height:4px;overflow:hidden">'+
+            '<div style="height:100%;width:'+pct+'%;background:'+(isDed?'var(--green3)':'var(--red3)')+';border-radius:1px"></div>'+
+          '</div>'+
+          '<div style="text-align:right;color:var(--text)">'+fmtE(r[1])+'</div>'+
+          '<div style="text-align:right">'+(isDed?'<span style="font-size:8px;color:var(--green3);padding:1px 4px;border:1px solid var(--green3);border-radius:1px">DED.</span>':'<span style="font-size:8px;color:var(--muted3)">—</span>')+'</div>'+
+        '</div>';
+      }).join(''):'<div style="color:var(--muted3);padding:8px 0;font-size:10px">No expenses for '+year+'.</div>')+
+    '</div>';
+  }
+}
+
+function irsRender() { _irsRenderCore(parseInt(document.getElementById('irs-year')?.value||2025), document.getElementById('irs-member')?.value||'all'); }
+
+function irsPrintSelected() {
+  var year = parseInt(document.getElementById('irs-year')?.value||2025);
+  var member = document.getElementById('irs-member')?.value||'all';
+  var members = member==='all' ? ['fabio','pedro','manuel','tiago'] : [member];
+  members.forEach(function(mk){ irsPrintMember(mk, year); });
+}
+
+function irsPrintMember(mk, year) {
+  var fmtE = function(v){ return '\u20ac '+Math.abs(v).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var name = MEMBER_NAMES_FT[mk];
+  var entries = (LEDGER_DATA||[]).filter(function(e){ return new Date(e.date).getFullYear()===year; });
+  var bandExpenses = entries.filter(function(e){ return e.amount<0; }).reduce(function(s,e){ return s+Math.abs(e.amount); },0);
+  var expByCat={};
+  entries.filter(function(e){ return e.amount<0; }).forEach(function(e){ var c=e.cat||'Outros'; expByCat[c]=(expByCat[c]||0)+Math.abs(e.amount); });
+  var deductible=0;
+  DEDUCTIBLE_CATS.forEach(function(cat){ deductible+=(expByCat[cat]||0)/4; });
+
+  var memberIncome=0, memberGigs=0;
+  (SPLITS_DATA||[]).forEach(function(s){
+    if (s.gig_date&&new Date(s.gig_date).getFullYear()!==year) return;
+    var p=parseFloat(s.per_member_eur||0); if(p>0){memberIncome+=p;memberGigs++;}
+  });
+
+  var net=memberIncome-deductible;
+  var taxableBase=Math.max(0,net)*0.75;
+  var estimatedTax=taxableBase*0.285;
+  var today=new Date().toLocaleDateString('pt-PT',{day:'2-digit',month:'long',year:'numeric'});
+  var splitsInYear=(SPLITS_DATA||[]).filter(function(s){ return !s.gig_date||new Date(s.gig_date).getFullYear()===year; });
+
+  var doc='<!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8"><title>Resumo IRS '+year+' — '+name+'</title><style>'+
+    '*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:11px;color:#1a1a1a;padding:24px 32px;line-height:1.5}'+
+    'h1{font-size:20px;font-weight:700;margin-bottom:2px}'+
+    '.header{border-bottom:3px double #111;padding-bottom:10px;margin-bottom:18px;display:flex;justify-content:space-between}'+
+    '.section{margin-bottom:18px}.section h2{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#555;border-bottom:1px solid #ddd;padding-bottom:3px;margin-bottom:10px}'+
+    'table{width:100%;border-collapse:collapse}td{padding:6px 10px;border-bottom:1px solid #eee;font-size:11px}'+
+    'td.l{font-weight:700;color:#333;width:55%}td.v{text-align:right}tr:last-child td{border-bottom:none;font-weight:700;font-size:13px}'+
+    '.highlight{background:#f8fdf8;border:1px solid #c6e8c6;border-radius:3px;padding:12px 16px;margin-bottom:16px}'+
+    '.warning{background:#fffbf0;border-left:3px solid #f59e0b;padding:8px 12px;font-size:10px;color:#92400e;margin-bottom:14px}'+
+    '.gig-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:10px}'+
+    '@page{margin:10mm;size:A4}'+
+    '</style></head><body>'+
+    '<div class="header">'+
+      '<div><h1>'+name.toUpperCase()+'</h1><div style="font-size:12px;color:#555">Resumo de Rendimentos Artísticos '+year+' / Artists Income Summary</div></div>'+
+      '<div style="text-align:right;font-size:9px;color:#666">Emitido: '+today+'<br>The Ginskeys · Sines, Portugal<br><em>Documento auxiliar — não substitui declaração IRS</em></div>'+
+    '</div>'+
+    '<div class="warning">⚠ Este documento é apenas orientativo para preparação da declaração IRS Mod.3 Anexo B. Os valores são estimativas baseadas nos dados registados na aplicação. Consulte um contabilista ou o Portal das Finanças.</div>'+
+    '<div class="highlight">'+
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center">'+
+        '<div><div style="font-size:8px;color:#555;text-transform:uppercase;margin-bottom:3px">Rendimento Bruto</div><div style="font-size:22px;font-weight:700;color:#166534">'+fmtE(memberIncome)+'</div></div>'+
+        '<div><div style="font-size:8px;color:#555;text-transform:uppercase;margin-bottom:3px">Base Tributável (×0,75)</div><div style="font-size:22px;font-weight:700;color:#92400e">'+fmtE(taxableBase)+'</div></div>'+
+        '<div><div style="font-size:8px;color:#555;text-transform:uppercase;margin-bottom:3px">IRS Estimado (28,5%)</div><div style="font-size:22px;font-weight:700;color:#dc2626">'+fmtE(estimatedTax)+'</div></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="section"><h2>Rendimentos por Espetáculo / Income by Show</h2>'+
+      '<div class="gig-row" style="background:#f8f8f8;font-weight:700"><div>Espetáculo</div><div>Data</div><div>Valor</div></div>'+
+      splitsInYear.map(function(s){
+        return '<div class="gig-row"><div>'+(s.gig_name||'—')+'</div><div>'+(s.gig_date||'—')+'</div><div>'+fmtE(parseFloat(s.per_member_eur||0))+'</div></div>';
+      }).join('')+
+      '<div class="gig-row" style="font-weight:700;border-top:2px solid #111"><div>TOTAL</div><div>'+memberGigs+' espetáculos</div><div>'+fmtE(memberIncome)+'</div></div>'+
+    '</div>'+
+    '<div class="section"><h2>Despesas Dedutíveis (quota-parte) / Deductible Expenses (share)</h2>'+
+      '<table>'+
+        DEDUCTIBLE_CATS.filter(function(c){return expByCat[c]>0;}).map(function(c){
+          return '<tr><td class="l">'+(CAT_PT[c]||c)+'</td><td class="v">-'+fmtE((expByCat[c]||0)/4)+'</td></tr>';
+        }).join('')+
+        '<tr style="border-top:2px solid #111"><td class="l">TOTAL DEDUTÍVEL</td><td class="v">-'+fmtE(deductible)+'</td></tr>'+
+      '</table>'+
+    '</div>'+
+    '<div class="section"><h2>Cálculo IRS / Tax Calculation</h2>'+
+      '<table>'+
+        '<tr><td class="l">Rendimento bruto / Gross income</td><td class="v">'+fmtE(memberIncome)+'</td></tr>'+
+        '<tr><td class="l">Despesas dedutíveis / Deductible expenses</td><td class="v">-'+fmtE(deductible)+'</td></tr>'+
+        '<tr><td class="l">Rendimento líquido / Net income</td><td class="v">'+fmtE(net)+'</td></tr>'+
+        '<tr><td class="l">Coeficiente Cat. B serviços (0,75)</td><td class="v">×0,75</td></tr>'+
+        '<tr><td class="l">Base tributável / Taxable base</td><td class="v">'+fmtE(taxableBase)+'</td></tr>'+
+        '<tr><td class="l">Taxa estimada / Estimated rate</td><td class="v">28,5%</td></tr>'+
+        '<tr><td class="l">IRS ESTIMADO / EST. TAX</td><td class="v">'+fmtE(estimatedTax)+'</td></tr>'+
+      '</table>'+
+      '<div style="font-size:9px;color:#888;margin-top:8px">Regime simplificado · Categoria B · Artistas e músicos · Prazo declaração: 30 Junho '+(year+1)+'</div>'+
+    '</div>'+
+    '</body></html>';
+
+  var w=window.open('','_blank'); w.document.write(doc); w.document.close();
+  setTimeout(function(){w.print();},600);
+}
+
+// ══ BUDGET VS ACTUAL ══════════════════════════════════
+
+function budgetSetTargets() {
+  var year = document.getElementById('budget-year')?.value || '2025';
+  document.getElementById('bt-year-label').textContent = year;
+  var t = BUDGET_TARGETS[year] || {};
+  var set = function(id,v){ var e=document.getElementById(id); if(e) e.value=v||''; };
+  set('bt-revenue',  t.revenue);
+  set('bt-expenses', t.expenses);
+  set('bt-gigs',     t.gigs);
+  set('bt-avg-fee',  t.avgFee);
+  set('bt-net',      t.net);
+  set('bt-fund',     t.fund);
+  document.getElementById('budget-targets-modal').classList.add('open');
+}
+
+function closeBudgetTargets() { document.getElementById('budget-targets-modal').classList.remove('open'); }
+
+function saveBudgetTargets() {
+  var year = document.getElementById('budget-year')?.value || '2025';
+  var get = function(id){ var e=document.getElementById(id); return parseFloat(e&&e.value)||0; };
+  BUDGET_TARGETS[year] = { revenue:get('bt-revenue'), expenses:get('bt-expenses'), gigs:get('bt-gigs'), avgFee:get('bt-avg-fee'), net:get('bt-net'), fund:get('bt-fund') };
+  try { localStorage.setItem(STORAGE_BUDGET, JSON.stringify(BUDGET_TARGETS)); } catch(e){}
+  closeBudgetTargets();
+  budgetRender();
+  showToast('Budget targets saved', 'ok');
+}
+
+function budgetRender() {
+  var year = parseInt(document.getElementById('budget-year')?.value || 2025);
+  var t = BUDGET_TARGETS[String(year)] || {};
+  var fmtE = function(v){ return '\u20ac\u00a0'+v.toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var fmtV = function(v){ return (v>=0?'+':'')+fmtE(v); };
+
+  // Actuals from ledger
+  var entries = (LEDGER_DATA||[]).filter(function(e){ return new Date(e.date).getFullYear()===year; });
+  var actualRev = entries.filter(function(e){return e.amount>0;}).reduce(function(s,e){return s+e.amount;},0);
+  var actualExp = entries.filter(function(e){return e.amount<0;}).reduce(function(s,e){return s+Math.abs(e.amount);},0);
+  var actualNet = actualRev - actualExp;
+  var actualGigs = (SPLITS_DATA||[]).filter(function(s){ return !s.gig_date||new Date(s.gig_date).getFullYear()===year; }).length;
+  var actualAvgFee = actualGigs > 0 ? actualRev / actualGigs : 0;
+  var actualFund = (SPLITS_DATA||[]).filter(function(s){ return !s.gig_date||new Date(s.gig_date).getFullYear()===year; }).reduce(function(s,sp){ return s+parseFloat(sp.band_fund_eur||0); },0);
+
+  // Annual summary cards
+  var annualEl = document.getElementById('budget-annual-summary');
+  if (annualEl) {
+    var items = [
+      { label:'Revenue', budget:t.revenue||0, actual:actualRev, col:'var(--green3)' },
+      { label:'Expenses', budget:t.expenses||0, actual:actualExp, col:'var(--red3)', invert:true },
+      { label:'Net Income', budget:t.net||0, actual:actualNet, col:'var(--text)' },
+      { label:'Gig Count', budget:t.gigs||0, actual:actualGigs, col:'var(--blue2)', money:false },
+    ];
+    annualEl.innerHTML = items.map(function(item) {
+      var bud = item.budget || 0;
+      var act = item.actual || 0;
+      var diff = act - bud;
+      var pct  = bud > 0 ? (act/bud*100).toFixed(0) : null;
+      var good = item.invert ? diff<=0 : diff>=0;
+      return '<div class="panel" style="padding:12px;text-align:center">'+
+        '<div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px">'+item.label.toUpperCase()+'</div>'+
+        (bud>0 ? '<div style="font-size:9px;color:var(--muted3);margin-bottom:2px">Budget: '+(item.money===false?bud:fmtE(bud))+'</div>' : '<div style="font-size:9px;color:var(--muted3);margin-bottom:2px">No target set</div>')+
+        '<div style="font-size:18px;font-weight:700;color:'+item.col+'">'+(item.money===false?act:fmtE(act))+'</div>'+
+        (bud>0 ? '<div style="font-size:9px;margin-top:3px;color:'+(good?'var(--green3)':'var(--red3)')+'">'+
+          (item.money===false ? (diff>=0?'+':'')+diff : fmtV(diff))+' ('+pct+'%)</div>' : '')+
+      '</div>';
+    }).join('');
+  }
+
+  // Show-by-show table
+  var tbody = document.getElementById('budget-tbody');
+  if (tbody) {
+    var showSplits = (SPLITS_DATA||[]).filter(function(s){ return !s.gig_date||new Date(s.gig_date).getFullYear()===year; });
+    if (!showSplits.length) {
+      tbody.innerHTML = '<tr><td colspan="9" style="padding:16px;text-align:center;color:var(--muted3)">No shows found for '+year+'. Save gig splits to see data here.</td></tr>';
+    } else {
+      var avgBudgetFee = t.avgFee || 0;
+      var avgBudgetExp = t.expenses && t.gigs ? (t.expenses/t.gigs) : 0;
+      tbody.innerHTML = showSplits.map(function(s) {
+        var aFee = parseFloat(s.gross_eur||0);
+        var aExp = parseFloat(s.total_expenses_eur||0);
+        var aNet = aFee - aExp;
+        var bFee = avgBudgetFee;
+        var bExp = avgBudgetExp;
+        var bNet = bFee - bExp;
+        var feeVar = aFee - bFee;
+        var margin = aFee > 0 ? (aNet/aFee*100).toFixed(0) : 0;
+        var feeColor = feeVar >= 0 ? 'var(--green3)' : 'var(--red3)';
+        return '<tr style="border-bottom:1px solid var(--border1);font-size:10px" onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'\'">'+
+          '<td style="padding:7px 10px"><div style="font-weight:700;color:var(--text)">'+(s.gig_name||'—')+'</div><div style="font-size:8px;color:var(--muted3)">'+(s.gig_date||'')+'</div></td>'+
+          '<td style="padding:7px 10px;text-align:right;color:var(--muted3)">'+(bFee>0?fmtE(bFee):'—')+'</td>'+
+          '<td style="padding:7px 10px;text-align:right;color:var(--green3)">'+fmtE(aFee)+'</td>'+
+          '<td style="padding:7px 10px;text-align:right;color:'+feeColor+'">'+(bFee>0?(feeVar>=0?'+':'')+fmtE(feeVar):'—')+'</td>'+
+          '<td style="padding:7px 10px;text-align:right;color:var(--muted3)">'+(bExp>0?fmtE(bExp):'—')+'</td>'+
+          '<td style="padding:7px 10px;text-align:right;color:var(--red3)">'+(aExp>0?'-'+fmtE(aExp):'—')+'</td>'+
+          '<td style="padding:7px 10px;text-align:right;color:var(--muted3)">'+(bNet>0?fmtE(bNet):'—')+'</td>'+
+          '<td style="padding:7px 10px;text-align:right;color:var(--text)">'+fmtE(aNet)+'</td>'+
+          '<td style="padding:7px 10px;text-align:right;color:'+(margin>=50?'var(--green3)':margin>=30?'var(--amber2)':'var(--red3)')+'">'+margin+'%</td>'+
+        '</tr>';
+      }).join('');
+    }
+  }
+
+  // Monthly breakdown
+  var monthlyEl = document.getElementById('budget-monthly');
+  if (monthlyEl) {
+    var monthlyAct = {};
+    entries.forEach(function(e) {
+      var m = new Date(e.date).getMonth();
+      if (!monthlyAct[m]) monthlyAct[m]={rev:0,exp:0};
+      if (e.amount>0) monthlyAct[m].rev+=e.amount;
+      else monthlyAct[m].exp+=Math.abs(e.amount);
+    });
+    var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var budgetMonthlyRev = t.revenue ? t.revenue/12 : 0;
+    var maxRev = Math.max(budgetMonthlyRev, ...Object.values(monthlyAct).map(function(m){return m.rev;}), 1);
+
+    monthlyEl.innerHTML = '<div style="display:grid;grid-template-columns:repeat(12,1fr);gap:4px;align-items:end;height:60px;margin-bottom:6px">'+
+      monthNames.map(function(mn,i) {
+        var m = monthlyAct[i] || {rev:0,exp:0};
+        var revH = maxRev>0 ? (m.rev/maxRev*100) : 0;
+        var budH = maxRev>0 ? (budgetMonthlyRev/maxRev*100) : 0;
+        return '<div style="position:relative;height:100%;display:flex;align-items:flex-end;gap:1px">'+
+          (budH>0?'<div style="width:4px;height:'+budH+'%;background:rgba(255,255,255,.15);border-radius:1px 1px 0 0"></div>':'')+
+          '<div style="flex:1;height:'+revH+'%;background:'+(m.rev>0?'var(--green3)':'var(--bg4)')+';border-radius:1px 1px 0 0;min-height:2px"></div>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(12,1fr);gap:4px">'+
+      monthNames.map(function(mn,i){
+        var m=monthlyAct[i]||{rev:0,exp:0};
+        return '<div style="text-align:center;font-size:8px;color:'+(m.rev>0?'var(--muted2)':'var(--muted3)')+'">'+mn+'</div>';
+      }).join('')+
+    '</div>';
+  }
+}
+
+function budgetExportPDF() {
+  var year = parseInt(document.getElementById('budget-year')?.value||2025);
+  var t = BUDGET_TARGETS[String(year)]||{};
+  var fmtE=function(v){return '\u20ac '+v.toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2});};
+  var entries=(LEDGER_DATA||[]).filter(function(e){return new Date(e.date).getFullYear()===year;});
+  var actualRev=entries.filter(function(e){return e.amount>0;}).reduce(function(s,e){return s+e.amount;},0);
+  var actualExp=entries.filter(function(e){return e.amount<0;}).reduce(function(s,e){return s+Math.abs(e.amount);},0);
+  var actualNet=actualRev-actualExp;
+  var today=new Date().toLocaleDateString('pt-PT',{day:'2-digit',month:'long',year:'numeric'});
+  var showSplits=(SPLITS_DATA||[]).filter(function(s){return !s.gig_date||new Date(s.gig_date).getFullYear()===year;});
+
+  var doc='<!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8"><title>Budget vs Actual '+year+'</title><style>'+
+    '*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:11px;color:#1a1a1a;padding:24px 32px}'+
+    'h1{font-size:18px;font-weight:700;margin-bottom:2px}.sub{font-size:10px;color:#777;margin-bottom:20px}'+
+    'table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:10px}'+
+    'th{background:#111;color:#fff;padding:6px 10px;text-align:left;font-size:9px;letter-spacing:.08em}th:not(:first-child){text-align:right}'+
+    'td{padding:6px 10px;border-bottom:1px solid #eee}td:not(:first-child){text-align:right}'+
+    '.pos{color:#166534;font-weight:700}.neg{color:#dc2626;font-weight:700}'+
+    '@page{margin:10mm;size:A4 landscape}'+
+    '</style></head><body>'+
+    '<h1>THE GINSKEYS — BUDGET VS ACTUAL '+year+'</h1>'+
+    '<div class="sub">Gerado em '+today+' · The Ginskeys · Sines, Portugal</div>'+
+    '<table>'+
+      '<tr><th>Indicador</th><th>Budget</th><th>Actual</th><th>Variação</th><th>%</th></tr>'+
+      [
+        ['Receita / Revenue', t.revenue||0, actualRev],
+        ['Despesas / Expenses', t.expenses||0, actualExp],
+        ['Resultado Líquido / Net', t.net||0, actualNet],
+        ['Espetáculos / Gigs', t.gigs||0, showSplits.length],
+      ].map(function(row){
+        var bud=row[1]||0, act=row[2]||0, diff=act-bud;
+        var pct=bud>0?(act/bud*100).toFixed(0)+'%':'—';
+        var isMoney=typeof act==='number'&&act>10;
+        return '<tr><td>'+row[0]+'</td>'+
+          '<td>'+(bud>0?(isMoney&&bud>10?fmtE(bud):bud):'—')+'</td>'+
+          '<td>'+(isMoney&&act>10?fmtE(act):act)+'</td>'+
+          '<td class="'+(diff>=0?'pos':'neg')+'">'+(bud>0?((diff>=0?'+':'')+(isMoney&&Math.abs(diff)>10?fmtE(diff):diff)):'—')+'</td>'+
+          '<td>'+(bud>0?pct:'—')+'</td></tr>';
+      }).join('')+
+    '</table>'+
+    '<table>'+
+      '<tr><th>Espetáculo</th><th>Data</th><th>Fee Real</th><th>Despesas</th><th>Resultado</th><th>Margem</th></tr>'+
+      showSplits.map(function(s){
+        var fee=parseFloat(s.gross_eur||0), exp=parseFloat(s.total_expenses_eur||0), net=fee-exp;
+        var margin=fee>0?(net/fee*100).toFixed(0)+'%':'—';
+        return '<tr><td>'+(s.gig_name||'—')+'</td><td>'+(s.gig_date||'—')+'</td><td>'+fmtE(fee)+'</td><td>-'+fmtE(exp)+'</td><td>'+fmtE(net)+'</td><td>'+margin+'</td></tr>';
+      }).join('')+
+    '</table>'+
+    '</body></html>';
+
+  var w=window.open('','_blank'); w.document.write(doc); w.document.close();
+  setTimeout(function(){w.print();},600);
+}
+
+
+// ══════════════════════════════════════════════════════════
+// SETLIST ANALYTICS ENGINE
+// ══════════════════════════════════════════════════════════
+
+function setlistAnalyticsRender() {
+  if (!PROD_SETLISTS || !PROD_SETLISTS.length) return;
+
+  // ── Aggregate all songs across all setlists ──
+  var songCount   = {};   // title → count
+  var openers     = {};   // first song → count
+  var closers     = {};   // last song → count
+  var allDurations = [];  // total sec per setlist
+  var allBpms      = [];  // all bpms
+  var keyCount    = {};   // key → count
+
+  PROD_SETLISTS.forEach(function(sl) {
+    var songs = Array.isArray(sl.songs) ? sl.songs.filter(function(s){ return s && s.title; }) : [];
+    if (!songs.length) return;
+
+    // Duration
+    var dur = songs.reduce(function(s,sg){ return s+(parseInt(sg.duration_sec)||0); },0);
+    if (dur > 0) allDurations.push(dur);
+
+    // Openers / closers
+    if (songs[0]) openers[songs[0].title] = (openers[songs[0].title]||0)+1;
+    if (songs[songs.length-1]) closers[songs[songs.length-1].title] = (closers[songs[songs.length-1].title]||0)+1;
+
+    // Song counts, BPMs, keys
+    songs.forEach(function(sg) {
+      songCount[sg.title] = (songCount[sg.title]||0)+1;
+      if (sg.bpm && parseInt(sg.bpm)) allBpms.push(parseInt(sg.bpm));
+      if (sg.key) keyCount[sg.key] = (keyCount[sg.key]||0)+1;
+    });
+  });
+
+  // ── Stats ──
+  var totalSongs   = Object.keys(songCount).length;
+  var avgDurSec    = allDurations.length ? allDurations.reduce(function(s,v){return s+v;},0)/allDurations.length : 0;
+  var avgDurMin    = avgDurSec > 0 ? Math.round(avgDurSec/60)+'min' : '—';
+  var avgBpm       = allBpms.length ? Math.round(allBpms.reduce(function(s,v){return s+v;},0)/allBpms.length) : null;
+
+  var set = function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
+  set('sl-stat-count',    PROD_SETLISTS.length);
+  set('sl-stat-songs',    totalSongs);
+  set('sl-stat-duration', avgDurMin);
+  set('sl-stat-bpm',      avgBpm ? avgBpm+' bpm' : '—');
+
+  // ── Opener / Closer ──
+  var topOpener = Object.entries(openers).sort(function(a,b){return b[1]-a[1];})[0];
+  var topCloser = Object.entries(closers).sort(function(a,b){return b[1]-a[1];})[0];
+  set('sl-opener', topOpener ? topOpener[0]+(topOpener[1]>1?' (×'+topOpener[1]+')':'') : '—');
+  set('sl-closer', topCloser ? topCloser[0]+(topCloser[1]>1?' (×'+topCloser[1]+')':'') : '—');
+
+  // ── Most played ──
+  var mpEl = document.getElementById('sl-most-played');
+  if (mpEl) {
+    var sorted = Object.entries(songCount).sort(function(a,b){return b[1]-a[1];}).slice(0,12);
+    var maxCount = sorted[0] ? sorted[0][1] : 1;
+    mpEl.innerHTML = sorted.map(function(entry, i) {
+      var pct = (entry[1]/maxCount*100).toFixed(0);
+      var rank = i+1;
+      var col = rank===1?'var(--green3)':rank===2?'var(--blue2)':rank===3?'var(--amber2)':'var(--muted2)';
+      return '<div style="display:grid;grid-template-columns:18px 1fr 80px 32px;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border1)">'+
+        '<span style="font-size:9px;color:var(--muted3);text-align:right">'+rank+'.</span>'+
+        '<div>'+
+          '<div style="font-size:10px;color:var(--text);font-weight:'++(rank<=3?'700':'400')+'">'+entry[0]+'</div>'+
+          '<div style="background:var(--bg4);border-radius:1px;height:3px;margin-top:3px;overflow:hidden">'+
+            '<div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:1px"></div>'+
+          '</div>'+
+        '</div>'+
+        '<div style="font-size:9px;color:var(--muted3);text-align:right">'+
+          (PROD_SETLISTS.length>1?Math.round(entry[1]/PROD_SETLISTS.length*100)+'% of sets':'')+'</div>'+
+        '<span style="font-size:10px;font-weight:700;color:'+col+';text-align:right">'+entry[1]+'×</span>'+
+      '</div>';
+    }).join('')+(totalSongs===0?'<div style="color:var(--muted3);text-align:center;padding:12px">No songs yet.</div>':'');
+  }
+
+  // ── Key distribution ──
+  var keysEl = document.getElementById('sl-keys');
+  if (keysEl) {
+    var keySorted = Object.entries(keyCount).sort(function(a,b){return b[1]-a[1];});
+    if (keySorted.length) {
+      keysEl.innerHTML = keySorted.map(function(e) {
+        var hue = e[0].includes('m')?240:120;
+        return '<span style="font-size:9px;padding:3px 8px;border-radius:2px;background:hsl('+hue+',40%,15%);color:hsl('+hue+',60%,65%);font-family:var(--mono)">'+
+          e[0]+' <span style="opacity:.7">'+e[1]+'×</span></span>';
+      }).join('');
+    } else {
+      keysEl.innerHTML = '<span style="color:var(--muted3)">No key data yet. Add keys when building setlists.</span>';
+    }
+  }
+
+  // ── Energy flow — latest setlist BPM chart ──
+  var canvas = document.getElementById('sl-bpm-canvas');
+  var placeholder = document.getElementById('sl-energy-placeholder');
+  if (canvas && PROD_SETLISTS.length > 0) {
+    var latest = PROD_SETLISTS[PROD_SETLISTS.length-1];
+    var songs = Array.isArray(latest.songs) ? latest.songs.filter(function(s){ return s&&s.title&&s.bpm; }) : [];
+    if (songs.length >= 2) {
+      if (placeholder) placeholder.style.display = 'none';
+      var ctx = canvas.getContext('2d');
+      var W = canvas.offsetWidth || 400;
+      var H = canvas.offsetHeight || 60;
+      canvas.width = W; canvas.height = H;
+      var bpms = songs.map(function(s){ return parseInt(s.bpm)||0; }).filter(function(b){ return b>0; });
+      var minB = Math.min.apply(null,bpms)-10, maxB = Math.max.apply(null,bpms)+10;
+      var range = maxB - minB || 1;
+      ctx.clearRect(0,0,W,H);
+      // Fill gradient under line
+      var grad = ctx.createLinearGradient(0,0,0,H);
+      grad.addColorStop(0,'rgba(0,230,118,.3)');
+      grad.addColorStop(1,'rgba(0,230,118,.02)');
+      ctx.beginPath();
+      bpms.forEach(function(b,i){
+        var x = (i/(bpms.length-1))*W;
+        var y = H - ((b-minB)/range)*(H-8) - 4;
+        i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      });
+      ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+      ctx.fillStyle = grad; ctx.fill();
+      // Line
+      ctx.beginPath();
+      bpms.forEach(function(b,i){
+        var x=(i/(bpms.length-1))*W;
+        var y=H-((b-minB)/range)*(H-8)-4;
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      });
+      ctx.strokeStyle='var(--green3)'; ctx.lineWidth=2; ctx.stroke();
+      // Dots + BPM labels
+      bpms.forEach(function(b,i){
+        var x=(i/(bpms.length-1))*W;
+        var y=H-((b-minB)/range)*(H-8)-4;
+        ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2);
+        ctx.fillStyle='var(--green3)'; ctx.fill();
+        if (bpms.length<=8) {
+          ctx.fillStyle='rgba(255,255,255,.5)'; ctx.font='8px monospace'; ctx.textAlign='center';
+          ctx.fillText(b, x, y>12?y-6:y+14);
+        }
+      });
+    } else {
+      if (placeholder) { placeholder.style.display='block'; placeholder.textContent='Add BPM to songs for energy chart'; }
+    }
+  }
+}
+
+// Hook into renderSetlistDisplay
+var _origRenderSetlistDisplay = window.renderSetlistDisplay;
+window.renderSetlistDisplay = function() {
+  if (typeof _origRenderSetlistDisplay === 'function') _origRenderSetlistDisplay();
+  setTimeout(setlistAnalyticsRender, 50);
+};
+
+
 // ── LOAD ALL GROWTH DATA ───────────────────────────────────────────────────
 
 // ── PRODUCTION HELPERS (stubs, real fns in production script) ──────────────
@@ -7045,6 +7913,73 @@ function _initAll_old_1() {
           </div>
           <div id="setlists-display"></div>
         </div>
+
+        <!-- ── SETLIST ANALYTICS ── -->
+        <div style="display:flex;flex-direction:column;gap:10px">
+
+          <!-- Stats strip -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex-shrink:0" id="sl-stats-strip">
+            <div class="panel" style="padding:10px 12px;text-align:center">
+              <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px">SETLISTS</div>
+              <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--text)" id="sl-stat-count">0</div>
+            </div>
+            <div class="panel" style="padding:10px 12px;text-align:center">
+              <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px">UNIQUE SONGS</div>
+              <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--green3)" id="sl-stat-songs">0</div>
+            </div>
+            <div class="panel" style="padding:10px 12px;text-align:center">
+              <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px">AVG SET LENGTH</div>
+              <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--blue2)" id="sl-stat-duration">—</div>
+            </div>
+            <div class="panel" style="padding:10px 12px;text-align:center">
+              <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px">AVG BPM</div>
+              <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--amber2)" id="sl-stat-bpm">—</div>
+            </div>
+          </div>
+
+          <!-- Most played songs -->
+          <div class="panel" style="flex-shrink:0">
+            <div class="panel-header">
+              <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Most Played Songs</div>
+            </div>
+            <div id="sl-most-played" style="padding:8px 12px;font-size:10px;color:var(--muted3)">No setlists yet.</div>
+          </div>
+
+          <!-- Opener / Closer -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;flex-shrink:0">
+            <div class="panel" style="padding:10px 12px">
+              <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px">MOST COMMON OPENER</div>
+              <div id="sl-opener" style="font-size:11px;font-weight:700;color:var(--green3)">—</div>
+            </div>
+            <div class="panel" style="padding:10px 12px">
+              <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px">MOST COMMON CLOSER</div>
+              <div id="sl-closer" style="font-size:11px;font-weight:700;color:var(--accent)">—</div>
+            </div>
+          </div>
+
+          <!-- Key distribution -->
+          <div class="panel" style="flex-shrink:0">
+            <div class="panel-header">
+              <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Key Distribution</div>
+            </div>
+            <div id="sl-keys" style="padding:8px 12px;display:flex;flex-wrap:wrap;gap:6px;font-size:10px">
+              <span style="color:var(--muted3)">No data yet.</span>
+            </div>
+          </div>
+
+          <!-- BPM flow chart -->
+          <div class="panel" style="flex-shrink:0">
+            <div class="panel-header">
+              <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Energy Flow — Latest Setlist</div>
+            </div>
+            <div id="sl-energy-chart" style="padding:10px 12px;height:60px;position:relative">
+              <canvas id="sl-bpm-canvas" style="width:100%;height:100%"></canvas>
+              <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--muted3);font-size:9px" id="sl-energy-placeholder">No setlist data</div>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </div>
 
@@ -10300,6 +11235,7 @@ function switchView(view, tab){
   if(tab) tab.classList.add('active');
   if(view==='streaming') initStreamChart();
   if(view==='members') membersLoad();
+  if(view==='finance-tools') financeToolsLoad();
   if(view==='audit'){ renderAuditLog(); showEmailTemplate('invite',document.querySelector('.email-tab')); }
   if(view==='mgmt') setTimeout(renderMgmtDashboard, 0);
 }
