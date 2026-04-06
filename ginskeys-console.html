@@ -7955,33 +7955,18 @@ function _initAll_old_1() {
               <span><span style="color:var(--accent)">01</span>&nbsp;&nbsp;<span data-i18n="rider_s1_title">BAND LINEUP</span></span><span>▼</span>
             </div>
             <div class="rider-section-body" style="padding:0">
-              <table style="width:100%;border-collapse:collapse">
+              <table style="width:100%;border-collapse:collapse" id="rider-lineup-table">
                 <tr style="border-bottom:1px solid var(--border2)">
                   <th style="text-align:left;padding:5px 10px;font-size:8px;color:var(--muted);letter-spacing:.12em;font-weight:400" data-i18n="rider_col_member">MEMBER</th>
                   <th style="text-align:left;padding:5px 10px;font-size:8px;color:var(--muted);letter-spacing:.12em;font-weight:400" data-i18n="rider_col_role">ROLE</th>
                   <th style="text-align:left;padding:5px 10px;font-size:8px;color:var(--muted);letter-spacing:.12em;font-weight:400" data-i18n="rider_col_position">POSITION</th>
+                  <th style="width:24px"></th>
                 </tr>
-                <tr style="border-bottom:1px solid var(--border1)">
-                  <td style="padding:8px 10px;font-weight:700;color:var(--accent)">FÁBIO</td>
-                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_fabio_role">Lead Vocals</span></td>
-                  <td style="padding:8px 10px;color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_fabio_pos">Centre / Stage Right</span></td>
-                </tr>
-                <tr style="border-bottom:1px solid var(--border1)">
-                  <td style="padding:8px 10px;font-weight:700;color:var(--accent)">PEDRO</td>
-                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_pedro_role">Bass</span></td>
-                  <td style="padding:8px 10px;color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_pedro_pos">Stage Left</span></td>
-                </tr>
-                <tr style="border-bottom:1px solid var(--border1)">
-                  <td style="padding:8px 10px;font-weight:700;color:var(--accent)">MANUEL</td>
-                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_manuel_role">Drums</span></td>
-                  <td style="padding:8px 10px;color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_manuel_pos">Centre Rear</span></td>
-                </tr>
-                <tr>
-                  <td style="padding:8px 10px;font-weight:700;color:var(--accent)">TIAGO</td>
-                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_tiago_role">Guitar</span></td>
-                  <td style="padding:8px 10px;color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_tiago_pos">Stage Right</span></td>
-                </tr>
+                <tbody id="rider-lineup-body"></tbody>
               </table>
+              <div style="padding:8px 10px;border-top:1px solid var(--border1)">
+                <button onclick="riderAddMember()" class="btn-sm" style="font-size:9px">+ Member</button>
+              </div>
             </div>
           </div>
 
@@ -8049,26 +8034,13 @@ function _initAll_old_1() {
           <!-- 04 Monitor Requirements -->
           <div class="rider-section">
             <div class="rider-section-hdr" onclick="toggleRiderSection(this)">
-              <span><span style="color:var(--accent)">04</span>&nbsp;&nbsp;<span data-i18n="rider_s4_title">MONITOR REQUIREMENTS</span> (<span class="rider-editable" contenteditable="true" onclick="event.stopPropagation()" data-rider-key="mon_mix_count">4</span> <span data-i18n="rider_mixes">MIXES</span>)</span><span>▼</span>
+              <span><span style="color:var(--accent)">04</span>&nbsp;&nbsp;<span data-i18n="rider_s4_title">MONITOR REQUIREMENTS</span> (<span id="mon-mix-count-display">4</span> <span data-i18n="rider_mixes">MIXES</span>)</span><span>▼</span>
             </div>
             <div class="rider-section-body">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--accent)">
-                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 1 — FÁBIO (<span data-i18n="rider_lead_vox">Lead Vocal</span>)</div>
-                  <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_1" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Vocal (self, loud)<br>Kick · Snare · Bass (low)</div>
-                </div>
-                <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--blue2)">
-                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 2 — PEDRO (<span data-i18n="rider_bass">Bass</span>)</div>
-                  <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_2" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Kick · Snare · Guitar 1<br>Vocal 1 · Bass (self, med)</div>
-                </div>
-                <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--green3)">
-                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 3 — MANUEL (<span data-i18n="rider_drums">Drums</span>)</div>
-                  <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_3" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Vocal 1 · Guitar 1 · Bass<br>Click track (optional)</div>
-                </div>
-                <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--amber2)">
-                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 4 — TIAGO (<span data-i18n="rider_guitar">Guitar</span>)</div>
-                  <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_4" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Vocal 1 · Vocal 2 (self)<br>Guitar 1 · Kick · Bass (low)</div>
-                </div>
+              <div id="rider-mix-boxes" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+              <div style="display:flex;gap:6px;margin-top:8px">
+                <button onclick="riderAddMix()" class="btn-sm" style="font-size:9px">+ Mix</button>
+                <button onclick="riderRemoveMix()" class="btn-sm" style="font-size:9px">− Mix</button>
               </div>
               <div style="margin-top:8px;font-size:9px;color:var(--muted2);padding:8px;background:var(--bg4);border-radius:2px">
                 <span style="color:var(--amber2)" data-i18n="rider_min">Min:</span> <span class="rider-editable" contenteditable="true" data-rider-key="mon_min_req">4× wedge monitors · Preferred: coax or QSC KW · IEM acceptable if provided</span>
@@ -12550,7 +12522,10 @@ async function loadRiderData() {
       ? '/production/rider/' + _riderCurrentShowId
       : '/production/rider';
     var data = await apiGet(url);
-    // Reset to HTML defaults first, then apply saved values
+    // Render dynamic sections first (they create the elements with data-rider-key)
+    riderRenderMixes(data);
+    riderRenderLineup(data);
+    // Then apply saved values to all static rider-editable fields
     document.querySelectorAll('[data-rider-key]').forEach(function(el) {
       var val = data[el.dataset.riderKey];
       if (val !== undefined && val !== '') el.innerHTML = val;
@@ -12558,6 +12533,9 @@ async function loadRiderData() {
     setRiderStatus(t('rider_click_edit'), 'var(--green3)');
   } catch(e) {
     console.warn('Rider load failed', e);
+    // Render defaults even if load fails
+    riderRenderMixes(null);
+    riderRenderLineup(null);
     setRiderStatus(t('rider_click_edit'), 'var(--green3)');
   }
 }
@@ -12662,6 +12640,141 @@ function riderRemoveRow() {
   _riderRowCount--;
   var chEl = document.querySelector('[data-rider-key="input_ch_count"]');
   if (chEl) { chEl.textContent = _riderRowCount; saveRiderField('input_ch_count', String(_riderRowCount)); }
+}
+
+// ── RIDER MONITOR MIXES ──────────────────────────────────
+var _riderMixColors = ['var(--accent)','var(--blue2)','var(--green3)','var(--amber2)','var(--purple2)','var(--red2)','var(--muted2)','var(--teal2,var(--green3))'];
+var _riderMixDefaults = [
+  {title:'FÁBIO — Lead Vocal',   content:'Vocal (self, loud)<br>Kick · Snare · Bass (low)'},
+  {title:'PEDRO — Bass',         content:'Kick · Snare · Guitar 1<br>Vocal 1 · Bass (self, med)'},
+  {title:'MANUEL — Drums',       content:'Vocal 1 · Guitar 1 · Bass<br>Click track (optional)'},
+  {title:'TIAGO — Guitar',       content:'Vocal 1 · Guitar 1 · Kick · Bass (low)'},
+];
+var _riderMixCount = 0;
+
+function riderBuildMixBox(n, title, content) {
+  var color = _riderMixColors[(n - 1) % _riderMixColors.length];
+  var box = document.createElement('div');
+  box.id = 'rider-mix-box-' + n;
+  box.style.cssText = 'background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid ' + color;
+  box.innerHTML =
+    '<div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px">' +
+      '<span style="color:var(--muted3);margin-right:4px">MIX ' + n + ' —</span>' +
+      '<span class="rider-editable" contenteditable="true" data-rider-key="mon_mix_' + n + '_title" style="color:var(--text)">' + (title || 'Mix ' + n) + '</span>' +
+    '</div>' +
+    '<div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_' + n + '" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">' + (content || '—') + '</div>';
+  return box;
+}
+
+function riderRenderMixes(savedData) {
+  var container = document.getElementById('rider-mix-boxes');
+  if (!container) return;
+  container.innerHTML = '';
+  // Determine count from saved data or default to 4
+  var countKey = savedData && savedData['mon_mix_count'];
+  _riderMixCount = countKey ? parseInt(countKey) : 4;
+  for (var i = 1; i <= _riderMixCount; i++) {
+    var def = _riderMixDefaults[i - 1] || {};
+    var title   = (savedData && savedData['mon_mix_' + i + '_title']) || def.title   || ('Mix ' + i);
+    var content = (savedData && savedData['mon_mix_' + i])            || def.content || '—';
+    container.appendChild(riderBuildMixBox(i, title, content));
+  }
+  var el = document.getElementById('mon-mix-count-display');
+  if (el) el.textContent = _riderMixCount;
+}
+
+function riderAddMix() {
+  _riderMixCount++;
+  var container = document.getElementById('rider-mix-boxes');
+  if (container) container.appendChild(riderBuildMixBox(_riderMixCount, 'Mix ' + _riderMixCount, '—'));
+  var el = document.getElementById('mon-mix-count-display');
+  if (el) el.textContent = _riderMixCount;
+  saveRiderField('mon_mix_count', String(_riderMixCount));
+}
+
+function riderRemoveMix() {
+  if (_riderMixCount <= 1) return;
+  var box = document.getElementById('rider-mix-box-' + _riderMixCount);
+  if (box) box.remove();
+  _riderMixCount--;
+  var el = document.getElementById('mon-mix-count-display');
+  if (el) el.textContent = _riderMixCount;
+  saveRiderField('mon_mix_count', String(_riderMixCount));
+}
+
+// ── RIDER LINEUP MEMBERS ──────────────────────────────────
+var _riderLineupDefaults = [
+  {name:'FÁBIO',  role:'Lead Vocals', pos:'Centre / Stage Right'},
+  {name:'PEDRO',  role:'Bass',        pos:'Stage Left'},
+  {name:'MANUEL', role:'Drums',       pos:'Centre Rear'},
+  {name:'TIAGO',  role:'Guitar',      pos:'Stage Right'},
+];
+var _riderMemberCount = 0;
+
+function riderBuildMemberRow(n, name, role, pos, isLast) {
+  var tr = document.createElement('tr');
+  tr.id = 'rider-member-row-' + n;
+  tr.style.borderBottom = '1px solid var(--border1)';
+  tr.innerHTML =
+    '<td style="padding:8px 10px;font-weight:700;color:var(--accent)">' +
+      '<span class="rider-editable" contenteditable="true" data-rider-key="lineup_' + n + '_name">' + (name || 'MEMBER') + '</span>' +
+    '</td>' +
+    '<td style="padding:8px 10px">' +
+      '<span class="rider-editable" contenteditable="true" data-rider-key="lineup_' + n + '_role">' + (role || '—') + '</span>' +
+    '</td>' +
+    '<td style="padding:8px 10px;color:var(--muted3)">' +
+      '<span class="rider-editable" contenteditable="true" data-rider-key="lineup_' + n + '_pos">' + (pos || '—') + '</span>' +
+    '</td>' +
+    '<td style="padding:4px 6px;text-align:center">' +
+      '<button onclick="riderRemoveMember(' + n + ')" style="background:transparent;border:none;color:var(--muted3);font-size:11px;cursor:pointer;padding:0 2px" title="Remove">✕</button>' +
+    '</td>';
+  return tr;
+}
+
+function riderRenderLineup(savedData) {
+  var tbody = document.getElementById('rider-lineup-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  var countKey = savedData && savedData['lineup_count'];
+  _riderMemberCount = countKey ? parseInt(countKey) : _riderLineupDefaults.length;
+  for (var i = 1; i <= _riderMemberCount; i++) {
+    var def  = _riderLineupDefaults[i - 1] || {};
+    var name = (savedData && savedData['lineup_' + i + '_name']) || def.name || '';
+    var role = (savedData && savedData['lineup_' + i + '_role']) || def.role || '';
+    var pos  = (savedData && savedData['lineup_' + i + '_pos'])  || def.pos  || '';
+    tbody.appendChild(riderBuildMemberRow(i, name, role, pos));
+  }
+}
+
+function riderAddMember() {
+  _riderMemberCount++;
+  var tbody = document.getElementById('rider-lineup-body');
+  if (tbody) tbody.appendChild(riderBuildMemberRow(_riderMemberCount, '', '', ''));
+  saveRiderField('lineup_count', String(_riderMemberCount));
+  // Focus the name cell of the new row
+  var row = document.getElementById('rider-member-row-' + _riderMemberCount);
+  if (row) { var el = row.querySelector('[data-rider-key]'); if (el) el.focus(); }
+}
+
+function riderRemoveMember(n) {
+  if (_riderMemberCount <= 1) return;
+  var row = document.getElementById('rider-member-row-' + n);
+  if (row) row.remove();
+  // Renumber remaining rows
+  var tbody = document.getElementById('rider-lineup-body');
+  if (!tbody) return;
+  var rows = tbody.querySelectorAll('tr');
+  _riderMemberCount = rows.length;
+  rows.forEach(function(tr, idx) {
+    var num = idx + 1;
+    tr.id = 'rider-member-row-' + num;
+    tr.querySelectorAll('[data-rider-key]').forEach(function(el) {
+      el.dataset.riderKey = el.dataset.riderKey.replace(/^lineup_\d+_/, 'lineup_' + num + '_');
+    });
+    var btn = tr.querySelector('button');
+    if (btn) btn.setAttribute('onclick', 'riderRemoveMember(' + num + ')');
+  });
+  saveRiderField('lineup_count', String(_riderMemberCount));
 }
 
 // ── RIDER NEW SHOW MODAL ─────────────────────────────────
