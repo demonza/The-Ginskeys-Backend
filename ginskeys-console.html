@@ -1159,11 +1159,21 @@ tr:hover .edit-btn{display:inline}
 .rider-editable:focus{background:rgba(255,92,26,.16);box-shadow:0 0 0 1px var(--accent);cursor:text;user-select:text;-webkit-user-select:text}
 .rider-editable[contenteditable="true"]:empty:before{content:attr(data-placeholder);color:var(--muted);font-style:italic}
 .input-row{
-  display:grid;grid-template-columns:30px 40px 1fr 110px 60px 70px;
+  display:grid;grid-template-columns:18px 30px 40px 1fr 110px 60px 70px;
   gap:8px;padding:5px 8px;font-size:12px;border-bottom:1px solid var(--border1);align-items:center;
   user-select:text;-webkit-user-select:text;
+  transition:background .15s,opacity .15s,transform .15s;
 }
 .input-row.hdr-row{color:var(--muted);font-size:11px;letter-spacing:.08em;background:var(--bg4)}
+.input-row .drag-handle{
+  cursor:grab;color:var(--muted);font-size:11px;text-align:center;
+  opacity:.35;transition:opacity .15s,color .15s;line-height:1;user-select:none;-webkit-user-select:none;
+}
+.input-row .drag-handle:hover{opacity:1;color:var(--accent)}
+.input-row .drag-handle:active{cursor:grabbing}
+.input-row.hdr-row .drag-handle{cursor:default;opacity:0}
+.input-row.rider-dragging{opacity:.4;background:rgba(255,92,26,.08)}
+.input-row.rider-drag-over{border-top:2px solid var(--accent);margin-top:-2px}
 /* ── SETLIST ── */
 .song-row{
   display:grid;grid-template-columns:32px 1fr 60px 52px 62px 80px 1fr;
@@ -1217,7 +1227,8 @@ tr:hover .edit-btn{display:inline}
   .rider-section{border:1px solid #ccc!important;background:#fff!important;break-inside:avoid}
   .rider-section-hdr{background:#f5f5f5!important;color:#000!important}
   .rider-section-body{color:#222!important}
-  .input-row{border-bottom:1px solid #ddd!important}
+  .input-row{border-bottom:1px solid #ddd!important;grid-template-columns:30px 40px 1fr 110px 60px 70px!important}
+  .input-row .drag-handle{display:none!important}
   #prod-stageplot .splot-canvas-wrap{border:1px solid #ccc!important}
 }
 
@@ -7977,6 +7988,7 @@ function _initAll_old_1() {
             </div>
             <div class="rider-section-body" style="padding:0">
               <div class="input-row hdr-row">
+                <div class="drag-handle"></div>
                 <div data-i18n="rider_col_ch">CH</div>
                 <div data-i18n="rider_col_type">TYPE</div>
                 <div data-i18n="rider_col_source">SOURCE</div>
@@ -7985,21 +7997,21 @@ function _initAll_old_1() {
                 <div data-i18n="rider_col_notes">NOTES</div>
               </div>
               <div id="rider-input-rows">
-              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_1_ch">1</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_1_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_1_src">Kick Drum</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_1_mic">Beta 91A / D112</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_1_stand">None</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_1_notes">Gate req.</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_2_ch">2</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_2_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_2_src">Snare Top</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_2_mic">SM57</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_2_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_2_notes">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_3_ch">3</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_3_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_3_src">Snare Bottom</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_3_mic">SM57</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_3_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_3_notes">Phase flip</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_4_ch">4</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_4_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_4_src">Hi-Hat</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_4_mic">SM81 / C451</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_4_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_4_notes">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_5_ch">5</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_5_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_5_src">Tom 1</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_5_mic">E904 clip</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_5_stand">—</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_5_notes">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_6_ch">6</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_6_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_6_src">Tom 2</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_6_mic">E904 clip</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_6_stand">—</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_6_notes">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_7_ch">7</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_7_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_7_src">Tom 3 (floor)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_7_mic">E904 clip</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_7_stand">—</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_7_notes">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_8_ch">8</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_8_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_8_src">OH Left</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_8_mic">SM81 / C451</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_8_stand">Tall</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_8_notes">—</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_9_ch">9</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_9_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_9_src">OH Right</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_9_mic">SM81 / C451</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_9_stand">Tall</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_9_notes">—</div></div>
-              <div class="input-row" style="background:rgba(170,0,255,.04)"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_10_ch">10</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_10_type">DI</div><div class="rider-editable" contenteditable="true" data-rider-key="input_10_src">Bass (direct)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_10_mic">Radial J48</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_10_stand">—</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_10_notes">Pre-amp out</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_11_ch">11</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_11_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_11_src">Bass Amp</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_11_mic">SM57 / β52</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_11_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_11_notes">Optional</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_12_ch">12</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_12_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_12_src">Guitar 1 Amp</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_12_mic">SM57</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_12_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_12_notes">Off-axis</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_13_ch">13</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_13_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_13_src">Guitar 2 Amp</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_13_mic">SM57</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_13_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_13_notes">Off-axis</div></div>
-              <div class="input-row" style="background:rgba(255,92,26,.04)"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_14_ch">14</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_14_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_14_src">Vocal 1 (lead)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_14_mic">SM58</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_14_stand">Tall</div><div style="color:var(--green3);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_14_notes">PRIORITY</div></div>
-              <div class="input-row"><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_15_ch">15</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_15_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_15_src">Vocal 2 (BG)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_15_mic">SM58</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_15_stand">Tall</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_15_notes">Rhythm gtr</div></div>
+              <div class="input-row"><div class="drag-handle" draggable="true">&#x2630;</div><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_1_ch">1</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_1_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_1_src">Kick Drum</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_1_mic">Beta 91A / D112</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_1_stand">None</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_1_notes">Gate req.</div></div>
+              <div class="input-row"><div class="drag-handle" draggable="true">&#x2630;</div><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_2_ch">2</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_2_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_2_src">Snare Top</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_2_mic">SM57</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_2_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_2_notes">—</div></div>
+              <div class="input-row"><div class="drag-handle" draggable="true">&#x2630;</div><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_3_ch">3</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_3_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_3_src">Snare Bottom</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_3_mic">SM57</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_3_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_3_notes">Phase flip</div></div>
+              <div class="input-row"><div class="drag-handle" draggable="true">&#x2630;</div><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_4_ch">4</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_4_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_4_src">Hi-Hat</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_4_mic">SM81 / C451</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_4_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_4_notes">—</div></div>
+              <div class="input-row"><div class="drag-handle" draggable="true">&#x2630;</div><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_5_ch">5</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_5_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_5_src">Tom 1</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_5_mic">E904 clip</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_5_stand">—</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_5_notes">—</div></div>
+              <div class="input-row"><div class="drag-handle" draggable="true">&#x2630;</div><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_6_ch">6</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_6_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_6_src">Tom 2</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_6_mic">E904 clip</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_6_stand">—</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_6_notes">—</div></div>
+              <div class="input-row"><div class="drag-handle" draggable="true">&#x2630;</div><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_7_ch">7</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_7_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_7_src">Tom 3 (floor)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_7_mic">E904 clip</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_7_stand">—</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_7_notes">—</div></div>
+              <div class="input-row"><div class="drag-handle" draggable="true">&#x2630;</div><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_8_ch">8</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_8_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_8_src">OH Left</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_8_mic">SM81 / C451</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_8_stand">Tall</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_8_notes">—</div></div>
+              <div class="input-row"><div class="drag-handle" draggable="true">&#x2630;</div><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_9_ch">9</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_9_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_9_src">OH Right</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_9_mic">SM81 / C451</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_9_stand">Tall</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_9_notes">—</div></div>
+              <div class="input-row" style="background:rgba(170,0,255,.04)"><div class="drag-handle" draggable="true">&#x2630;</div><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_10_ch">10</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_10_type">DI</div><div class="rider-editable" contenteditable="true" data-rider-key="input_10_src">Bass (direct)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_10_mic">Radial J48</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_10_stand">—</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_10_notes">Pre-amp out</div></div>
+              <div class="input-row"><div class="drag-handle" draggable="true">&#x2630;</div><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_11_ch">11</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_11_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_11_src">Bass Amp</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_11_mic">SM57 / β52</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_11_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_11_notes">Optional</div></div>
+              <div class="input-row"><div class="drag-handle" draggable="true">&#x2630;</div><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_12_ch">12</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_12_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_12_src">Guitar 1 Amp</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_12_mic">SM57</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_12_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_12_notes">Off-axis</div></div>
+              <div class="input-row"><div class="drag-handle" draggable="true">&#x2630;</div><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_13_ch">13</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_13_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_13_src">Guitar 2 Amp</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_13_mic">SM57</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_13_stand">Short</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_13_notes">Off-axis</div></div>
+              <div class="input-row" style="background:rgba(255,92,26,.04)"><div class="drag-handle" draggable="true">&#x2630;</div><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_14_ch">14</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_14_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_14_src">Vocal 1 (lead)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_14_mic">SM58</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_14_stand">Tall</div><div style="color:var(--green3);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_14_notes">PRIORITY</div></div>
+              <div class="input-row"><div class="drag-handle" draggable="true">&#x2630;</div><div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_15_ch">15</div><div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_15_type">MIC</div><div class="rider-editable" contenteditable="true" data-rider-key="input_15_src">Vocal 2 (BG)</div><div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_15_mic">SM58</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_15_stand">Tall</div><div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_15_notes">Rhythm gtr</div></div>
               </div>
               <div style="padding:6px 8px;border-top:1px solid var(--border2);display:flex;gap:6px;align-items:center">
                 <button class="btn-sm" onclick="riderAddRow()" style="font-size:10px">+ Add Row</button>
@@ -12617,6 +12629,7 @@ function riderAddRow() {
   var row = document.createElement('div');
   row.className = 'input-row';
   row.innerHTML =
+    '<div class="drag-handle" draggable="true">☰</div>' +
     '<div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_'+n+'_ch">'+n+'</div>' +
     '<div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_'+n+'_type">MIC</div>' +
     '<div class="rider-editable" contenteditable="true" data-rider-key="input_'+n+'_src">Source</div>' +
@@ -12640,6 +12653,149 @@ function riderRemoveRow() {
   _riderRowCount--;
   var chEl = document.querySelector('[data-rider-key="input_ch_count"]');
   if (chEl) { chEl.textContent = _riderRowCount; saveRiderField('input_ch_count', String(_riderRowCount)); }
+}
+
+// ── RIDER INPUT LIST DRAG-AND-DROP REORDER ───────────────
+(function() {
+  var _dragRow = null;
+  var _dragPlaceholder = null;
+
+  function getContainer() { return document.getElementById('rider-input-rows'); }
+
+  function getDataRows() {
+    var c = getContainer();
+    return c ? Array.from(c.querySelectorAll('.input-row:not(.hdr-row)')) : [];
+  }
+
+  // Delegate events on the container
+  document.addEventListener('DOMContentLoaded', function() {
+    var container = getContainer();
+    if (!container) return;
+
+    // --- Pointer-based drag (works on touch + mouse) ---
+    container.addEventListener('pointerdown', function(e) {
+      var handle = e.target.closest('.drag-handle');
+      if (!handle) return;
+      var row = handle.closest('.input-row');
+      if (!row || row.classList.contains('hdr-row')) return;
+
+      e.preventDefault();
+      handle.setPointerCapture(e.pointerId);
+      _dragRow = row;
+
+      // Create placeholder
+      _dragPlaceholder = document.createElement('div');
+      _dragPlaceholder.className = 'input-row rider-drag-placeholder';
+      _dragPlaceholder.style.cssText = 'height:' + row.offsetHeight + 'px;background:rgba(255,92,26,.08);border:1px dashed var(--accent);border-radius:2px;display:block;grid-template-columns:none;';
+
+      // Style the dragged row
+      var rect = row.getBoundingClientRect();
+      var containerRect = container.getBoundingClientRect();
+      row.style.position = 'fixed';
+      row.style.left = rect.left + 'px';
+      row.style.top = rect.top + 'px';
+      row.style.width = rect.width + 'px';
+      row.style.zIndex = '9999';
+      row.style.boxShadow = '0 4px 20px rgba(0,0,0,.3)';
+      row.style.background = 'var(--bg3)';
+      row.style.opacity = '0.92';
+      row.style.pointerEvents = 'none';
+
+      // Insert placeholder where row was
+      row.parentNode.insertBefore(_dragPlaceholder, row);
+
+      var _startY = e.clientY;
+      var _offsetY = e.clientY - rect.top;
+
+      function onMove(ev) {
+        if (!_dragRow) return;
+        _dragRow.style.top = (ev.clientY - _offsetY) + 'px';
+
+        // Find the row we're hovering over
+        var rows = getDataRows().filter(function(r) { return r !== _dragRow; });
+        var inserted = false;
+        for (var i = 0; i < rows.length; i++) {
+          var r = rows[i];
+          var rRect = r.getBoundingClientRect();
+          var mid = rRect.top + rRect.height / 2;
+          if (ev.clientY < mid) {
+            if (_dragPlaceholder.nextSibling !== r) {
+              container.insertBefore(_dragPlaceholder, r);
+            }
+            inserted = true;
+            break;
+          }
+        }
+        if (!inserted && _dragPlaceholder.nextSibling !== null) {
+          container.appendChild(_dragPlaceholder);
+        }
+      }
+
+      function onUp(ev) {
+        if (!_dragRow) return;
+        handle.releasePointerCapture(ev.pointerId);
+
+        // Reset dragged row styles
+        _dragRow.style.position = '';
+        _dragRow.style.left = '';
+        _dragRow.style.top = '';
+        _dragRow.style.width = '';
+        _dragRow.style.zIndex = '';
+        _dragRow.style.boxShadow = '';
+        _dragRow.style.background = '';
+        _dragRow.style.opacity = '';
+        _dragRow.style.pointerEvents = '';
+
+        // Place row where placeholder is
+        if (_dragPlaceholder && _dragPlaceholder.parentNode) {
+          _dragPlaceholder.parentNode.insertBefore(_dragRow, _dragPlaceholder);
+          _dragPlaceholder.remove();
+        }
+
+        _dragRow = null;
+        _dragPlaceholder = null;
+
+        // Renumber all rows and save
+        riderRenumberInputRows();
+
+        handle.removeEventListener('pointermove', onMove);
+        handle.removeEventListener('pointerup', onUp);
+        handle.removeEventListener('pointercancel', onUp);
+      }
+
+      handle.addEventListener('pointermove', onMove);
+      handle.addEventListener('pointerup', onUp);
+      handle.addEventListener('pointercancel', onUp);
+    });
+  });
+})();
+
+function riderRenumberInputRows() {
+  var rows = document.querySelectorAll('#rider-input-rows .input-row:not(.hdr-row)');
+  var fields = ['ch','type','src','mic','stand','notes'];
+  rows.forEach(function(row, idx) {
+    var newNum = idx + 1;
+    var editables = row.querySelectorAll('[data-rider-key]');
+    editables.forEach(function(el) {
+      var oldKey = el.dataset.riderKey;
+      // Extract field suffix (ch, type, src, mic, stand, notes)
+      var match = oldKey.match(/^input_\d+_(\w+)$/);
+      if (!match) return;
+      var suffix = match[1];
+      var newKey = 'input_' + newNum + '_' + suffix;
+      el.dataset.riderKey = newKey;
+      // Update the CH number display
+      if (suffix === 'ch') {
+        el.textContent = String(newNum);
+      }
+      // Save the field with the new key
+      saveRiderField(newKey, el.innerHTML);
+    });
+  });
+  _riderRowCount = rows.length;
+  var chEl = document.querySelector('[data-rider-key="input_ch_count"]');
+  if (chEl) { chEl.textContent = _riderRowCount; saveRiderField('input_ch_count', String(_riderRowCount)); }
+  setRiderStatus('Reordered — saved', 'var(--green3)');
 }
 
 // ── RIDER MONITOR MIXES ──────────────────────────────────
@@ -12881,7 +13037,7 @@ function printRider() {
           ${Array.from(riderEl.querySelectorAll('.input-row')).map(row => {
             const divs = row.querySelectorAll('div');
             const cls = row.classList.contains('hdr-row') ? 'input-hdr' : '';
-            return `<div class="input-grid ${cls}">${Array.from(divs).map(d=>`<div>${d.innerText}</div>`).join('')}</div>`;
+            return `<div class="input-grid ${cls}">${Array.from(divs).filter(d=>!d.classList.contains('drag-handle')).map(d=>`<div>${d.innerText}</div>`).join('')}</div>`;
           }).join('')}
         </div>
       </div>
