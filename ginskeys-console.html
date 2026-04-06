@@ -3884,7 +3884,7 @@ tr:hover .edit-btn{display:inline}
       <div class="panel" style="padding:14px;border-top:3px solid var(--blue2)">
         <div style="font-size:9px;font-weight:700;color:var(--blue2);letter-spacing:.1em;margin-bottom:6px">PEDRO</div>
         <div style="font-size:10px;color:var(--muted2);line-height:2">
-          <div>Bass + BG Vocals</div>
+          <div>Bass</div>
           <div style="color:var(--muted3)">Stage Left</div>
           <div id="mem-card-attendance-pedro" style="color:var(--green3);margin-top:4px">— rehearsals</div>
         </div>
@@ -3900,7 +3900,7 @@ tr:hover .edit-btn{display:inline}
       <div class="panel" style="padding:14px;border-top:3px solid var(--purple2)">
         <div style="font-size:9px;font-weight:700;color:var(--purple2);letter-spacing:.1em;margin-bottom:6px">TIAGO</div>
         <div style="font-size:10px;color:var(--muted2);line-height:2">
-          <div>Guitar + BG Vocals</div>
+          <div>Guitar</div>
           <div style="color:var(--muted3)">Stage Right</div>
           <div id="mem-card-attendance-tiago" style="color:var(--green3);margin-top:4px">— rehearsals</div>
         </div>
@@ -7968,7 +7968,7 @@ function _initAll_old_1() {
                 </tr>
                 <tr style="border-bottom:1px solid var(--border1)">
                   <td style="padding:8px 10px;font-weight:700;color:var(--accent)">PEDRO</td>
-                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_pedro_role">Bass + BG Vocals</span></td>
+                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_pedro_role">Bass</span></td>
                   <td style="padding:8px 10px;color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_pedro_pos">Stage Left</span></td>
                 </tr>
                 <tr style="border-bottom:1px solid var(--border1)">
@@ -7978,7 +7978,7 @@ function _initAll_old_1() {
                 </tr>
                 <tr>
                   <td style="padding:8px 10px;font-weight:700;color:var(--accent)">TIAGO</td>
-                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_tiago_role">Guitar + BG Vocals</span></td>
+                  <td style="padding:8px 10px"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_tiago_role">Guitar</span></td>
                   <td style="padding:8px 10px;color:var(--muted3)"><span class="rider-editable" contenteditable="true" data-rider-key="lineup_tiago_pos">Stage Right</span></td>
                 </tr>
               </table>
@@ -8055,7 +8055,7 @@ function _initAll_old_1() {
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                 <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--accent)">
                   <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 1 — FÁBIO (<span data-i18n="rider_lead_vox">Lead Vocal</span>)</div>
-                  <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_1" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Vocal (self, loud) · Guitar (self, low)<br>Kick · Snare · Bass (low)</div>
+                  <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_1" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Vocal (self, loud)<br>Kick · Snare · Bass (low)</div>
                 </div>
                 <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--blue2)">
                   <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 2 — PEDRO (<span data-i18n="rider_bass">Bass</span>)</div>
@@ -8066,7 +8066,7 @@ function _initAll_old_1() {
                   <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_3" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Vocal 1 · Guitar 1 · Bass<br>Click track (optional)</div>
                 </div>
                 <div style="background:var(--bg4);padding:10px;border-radius:2px;border-left:3px solid var(--amber2)">
-                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 4 — TIAGO (<span data-i18n="rider_bg_vox">BG Vocal</span>)</div>
+                  <div style="font-size:9px;font-weight:700;color:var(--text);margin-bottom:4px"><span data-i18n="rider_mix">MIX</span> 4 — TIAGO (<span data-i18n="rider_guitar">Guitar</span>)</div>
                   <div class="rider-editable" contenteditable="true" data-rider-key="mon_mix_4" style="font-size:8px;color:var(--muted3);line-height:1.7;display:block">Vocal 1 · Vocal 2 (self)<br>Guitar 1 · Kick · Bass (low)</div>
                 </div>
               </div>
@@ -10322,6 +10322,7 @@ const TRANSLATIONS = {
     rider_bass:           'Bass',
     rider_drums:          'Drums',
     rider_bg_vox:         'BG Vocal',
+    rider_guitar:         'Guitar',
     rider_min:            'Min:',
     rider_band_provides:  'BAND PROVIDES',
     rider_venue_provides: 'VENUE PROVIDES',
@@ -10540,6 +10541,7 @@ const TRANSLATIONS = {
     rider_bass:           'Baixo',
     rider_drums:          'Bateria',
     rider_bg_vox:         'Segundas Vozes',
+    rider_guitar:         'Guitarra',
     rider_min:            'Mín:',
     rider_band_provides:  'BANDA FORNECE',
     rider_venue_provides: 'LOCAL FORNECE',
@@ -12793,7 +12795,7 @@ function copyRiderText() {
     'Fábio — Lead Vocals (Centre/SR)',
     'Pedro — Bass (Stage Left)',
     'Manuel — Drums (Centre Rear)',
-    'Tiago — Guitar + BG Vocals (SR)',
+    'Tiago — Guitar (SR)',
     '',
     'TOTAL INPUTS: 15 channels (see input list)',
     'MONITORS: 4 separate mixes required',
@@ -12830,7 +12832,7 @@ const SNAP_SIZE = 10;
 // ── Element definitions: type → { label, w, h, color, channels, symbol } ──
 const SPLOT_DEFS = {
   vocal_lead:    { label:'VOC 1\nFábio', w:52, h:52, color:'#ff3c1e', channels:[{src:'Lead Vocal',type:'MIC',stand:'Tall'}] },
-  vocal_bg:      { label:'VOC 2\nPedro', w:52, h:52, color:'#ff7043', channels:[{src:'BG Vocal',type:'MIC',stand:'Tall'}] },
+  vocal_bg:      { label:'VOC 2\nFábio', w:52, h:52, color:'#ff7043', channels:[{src:'BG Vocal',type:'MIC',stand:'Tall'}] },
   guitar_amp:    { label:'GTR\nTiago', w:60, h:60, color:'#aa00ff', channels:[{src:'Guitar Amp',type:'MIC',stand:'Short'},{src:'Guitar DI',type:'DI',stand:'-'}] },
   bass_amp:      { label:'BASS + BG\nPedro', w:60, h:60, color:'#2979ff', channels:[{src:'Bass DI',type:'DI',stand:'-'},{src:'Bass Amp',type:'MIC',stand:'Short'}] },
   keys:          { label:'KEYS', w:80, h:44, color:'#00bcd4', channels:[{src:'Keys L',type:'DI',stand:'-'},{src:'Keys R',type:'DI',stand:'-'}] },
