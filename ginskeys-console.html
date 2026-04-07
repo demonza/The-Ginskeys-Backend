@@ -14661,21 +14661,12 @@ function printStagePlot() {
   SPLOT_W = origW; SPLOT_H = origH;
   splotDrawAll();
 
-  // Build channel list
+  // Count total channels
   var ch = 1;
-  var chRows = [];
   SPLOT_ELS.forEach(function(el){
     var def = SPLOT_DEFS[el.type];
     if (!def || !def.channels.length) return;
-    def.channels.forEach(function(c){
-      var n = ch++;
-      chRows.push('<div class="il'+(n%2===0?' st':'')+'">' +
-        '<div class="cn">'+n+'</div>' +
-        '<div>'+c.src+'</div>' +
-        '<div class="mu">'+el.label.replace('\n',' — ')+'</div>' +
-        '<div class="mc">'+c.type+'</div>' +
-        '<div class="mu">'+c.stand+'</div></div>');
-    });
+    def.channels.forEach(function(){ ch++; });
   });
 
   var sw = (document.getElementById('splot-stage-w') || {}).value || 12;
@@ -14691,33 +14682,33 @@ function printStagePlot() {
   'body{font-family:Inter,system-ui,sans-serif;font-size:10px;color:#111;background:#fff;max-width:297mm;margin:0 auto}'+
   '@page{margin:8mm 10mm;size:A4 landscape}'+
 
-  '.hdr-bar{background:#0a0a0a;color:#fff;padding:18px 28px;display:flex;align-items:center;gap:20px}'+
-  '.hdr-logo{height:38px;width:auto;flex-shrink:0;filter:brightness(1.1)}'+
+  '.hdr-bar{background:#0a0a0a;color:#fff;padding:14px 24px;display:flex;align-items:center;gap:16px}'+
+  '.hdr-logo{height:34px;width:auto;flex-shrink:0;filter:brightness(1.1)}'+
   '.hdr-info{flex:1}'+
-  '.hdr-title{font-size:11px;font-weight:800;letter-spacing:.2em;color:#ff5500;margin-bottom:2px}'+
-  '.hdr-sub{font-size:8.5px;letter-spacing:.12em;color:#999;font-weight:500}'+
+  '.hdr-title{font-size:10px;font-weight:800;letter-spacing:.2em;color:#ff5500;margin-bottom:2px}'+
+  '.hdr-sub{font-size:8px;letter-spacing:.12em;color:#999;font-weight:500}'+
   '.hdr-sub b{color:#ccc}'+
   '.hdr-right{text-align:right;white-space:nowrap}'+
   '.hdr-date{font-family:"JetBrains Mono",monospace;font-size:8px;color:#666}'+
-  '.hdr-stage{font-size:8px;color:#888;margin-top:2px}'+
+  '.hdr-stage{font-size:7.5px;color:#888;margin-top:2px}'+
 
-  '.bd{padding:12px 28px 16px}'+
+  '.bd{padding:8px 24px 12px}'+
 
-  '.plot-wrap{background:#0a0a0a;border-radius:4px;padding:8px;margin-bottom:12px}'+
-  '.plot-img{display:block;width:100%;border-radius:2px}'+
-  '.plot-note{font-size:7.5px;color:#666;text-align:center;margin-top:6px;letter-spacing:.06em}'+
+  '.plot-wrap{background:#0a0a0a;border-radius:3px;padding:6px;margin-bottom:8px}'+
+  '.plot-img{display:block;width:100%;max-height:440px;object-fit:contain;border-radius:2px}'+
+  '.plot-note{font-size:7px;color:#555;text-align:center;margin-top:4px;letter-spacing:.06em}'+
 
-  '.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}'+
+  '.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}'+
 
-  '.sec{margin-bottom:10px;break-inside:avoid}'+
-  '.sh{font-size:9px;font-weight:700;letter-spacing:.1em;color:#0a0a0a;padding:6px 10px;background:#f2f2f2;border-left:3px solid #ff5500;display:flex;align-items:center}'+
-  '.sn{color:#ff5500;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:10px;margin-right:8px;min-width:18px}'+
-  '.sb{padding:8px 10px;border:1px solid #e0e0e0;border-top:none;font-size:9px;line-height:1.7;color:#333}'+
+  '.sec{margin-bottom:8px;break-inside:avoid}'+
+  '.sh{font-size:8.5px;font-weight:700;letter-spacing:.1em;color:#0a0a0a;padding:5px 8px;background:#f2f2f2;border-left:3px solid #ff5500;display:flex;align-items:center}'+
+  '.sn{color:#ff5500;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:9px;margin-right:6px;min-width:14px}'+
+  '.sb{padding:6px 8px;border:1px solid #e0e0e0;border-top:none;font-size:8.5px;line-height:1.6;color:#333}'+
 
-  '.il{display:grid;grid-template-columns:28px 1fr 1fr 50px 55px;gap:5px;padding:4px 8px;border-bottom:1px solid #eee;font-size:9px;align-items:center}'+
-  '.il.hd{background:#f2f2f2;font-weight:700;font-size:7.5px;letter-spacing:.12em;color:#555;border-bottom:2px solid #ddd;padding:5px 8px}'+
+  '.il{display:grid;grid-template-columns:24px 1fr 1fr 42px 48px;gap:4px;padding:3px 6px;border-bottom:1px solid #eee;font-size:8.5px;align-items:center}'+
+  '.il.hd{background:#f2f2f2;font-weight:700;font-size:7px;letter-spacing:.12em;color:#555;border-bottom:2px solid #ddd;padding:4px 6px}'+
   '.il.st{background:#fafafa}'+
-  '.il .cn{font-family:"JetBrains Mono",monospace;font-weight:700;color:#ff5500;font-size:9.5px}'+
+  '.il .cn{font-family:"JetBrains Mono",monospace;font-weight:700;color:#ff5500;font-size:8.5px}'+
   '.il .mc{color:#ff5500;font-weight:500}'+
   '.il .mu{color:#888}'+
 
@@ -14725,10 +14716,10 @@ function printStagePlot() {
   '.legend-item{display:flex;align-items:center;gap:4px}'+
   '.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}'+
 
-  '.ft{background:#0a0a0a;color:#888;padding:10px 28px;display:flex;justify-content:space-between;font-size:8px;letter-spacing:.06em}'+
+  '.ft{background:#0a0a0a;color:#888;padding:8px 24px;display:flex;justify-content:space-between;font-size:7.5px;letter-spacing:.06em}'+
   '.ft b{color:#ff5500}'+
 
-  '@media print{body{padding:0}.hdr-bar{padding:14px 0}.bd{padding:10px 0 12px}.ft{padding:8px 0}}'+
+  '@media print{body{padding:0}.hdr-bar{padding:12px 0}.bd{padding:6px 0 8px}.ft{padding:6px 0}.plot-img{max-height:360px}}'+
   '</style></head><body>'+
 
   '<div class="hdr-bar">'+
@@ -14750,31 +14741,18 @@ function printStagePlot() {
       '<div class="plot-note">AUDIENCE ▼ &nbsp;&nbsp;·&nbsp;&nbsp; All positions approximate — confirm with production manager on day of show</div>'+
     '</div>'+
 
-    '<div class="cols">'+
-      '<div>'+
-        (chRows.length ? '<div class="sec">'+
-          '<div class="sh"><span class="sn">▸</span>DERIVED INPUT LIST</div>'+
-          '<div class="sb" style="padding:0">'+
-            '<div class="il hd"><div>CH</div><div>SOURCE</div><div>ELEMENT</div><div>TYPE</div><div>STAND</div></div>'+
-            chRows.join('')+
-          '</div>'+
-        '</div>' : '')+
-      '</div>'+
-      '<div>'+
-        '<div class="sec">'+
-          '<div class="sh"><span class="sn">▸</span>STAGE ELEMENTS</div>'+
-          '<div class="sb">'+
-            '<div class="legend">'+
-            SPLOT_ELS.map(function(el){
-              return '<div class="legend-item"><div class="legend-dot" style="background:'+el.color+'"></div>'+el.label.replace('\n',' — ')+'</div>';
-            }).join('')+
-            '</div>'+
-            '<div style="margin-top:8px;font-size:8px;color:#888;line-height:1.8">'+
-              'Total elements: '+SPLOT_ELS.length+' &nbsp;·&nbsp; '+
-              'Total inputs: '+(ch-1)+' CH &nbsp;·&nbsp; '+
-              'Canvas: '+origW+'×'+origH+'px'+
-            '</div>'+
-          '</div>'+
+    '<div class="sec">'+
+      '<div class="sh"><span class="sn">▸</span>STAGE ELEMENTS</div>'+
+      '<div class="sb">'+
+        '<div class="legend">'+
+        SPLOT_ELS.map(function(el){
+          return '<div class="legend-item"><div class="legend-dot" style="background:'+el.color+'"></div>'+el.label.replace('\n',' — ')+'</div>';
+        }).join('')+
+        '</div>'+
+        '<div style="margin-top:6px;font-size:7.5px;color:#888">'+
+          'Total elements: '+SPLOT_ELS.length+' &nbsp;·&nbsp; '+
+          'Total inputs: '+(ch-1)+' CH &nbsp;·&nbsp; '+
+          'Stage: '+sw+'m × '+sd+'m'+
         '</div>'+
       '</div>'+
     '</div>'+
