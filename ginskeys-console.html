@@ -13014,19 +13014,21 @@ function printRider() {
     @page{margin:15mm}
   </style></head><body>
   <h1>THE GINSKEYS</h1>
-  <div class="sub">TECHNICAL RIDER · HARD ROCK · 4 PIECE · SINES, PORTUGAL · ${new Date().toLocaleDateString('pt-PT')}</div>
+  <div class="sub">TECHNICAL RIDER · HARD ROCK · ${document.querySelectorAll('#rider-lineup-body tr').length || 4} PIECE · SINES, PORTUGAL · ${new Date().toLocaleDateString('pt-PT')}</div>
   <div class="cols">
     <div>
       <div class="section">
         <div class="section-hdr">01 &nbsp; BAND LINEUP</div>
         <div class="section-body">
           <table><tr><th>MEMBER</th><th>ROLE</th><th>POSITION</th></tr>
-          ${['FÁBIO','PEDRO','MANUEL','TIAGO'].map((n,i) => {
-            const rows = riderEl.querySelectorAll('tr');
-            const row = Array.from(rows).find(r => r.querySelector('td') && r.querySelector('td').textContent.trim() === n);
-            if (!row) return '';
+          ${Array.from(riderEl.querySelectorAll('#rider-lineup-body tr')).map(row => {
             const cells = row.querySelectorAll('td');
-            return `<tr><td><strong>${n}</strong></td><td>${cells[1]?.innerText||''}</td><td>${cells[2]?.innerText||''}</td></tr>`;
+            if (!cells.length) return '';
+            const name = (cells[0]?.innerText || '').trim();
+            const role = (cells[1]?.innerText || '').trim();
+            const pos  = (cells[2]?.innerText || '').trim();
+            if (!name) return '';
+            return `<tr><td><strong>${name}</strong></td><td>${role}</td><td>${pos}</td></tr>`;
           }).join('')}
           </table>
         </div>
@@ -13056,18 +13058,29 @@ function printRider() {
 }
 
 function copyRiderText() {
+  // Build lineup dynamically from the rider table
+  var lineupRows = document.querySelectorAll('#rider-lineup-body tr');
+  var lineupLines = [];
+  lineupRows.forEach(function(row) {
+    var cells = row.querySelectorAll('td');
+    if (!cells.length) return;
+    var name = (cells[0]?.innerText || '').trim();
+    var role = (cells[1]?.innerText || '').trim();
+    var pos  = (cells[2]?.innerText || '').trim();
+    if (name) lineupLines.push(name + ' — ' + role + ' (' + pos + ')');
+  });
+  // Build input count dynamically
+  var inputCount = document.querySelectorAll('#rider-input-rows .input-row:not(.hdr-row)').length || _riderRowCount;
+  var monitorCount = _riderMixCount || 4;
   const lines = [
     'THE GINSKEYS — TECHNICAL RIDER',
-    'Hard Rock · 4 piece · Sines, Portugal',
+    'Hard Rock · ' + lineupLines.length + ' piece · Sines, Portugal',
     '',
     'BAND LINEUP:',
-    'Fábio — Lead Vocals (Centre/SR)',
-    'Pedro — Bass (Stage Left)',
-    'Manuel — Drums (Centre Rear)',
-    'Tiago — Guitar (SR)',
+    ...lineupLines,
     '',
-    'TOTAL INPUTS: 15 channels (see input list)',
-    'MONITORS: 4 separate mixes required',
+    'TOTAL INPUTS: ' + inputCount + ' channels (see input list)',
+    'MONITORS: ' + monitorCount + ' separate mixes required',
     '',
     'VENUE TO PROVIDE: Guitar cab 4×12 · Bass cab · Full drum kit + hardware + throne + rug',
     'All mic stands · All XLR cables · 2× DI boxes · 4× power strips · 6× water on stage',
