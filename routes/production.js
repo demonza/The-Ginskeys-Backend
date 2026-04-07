@@ -306,4 +306,71 @@ router.put('/rider', requireAuth, requirePerm('addTxn'), async (req, res, next) 
   } catch (err) { next(err); }
 });
 
+// ── STAGE PLOTS ──────────────────────────────────────────
+
+// GET /api/production/stageplots — list all plots
+router.get('/stageplots', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, name, show_id, is_default, canvas_w, canvas_h, updated_at
+       FROM stage_plots ORDER BY is_default DESC, updated_at DESC`
+    );
+    res.json(rows);
+  } catch (err) { next(err); }
+});
+
+// GET /api/production/stageplot/:id — get single plot with elements
+router.get('/stageplot/:id', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT * FROM stage_plots WHERE id = $1`, [req.params.id]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Plot not found' });
+    res.json(rows[0]);
+  } catch (err) { next(err); }
+});
+
+// POST /api/production/stageplot — create new plot
+router.post('/stageplot', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
+  try {
+    const { name, show_id, elements, canvas_w, canvas_h } = req.body;
+    const { rows } = await pool.query(
+      `INSERT INTO stage_plots (name, show_id, elements, canvas_w, canvas_h, created_by, updated_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $6) RETURNING *`,
+      [name || 'Untitled', show_id || null, JSON.stringify(elements || []), canvas_w || 800, canvas_h || 540, req.user.id]
+    );
+    res.json(rows[0]);
+  } catch (err) { next(err); }
+});
+
+// PUT /api/production/stageplot/:id — update plot
+router.put('/stageplot/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
+  try {
+    const { name, show_id, elements, canvas_w, canvas_h, is_default } = req.body;
+    const { rows } = await pool.query(
+      `UPDATE stage_plots
+       SET name = COALESCE($1, name),
+           show_id = $2,
+           elements = COALESCE($3, elements),
+           canvas_w = COALESCE($4, canvas_w),
+           canvas_h = COALESCE($5, canvas_h),
+           is_default = COALESCE($6, is_default),
+           updated_by = $7,
+           updated_at = now()
+       WHERE id = $8 RETURNING *`,
+      [name, show_id, elements ? JSON.stringify(elements) : null, canvas_w, canvas_h, is_default, req.user.id, req.params.id]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Plot not found' });
+    res.json(rows[0]);
+  } catch (err) { next(err); }
+});
+
+// DELETE /api/production/stageplot/:id
+router.delete('/stageplot/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
+  try {
+    await pool.query(`DELETE FROM stage_plots WHERE id = $1`, [req.params.id]);
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+});
+
 module.exports = router;
