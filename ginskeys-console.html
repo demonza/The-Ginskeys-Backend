@@ -12993,65 +12993,222 @@ function toggleRiderSection(el) {
 
 function printRider() {
   const riderEl = document.getElementById('prod-rider');
+  if (!riderEl) return;
+
+  /* ── Gather dynamic data ── */
+  const memberCount = document.querySelectorAll('#rider-lineup-body tr').length || 4;
+  const dateStr = new Date().toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
+
+  /* ── Lineup rows ── */
+  const lineupHTML = Array.from(riderEl.querySelectorAll('#rider-lineup-body tr')).map((row,i) => {
+    const cells = row.querySelectorAll('td');
+    if (!cells.length) return '';
+    const name = (cells[0]?.innerText || '').trim();
+    const role = (cells[1]?.innerText || '').trim();
+    const pos  = (cells[2]?.innerText || '').trim();
+    if (!name) return '';
+    const stripe = i % 2 === 0 ? '' : ' style="background:#f8f8fa"';
+    return `<tr${stripe}><td class="name-cell">${name}</td><td>${role}</td><td class="muted">${pos}</td></tr>`;
+  }).join('');
+
+  /* ── Input list rows ── */
+  const inputHTML = Array.from(riderEl.querySelectorAll('.input-row')).map((row,i) => {
+    const divs = Array.from(row.querySelectorAll('div')).filter(d => !d.classList.contains('drag-handle'));
+    if (row.classList.contains('hdr-row')) {
+      return `<div class="il-row il-hdr">${divs.map(d => `<div>${d.innerText}</div>`).join('')}</div>`;
+    }
+    const stripe = i % 2 === 0 ? '' : ' il-stripe';
+    return `<div class="il-row${stripe}">${divs.map((d,ci) => {
+      let cls = '';
+      if (ci === 0) cls = ' class="ch-num"';
+      else if (ci === 3) cls = ' class="mic-col"';
+      else if (ci === 1 || ci === 4) cls = ' class="muted"';
+      else if (ci === 5) cls = ' class="notes-col"';
+      return `<div${cls}>${d.innerText}</div>`;
+    }).join('')}</div>`;
+  }).join('');
+
+  /* ── Remaining rider sections (FOH, monitors, backline, hospitality, etc.) ── */
+  const extraSections = Array.from(riderEl.querySelectorAll('.rider-section')).slice(2).map(sec => {
+    const hdr = sec.querySelector('.rider-section-hdr')?.innerText?.replace('▼','').replace('▶','').trim() || '';
+    const body = sec.querySelector('.rider-section-body');
+    if (!body) return '';
+    /* ── Monitor mix boxes get special treatment ── */
+    const mixBoxes = body.querySelectorAll('[id^="rider-mix-box-"]');
+    if (mixBoxes.length > 0) {
+      const mixHTML = Array.from(mixBoxes).map((box, bi) => {
+        const titleEl = box.querySelector('[data-rider-key*="_title"]');
+        const contentEl = box.querySelector('[data-rider-key*="mon_mix_"]');
+        const title = titleEl ? titleEl.innerText : 'Mix ' + (bi+1);
+        const content = contentEl ? contentEl.innerHTML : '';
+        const colors = ['#ff5c1a','#4a9eff','#22c55e','#f59e0b','#a855f7','#ef4444'];
+        const c = colors[bi % colors.length];
+        return `<div class="mix-card"><div class="mix-num" style="background:${c}">MIX ${bi+1}</div><div class="mix-body"><div class="mix-title">${title}</div><div class="mix-content">${content}</div></div></div>`;
+      }).join('');
+      return `<div class="section"><div class="section-hdr"><span class="hdr-num">${hdr.slice(0,2)}</span>${hdr.slice(2)}</div><div class="section-body"><div class="mix-grid">${mixHTML}</div></div></div>`;
+    }
+    return `<div class="section"><div class="section-hdr"><span class="hdr-num">${hdr.slice(0,2)}</span>${hdr.slice(2)}</div><div class="section-body">${body.innerHTML}</div></div>`;
+  }).join('');
+
+  /* ── Build the full document ── */
   const w = window.open('', '_blank');
   w.document.write(`<!DOCTYPE html><html><head><title>The Ginskeys — Tech Rider</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    *{box-sizing:border-box}
-    body{font-family:'Courier New',monospace;font-size:11px;padding:24px 32px;color:#111;background:#fff;max-width:900px;margin:0 auto}
-    h1{font-size:22px;font-weight:900;letter-spacing:.1em;margin:0 0 4px}
-    .sub{font-size:10px;color:#555;letter-spacing:.08em;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #111}
-    .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .section{border:1px solid #ccc;margin-bottom:12px;break-inside:avoid}
-    .section-hdr{background:#f5f5f5;padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.06em;border-bottom:1px solid #ccc}
-    .section-body{padding:10px 12px;font-size:10px;line-height:1.8}
-    table{width:100%;border-collapse:collapse}
-    td,th{padding:5px 8px;border:1px solid #ddd;font-size:10px;text-align:left}
-    th{background:#f5f5f5;font-weight:700;letter-spacing:.08em}
-    .input-grid{display:grid;grid-template-columns:28px 36px 1fr 100px 55px 65px;gap:6px;padding:4px 8px;border-bottom:1px solid #eee;font-size:10px}
-    .input-hdr{background:#f5f5f5;font-weight:700;letter-spacing:.06em}
-    .mix-box{padding:8px;border:1px solid #ddd;margin-bottom:6px;font-size:10px}
-    .mix-box-hdr{font-weight:700;margin-bottom:4px}
-    @page{margin:15mm}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',system-ui,sans-serif;font-size:10px;color:#1a1a2e;background:#fff;max-width:210mm;margin:0 auto;padding:0}
+    @page{margin:12mm 14mm;size:A4}
+
+    /* ── HEADER ── */
+    .rider-header{
+      padding:28px 32px 20px;
+      border-bottom:3px solid #1a1a2e;
+      position:relative;
+    }
+    .rider-header::after{
+      content:'';position:absolute;bottom:-6px;left:0;right:0;height:1px;background:#1a1a2e;
+    }
+    .band-name{
+      font-size:32px;font-weight:900;letter-spacing:.18em;line-height:1;margin-bottom:6px;color:#1a1a2e;
+    }
+    .rider-meta{
+      display:flex;gap:8px;align-items:center;font-size:9px;letter-spacing:.12em;color:#666;font-weight:500;
+    }
+    .meta-sep{color:#ccc}
+    .meta-badge{
+      display:inline-block;background:#ff5c1a;color:#fff;padding:2px 8px;border-radius:2px;
+      font-weight:700;font-size:8px;letter-spacing:.1em;
+    }
+    .date-badge{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:8.5px;color:#888;font-weight:500}
+
+    /* ── LAYOUT ── */
+    .rider-body{padding:20px 32px 32px}
+    .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .full-width{grid-column:1/-1}
+
+    /* ── SECTIONS ── */
+    .section{margin-bottom:16px;break-inside:avoid}
+    .section-hdr{
+      font-size:9.5px;font-weight:700;letter-spacing:.1em;color:#1a1a2e;
+      padding:7px 12px;background:#f4f4f7;border-left:3px solid #ff5c1a;
+      margin-bottom:0;display:flex;align-items:center;gap:2px;
+    }
+    .hdr-num{color:#ff5c1a;font-family:'JetBrains Mono',monospace;font-weight:800;margin-right:6px}
+    .section-body{
+      padding:10px 12px;border:1px solid #e5e5ea;border-top:none;
+      font-size:9.5px;line-height:1.7;color:#333;
+    }
+
+    /* ── LINEUP TABLE ── */
+    .lineup-table{width:100%;border-collapse:collapse}
+    .lineup-table th{
+      font-size:8px;letter-spacing:.14em;color:#888;font-weight:600;
+      text-align:left;padding:6px 10px;border-bottom:2px solid #e5e5ea;
+    }
+    .lineup-table td{padding:7px 10px;border-bottom:1px solid #eee;font-size:10px}
+    .lineup-table .name-cell{font-weight:700;color:#1a1a2e;letter-spacing:.04em}
+    .lineup-table .muted{color:#777}
+
+    /* ── INPUT LIST ── */
+    .il-row{
+      display:grid;grid-template-columns:30px 38px 1fr 105px 55px 72px;
+      gap:6px;padding:5px 10px;border-bottom:1px solid #eee;font-size:9.5px;align-items:center;
+    }
+    .il-hdr{
+      background:#f4f4f7;font-weight:700;font-size:8px;letter-spacing:.12em;color:#666;
+      border-bottom:2px solid #e5e5ea;padding:6px 10px;
+    }
+    .il-stripe{background:#fafafa}
+    .il-row .ch-num{font-family:'JetBrains Mono',monospace;font-weight:700;color:#ff5c1a}
+    .il-row .mic-col{color:#7c3aed;font-weight:500}
+    .il-row .muted{color:#888}
+    .il-row .notes-col{color:#666;font-style:italic;font-size:9px}
+
+    /* ── MIX CARDS ── */
+    .mix-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .mix-card{display:flex;border:1px solid #e5e5ea;border-radius:3px;overflow:hidden}
+    .mix-num{
+      writing-mode:vertical-lr;text-orientation:mixed;
+      padding:8px 5px;font-size:7px;font-weight:800;letter-spacing:.16em;
+      color:#fff;display:flex;align-items:center;justify-content:center;min-width:24px;
+    }
+    .mix-body{padding:8px 10px;flex:1}
+    .mix-title{font-weight:700;font-size:9.5px;color:#1a1a2e;margin-bottom:3px}
+    .mix-content{font-size:8.5px;color:#666;line-height:1.7}
+
+    /* ── EXTRA BODY CLEANUP ── */
+    .section-body .rider-editable{display:inline}
+    .section-body [contenteditable]{outline:none}
+    .section-body div[style*="display:grid"]{gap:14px}
+    .section-body div[style*="font-size:8px"][style*="letter-spacing"]{
+      font-size:8px;color:#ff5c1a;font-weight:700;letter-spacing:.12em;margin-bottom:4px;
+    }
+    .section-body div[style*="line-height:1.9"]{line-height:1.8;color:#444;font-size:9px}
+
+    /* ── FOOTER ── */
+    .rider-footer{
+      margin-top:24px;padding:14px 32px;border-top:2px solid #1a1a2e;
+      display:flex;justify-content:space-between;font-size:8px;color:#888;letter-spacing:.06em;
+    }
+    .rider-footer strong{color:#1a1a2e}
+
+    /* ── PRINT OVERRIDES ── */
+    @media print{
+      body{padding:0}
+      .rider-header{padding:20px 0 16px}
+      .rider-body{padding:16px 0 24px}
+      .rider-footer{padding:12px 0}
+    }
   </style></head><body>
-  <h1>THE GINSKEYS</h1>
-  <div class="sub">TECHNICAL RIDER · HARD ROCK · ${document.querySelectorAll('#rider-lineup-body tr').length || 4} PIECE · SINES, PORTUGAL · ${new Date().toLocaleDateString('pt-PT')}</div>
-  <div class="cols">
-    <div>
-      <div class="section">
-        <div class="section-hdr">01 &nbsp; BAND LINEUP</div>
-        <div class="section-body">
-          <table><tr><th>MEMBER</th><th>ROLE</th><th>POSITION</th></tr>
-          ${Array.from(riderEl.querySelectorAll('#rider-lineup-body tr')).map(row => {
-            const cells = row.querySelectorAll('td');
-            if (!cells.length) return '';
-            const name = (cells[0]?.innerText || '').trim();
-            const role = (cells[1]?.innerText || '').trim();
-            const pos  = (cells[2]?.innerText || '').trim();
-            if (!name) return '';
-            return `<tr><td><strong>${name}</strong></td><td>${role}</td><td>${pos}</td></tr>`;
-          }).join('')}
-          </table>
-        </div>
-      </div>
-      <div class="section">
-        <div class="section-hdr">02 &nbsp; INPUT LIST</div>
-        <div class="section-body" style="padding:0">
-          ${Array.from(riderEl.querySelectorAll('.input-row')).map(row => {
-            const divs = row.querySelectorAll('div');
-            const cls = row.classList.contains('hdr-row') ? 'input-hdr' : '';
-            return `<div class="input-grid ${cls}">${Array.from(divs).filter(d=>!d.classList.contains('drag-handle')).map(d=>`<div>${d.innerText}</div>`).join('')}</div>`;
-          }).join('')}
-        </div>
-      </div>
-    </div>
-    <div>
-      ${Array.from(riderEl.querySelectorAll('.rider-section')).slice(2).map(sec => {
-        const hdr = sec.querySelector('.rider-section-hdr')?.innerText?.replace('▼','').replace('▶','').trim() || '';
-        const body = sec.querySelector('.rider-section-body')?.innerHTML || '';
-        return `<div class="section"><div class="section-hdr">${hdr}</div><div class="section-body">${body}</div></div>`;
-      }).join('')}
+
+  <div class="rider-header">
+    <div class="band-name">THE GINSKEYS</div>
+    <div class="rider-meta">
+      <span class="meta-badge">TECH RIDER</span>
+      <span class="meta-sep">·</span>
+      <span>HARD ROCK</span>
+      <span class="meta-sep">·</span>
+      <span>${memberCount} PIECE</span>
+      <span class="meta-sep">·</span>
+      <span>SINES, PORTUGAL</span>
+      <span class="date-badge">${dateStr}</span>
     </div>
   </div>
+
+  <div class="rider-body">
+    <!-- ROW 1: Lineup + Input List side by side -->
+    <div class="cols">
+      <div>
+        <div class="section">
+          <div class="section-hdr"><span class="hdr-num">01</span>BAND LINEUP</div>
+          <div class="section-body" style="padding:0">
+            <table class="lineup-table">
+              <thead><tr><th>MEMBER</th><th>ROLE</th><th>POSITION</th></tr></thead>
+              <tbody>${lineupHTML}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div>
+        <!-- Right column: extra sections (FOH, monitors, backline, etc.) -->
+        ${extraSections}
+      </div>
+    </div>
+
+    <!-- FULL WIDTH: Input List -->
+    <div class="section" style="margin-top:4px">
+      <div class="section-hdr"><span class="hdr-num">02</span>INPUT LIST / PATCH</div>
+      <div class="section-body" style="padding:0">
+        ${inputHTML}
+      </div>
+    </div>
+  </div>
+
+  <div class="rider-footer">
+    <div><strong>THE GINSKEYS</strong> · Technical Rider · Confidential</div>
+    <div>Contact: Tiago M. · tiago@ginskeys.com</div>
+  </div>
+
   </body></html>`);
   w.document.close();
   setTimeout(() => w.print(), 600);
