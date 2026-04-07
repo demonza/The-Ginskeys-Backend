@@ -157,29 +157,35 @@ async function start() {
   try {
     const client = await pool.connect();
     await client.query('SELECT 1');
-    // Auto-create stage_plots table if missing
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS stage_plots (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(200) NOT NULL DEFAULT 'Untitled',
-        show_id INTEGER REFERENCES shows(id) ON DELETE SET NULL,
-        elements JSONB NOT NULL DEFAULT '[]',
-        canvas_w INTEGER DEFAULT 800,
-        canvas_h INTEGER DEFAULT 500,
-        is_default BOOLEAN DEFAULT false,
-        created_by INTEGER REFERENCES users(id),
-        updated_by INTEGER REFERENCES users(id),
-        created_at TIMESTAMPTZ DEFAULT now(),
-        updated_at TIMESTAMPTZ DEFAULT now()
-      )
-    `);
-    await client.query(`CREATE INDEX IF NOT EXISTS idx_stage_plots_show ON stage_plots(show_id)`);
-    await client.query(`CREATE INDEX IF NOT EXISTS idx_stage_plots_default ON stage_plots(is_default) WHERE is_default = true`);
     client.release();
     console.log('✅ Database connected.');
   } catch (err) {
     console.error('❌ Cannot connect to database:', err.message);
     process.exit(1);
+  }
+
+  // Auto-create stage_plots table if missing (non-fatal)
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS stage_plots (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(200) NOT NULL DEFAULT 'Untitled',
+        show_id INTEGER,
+        elements JSONB NOT NULL DEFAULT '[]',
+        canvas_w INTEGER DEFAULT 800,
+        canvas_h INTEGER DEFAULT 500,
+        is_default BOOLEAN DEFAULT false,
+        created_by INTEGER,
+        updated_by INTEGER,
+        created_at TIMESTAMPTZ DEFAULT now(),
+        updated_at TIMESTAMPTZ DEFAULT now()
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_stage_plots_show ON stage_plots(show_id)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_stage_plots_default ON stage_plots(is_default) WHERE is_default = true`);
+    console.log('  ✔ stage_plots table ready');
+  } catch (err) {
+    console.warn('⚠ stage_plots auto-create skipped:', err.message);
   }
 
   app.listen(PORT, '0.0.0.0', () => {
