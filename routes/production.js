@@ -308,32 +308,66 @@ router.put('/rider', requireAuth, requirePerm('addTxn'), async (req, res, next) 
 
 // ── STAGE PLOTS ──────────────────────────────────────────
 
+// ── STAGE PLOT PERSISTENCE ──────────────────────────────
+// Auto-ensure table exists on first use
+let _stagePlotsReady = false;
+async function ensureStagePlotsTable() {
+  if (_stagePlotsReady) return;
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS stage_plots (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL DEFAULT 'Untitled',
+        show_id INTEGER,
+        elements TEXT NOT NULL DEFAULT '[]',
+        canvas_w INTEGER DEFAULT 800,
+        canvas_h INTEGER DEFAULT 500,
+        is_default BOOLEAN DEFAULT false,
+        created_by INTEGER,
+        updated_by INTEGER,
+        created_at TIMESTAMPTZ DEFAULT now(),
+        updated_at TIMESTAMPTZ DEFAULT now()
+      )
+    `);
+    _stagePlotsReady = true;
+  } catch (e) {
+    console.warn('stage_plots ensure failed:', e.message);
+    _stagePlotsReady = true; // don't retry forever
+  }
+}
+
 // GET /api/production/stageplots — list all plots
 router.get('/stageplots', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
   try {
+    await ensureStagePlotsTable();
     const { rows } = await pool.query(
       `SELECT id, name, show_id, is_default, canvas_w, canvas_h, updated_at
        FROM stage_plots ORDER BY is_default DESC, updated_at DESC`
     );
     res.json(rows);
-  } catch (err) { next(err); }
+  } catch (err) {
+    console.error('stageplots list error:', err.message);
+    res.json([]); // graceful fallback
+  }
 });
 
-// GET /api/production/stageplot/:id — get single plot with elements
+// GET /api/production/stageplot/:id — get single plot
 router.get('/stageplot/:id', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
   try {
+    await ensureStagePlotsTable();
     const { rows } = await pool.query(
-      `SELECT id, name, show_id, elements, canvas_w, canvas_h, is_default, updated_at FROM stage_plots WHERE id = $1`, [req.params.id]
+      `SELECT id, name, show_id, elements, canvas_w, canvas_h, is_default, updated_at
+       FROM stage_plots WHERE id = $1`, [req.params.id]
     );
     if (!rows.length) return res.status(404).json({ error: 'Plot not found' });
-    // Ensure elements is parsed
     const plot = rows[0];
+    // elements could be TEXT or JSONB — handle both
     if (typeof plot.elements === 'string') {
       try { plot.elements = JSON.parse(plot.elements); } catch(e) { plot.elements = []; }
     }
     res.json(plot);
   } catch (err) {
-    console.error('Stage plot load error:', err.message);
+    console.error('stageplot load error:', err.message);
     next(err);
   }
 });
@@ -341,16 +375,17 @@ router.get('/stageplot/:id', requireAuth, requirePerm('viewLedger'), async (req,
 // POST /api/production/stageplot — create new plot
 router.post('/stageplot', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
   try {
-    const { name, show_id, elements, canvas_w, canvas_h } = req.body;
-    const userId = req.user ? req.user.id : null;
+    await ensureStagePlotsTable();
+    const { name, elements, canvas_w, canvas_h } = req.body;
+    const elemStr = typeof elements === 'string' ? elements : JSON.stringify(elements || []);
     const { rows } = await pool.query(
-      `INSERT INTO stage_plots (name, show_id, elements, canvas_w, canvas_h, created_by, updated_by)
-       VALUES ($1, $2, $3::jsonb, $4, $5, $6, $6) RETURNING id, name, show_id, is_default, updated_at`,
-      [name || 'Untitled', show_id || null, JSON.stringify(elements || []), canvas_w || 800, canvas_h || 540, userId]
+      `INSERT INTO stage_plots (name, elements, canvas_w, canvas_h)
+       VALUES ($1, $2, $3, $4) RETURNING id, name, is_default, updated_at`,
+      [name || 'Untitled', elemStr, canvas_w || 800, canvas_h || 540]
     );
     res.json(rows[0]);
   } catch (err) {
-    console.error('Stage plot save error:', err.message);
+    console.error('stageplot save error:', err.message);
     next(err);
   }
 });
@@ -358,25 +393,23 @@ router.post('/stageplot', requireAuth, requirePerm('addTxn'), async (req, res, n
 // PUT /api/production/stageplot/:id — update plot
 router.put('/stageplot/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
   try {
-    const { name, show_id, elements, canvas_w, canvas_h, is_default } = req.body;
-    const userId = req.user ? req.user.id : null;
+    await ensureStagePlotsTable();
+    const { name, elements, canvas_w, canvas_h } = req.body;
+    const elemStr = elements ? (typeof elements === 'string' ? elements : JSON.stringify(elements)) : null;
     const { rows } = await pool.query(
       `UPDATE stage_plots
        SET name = COALESCE($1, name),
-           show_id = $2,
-           elements = COALESCE($3::jsonb, elements),
-           canvas_w = COALESCE($4, canvas_w),
-           canvas_h = COALESCE($5, canvas_h),
-           is_default = COALESCE($6, is_default),
-           updated_by = $7,
+           elements = COALESCE($2, elements),
+           canvas_w = COALESCE($3, canvas_w),
+           canvas_h = COALESCE($4, canvas_h),
            updated_at = now()
-       WHERE id = $8 RETURNING id, name, show_id, is_default, updated_at`,
-      [name, show_id || null, elements ? JSON.stringify(elements) : null, canvas_w, canvas_h, is_default, userId, req.params.id]
+       WHERE id = $5 RETURNING id, name, is_default, updated_at`,
+      [name, elemStr, canvas_w, canvas_h, req.params.id]
     );
     if (!rows.length) return res.status(404).json({ error: 'Plot not found' });
     res.json(rows[0]);
   } catch (err) {
-    console.error('Stage plot update error:', err.message);
+    console.error('stageplot update error:', err.message);
     next(err);
   }
 });
@@ -384,9 +417,13 @@ router.put('/stageplot/:id', requireAuth, requirePerm('addTxn'), async (req, res
 // DELETE /api/production/stageplot/:id
 router.delete('/stageplot/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
   try {
+    await ensureStagePlotsTable();
     await pool.query(`DELETE FROM stage_plots WHERE id = $1`, [req.params.id]);
     res.json({ ok: true });
-  } catch (err) { next(err); }
+  } catch (err) {
+    console.error('stageplot delete error:', err.message);
+    next(err);
+  }
 });
 
 module.exports = router;

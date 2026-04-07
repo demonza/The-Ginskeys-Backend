@@ -29,6 +29,7 @@ const splitsRoutes      = require('./routes/splits');
 const agentRoutes       = require('./routes/agent');
 const productionRoutes  = require('./routes/production');
 const fxRoutes          = require('./routes/fx');
+const reportRoutes      = require('./routes/reports');
 
 const app = express();
 
@@ -109,6 +110,7 @@ app.use('/api/splits',       splitsRoutes);
 app.use('/api/agent',        agentRoutes);
 app.use('/api/production',   productionRoutes);
 app.use('/api/fx',           fxRoutes);
+app.use('/api/reports',      reportRoutes);
 
 // ─── HEALTH ───────────────────────────────────────────
 app.get('/api/health', async (_req, res) => {
