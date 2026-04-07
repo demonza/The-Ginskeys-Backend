@@ -323,11 +323,19 @@ router.get('/stageplots', requireAuth, requirePerm('viewLedger'), async (req, re
 router.get('/stageplot/:id', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM stage_plots WHERE id = $1`, [req.params.id]
+      `SELECT id, name, show_id, elements, canvas_w, canvas_h, is_default, updated_at FROM stage_plots WHERE id = $1`, [req.params.id]
     );
     if (!rows.length) return res.status(404).json({ error: 'Plot not found' });
-    res.json(rows[0]);
-  } catch (err) { next(err); }
+    // Ensure elements is parsed
+    const plot = rows[0];
+    if (typeof plot.elements === 'string') {
+      try { plot.elements = JSON.parse(plot.elements); } catch(e) { plot.elements = []; }
+    }
+    res.json(plot);
+  } catch (err) {
+    console.error('Stage plot load error:', err.message);
+    next(err);
+  }
 });
 
 // POST /api/production/stageplot — create new plot
