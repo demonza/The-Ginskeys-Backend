@@ -12537,6 +12537,36 @@ async function loadRiderData() {
     // Render dynamic sections first (they create the elements with data-rider-key)
     riderRenderMixes(data);
     riderRenderLineup(data);
+    // Dynamically create/remove input rows to match saved count
+    var savedChCount = data['input_ch_count'] ? parseInt(data['input_ch_count']) : null;
+    if (savedChCount && savedChCount !== _riderRowCount) {
+      var container = document.getElementById('rider-input-rows');
+      if (container) {
+        if (savedChCount > _riderRowCount) {
+          // Add missing rows
+          for (var ri = _riderRowCount + 1; ri <= savedChCount; ri++) {
+            var row = document.createElement('div');
+            row.className = 'input-row';
+            row.innerHTML =
+              '<div class="drag-handle" draggable="true">\u2630</div>' +
+              '<div style="color:var(--accent);font-weight:700" class="rider-editable" contenteditable="true" data-rider-key="input_'+ri+'_ch">'+ri+'</div>' +
+              '<div style="color:var(--muted2)" class="rider-editable" contenteditable="true" data-rider-key="input_'+ri+'_type">MIC</div>' +
+              '<div class="rider-editable" contenteditable="true" data-rider-key="input_'+ri+'_src">Source</div>' +
+              '<div style="color:var(--purple2)" class="rider-editable" contenteditable="true" data-rider-key="input_'+ri+'_mic">\u2014</div>' +
+              '<div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_'+ri+'_stand">\u2014</div>' +
+              '<div style="color:var(--muted3)" class="rider-editable" contenteditable="true" data-rider-key="input_'+ri+'_notes">\u2014</div>';
+            container.appendChild(row);
+          }
+        } else {
+          // Remove excess rows
+          var rows = container.querySelectorAll('.input-row');
+          for (var ri = rows.length - 1; ri >= savedChCount; ri--) {
+            rows[ri].remove();
+          }
+        }
+        _riderRowCount = savedChCount;
+      }
+    }
     // Then apply saved values to all static rider-editable fields
     document.querySelectorAll('[data-rider-key]').forEach(function(el) {
       var val = data[el.dataset.riderKey];
@@ -13212,8 +13242,8 @@ function printRider() {
 
   /* ═══ FOOTER ═══ */
   '<div class="ft">'+
-    '<div><b>THE GINSKEYS</b> &nbsp;·&nbsp; Technical Rider &nbsp;·&nbsp; </div>'+
-    '<div>Contact: Tiago Mendonça &nbsp;·&nbsp; theginskeys@gmail.com</div>'+
+    '<div><b>THE GINSKEYS</b> &nbsp;·&nbsp; Technical Rider &nbsp;·&nbsp; Confidential</div>'+
+    '<div>Contact: Tiago M. &nbsp;·&nbsp; tiago@ginskeys.com</div>'+
   '</div>'+
 
   '</body></html>');
