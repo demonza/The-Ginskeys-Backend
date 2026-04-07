@@ -14645,65 +14645,149 @@ function splotUpdateInputList() {
 
 // ── Print ──
 function printStagePlot() {
-  const canvas = document.getElementById('splot-canvas');
+  var canvas = document.getElementById('splot-canvas');
   if (!canvas) return;
-  // First redraw at high res
-  const origW = SPLOT_W, origH = SPLOT_H;
-  const scale = 2;
+  // Render at high res
+  var origW = SPLOT_W, origH = SPLOT_H;
+  var scale = 2;
   canvas.width = origW * scale; canvas.height = origH * scale;
   SPLOT_W = origW * scale; SPLOT_H = origH * scale;
-  SPLOT_ELS.forEach(el => { el.x *= scale; el.y *= scale; el.w *= scale; el.h *= scale; });
+  SPLOT_ELS.forEach(function(el){ el.x *= scale; el.y *= scale; el.w *= scale; el.h *= scale; });
   splotDrawAll();
-  const imgData = canvas.toDataURL('image/png', 1.0);
+  var imgData = canvas.toDataURL('image/png', 1.0);
   // Restore
-  SPLOT_ELS.forEach(el => { el.x /= scale; el.y /= scale; el.w /= scale; el.h /= scale; });
+  SPLOT_ELS.forEach(function(el){ el.x /= scale; el.y /= scale; el.w /= scale; el.h /= scale; });
   canvas.width = origW; canvas.height = origH;
   SPLOT_W = origW; SPLOT_H = origH;
   splotDrawAll();
 
-  let ch = 1;
-  const chRows = [];
-  SPLOT_ELS.forEach(el => {
-    const def = SPLOT_DEFS[el.type];
+  // Build channel list
+  var ch = 1;
+  var chRows = [];
+  SPLOT_ELS.forEach(function(el){
+    var def = SPLOT_DEFS[el.type];
     if (!def || !def.channels.length) return;
-    def.channels.forEach(c => {
-      chRows.push(`<tr><td><strong>${ch++}</strong></td><td>${c.src}</td><td>${el.label.replace('\n',' — ')}</td><td>${c.type}</td><td>${c.stand}</td></tr>`);
+    def.channels.forEach(function(c){
+      var n = ch++;
+      chRows.push('<div class="il'+(n%2===0?' st':'')+'">' +
+        '<div class="cn">'+n+'</div>' +
+        '<div>'+c.src+'</div>' +
+        '<div class="mu">'+el.label.replace('\n',' — ')+'</div>' +
+        '<div class="mc">'+c.type+'</div>' +
+        '<div class="mu">'+c.stand+'</div></div>');
     });
   });
 
-  const sw = document.getElementById('splot-stage-w')?.value || 12;
-  const sd = document.getElementById('splot-stage-d')?.value || 8;
+  var sw = (document.getElementById('splot-stage-w') || {}).value || 12;
+  var sd = (document.getElementById('splot-stage-d') || {}).value || 8;
+  var memberCount = document.querySelectorAll('#rider-lineup-body tr').length || 4;
+  var dateStr = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
 
-  const w = window.open('', '_blank');
-  w.document.write(`<!DOCTYPE html><html><head><title>The Ginskeys — Stage Plot</title>
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Courier New',monospace;padding:16px 24px;background:#fff;color:#000;font-size:10px}
-    .hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid #000}
-    .hdr h1{font-size:20px;font-weight:900;letter-spacing:.1em}
-    .hdr .meta{font-size:9px;color:#555;text-align:right;line-height:1.8}
-    .plot{display:block;width:100%;border:1px solid #ccc;margin-bottom:12px}
-    .note{font-size:8px;color:#888;text-align:center;margin-bottom:12px}
-    table{width:100%;border-collapse:collapse}
-    th{background:#111;color:#fff;padding:5px 8px;text-align:left;letter-spacing:.08em;font-size:9px}
-    td{padding:4px 8px;border-bottom:1px solid #eee;font-size:9px}
-    tr:nth-child(even) td{background:#f9f9f9}
-    @page{margin:10mm;size:A4 landscape}
-  </style></head><body>
-  <div class="hdr">
-    <div><h1>THE GINSKEYS</h1><div style="font-size:10px;color:#555">STAGE PLOT · Hard Rock · 4 Piece · Sines, Portugal</div></div>
-    <div class="meta">
-      Stage: ${sw}m wide × ${sd}m deep<br>
-      ${new Date().toLocaleDateString('pt-PT')}<br>
-      SR = Stage Right (audience left) · SL = Stage Left (audience right)
-    </div>
-  </div>
-  <img class="plot" src="${imgData}">
-  <div class="note">Audience at bottom. All positions approximate — confirm with production manager on day of show.</div>
-  ${chRows.length ? `<table><tr><th>CH</th><th>SOURCE</th><th>ELEMENT</th><th>TYPE</th><th>STAND</th></tr>${chRows.join('')}</table>` : ''}
-  </body></html>`);
+  var w = window.open('', '_blank');
+  w.document.write('<!DOCTYPE html><html><head><title>The Ginskeys — Stage Plot</title>'+
+  '<style>'+
+  '@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap");'+
+  '*{box-sizing:border-box;margin:0;padding:0}'+
+  'body{font-family:Inter,system-ui,sans-serif;font-size:10px;color:#111;background:#fff;max-width:297mm;margin:0 auto}'+
+  '@page{margin:8mm 10mm;size:A4 landscape}'+
+
+  '.hdr-bar{background:#0a0a0a;color:#fff;padding:18px 28px;display:flex;align-items:center;gap:20px}'+
+  '.hdr-logo{height:38px;width:auto;flex-shrink:0;filter:brightness(1.1)}'+
+  '.hdr-info{flex:1}'+
+  '.hdr-title{font-size:11px;font-weight:800;letter-spacing:.2em;color:#ff5500;margin-bottom:2px}'+
+  '.hdr-sub{font-size:8.5px;letter-spacing:.12em;color:#999;font-weight:500}'+
+  '.hdr-sub b{color:#ccc}'+
+  '.hdr-right{text-align:right;white-space:nowrap}'+
+  '.hdr-date{font-family:"JetBrains Mono",monospace;font-size:8px;color:#666}'+
+  '.hdr-stage{font-size:8px;color:#888;margin-top:2px}'+
+
+  '.bd{padding:12px 28px 16px}'+
+
+  '.plot-wrap{background:#0a0a0a;border-radius:4px;padding:8px;margin-bottom:12px}'+
+  '.plot-img{display:block;width:100%;border-radius:2px}'+
+  '.plot-note{font-size:7.5px;color:#666;text-align:center;margin-top:6px;letter-spacing:.06em}'+
+
+  '.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}'+
+
+  '.sec{margin-bottom:10px;break-inside:avoid}'+
+  '.sh{font-size:9px;font-weight:700;letter-spacing:.1em;color:#0a0a0a;padding:6px 10px;background:#f2f2f2;border-left:3px solid #ff5500;display:flex;align-items:center}'+
+  '.sn{color:#ff5500;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:10px;margin-right:8px;min-width:18px}'+
+  '.sb{padding:8px 10px;border:1px solid #e0e0e0;border-top:none;font-size:9px;line-height:1.7;color:#333}'+
+
+  '.il{display:grid;grid-template-columns:28px 1fr 1fr 50px 55px;gap:5px;padding:4px 8px;border-bottom:1px solid #eee;font-size:9px;align-items:center}'+
+  '.il.hd{background:#f2f2f2;font-weight:700;font-size:7.5px;letter-spacing:.12em;color:#555;border-bottom:2px solid #ddd;padding:5px 8px}'+
+  '.il.st{background:#fafafa}'+
+  '.il .cn{font-family:"JetBrains Mono",monospace;font-weight:700;color:#ff5500;font-size:9.5px}'+
+  '.il .mc{color:#ff5500;font-weight:500}'+
+  '.il .mu{color:#888}'+
+
+  '.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:8px;color:#666;margin-top:8px;padding:8px 10px;background:#fafafa;border:1px solid #eee;border-radius:2px}'+
+  '.legend-item{display:flex;align-items:center;gap:4px}'+
+  '.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}'+
+
+  '.ft{background:#0a0a0a;color:#888;padding:10px 28px;display:flex;justify-content:space-between;font-size:8px;letter-spacing:.06em}'+
+  '.ft b{color:#ff5500}'+
+
+  '@media print{body{padding:0}.hdr-bar{padding:14px 0}.bd{padding:10px 0 12px}.ft{padding:8px 0}}'+
+  '</style></head><body>'+
+
+  '<div class="hdr-bar">'+
+    '<img class="hdr-logo" src="'+GINSKEYS_LOGO_B64+'" alt="The Ginskeys">'+
+    '<div class="hdr-info">'+
+      '<div class="hdr-title">STAGE PLOT</div>'+
+      '<div class="hdr-sub"><b>HARD ROCK</b> &nbsp;·&nbsp; '+memberCount+' PIECE &nbsp;·&nbsp; SINES, PORTUGAL</div>'+
+    '</div>'+
+    '<div class="hdr-right">'+
+      '<div class="hdr-date">'+dateStr+'</div>'+
+      '<div class="hdr-stage">Stage: '+sw+'m wide × '+sd+'m deep</div>'+
+      '<div class="hdr-stage">SR = Stage Right (audience left)</div>'+
+    '</div>'+
+  '</div>'+
+
+  '<div class="bd">'+
+    '<div class="plot-wrap">'+
+      '<img class="plot-img" src="'+imgData+'">'+
+      '<div class="plot-note">AUDIENCE ▼ &nbsp;&nbsp;·&nbsp;&nbsp; All positions approximate — confirm with production manager on day of show</div>'+
+    '</div>'+
+
+    '<div class="cols">'+
+      '<div>'+
+        (chRows.length ? '<div class="sec">'+
+          '<div class="sh"><span class="sn">▸</span>DERIVED INPUT LIST</div>'+
+          '<div class="sb" style="padding:0">'+
+            '<div class="il hd"><div>CH</div><div>SOURCE</div><div>ELEMENT</div><div>TYPE</div><div>STAND</div></div>'+
+            chRows.join('')+
+          '</div>'+
+        '</div>' : '')+
+      '</div>'+
+      '<div>'+
+        '<div class="sec">'+
+          '<div class="sh"><span class="sn">▸</span>STAGE ELEMENTS</div>'+
+          '<div class="sb">'+
+            '<div class="legend">'+
+            SPLOT_ELS.map(function(el){
+              return '<div class="legend-item"><div class="legend-dot" style="background:'+el.color+'"></div>'+el.label.replace('\n',' — ')+'</div>';
+            }).join('')+
+            '</div>'+
+            '<div style="margin-top:8px;font-size:8px;color:#888;line-height:1.8">'+
+              'Total elements: '+SPLOT_ELS.length+' &nbsp;·&nbsp; '+
+              'Total inputs: '+(ch-1)+' CH &nbsp;·&nbsp; '+
+              'Canvas: '+origW+'×'+origH+'px'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>'+
+
+  '<div class="ft">'+
+    '<div><b>THE GINSKEYS</b> &nbsp;·&nbsp; Stage Plot &nbsp;·&nbsp; Confidential</div>'+
+    '<div>Contact: Tiago M. &nbsp;·&nbsp; tiago@ginskeys.com</div>'+
+  '</div>'+
+
+  '</body></html>');
   w.document.close();
-  setTimeout(() => w.print(), 800);
+  setTimeout(function(){ w.print(); }, 800);
 }
 
 
