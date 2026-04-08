@@ -13558,6 +13558,11 @@ async function splotOnPickerChange() {
     _splotId = 1;
     SPLOT_NEXT_CH = 1;
     var elems = typeof data.elements === 'string' ? JSON.parse(data.elements) : data.elements;
+    // Rescale positions if canvas size differs from when it was saved
+    var savedW = data.canvas_w || SPLOT_W;
+    var savedH = data.canvas_h || SPLOT_H;
+    var scaleX = SPLOT_W / savedW;
+    var scaleY = SPLOT_H / savedH;
     elems.forEach(function(e) {
       var def = SPLOT_DEFS[e.type];
       if (!def) return;
@@ -13567,7 +13572,8 @@ async function splotOnPickerChange() {
         id: splotNextId(),
         type: e.type,
         label: e.label || def.label,
-        x: e.x || 0, y: e.y || 0,
+        x: Math.round((e.x || 0) * scaleX),
+        y: Math.round((e.y || 0) * scaleY),
         w: e.w || def.w, h: e.h || def.h,
         color: e.color || def.color,
         ch: startCh,
@@ -13589,6 +13595,14 @@ function splotSerializeElements() {
   return SPLOT_ELS.map(function(el) {
     return { type: el.type, label: el.label, x: el.x, y: el.y, w: el.w, h: el.h, color: el.color };
   });
+}
+
+function splotGetSavePayload() {
+  return {
+    elements: splotSerializeElements(),
+    canvas_w: SPLOT_W,
+    canvas_h: SPLOT_H
+  };
 }
 
 async function splotSaveCurrent() {
