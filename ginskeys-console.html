@@ -8191,6 +8191,7 @@ function _initAll_old_1() {
           <select id="splot-picker" onchange="splotOnPickerChange()" style="background:var(--bg4);color:var(--text);border:1px solid var(--border2);padding:3px 6px;font-size:10px;font-family:var(--mono);min-width:160px;border-radius:2px">
             <option value="">— select saved plot —</option>
           </select>
+          <button class="splot-btn" onclick="splotNewPlot()" title="Start a new empty plot" style="color:var(--green3);border-color:var(--green3)">+ NEW</button>
           <button class="splot-btn" onclick="splotSaveCurrent()" title="Save current plot">💾 SAVE</button>
           <button class="splot-btn" onclick="splotSaveAs()" title="Save as new">SAVE AS</button>
           <button class="splot-btn" onclick="splotDeletePlot()" title="Delete selected plot" style="color:var(--red3)">🗑</button>
@@ -13408,6 +13409,29 @@ function splotReset() {
   splotUpdateInputList();
   splotUpdateProps();
   splotRAF();
+}
+
+function splotNewPlot() {
+  if (SPLOT_ELS.length) {
+    // If there are unsaved changes, warn the user
+    if (_splotCurrentId) {
+      if (!confirm('Start a new plot? Make sure you\'ve saved the current one first.')) return;
+    } else {
+      if (!confirm('Start a new empty plot? The current unsaved plot will be lost.')) return;
+    }
+  }
+  // Clear everything and detach from any saved plot
+  SPLOT_ELS = [];
+  SPLOT_SEL = null;
+  SPLOT_NEXT_CH = 1;
+  _splotCurrentId = null;
+  // Reset the picker
+  var picker = document.getElementById('splot-picker');
+  if (picker) picker.value = '';
+  splotUpdateInputList();
+  splotUpdateProps();
+  splotRAF();
+  splotSetStatus('New plot — add elements and save when ready', 'var(--green3)');
 }
 
 function splotToggleGrid(btn) {
