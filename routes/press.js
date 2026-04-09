@@ -11,7 +11,7 @@ const TYPES   = ['press','radio','blog','sync','playlist','podcast','tv','other'
 const STAGES  = ['target','pitched','following_up','responded','published','rejected'];
 
 // GET /api/press
-router.get('/', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
+router.get('/', requireAuth, requirePerm(['viewLedger','viewPress']), async (req, res, next) => {
   try {
     const { type, stage } = req.query;
     const params=[], wheres=[];
@@ -27,7 +27,7 @@ router.get('/', requireAuth, requirePerm('viewLedger'), async (req, res, next) =
 });
 
 // POST /api/press
-router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
+router.post('/', requireAuth, requirePerm(['addTxn','viewPress']), async (req, res, next) => {
   try {
     const { outlet, type='press', contact_name, contact_email, country='PT',
             stage='target', pitched_release, notes, follow_up_date,
@@ -49,7 +49,7 @@ router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
 });
 
 // PUT /api/press/:id
-router.put('/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
+router.put('/:id', requireAuth, requirePerm(['addTxn','viewPress']), async (req, res, next) => {
   try {
     const { outlet,type,contact_name,contact_email,country,stage,
             pitched_release,notes,follow_up_date,estimated_value_eur,published_url } = req.body;
@@ -75,7 +75,7 @@ router.put('/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) =>
 });
 
 // DELETE /api/press/:id
-router.delete('/:id', requireAuth, requirePerm('deleteTxn'), async (req, res, next) => {
+router.delete('/:id', requireAuth, requirePerm(['deleteTxn','viewPress']), async (req, res, next) => {
   try {
     const { rows } = await pool.query('DELETE FROM press_contacts WHERE id=$1 RETURNING id',[req.params.id]);
     if (!rows[0]) return res.status(404).json({ error: 'Not found' });

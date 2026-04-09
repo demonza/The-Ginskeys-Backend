@@ -34,7 +34,7 @@ async function ensureSocialMediaColumn() {
 }
 
 // GET /api/releases
-router.get('/', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
+router.get('/', requireAuth, requirePerm(["viewLedger","viewReleases"]), async (req, res, next) => {
   try {
     await ensureSocialMediaColumn();
     const { rows } = await pool.query(
@@ -48,7 +48,7 @@ router.get('/', requireAuth, requirePerm('viewLedger'), async (req, res, next) =
 });
 
 // POST /api/releases
-router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
+router.post('/', requireAuth, requirePerm(['addTxn','viewReleases']), async (req, res, next) => {
   try {
     await ensureSocialMediaColumn();
     const { title, type='single', stage='idea', release_date, spotify_url,
@@ -82,7 +82,7 @@ router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
 });
 
 // PUT /api/releases/:id
-router.put('/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
+router.put('/:id', requireAuth, requirePerm(['addTxn','viewReleases']), async (req, res, next) => {
   try {
     await ensureSocialMediaColumn();
     const { title, type, stage, release_date, spotify_url, artwork_done,
@@ -113,7 +113,7 @@ router.put('/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) =>
 });
 
 // DELETE /api/releases/:id
-router.delete('/:id', requireAuth, requirePerm('deleteTxn'), async (req, res, next) => {
+router.delete('/:id', requireAuth, requirePerm(['deleteTxn','viewReleases']), async (req, res, next) => {
   try {
     await pool.query('DELETE FROM release_tracks WHERE release_id=$1',[req.params.id]);
     const { rows } = await pool.query('DELETE FROM releases WHERE id=$1 RETURNING id',[req.params.id]);
