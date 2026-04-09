@@ -676,6 +676,7 @@ body::after{
 .role-badge-pill.manager{background:rgba(22,163,74,.12);color:var(--green3);border:1px solid rgba(22,163,74,.3)}
 .role-badge-pill.accountant{background:rgba(45,127,255,.12);color:var(--blue2);border:1px solid rgba(45,127,255,.3)}
 .role-badge-pill.viewer{background:rgba(217,119,6,.12);color:var(--amber3);border:1px solid rgba(217,119,6,.3)}
+.role-badge-pill.social_media_manager{background:rgba(236,72,153,.12);color:#f472b6;border:1px solid rgba(236,72,153,.3)}
 .role-online{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 
 /* ─── SHORTCUTS ──────────────────────────────────── */
@@ -1392,6 +1393,7 @@ tr:hover .edit-btn{display:inline}
           <option value="manager">Manager — View + add/edit transactions, no delete, no user mgmt</option>
           <option value="accountant">Accountant — View + add transactions only</option>
           <option value="viewer">Viewer — Read-only dashboard</option>
+          <option value="social_media_manager">Social Media Manager — Releases + Press only</option>
         </select>
       </div>
       <div class="form-field">
@@ -2016,6 +2018,7 @@ tr:hover .edit-btn{display:inline}
           <option value="manager">Manager — all views, add+edit transactions</option>
           <option value="accountant">Accountant — ledger + add transactions</option>
           <option value="viewer">Viewer — read only</option>
+          <option value="social_media_manager">Social Media Manager — releases + press only</option>
         </select>
       </div>
       <div class="form-field">
@@ -2165,32 +2168,32 @@ tr:hover .edit-btn{display:inline}
 </div>
   <nav class="tb-nav">
     <!-- COMMAND -->
-    <div class="tb-tab active" data-view="mgmt" onclick="switchView('mgmt',this)">◉ Overview</div>
-    <div class="tb-tab" data-view="alerts" onclick="switchView('alerts',this)">⚡ Alerts <span class="tab-badge">3</span></div>
+    <div class="tb-tab active" data-view="mgmt" onclick="switchView('mgmt',this)" id="tab-mgmt">◉ Overview</div>
+    <div class="tb-tab" data-view="alerts" onclick="switchView('alerts',this)" id="tab-alerts">⚡ Alerts <span class="tab-badge">3</span></div>
     <div class="tb-tab" data-view="agent" onclick="switchView('agent',this)" id="tab-agent" style="color:var(--accent)">✦ Agent</div>
     <div class="tb-nav-sep"></div>
     <!-- MONEY -->
-    <div class="tb-tab" data-view="dashboard" onclick="switchView('dashboard',this)">$ Financials</div>
-    <div class="tb-tab" data-view="ledger" onclick="switchView('ledger',this)">≡ Ledger</div>
+    <div class="tb-tab" data-view="dashboard" onclick="switchView('dashboard',this)" id="tab-dashboard">$ Financials</div>
+    <div class="tb-tab" data-view="ledger" onclick="switchView('ledger',this)" id="tab-ledger">≡ Ledger</div>
     <div class="tb-tab" data-view="splits" onclick="switchView('splits',this)" id="tab-splits">÷ Splits</div>
     <div class="tb-tab" data-view="members" onclick="switchView('members',this)" id="tab-members">◈ Members</div>
     <div class="tb-nav-sep"></div>
     <!-- LIVE -->
     <div class="tb-tab" data-view="booking" onclick="switchView('booking',this)" id="tab-booking">◎ Booking <span class="tab-badge" id="booking-badge" style="display:none">0</span></div>
     <div class="tb-tab" data-view="invoices" onclick="switchView('invoices',this)" id="tab-invoices">⎙ Invoices <span class="tab-badge" id="invoices-overdue-badge" style="display:none;background:var(--red3)">0</span></div>
-    <div class="tb-tab" data-view="tours" onclick="switchView('tours',this)">↗ Tours</div>
+    <div class="tb-tab" data-view="tours" onclick="switchView('tours',this)" id="tab-tours">↗ Tours</div>
     <div class="tb-tab" data-view="production" onclick="switchView('production',this)" id="tab-production">🎚 Production</div>
     <div class="tb-nav-sep"></div>
     <!-- CONTENT -->
     <div class="tb-tab" data-view="releases" onclick="switchView('releases',this)" id="tab-releases">◈ Releases</div>
     <div class="tb-tab" data-view="press" onclick="switchView('press',this)" id="tab-press">✉ Press & Sync</div>
-    <div class="tb-tab" data-view="streaming" onclick="switchView('streaming',this)">▶ Streaming</div>
+    <div class="tb-tab" data-view="streaming" onclick="switchView('streaming',this)" id="tab-streaming">▶ Streaming</div>
     <div class="tb-nav-sep"></div>
     <!-- ADMIN -->
     <div class="tb-tab" data-view="finance-tools" onclick="switchView('finance-tools',this)" id="tab-finance-tools">⊟ Finance Tools</div>
     <div class="tb-tab" data-view="access" onclick="switchView('access',this)" id="tab-access">⊕ Access</div>
     <div class="tb-tab" data-view="audit" onclick="switchView('audit',this)" id="tab-audit">⊞ Audit Log</div>
-    <div class="tb-tab" data-view="settings" onclick="switchView('settings',this)">⚙ Settings</div>
+    <div class="tb-tab" data-view="settings" onclick="switchView('settings',this)" id="tab-settings">⚙ Settings</div>
   </nav>
   <div class="tb-right">
     <div class="tb-live"><div class="tb-live-dot"></div>LIVE</div>
@@ -2209,7 +2212,7 @@ tr:hover .edit-btn{display:inline}
 </header>
 
 <!-- ══ ALERT TICKER ══════════════════════════════════ -->
-<div class="alert-ticker">
+<div class="alert-ticker" id="sys-ticker">
   <div class="ticker-label">⚡ SYS</div>
   <div class="ticker-sep">|</div>
   <div class="ticker-track">
@@ -2230,7 +2233,7 @@ tr:hover .edit-btn{display:inline}
 <div id="export-report-bar" style="display:none;justify-content:flex-end;padding:4px 10px;background:var(--bg0);border-bottom:1px solid var(--border);flex-shrink:0">
   <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="downloadFinancialPDF()">⎙ Export Financial Report (PDF)</button>
 </div>
-<div class="kpi-strip" style="grid-template-columns:repeat(8,1fr)">
+<div class="kpi-strip" id="kpi-strip" style="grid-template-columns:repeat(8,1fr)">
   <div class="kpi-card green">
     <div class="kpi-label" data-i18n="kpi_balance">Total Balance</div>
     <div class="kpi-value green" id="kpi-total-balance">—</div>
@@ -10925,11 +10928,12 @@ const ADMIN_ROLES = new Set(['admin','co-admin']); // both are admins
 function isAdmin(){ return SESSION && ADMIN_ROLES.has(SESSION.role); }
 
 const ROLE_PERMS = {
-  'admin':     {viewDashboard:true,viewLedger:true,viewTours:true,viewStreaming:true,viewAccess:true,viewAudit:true,viewAlerts:true,viewSettings:true,addTransaction:true,editTransaction:true,deleteTransaction:true,createInvite:true,manageUsers:true,editTour:true,deleteTour:true,editAlertRule:true,importData:true,changeSetting:true},
-  'co-admin':  {viewDashboard:true,viewLedger:true,viewTours:true,viewStreaming:true,viewAccess:true,viewAudit:true,viewAlerts:true,viewSettings:true,addTransaction:true,editTransaction:true,deleteTransaction:true,createInvite:true,manageUsers:false,editTour:true,deleteTour:true,editAlertRule:true,importData:true,changeSetting:true},
-  'manager':   {viewDashboard:true,viewLedger:true,viewTours:true,viewStreaming:true,viewAccess:false,viewAudit:false,viewAlerts:true,viewSettings:false,addTransaction:true,editTransaction:true,deleteTransaction:false,createInvite:false,manageUsers:false,editTour:true,deleteTour:false,editAlertRule:false,importData:false,changeSetting:false},
-  'accountant':{viewDashboard:true,viewLedger:true,viewTours:true,viewStreaming:false,viewAccess:false,viewAudit:true,viewAlerts:false,viewSettings:false,addTransaction:true,editTransaction:false,deleteTransaction:false,createInvite:false,manageUsers:false,editTour:false,deleteTour:false,editAlertRule:false,importData:false,changeSetting:false},
-  'viewer':    {viewDashboard:true,viewLedger:true,viewTours:false,viewStreaming:false,viewAccess:false,viewAudit:false,viewAlerts:false,viewSettings:false,addTransaction:false,editTransaction:false,deleteTransaction:false,createInvite:false,manageUsers:false,editTour:false,deleteTour:false,editAlertRule:false,importData:false,changeSetting:false},
+  'admin':     {viewDashboard:true,viewLedger:true,viewTours:true,viewStreaming:true,viewAccess:true,viewAudit:true,viewAlerts:true,viewSettings:true,addTransaction:true,editTransaction:true,deleteTransaction:true,createInvite:true,manageUsers:true,editTour:true,deleteTour:true,editAlertRule:true,importData:true,changeSetting:true,viewReleases:true,viewPress:true,viewBooking:true,viewProduction:true,viewSplits:true,viewMembers:true,viewInvoices:true,viewFinanceTools:true},
+  'co-admin':  {viewDashboard:true,viewLedger:true,viewTours:true,viewStreaming:true,viewAccess:true,viewAudit:true,viewAlerts:true,viewSettings:true,addTransaction:true,editTransaction:true,deleteTransaction:true,createInvite:true,manageUsers:false,editTour:true,deleteTour:true,editAlertRule:true,importData:true,changeSetting:true,viewReleases:true,viewPress:true,viewBooking:true,viewProduction:true,viewSplits:true,viewMembers:true,viewInvoices:true,viewFinanceTools:true},
+  'manager':   {viewDashboard:true,viewLedger:true,viewTours:true,viewStreaming:true,viewAccess:false,viewAudit:false,viewAlerts:true,viewSettings:false,addTransaction:true,editTransaction:true,deleteTransaction:false,createInvite:false,manageUsers:false,editTour:true,deleteTour:false,editAlertRule:false,importData:false,changeSetting:false,viewReleases:true,viewPress:true,viewBooking:true,viewProduction:true,viewSplits:true,viewMembers:true,viewInvoices:true,viewFinanceTools:false},
+  'accountant':{viewDashboard:true,viewLedger:true,viewTours:true,viewStreaming:false,viewAccess:false,viewAudit:true,viewAlerts:false,viewSettings:false,addTransaction:true,editTransaction:false,deleteTransaction:false,createInvite:false,manageUsers:false,editTour:false,deleteTour:false,editAlertRule:false,importData:false,changeSetting:false,viewReleases:false,viewPress:false,viewBooking:false,viewProduction:false,viewSplits:false,viewMembers:false,viewInvoices:true,viewFinanceTools:true},
+  'viewer':    {viewDashboard:true,viewLedger:true,viewTours:false,viewStreaming:false,viewAccess:false,viewAudit:false,viewAlerts:false,viewSettings:false,addTransaction:false,editTransaction:false,deleteTransaction:false,createInvite:false,manageUsers:false,editTour:false,deleteTour:false,editAlertRule:false,importData:false,changeSetting:false,viewReleases:true,viewPress:false,viewBooking:false,viewProduction:false,viewSplits:false,viewMembers:false,viewInvoices:false,viewFinanceTools:false},
+  'social_media_manager':{viewDashboard:false,viewLedger:false,viewTours:false,viewStreaming:false,viewAccess:false,viewAudit:false,viewAlerts:false,viewSettings:false,addTransaction:false,editTransaction:false,deleteTransaction:false,createInvite:false,manageUsers:false,editTour:false,deleteTour:false,editAlertRule:false,importData:false,changeSetting:false,viewReleases:true,viewPress:true,viewBooking:false,viewProduction:false,viewSplits:false,viewMembers:false,viewInvoices:false,viewFinanceTools:false},
 };
 
 // Whitelist of pre-approved emails (would be server-side in production)
@@ -11287,14 +11291,20 @@ async function doRegister(){
 
 function enterApp(){
   document.getElementById('login-gate').classList.add('hidden');
+  var roleDisplay = {
+    'admin':'ADMIN','co-admin':'CO-ADMIN','manager':'MANAGER',
+    'accountant':'ACCOUNTANT','viewer':'VIEWER',
+    'social_media_manager':'SOCIAL MEDIA'
+  };
+  var roleName = roleDisplay[SESSION.role] || SESSION.role.toUpperCase();
   const badge=document.getElementById('tb-role-badge');
-  if(badge) badge.textContent=SESSION.role.toUpperCase();
+  if(badge) badge.textContent=roleName;
   const sbUser=document.getElementById('sb-session-user');
   if(sbUser) sbUser.textContent=SESSION.email;
   const settEmail=document.getElementById('settings-email');
   if(settEmail) settEmail.textContent=SESSION.email;
   const settRole=document.getElementById('settings-role');
-  if(settRole) settRole.textContent=SESSION.role.toUpperCase();
+  if(settRole) settRole.textContent=roleName;
   // Inject logout button into statusbar (once)
   if(!document.getElementById('sb-logout-btn')){
     const sb=document.querySelector('.statusbar');
@@ -11315,16 +11325,40 @@ function enterApp(){
 function applyRolePermissions(){
   if(!SESSION) return;
   const perms=ROLE_PERMS[SESSION.role]||ROLE_PERMS.viewer;
-  // Tabs
   const show=(id,v)=>{ const e=document.getElementById(id); if(e) e.style.display=v?'flex':'none'; };
-  show('tab-access',perms.viewAccess);
-  show('tab-audit',perms.viewAudit);
-  // Buttons gated by permission
+  const showBlock=(id,v)=>{ const e=document.getElementById(id); if(e) e.style.display=v?'':'none'; };
+
+  // ── Navigation tabs ──
+  show('tab-mgmt',       perms.viewDashboard);
+  show('tab-alerts',     perms.viewAlerts);
+  show('tab-agent',      perms.viewDashboard);
+  show('tab-dashboard',  perms.viewLedger);
+  show('tab-ledger',     perms.viewLedger);
+  show('tab-splits',     perms.viewSplits!==false && perms.viewLedger);
+  show('tab-members',    perms.viewMembers!==false && perms.viewLedger);
+  show('tab-booking',    perms.viewBooking!==false && perms.viewDashboard);
+  show('tab-invoices',   perms.viewInvoices!==false && perms.viewLedger);
+  show('tab-tours',      perms.viewTours);
+  show('tab-production', perms.viewProduction!==false && perms.viewDashboard);
+  show('tab-releases',   perms.viewReleases);
+  show('tab-press',      perms.viewPress);
+  show('tab-streaming',  perms.viewStreaming);
+  show('tab-finance-tools', perms.viewFinanceTools!==false && perms.viewLedger);
+  show('tab-access',     perms.viewAccess);
+  show('tab-audit',      perms.viewAudit);
+  show('tab-settings',   perms.viewSettings);
+
+  // ── KPI strip + SYS ticker (financial data) ──
+  showBlock('kpi-strip',  perms.viewLedger);
+  showBlock('sys-ticker', perms.viewDashboard);
+
+  // ── Buttons gated by permission ──
   const showBtn=(id,v,disp='inline-flex')=>{ const e=document.getElementById(id); if(e) e.style.display=v?disp:'none'; };
   showBtn('btn-invite',perms.createInvite);
   showBtn('btn-add-tour',perms.editTour);
   showBtn('btn-import',perms.importData);
   showBtn('btn-add-rule',perms.editAlertRule);
+
   // New transaction button
   document.querySelectorAll('[onclick*="openModal()"]').forEach(b=>{
     b.style.display=perms.addTransaction?'':'none';
@@ -11333,6 +11367,13 @@ function applyRolePermissions(){
   document.querySelectorAll('[onclick*="exportCSV"]').forEach(b=>{
     b.style.display=perms.viewLedger?'':'none';
   });
+
+  // ── For social_media_manager: auto-switch to releases tab since overview is hidden ──
+  if(!perms.viewDashboard && perms.viewReleases){
+    // Find first visible tab and switch to it
+    var firstTab = document.getElementById('tab-releases');
+    if(firstTab){ switchView('releases', firstTab); }
+  }
 }
 
 async function doLogout(){
