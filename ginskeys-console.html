@@ -2890,6 +2890,7 @@ tr:hover .edit-btn{display:inline}
         <div class="shortcut-row"><span class="shortcut-desc">Manager</span><span class="shortcut-key" style="color:var(--green3);border-color:var(--green)">All views, add+edit</span></div>
         <div class="shortcut-row"><span class="shortcut-desc">Accountant</span><span class="shortcut-key" style="color:var(--blue2);border-color:var(--blue)">Ledger + add only</span></div>
         <div class="shortcut-row"><span class="shortcut-desc">Viewer</span><span class="shortcut-key" style="color:var(--amber3);border-color:var(--amber)">Read-only</span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Social Media Manager</span><span class="shortcut-key" style="color:#f472b6;border-color:#ec4899">Releases + Press only</span></div>
       </div>
     </div>
   </div>
@@ -11438,11 +11439,11 @@ async function generateInvite(){
 // ─── RENDER: USERS (with real invite list) ─────────────
 const BASE_USERS=[];
 // Role display colors map (used in renderUsers and elsewhere)
-const ROLE_COLORS={'admin':'var(--accent)','co-admin':'var(--accent3)','manager':'var(--green2)','accountant':'var(--blue2)','viewer':'var(--amber2)'};
+const ROLE_COLORS={'admin':'var(--accent)','co-admin':'var(--accent3)','manager':'var(--green2)','accountant':'var(--blue2)','viewer':'var(--amber2)','social_media_manager':'#f472b6'};
 function renderUsers(){
   const el=document.getElementById('access-users-panel');
   if(!el) return;
-  const roleColors={admin:'var(--accent)','co-admin':'var(--accent3)',manager:'var(--green2)',accountant:'var(--blue2)',viewer:'var(--amber2)'};
+  const roleColors={admin:'var(--accent)','co-admin':'var(--accent3)',manager:'var(--green2)',accountant:'var(--blue2)',viewer:'var(--amber2)','social_media_manager':'#f472b6'};
   const canManage=can('manageUsers');
 
   if (API_BASE && SESSION?.token) {
