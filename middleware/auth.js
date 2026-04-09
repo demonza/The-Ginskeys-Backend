@@ -31,13 +31,17 @@ const PERMS = {
   'manager':    ['viewLedger','addTxn','editTxn'],
   'accountant': ['viewLedger','addTxn','viewAudit'],
   'viewer':     ['viewLedger'],
+  'social_media_manager': ['viewReleases','viewPress'],
 };
 
 function requirePerm(perm) {
   return (req, res, next) => {
     const userPerms = PERMS[req.user?.role] || [];
-    if (!userPerms.includes(perm)) {
-      return res.status(403).json({ error: `Permission denied: requires ${perm}` });
+    // Support single perm or array of perms (OR logic)
+    const permsToCheck = Array.isArray(perm) ? perm : [perm];
+    const hasAny = permsToCheck.some(p => userPerms.includes(p));
+    if (!hasAny) {
+      return res.status(403).json({ error: `Permission denied: requires ${permsToCheck.join(' or ')}` });
     }
     next();
   };
