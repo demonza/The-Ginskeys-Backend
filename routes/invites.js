@@ -25,7 +25,7 @@ router.post('/', requireAuth, requirePerm('createInvite'), async (req, res, next
   try {
     const { email, role, hoursValid = 72 } = req.body || {};
     if (!email || !role) return res.status(400).json({ error: 'email and role required' });
-    const validRoles = ['co-admin','manager','accountant','viewer'];
+    const validRoles = ['co-admin','manager','accountant','viewer','social_media_manager'];
     if (!validRoles.includes(role))
       return res.status(400).json({ error: 'role must be one of: ' + validRoles.join(', ') });
 
