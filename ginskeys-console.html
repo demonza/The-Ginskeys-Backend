@@ -12369,7 +12369,7 @@ function _renderUsersHtml(el, allUsers, rawInvites, roleColors, canManage){
         <div class="role-badge-pill ${i.role}">${i.role.replace('-',' ').toUpperCase()}</div>
         ${canManage?`<button class="edit-btn del" style="display:inline" onclick="revokeInvite('${i.token}')">&#x2715; Revoke</button>`:''}
       </div>
-    `).join('') : '<div style="font-size:9px;color:var(--muted3);padding:6px 0"><span data-i18n="acc_no_invites">${t('acc_no_invites')}</span></div>'}
+    `).join('') : '<div style="font-size:9px;color:var(--muted3);padding:6px 0">' + t('acc_no_invites') + '</div>'}
   `;
   const btnInv=document.getElementById('btn-invite');
   if(btnInv) btnInv.style.display=can('createInvite')?'inline-flex':'none';
