@@ -4789,9 +4789,32 @@ async function addBookingContact() {
 
 async function updateBookingStage(id, stage) {
   try {
-    await _apiFetch('PUT', '/booking/'+id, { stage });
-    await loadBooking(); showToast('Stage → '+stage,'ok');
-  } catch(e) { showToast('Failed: '+e.message,'err'); }
+    const result = await _apiFetch('PUT', '/booking/'+id, { stage });
+    await loadBooking();
+    showToast('Stage → '+stage, 'ok');
+
+    // If confirmed → auto-created tour: reload tours and navigate there
+    if ((stage === 'confirmed' || stage === 'completed') && result.tour) {
+      await loadTours();
+      showToast('Show added to Tours tab ↗', 'ok');
+      // Navigate to Tours tab and highlight the new entry
+      const toursTab = document.querySelector('[data-view="tours"]');
+      if (toursTab) toursTab.click();
+      // After render, flash the new tour row
+      setTimeout(() => {
+        const tourId = result.tour.id;
+        const rows = document.querySelectorAll('#tours-list-panel [data-tour-id]');
+        rows.forEach(row => {
+          if (row.getAttribute('data-tour-id') === tourId) {
+            row.style.transition = 'background .3s';
+            row.style.background = 'rgba(255,85,0,.18)';
+            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => { row.style.background = ''; }, 2000);
+          }
+        });
+      }, 350);
+    }
+  } catch(e) { showToast('Failed: '+e.message, 'err'); }
 }
 
 // ── RELEASES ───────────────────────────────────────────────────────────────
@@ -8641,6 +8664,7 @@ async function loadAllGrowthData() {
     loadAgentVenues(),
     loadShows().then(()=>{ updateProductionBanner(); }),
     loadSetlists().then(()=>{ updateProductionBanner(); }),
+    loadTours(),
   ]);
 }
 
@@ -9318,11 +9342,49 @@ let LEDGER_DATA = (() => {
   return ordered.reverse().map((t,i)=>({id:`TXN-${String(i+1).padStart(3,'0')}`,...t}));
 })();
 
-const TOUR_DATA = [
-  {id:'T1',name:'ABRIL EM ODEMIRA',status:'completed',budget:100,revenue:1000,costs:0,start:'2025-04-24',end:'2025-04-24',shows:1,cities:'Odemira'},
-  {id:'T2',name:'SEMANA DA JUVENTUDE',status:'completed',budget:100,revenue:1200,costs:0,start:'2025-08-02',end:'2025-08-02',shows:1,cities:'Sines'},
-  {id:'T3',name:'TASQUINHAS - SINES',status:'completed',budget:100,revenue:1200,costs:0,start:'2026-03-10',end:'2026-03-10',shows:1,cities:'Sines'},
-];
+// TOUR_DATA — populated from /api/tours on load and after each mutation
+let TOUR_DATA = [];
+
+// Maps a DB tour row → the shape renderToursList / openTourDrawer expect
+function _mapTourRow(r) {
+  return {
+    id:       r.id,
+    name:     r.name,
+    start:    r.start_date || '',
+    end:      r.end_date   || '',
+    cities:   // notes field stores "Location: X" from auto-create, or use booking_location
+              r.booking_location ||
+              (r.notes && r.notes.startsWith('Location: ') ? r.notes.slice(10) : (r.notes || '')),
+    status:   r.status     || 'planned',
+    budget:   parseFloat(r.budget || 0),
+    revenue:  parseFloat(r.revenue || 0),
+    costs:    parseFloat(r.costs   || 0),
+    shows:    1,
+    // extra DB fields kept for API calls
+    _id:      r.id,
+    _booking_id:    r.booking_id    || null,
+    _booking_stage: r.booking_stage || null,
+    _booking_fee:   parseFloat(r.booking_fee || 0),
+    _notes:         r.notes || '',
+  };
+}
+
+async function loadTours() {
+  if (!API_BASE || !SESSION?.token) return;
+  try {
+    const rows = await apiGet('/tours');
+    TOUR_DATA = rows.map(_mapTourRow);
+    renderToursList();
+    renderTourBannerKpis();
+    renderTourPnlChart();
+    renderTourPnl();
+    renderTourLedger();
+    renderHeatmap();
+    if (typeof renderMgmtDashboard === 'function') setTimeout(renderMgmtDashboard, 0);
+  } catch (e) {
+    console.warn('loadTours failed:', e.message);
+  }
+}
 
 // NOTE: Streaming data loaded from API (streaming_snapshots table) or entered manually.
 let PLATFORM_DATA = [
@@ -10533,6 +10595,7 @@ function renderToursList() {
 
     return `
     <div onclick="openTourDrawer(${i})"
+      data-tour-id="${t._id || t.id}"
       style="display:grid;grid-template-columns:60px 1fr auto;gap:0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;border-left:3px solid ${isPast?'var(--border3)':sc}"
       onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
 
@@ -10727,46 +10790,73 @@ function openTourDrawerNew() {
   openDrawer('↗ New Show', body, footer);
 }
 
-function saveTourFromDrawer(idx) {
+async function saveTourFromDrawer(idx) {
   const get   = id => document.getElementById(id)?.value || '';
   const name  = get('td-name').trim();
   if (!name) { showToast('Venue / event name required', 'err'); return; }
-  const obj = {
-    id:      idx !== null ? TOUR_DATA[idx].id : 'T' + Date.now(),
+
+  const startDate = get('td-start') || null;
+  const payload = {
     name,
-    start:   get('td-start'),
-    end:     get('td-start'),
-    cities:  get('td-cities'),
-    revenue: parseFloat(get('td-revenue')) || 0,
-    costs:   parseFloat(get('td-costs'))   || 0,
-    status:  get('td-status') || 'planned',
-    shows:   parseInt(get('td-shows')) || 1,
-    budget:  idx !== null ? (TOUR_DATA[idx].budget || 0) : 0,
+    startDate,
+    endDate:   startDate,
+    notes:     get('td-cities') ? `Location: ${get('td-cities')}` : undefined,
+    status:    get('td-status') || 'planned',
+    budget:    parseFloat(get('td-revenue')) || 0,
   };
-  if (idx !== null) {
-    TOUR_DATA[idx] = obj;
-    showToast('Show updated', 'ok');
+
+  if (idx !== null && TOUR_DATA[idx]?._id) {
+    // Edit existing — PUT /api/tours/:id
+    try {
+      if (API_BASE && SESSION?.token) {
+        await _apiFetch('PUT', '/tours/' + TOUR_DATA[idx]._id, payload);
+      } else {
+        // Offline fallback
+        const obj = { ...TOUR_DATA[idx], name, start: startDate||TOUR_DATA[idx].start,
+          cities: get('td-cities'), revenue: parseFloat(get('td-revenue'))||0,
+          costs: parseFloat(get('td-costs'))||0, status: get('td-status')||'planned' };
+        TOUR_DATA[idx] = obj;
+      }
+      showToast('Show updated', 'ok');
+    } catch(e) { showToast('Update failed: ' + e.message, 'err'); return; }
   } else {
-    TOUR_DATA.unshift(obj);
-    showToast('Show added', 'ok');
+    // New show — POST /api/tours
+    try {
+      if (API_BASE && SESSION?.token) {
+        const saved = await apiPost('/tours', payload);
+        TOUR_DATA.unshift(_mapTourRow({ ...saved, revenue: 0, costs: 0 }));
+      } else {
+        TOUR_DATA.unshift({ id: 'T'+Date.now(), name, start: startDate||'', end: startDate||'',
+          cities: get('td-cities'), revenue: parseFloat(get('td-revenue'))||0,
+          costs: parseFloat(get('td-costs'))||0, status: get('td-status')||'planned',
+          shows: 1, budget: 0, _id: 'T'+Date.now() });
+      }
+      showToast('Show added', 'ok');
+    } catch(e) { showToast('Add failed: ' + e.message, 'err'); return; }
   }
+
   closeDrawer();
-  renderToursList();
-  renderTourBannerKpis();
-  renderTourPnlChart();
-  renderTourPnl();
+  await loadTours();
 }
 
-function deleteTourFromDrawer(idx) {
+async function deleteTourFromDrawer(idx) {
   const t = TOUR_DATA[idx];
   if (!t) return;
   if (!confirm(`Delete show "${t.name}"? This cannot be undone.`)) return;
-  TOUR_DATA.splice(idx, 1);
+
+  try {
+    if (API_BASE && SESSION?.token && t._id) {
+      await apiDelete('/tours/' + t._id);
+    } else {
+      TOUR_DATA.splice(idx, 1);
+    }
+  } catch(e) {
+    showToast('Delete failed: ' + e.message, 'err');
+    return;
+  }
+
   closeDrawer();
-  renderToursList();
-  renderTourBannerKpis();
-  renderTourPnlChart();
-  renderTourPnl();
+  await loadTours();
   showToast('Show deleted', 'ok');
 }
 
@@ -13505,6 +13595,7 @@ function switchView(view, tab){
   }
   if(tab) tab.classList.add('active');
   if(view==='streaming') initStreamChart();
+  if(view==='tours') loadTours();             // async, fire-and-forget
   if(view==='members') membersLoad();         // async, fire-and-forget
   if(view==='finance-tools') financeToolsLoad(); // async, fire-and-forget
   if(view==='invoices') invoiceTrackerLoad(); // async, fire-and-forget
@@ -17811,12 +17902,34 @@ function openBookingDrawer(id) {
 
 async function updateBookingStageDrawer(id, stage) {
   try {
-    await _apiFetch('PUT', '/booking/'+id, { stage });
+    const result = await _apiFetch('PUT', '/booking/'+id, { stage });
     await loadBooking();
     showToast('Stage → '+stage, 'ok');
-    // Refresh drawer content
-    openBookingDrawer(id);
+
+    if ((stage === 'confirmed' || stage === 'completed') && result.tour) {
+      await loadTours();
+      closeDrawer();
+      showToast('Show added to Tours tab ↗', 'ok');
+      const toursTab = document.querySelector('[data-view="tours"]');
+      if (toursTab) toursTab.click();
+      setTimeout(() => {
+        const tourId = result.tour.id;
+        const rows = document.querySelectorAll('#tours-list-panel [data-tour-id]');
+        rows.forEach(row => {
+          if (row.getAttribute('data-tour-id') === tourId) {
+            row.style.transition = 'background .3s';
+            row.style.background = 'rgba(255,85,0,.18)';
+            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => { row.style.background = ''; }, 2000);
+          }
+        });
+      }, 350);
+    } else {
+      // Refresh drawer content
+      openBookingDrawer(id);
+    }
   } catch(e) { showToast('Failed: '+e.message, 'err'); }
+}
 }
 
 async function saveBookingDrawer(id) {
