@@ -3341,28 +3341,17 @@ tr:hover .edit-btn{display:inline}
           </select>
         </div>
       </div>
-      <div class="panel">
+      <div class="panel" style="overflow-y:auto;max-height:320px">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="rel_benchmarks">Streaming Benchmarks</span></div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Release Engine</div>
         </div>
-        <div class="panel-body" style="display:flex;flex-direction:column;gap:6px">
-          <div style="font-size:9px;color:var(--muted2);margin-bottom:4px">What consistent releasing achieves</div>
-          <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--bg4);border-radius:2px">
-            <div style="width:6px;height:6px;border-radius:50%;background:var(--blue2);flex-shrink:0"></div>
-            <div><div style="font-size:9px;font-weight:700;color:var(--text)">After Single #1</div><div style="font-size:8px;color:var(--muted3)">Release Radar · 100% of followers notified</div></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--bg4);border-radius:2px">
-            <div style="width:6px;height:6px;border-radius:50%;background:var(--amber2);flex-shrink:0"></div>
-            <div><div style="font-size:9px;font-weight:700;color:var(--text)">After 3 Singles</div><div style="font-size:8px;color:var(--muted3)">Monthly listeners · 500–1,000 target</div></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--bg4);border-radius:2px">
-            <div style="width:6px;height:6px;border-radius:50%;background:var(--purple2);flex-shrink:0"></div>
-            <div><div style="font-size:9px;font-weight:700;color:var(--text)">After Album</div><div style="font-size:8px;color:var(--muted3)">Spotify editorial · Fresh Finds eligible</div></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--bg4);border-radius:2px">
-            <div style="width:6px;height:6px;border-radius:50%;background:var(--green3);flex-shrink:0"></div>
-            <div><div style="font-size:9px;font-weight:700;color:var(--text)">After 6 months</div><div style="font-size:8px;color:var(--muted3)">50%+ streams outside PT</div></div>
-          </div>
+        <div style="padding:4px 12px 8px">
+          <select id="rel-engine-picker" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-family:var(--mono);font-size:9px;padding:3px 6px;width:100%" onchange="renderReleaseEngine()">
+            <option value="">— select release to generate launch plan —</option>
+          </select>
+        </div>
+        <div id="rel-engine-output" style="padding:0 12px 10px;display:flex;flex-direction:column;gap:4px;font-size:9px">
+          <div style="color:var(--muted3);font-size:9px;padding:4px 0">Select a release with a date set to generate your 45-day launch plan.</div>
         </div>
       </div>
     </div>
@@ -7686,6 +7675,17 @@ function renderReleaseChecklist() {
       RELEASES_DATA.map(rel=>`<option value="${rel.id}"${rel.id===current?' selected':''}>${rel.title}</option>`).join('');
   }
 
+  // Also sync the engine picker
+  var enginePicker = document.getElementById('rel-engine-picker');
+  if (enginePicker) {
+    var ecur = enginePicker.value;
+    enginePicker.innerHTML = '<option value="">— select release to generate launch plan —</option>' +
+      RELEASES_DATA.filter(function(rel){ return rel.release_date; }).map(function(rel){
+        return '<option value="'+rel.id+'"'+(rel.id===ecur?' selected':'')+'>'+rel.title+' ('+rel.release_date?.slice(0,10)+')</option>';
+      }).join('');
+    if (ecur) renderReleaseEngine();
+  }
+
   if (!el) return;
   const r = id ? RELEASES_DATA.find(x=>x.id===id) : null;
   if (!r) { el.innerHTML='<div style="color:var(--muted3);font-size:9px">Select a release to see its checklist status.</div>'; return; }
@@ -7711,6 +7711,109 @@ function renderReleaseChecklist() {
       <div style="width:12px;height:12px;border-radius:2px;background:${c.done?'var(--green3)':'var(--bg4)'};border:1px solid ${c.done?'var(--green3)':'var(--border2)'};display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0">${c.done?'✓':''}</div>
       <div style="color:${c.done?'var(--muted2)':'var(--text)'};${c.done?'text-decoration:line-through':''}">${c.label}</div>
     </div>`).join('')}`;
+}
+
+// ── RELEASE ENGINE — 45 DAY LAUNCH PLAN ─────────────────
+function renderReleaseEngine() {
+  var picker = document.getElementById('rel-engine-picker');
+  var output = document.getElementById('rel-engine-output');
+  if (!picker || !output) return;
+  var id = picker.value;
+  var r = id ? RELEASES_DATA.find(function(x){ return x.id === id; }) : null;
+  if (!r || !r.release_date) {
+    output.innerHTML = '<div style="color:var(--muted3);font-size:9px;padding:4px 0">Select a release with a date set to generate your 45-day launch plan.</div>';
+    return;
+  }
+
+  var releaseDate = new Date(r.release_date);
+  var today = new Date(); today.setHours(0,0,0,0);
+  var title = r.title;
+  var type = r.type || 'single';
+
+  // Generate the launch plan based on release date
+  var plan = generateLaunchPlan(title, type, releaseDate, today, r);
+
+  // Render
+  var daysToRelease = Math.ceil((releaseDate - today) / 86400000);
+  var phaseLabel = daysToRelease > 28 ? 'PRE-CAMPAIGN' : daysToRelease > 0 ? 'LAUNCH WINDOW' : daysToRelease > -14 ? 'RELEASE WEEK+' : 'SUSTAIN PHASE';
+  var phaseColor = daysToRelease > 28 ? 'var(--blue2)' : daysToRelease > 0 ? 'var(--amber2)' : daysToRelease > -14 ? 'var(--green3)' : 'var(--purple2)';
+
+  var html = '';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+  html += '<div style="font-weight:700;font-size:10px;color:var(--text)">' + title + '</div>';
+  html += '<div style="font-size:8px;font-weight:700;color:' + phaseColor + ';letter-spacing:.08em">' + phaseLabel + '</div>';
+  html += '</div>';
+  html += '<div style="font-size:8px;color:var(--muted3);margin-bottom:8px">' + (daysToRelease > 0 ? daysToRelease + ' days to release' : daysToRelease === 0 ? 'RELEASE DAY' : Math.abs(daysToRelease) + ' days since release') + ' · ' + releaseDate.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) + '</div>';
+
+  plan.forEach(function(item) {
+    var isPast = item.date < today;
+    var isToday = item.date.toDateString() === today.toDateString();
+    var isReleaseDay = item.date.toDateString() === releaseDate.toDateString();
+    var borderColor = isReleaseDay ? 'var(--accent)' : isToday ? 'var(--green3)' : item.category === 'spotify' ? 'var(--green3)' : item.category === 'social' ? 'var(--purple2)' : item.category === 'press' ? 'var(--amber2)' : item.category === 'content' ? 'var(--blue2)' : 'var(--muted)';
+    var opacity = isPast && !isToday ? '0.45' : '1';
+
+    html += '<div style="display:flex;gap:8px;padding:5px 8px;background:' + (isToday ? 'rgba(74,222,128,.06)' : isReleaseDay ? 'rgba(255,85,0,.06)' : 'var(--bg4)') + ';border-radius:2px;border-left:2px solid ' + borderColor + ';opacity:' + opacity + '">';
+    html += '<div style="min-width:52px;font-family:var(--mono);font-size:8px;color:var(--muted3)">' + item.date.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}) + '</div>';
+    html += '<div style="flex:1">';
+    html += '<div style="font-size:9px;font-weight:' + (isToday || isReleaseDay ? '700' : '500') + ';color:' + (isToday ? 'var(--green3)' : isReleaseDay ? 'var(--accent)' : 'var(--text)') + '">' + (isToday ? '→ ' : '') + item.action + '</div>';
+    if (item.detail) html += '<div style="font-size:8px;color:var(--muted3);margin-top:1px">' + item.detail + '</div>';
+    html += '</div>';
+    html += '<div style="font-size:7px;font-weight:700;letter-spacing:.08em;color:' + borderColor + ';white-space:nowrap;align-self:center">' + item.tag + '</div>';
+    html += '</div>';
+  });
+
+  output.innerHTML = html;
+}
+
+function generateLaunchPlan(title, type, releaseDate, today, r) {
+  var plan = [];
+  var d = function(offset) { var dt = new Date(releaseDate); dt.setDate(dt.getDate() + offset); dt.setHours(0,0,0,0); return dt; };
+
+  // ── PRE-CAMPAIGN: -42 to -29 days ──
+  plan.push({date:d(-42), action:'Submit to Spotify for Artists editorial playlists', detail:'Go to Spotify for Artists → Music → Upcoming → Pitch a song. Select mood, genre, instruments, culture.', tag:'SPOTIFY', category:'spotify'});
+  plan.push({date:d(-40), action:'Submit to Apple Music & Deezer editorial', detail:'Via distributor dashboard (CDBaby/DistroKid). Tag genre accurately.', tag:'DSPs', category:'spotify'});
+  plan.push({date:d(-38), action:'Finalize artwork + press assets', detail:'Cover art 3000×3000px. Press photos 300dpi. Bio updated. EPK ready.', tag:'CONTENT', category:'content'});
+  plan.push({date:d(-35), action:'Send press release to PT music media', detail:'Blitz, Loud!, Rock FM, Antena 3, Rádio Radar. Personalize each pitch.', tag:'PRESS', category:'press'});
+  plan.push({date:d(-33), action:'Send press release to BR/international outlets', detail:'Whiplash.net, Rock Brigade, international hard rock blogs.', tag:'PRESS', category:'press'});
+  plan.push({date:d(-30), action:'Create pre-save link + landing page', detail:'Use feature.fm or distrokid.com/hyperfollow. Collect emails.', tag:'SOCIAL', category:'social'});
+
+  // ── BUILD-UP: -28 to -15 days ──
+  plan.push({date:d(-28), action:'Announce release date on all socials', detail:'Post artwork + pre-save link. Instagram, Facebook, Twitter/X. Pin the post.', tag:'SOCIAL', category:'social'});
+  plan.push({date:d(-25), action:'Behind-the-scenes content #1', detail:'Studio recording footage, mixing session, band rehearsal clip. 30-60 sec for Reels/TikTok.', tag:'CONTENT', category:'content'});
+  plan.push({date:d(-21), action:'Teaser clip #1 — 15 sec audio snippet', detail:'Post on Instagram Reels + TikTok + YouTube Shorts. Use the hook/chorus.', tag:'SOCIAL', category:'social'});
+  plan.push({date:d(-18), action:'Share lyric teaser or artwork detail', detail:'Instagram Story carousel with lyrics. Ask fans to guess the theme.', tag:'SOCIAL', category:'social'});
+  plan.push({date:d(-15), action:'Behind-the-scenes content #2', detail:'Guitar tone creation, drum tracking, bass recording — show the craft.', tag:'CONTENT', category:'content'});
+
+  // ── FINAL PUSH: -14 to -1 days ──
+  plan.push({date:d(-14), action:'Release countdown begins — 2 weeks', detail:'Instagram countdown sticker in Stories. Daily reminder.', tag:'SOCIAL', category:'social'});
+  plan.push({date:d(-12), action:'Teaser clip #2 — different section', detail:'Verse or bridge snippet. Different visual/angle from teaser #1.', tag:'SOCIAL', category:'social'});
+  plan.push({date:d(-10), action:'Contact playlist curators (independent)', detail:'SubmitHub, PlaylistPush, or direct DM to genre-specific curators.', tag:'SPOTIFY', category:'spotify'});
+  plan.push({date:d(-7),  action:'Share story behind the song', detail:'Text post or video: why you wrote it, what it means, recording stories.', tag:'CONTENT', category:'content'});
+  plan.push({date:d(-5),  action:'Teaser clip #3 — final hook', detail:'Most energetic 10-15 sec. "Out in 5 days" text overlay.', tag:'SOCIAL', category:'social'});
+  plan.push({date:d(-3),  action:'Notify your email list + WhatsApp contacts', detail:'Personal message to core fans. Ask them to save + stream Day 1.', tag:'SOCIAL', category:'social'});
+  plan.push({date:d(-2),  action:'Instagram Live or Q&A about the release', detail:'Announce tomorrow\'s release. Play a snippet live. Build anticipation.', tag:'SOCIAL', category:'social'});
+  plan.push({date:d(-1),  action:'Final "tomorrow" post + Story countdown', detail:'Artwork post: "Tomorrow." Pre-save link in bio. Story countdown to midnight.', tag:'SOCIAL', category:'social'});
+
+  // ── RELEASE DAY ──
+  plan.push({date:d(0), action:'▶ RELEASE DAY — Post everywhere at 00:01', detail:'Link in bio. Instagram post + Stories + Reels. Facebook. X/Twitter. WhatsApp status. YouTube.', tag:'DROP', category:'social'});
+  plan.push({date:d(0), action:'Share on all WhatsApp groups + personal contacts', detail:'First 24h streams are CRITICAL for algorithmic pickup. Ask everyone to play it.', tag:'DROP', category:'social'});
+
+  // ── POST-RELEASE: +1 to +30 days ──
+  plan.push({date:d(1),  action:'Thank-you post + first reactions', detail:'Screenshot stream count. Share fan reactions. Repost stories that tag you.', tag:'SOCIAL', category:'social'});
+  plan.push({date:d(2),  action:'Share lyrics video or visualizer', detail:'Lyric video on YouTube. Cross-post snippets as Reels.', tag:'CONTENT', category:'content'});
+  plan.push({date:d(3),  action:'Follow up with press contacts', detail:'Send stream numbers + any early reactions. Ask for review/feature.', tag:'PRESS', category:'press'});
+  plan.push({date:d(5),  action:'User-generated content push', detail:'Ask fans to film themselves listening. Repost every single one.', tag:'SOCIAL', category:'social'});
+  plan.push({date:d(7),  action:'Live performance video — 1 week after release', detail:'Film a live session (rehearsal room, outdoor, stripped-back). Post on YouTube + Reels.', tag:'CONTENT', category:'content'});
+  plan.push({date:d(10), action:'Spotify data check + playlist audit', detail:'Check Spotify for Artists: which playlists picked it up, listener demographics, save rate.', tag:'SPOTIFY', category:'spotify'});
+  plan.push({date:d(14), action:'Second wave content — remix/acoustic/behind-the-mix', detail:'New angle on the same song keeps algorithmic momentum. Different format = new audience.', tag:'CONTENT', category:'content'});
+  plan.push({date:d(21), action:'Pitch to sync licensing agencies', detail:'Musicão, SPA sync catalogue. Submit to music libraries for TV/film/ads.', tag:'PRESS', category:'press'});
+  plan.push({date:d(28), action:'Monthly review — streams, saves, playlist adds', detail:'Compare to previous releases. Document what worked. Plan adjustments for next single.', tag:'SPOTIFY', category:'spotify'});
+  plan.push({date:d(30), action:'Tease next release if ready', detail:'Keep momentum. Ideal gap between singles: 6-8 weeks. Start the cycle again.', tag:'SOCIAL', category:'social'});
+
+  // Sort by date
+  plan.sort(function(a,b){ return a.date - b.date; });
+  return plan;
+}
 }
 
 function updateSplitsMiddle() {
