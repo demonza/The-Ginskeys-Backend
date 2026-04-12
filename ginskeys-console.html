@@ -2320,7 +2320,7 @@ tr:hover .edit-btn{display:inline}
       <div class="panel-header" style="background:var(--bg0);border-bottom:2px solid var(--border2)">
         <div class="panel-title" style="gap:8px">
           <div class="panel-title-dot" style="background:var(--green3);width:7px;height:7px"></div>
-          <span style="font-family:var(--display);font-size:12px;letter-spacing:.14em">BAND HEALTH SCORE</span>
+          <span style="font-family:var(--display);font-size:12px;letter-spacing:.14em"><span data-i18n="ov_band_health">BAND HEALTH SCORE</span></span>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
           <div style="font-size:8px;color:var(--muted3);letter-spacing:.06em">live · recalculates from ledger data</div>
@@ -2399,7 +2399,7 @@ tr:hover .edit-btn{display:inline}
 
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>12-Month Activity Timeline</div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div><span data-i18n="ov_timeline">12-Month Activity Timeline</span></div>
         <span style="font-size:8px;color:var(--muted3)" id="mgmt-timeline-range">—</span>
       </div>
       <div style="padding:10px 12px" id="mgmt-timeline"></div>
@@ -2884,13 +2884,13 @@ tr:hover .edit-btn{display:inline}
         <div class="shortcut-row"><span class="shortcut-desc">Import CSV</span><span class="shortcut-key">Admin only</span></div>
         <div class="shortcut-row"><span class="shortcut-desc">Send invite</span><span class="shortcut-key">I</span></div>
         <div class="shortcut-row"><span class="shortcut-desc">Search ledger</span><span class="shortcut-key">/</span></div>
-        <div class="section-head" style="margin-top:12px">Role Permissions</div>
-        <div class="shortcut-row"><span class="shortcut-desc">Admin</span><span class="shortcut-key" style="color:var(--accent2);border-color:var(--accent)">Full + user management</span></div>
-        <div class="shortcut-row"><span class="shortcut-desc">Co-Admin</span><span class="shortcut-key" style="color:var(--accent3);border-color:var(--accent2)">Full, no user mgmt</span></div>
-        <div class="shortcut-row"><span class="shortcut-desc">Manager</span><span class="shortcut-key" style="color:var(--green3);border-color:var(--green)">All views, add+edit</span></div>
-        <div class="shortcut-row"><span class="shortcut-desc">Accountant</span><span class="shortcut-key" style="color:var(--blue2);border-color:var(--blue)">Ledger + add only</span></div>
-        <div class="shortcut-row"><span class="shortcut-desc">Viewer</span><span class="shortcut-key" style="color:var(--amber3);border-color:var(--amber)">Read-only</span></div>
-        <div class="shortcut-row"><span class="shortcut-desc">Social Media Advisor</span><span class="shortcut-key" style="color:#f472b6;border-color:#ec4899">Releases + Press only</span></div>
+        <div class="section-head" style="margin-top:12px"><span data-i18n="acc_role_perms">Role Permissions</span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Admin</span><span class="shortcut-key" style="color:var(--accent2);border-color:var(--accent)"><span data-i18n="acc_admin_desc">Full + user management</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Co-Admin</span><span class="shortcut-key" style="color:var(--accent3);border-color:var(--accent2)"><span data-i18n="acc_coadmin_desc">Full, no user mgmt</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Manager</span><span class="shortcut-key" style="color:var(--green3);border-color:var(--green)"><span data-i18n="acc_manager_desc">All views, add+edit</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Accountant</span><span class="shortcut-key" style="color:var(--blue2);border-color:var(--blue)"><span data-i18n="acc_accountant_desc">Ledger + add only</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Viewer</span><span class="shortcut-key" style="color:var(--amber3);border-color:var(--amber)"><span data-i18n="acc_viewer_desc">Read-only</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Social Media Advisor</span><span class="shortcut-key" style="color:#f472b6;border-color:#ec4899"><span data-i18n="acc_smadvisor_desc">Releases + Press only</span></span></div>
       </div>
     </div>
   </div>
@@ -3136,10 +3136,10 @@ tr:hover .edit-btn{display:inline}
             </select></div>
           <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">FEE (€)</div><input id="bk-fee" class="login-input" type="number" placeholder="1000"></div>
           <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">LOCATION</div><input id="bk-location" class="login-input" style="width:100%" placeholder="Lagos, Algarve"></div>
-          <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">CONTACT NAME</div><input id="bk-contact-name" class="login-input" placeholder="João Silva"></div>
+          <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px"><span data-i18n="pr_contact_name">CONTACT NAME</span></div><input id="bk-contact-name" class="login-input" placeholder="João Silva"></div>
           <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">EMAIL</div><input id="bk-contact-email" class="login-input" type="email" placeholder="joao@venue.pt"></div>
           <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">GIG DATE</div><input id="bk-date" class="login-input" type="date"></div>
-          <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">FOLLOW UP</div><input id="bk-followup" class="login-input" type="date"></div>
+          <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px"><span data-i18n="pr_follow_up">FOLLOW UP</span></div><input id="bk-followup" class="login-input" type="date"></div>
           <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">NOTES</div><input id="bk-notes" class="login-input" style="width:100%" placeholder="e.g. Met at FMM. Interested for August slot."></div>
           <div style="grid-column:1/-1;display:flex;gap:8px;align-items:center">
             <button class="login-btn" style="width:auto;padding:0 20px" onclick="addBookingContact()">Add Contact</button>
@@ -3322,7 +3322,7 @@ tr:hover .edit-btn{display:inline}
           <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div><span data-i18n="rel_calendar">Release Calendar</span></div>
         </div>
         <div id="rel-calendar" style="padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:10px">
-          <div style="color:var(--muted3)">No releases scheduled yet.</div>
+          <div style="color:var(--muted3)"><span data-i18n="rel_no_scheduled">No releases scheduled yet.</span></div>
         </div>
         <div style="padding:8px 12px;border-top:1px solid var(--border2);font-size:9px;color:var(--muted2)">
           <span style="color:var(--amber2)">Rule:</span> min 6 weeks between release date and pitch deadline
@@ -3363,37 +3363,37 @@ tr:hover .edit-btn{display:inline}
       <!-- Caption Templates -->
       <div class="panel" style="overflow-y:auto;max-height:280px">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:#f472b6"></div>Caption Templates</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:#f472b6"></div><span data-i18n="sm_caption_templates">Caption Templates</span></div>
         </div>
         <div style="padding:8px 12px;display:flex;flex-direction:column;gap:6px">
-          <div style="font-size:8px;color:var(--muted3);margin-bottom:2px">Select a release, then click a template to copy</div>
+          <div style="font-size:8px;color:var(--muted3);margin-bottom:2px"><span data-i18n="sm_caption_select">Select a release, then click a template to copy</span></div>
           <select id="rel-caption-picker" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-family:var(--mono);font-size:9px;padding:3px 6px;width:100%;margin-bottom:4px">
             <option value="">— select release —</option>
           </select>
           <div id="rel-caption-templates" style="display:flex;flex-direction:column;gap:4px">
             <div onclick="copyCaptionTemplate('announce')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
-              <div style="font-weight:700;color:var(--text);margin-bottom:2px">📢 Announcement</div>
-              <div style="color:var(--muted3)">New music coming. Title + date + pre-save</div>
+              <div style="font-weight:700;color:var(--text);margin-bottom:2px"><span data-i18n="sm_caption_announce">📢 Announcement</span></div>
+              <div style="color:var(--muted3)"><span data-i18n="sm_caption_announce_d">New music coming. Title + date + pre-save</span></div>
             </div>
             <div onclick="copyCaptionTemplate('teaser')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
-              <div style="font-weight:700;color:var(--text);margin-bottom:2px">🔥 Teaser</div>
-              <div style="color:var(--muted3)">Countdown snippet for Reels/TikTok</div>
+              <div style="font-weight:700;color:var(--text);margin-bottom:2px"><span data-i18n="sm_caption_teaser">🔥 Teaser</span></div>
+              <div style="color:var(--muted3)"><span data-i18n="sm_caption_teaser_d">Countdown snippet for Reels/TikTok</span></div>
             </div>
             <div onclick="copyCaptionTemplate('drop')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
-              <div style="font-weight:700;color:var(--text);margin-bottom:2px">▶ Release Day</div>
-              <div style="color:var(--muted3)">IT'S OUT. Stream now + link</div>
+              <div style="font-weight:700;color:var(--text);margin-bottom:2px"><span data-i18n="sm_caption_drop">▶ Release Day</span></div>
+              <div style="color:var(--muted3)"><span data-i18n="sm_caption_drop_d">IT'S OUT. Stream now + link</span></div>
             </div>
             <div onclick="copyCaptionTemplate('bts')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
-              <div style="font-weight:700;color:var(--text);margin-bottom:2px">🎬 Behind The Scenes</div>
-              <div style="color:var(--muted3)">Studio / rehearsal / making-of</div>
+              <div style="font-weight:700;color:var(--text);margin-bottom:2px"><span data-i18n="sm_caption_bts">🎬 Behind The Scenes</span></div>
+              <div style="color:var(--muted3)"><span data-i18n="sm_caption_bts_d">Studio / rehearsal / making-of</span></div>
             </div>
             <div onclick="copyCaptionTemplate('gig')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
-              <div style="font-weight:700;color:var(--text);margin-bottom:2px">🎸 Gig Promo</div>
-              <div style="color:var(--muted3)">Venue + date + link + CTA</div>
+              <div style="font-weight:700;color:var(--text);margin-bottom:2px"><span data-i18n="sm_caption_gig">🎸 Gig Promo</span></div>
+              <div style="color:var(--muted3)"><span data-i18n="sm_caption_gig_d">Venue + date + link + CTA</span></div>
             </div>
             <div onclick="copyCaptionTemplate('thankyou')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
-              <div style="font-weight:700;color:var(--text);margin-bottom:2px">🙏 Thank You</div>
-              <div style="color:var(--muted3)">Post-release / post-gig gratitude</div>
+              <div style="font-weight:700;color:var(--text);margin-bottom:2px"><span data-i18n="sm_caption_thankyou">🙏 Thank You</span></div>
+              <div style="color:var(--muted3)"><span data-i18n="sm_caption_thankyou_d">Post-release / post-gig gratitude</span></div>
             </div>
           </div>
           <div id="rel-caption-output" style="display:none;background:var(--bg4);padding:8px 10px;border-radius:2px;font-size:9px;color:var(--text);line-height:1.6;border:1px solid var(--border2);position:relative;margin-top:4px">
@@ -3406,77 +3406,77 @@ tr:hover .edit-btn{display:inline}
       <!-- Hashtag Bank -->
       <div class="panel" style="overflow-y:auto;max-height:280px">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Hashtag Bank</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="sm_hashtag_bank">Hashtag Bank</span></div>
         </div>
         <div style="padding:8px 12px;display:flex;flex-direction:column;gap:8px;font-size:9px">
           <div>
-            <div style="font-size:8px;color:var(--accent);letter-spacing:.1em;font-weight:700;margin-bottom:4px">CORE — always use</div>
+            <div style="font-size:8px;color:var(--accent);letter-spacing:.1em;font-weight:700;margin-bottom:4px"><span data-i18n="sm_ht_core">CORE — always use</span></div>
             <div id="ht-core" style="display:flex;flex-wrap:wrap;gap:3px"></div>
           </div>
           <div>
-            <div style="font-size:8px;color:var(--purple2);letter-spacing:.1em;font-weight:700;margin-bottom:4px">GENRE</div>
+            <div style="font-size:8px;color:var(--purple2);letter-spacing:.1em;font-weight:700;margin-bottom:4px"><span data-i18n="sm_ht_genre">GENRE</span></div>
             <div id="ht-genre" style="display:flex;flex-wrap:wrap;gap:3px"></div>
           </div>
           <div>
-            <div style="font-size:8px;color:var(--green3);letter-spacing:.1em;font-weight:700;margin-bottom:4px">PORTUGUESE SCENE</div>
+            <div style="font-size:8px;color:var(--green3);letter-spacing:.1em;font-weight:700;margin-bottom:4px"><span data-i18n="sm_ht_pt">PORTUGUESE SCENE</span></div>
             <div id="ht-pt" style="display:flex;flex-wrap:wrap;gap:3px"></div>
           </div>
           <div>
-            <div style="font-size:8px;color:var(--blue2);letter-spacing:.1em;font-weight:700;margin-bottom:4px">RELEASE SPECIFIC</div>
+            <div style="font-size:8px;color:var(--blue2);letter-spacing:.1em;font-weight:700;margin-bottom:4px"><span data-i18n="sm_ht_release">RELEASE SPECIFIC</span></div>
             <div id="ht-release" style="display:flex;flex-wrap:wrap;gap:3px"></div>
           </div>
           <div>
-            <div style="font-size:8px;color:var(--amber2);letter-spacing:.1em;font-weight:700;margin-bottom:4px">DISCOVERY / REACH</div>
+            <div style="font-size:8px;color:var(--amber2);letter-spacing:.1em;font-weight:700;margin-bottom:4px"><span data-i18n="sm_ht_discovery">DISCOVERY / REACH</span></div>
             <div id="ht-discovery" style="display:flex;flex-wrap:wrap;gap:3px"></div>
           </div>
-          <button onclick="copyAllHashtags()" style="background:var(--accent);color:#fff;border:none;padding:5px 12px;cursor:pointer;font-size:8px;font-weight:700;letter-spacing:.06em;border-radius:1px;margin-top:4px">COPY ALL HASHTAGS</button>
+          <button onclick="copyAllHashtags()" style="background:var(--accent);color:#fff;border:none;padding:5px 12px;cursor:pointer;font-size:8px;font-weight:700;letter-spacing:.06em;border-radius:1px;margin-top:4px"><span data-i18n="sm_copy_all_ht">COPY ALL HASHTAGS</span></button>
         </div>
       </div>
 
       <!-- Content Calendar -->
       <div class="panel" style="overflow-y:auto;max-height:280px">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Weekly Content Grid</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div><span data-i18n="sm_weekly_grid">Weekly Content Grid</span></div>
         </div>
         <div style="padding:8px 12px;display:flex;flex-direction:column;gap:3px;font-size:9px">
-          <div style="font-size:8px;color:var(--muted3);margin-bottom:4px">Optimal posting schedule for algorithm growth</div>
+          <div style="font-size:8px;color:var(--muted3);margin-bottom:4px"><span data-i18n="sm_weekly_subtitle">Optimal posting schedule for algorithm growth</span></div>
           <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:4px 0;border-bottom:1px solid var(--border2);font-size:7.5px;font-weight:700;color:var(--muted);letter-spacing:.08em">
             <div>DAY</div><div>INSTAGRAM</div><div>TIKTOK / YT</div>
           </div>
           <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:5px 0;border-bottom:1px solid var(--border1)">
             <div style="font-weight:700;color:var(--accent);font-size:9px">MON</div>
-            <div style="color:var(--muted2);font-size:8px">Reel — studio/rehearsal clip<br><span style="color:var(--muted)">18:00-20:00</span></div>
-            <div style="color:var(--muted2);font-size:8px">TikTok — trending audio + band<br><span style="color:var(--muted)">19:00-21:00</span></div>
+            <div style="color:var(--muted2);font-size:8px"><span data-i18n="sm_mon_ig">Reel — studio/rehearsal clip</span><br><span style="color:var(--muted)">18:00-20:00</span></div>
+            <div style="color:var(--muted2);font-size:8px"><span data-i18n="sm_mon_tt">TikTok — trending audio + band</span><br><span style="color:var(--muted)">19:00-21:00</span></div>
           </div>
           <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:5px 0;border-bottom:1px solid var(--border1)">
             <div style="font-weight:700;color:var(--text);font-size:9px">TUE</div>
-            <div style="color:var(--muted2);font-size:8px">Story — poll/question sticker<br><span style="color:var(--muted)">12:00-14:00</span></div>
-            <div style="color:var(--muted3);font-size:8px">— rest —</div>
+            <div style="color:var(--muted2);font-size:8px"><span data-i18n="sm_tue_ig">Story — poll/question sticker</span><br><span style="color:var(--muted)">12:00-14:00</span></div>
+            <div style="color:var(--muted3);font-size:8px"><span data-i18n="sm_rest">— rest —</span></div>
           </div>
           <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:5px 0;border-bottom:1px solid var(--border1)">
             <div style="font-weight:700;color:var(--accent);font-size:9px">WED</div>
-            <div style="color:var(--muted2);font-size:8px">Carousel — gear/process/tips<br><span style="color:var(--muted)">18:00-20:00</span></div>
-            <div style="color:var(--muted2);font-size:8px">YT Short — riff/solo clip<br><span style="color:var(--muted)">17:00-19:00</span></div>
+            <div style="color:var(--muted2);font-size:8px"><span data-i18n="sm_wed_ig">Carousel — gear/process/tips</span><br><span style="color:var(--muted)">18:00-20:00</span></div>
+            <div style="color:var(--muted2);font-size:8px"><span data-i18n="sm_wed_tt">YT Short — riff/solo clip</span><br><span style="color:var(--muted)">17:00-19:00</span></div>
           </div>
           <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:5px 0;border-bottom:1px solid var(--border1)">
             <div style="font-weight:700;color:var(--text);font-size:9px">THU</div>
-            <div style="color:var(--muted2);font-size:8px">Story — countdown/teaser<br><span style="color:var(--muted)">12:00-14:00</span></div>
-            <div style="color:var(--muted3);font-size:8px">— rest —</div>
+            <div style="color:var(--muted2);font-size:8px"><span data-i18n="sm_thu_ig">Story — countdown/teaser</span><br><span style="color:var(--muted)">12:00-14:00</span></div>
+            <div style="color:var(--muted3);font-size:8px"><span data-i18n="sm_rest">— rest —</span></div>
           </div>
           <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:5px 0;border-bottom:1px solid var(--border1)">
             <div style="font-weight:700;color:var(--accent);font-size:9px">FRI</div>
-            <div style="color:var(--muted2);font-size:8px">Reel — music content/performance<br><span style="color:var(--muted)">17:00-19:00</span></div>
-            <div style="color:var(--muted2);font-size:8px">TikTok — hook/chorus clip<br><span style="color:var(--muted)">18:00-21:00</span></div>
+            <div style="color:var(--muted2);font-size:8px"><span data-i18n="sm_fri_ig">Reel — music content/performance</span><br><span style="color:var(--muted)">17:00-19:00</span></div>
+            <div style="color:var(--muted2);font-size:8px"><span data-i18n="sm_fri_tt">TikTok — hook/chorus clip</span><br><span style="color:var(--muted)">18:00-21:00</span></div>
           </div>
           <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:5px 0;border-bottom:1px solid var(--border1)">
             <div style="font-weight:700;color:var(--text);font-size:9px">SAT</div>
-            <div style="color:var(--muted2);font-size:8px">Feed post — photo/artwork<br><span style="color:var(--muted)">11:00-13:00</span></div>
-            <div style="color:var(--muted2);font-size:8px">YT — full video/live session<br><span style="color:var(--muted)">14:00-16:00</span></div>
+            <div style="color:var(--muted2);font-size:8px"><span data-i18n="sm_sat_ig">Feed post — photo/artwork</span><br><span style="color:var(--muted)">11:00-13:00</span></div>
+            <div style="color:var(--muted2);font-size:8px"><span data-i18n="sm_sat_tt">YT — full video/live session</span><br><span style="color:var(--muted)">14:00-16:00</span></div>
           </div>
           <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:5px 0">
             <div style="font-weight:700;color:var(--text);font-size:9px">SUN</div>
-            <div style="color:var(--muted2);font-size:8px">Story — personal/casual<br><span style="color:var(--muted)">10:00-12:00</span></div>
-            <div style="color:var(--muted3);font-size:8px">— rest —</div>
+            <div style="color:var(--muted2);font-size:8px"><span data-i18n="sm_sun_ig">Story — personal/casual</span><br><span style="color:var(--muted)">10:00-12:00</span></div>
+            <div style="color:var(--muted3);font-size:8px"><span data-i18n="sm_rest">— rest —</span></div>
           </div>
           <div style="font-size:7.5px;color:var(--muted);margin-top:4px;line-height:1.6;padding:4px 0;border-top:1px solid var(--border2)">
             ▸ Reels/TikTok: 3-4x week · Feed posts: 2x week · Stories: daily<br>
@@ -3495,7 +3495,7 @@ tr:hover .edit-btn{display:inline}
           <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div><span data-i18n="rel_add">Add Release</span></div>
         </div>
         <div class="panel-body" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">TITLE *</div><input id="rel-title" class="login-input" style="width:100%" placeholder="All I See"></div>
+          <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px"><span data-i18n="rel_title_label">TITLE</span> *</div><input id="rel-title" class="login-input" style="width:100%" placeholder="All I See"></div>
           <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">TYPE</div>
             <select id="rel-type" class="login-input" style="width:100%">
               <option value="single">Single</option><option value="ep">EP</option>
@@ -3508,8 +3508,8 @@ tr:hover .edit-btn{display:inline}
               <option value="artwork">Artwork</option><option value="submitted">Submitted</option>
               <option value="scheduled">Scheduled</option><option value="released">Released</option>
             </select></div>
-          <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">RELEASE DATE</div><input id="rel-date" class="login-input" type="date" style="width:100%"></div>
-          <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">SPOTIFY URL</div><input id="rel-spotify" class="login-input" style="width:100%" placeholder="https://open.spotify.com/..."></div>
+          <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px"><span data-i18n="rel_date_label">RELEASE DATE</span></div><input id="rel-date" class="login-input" type="date" style="width:100%"></div>
+          <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px"><span data-i18n="rel_spotify_label">SPOTIFY URL</span></div><input id="rel-spotify" class="login-input" style="width:100%" placeholder="https://open.spotify.com/..."></div>
           <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;grid-column:1/-1">
             <label style="font-size:9px;color:var(--muted3);display:flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" id="rel-artwork"> Artwork</label>
             <label style="font-size:9px;color:var(--muted3);display:flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" id="rel-video"> Video</label>
@@ -3526,7 +3526,7 @@ tr:hover .edit-btn{display:inline}
       </div>
       <div class="panel" style="display:flex;flex-direction:column">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Release Pipeline</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div><span data-i18n="rel_pipeline_title">Release Pipeline</span></div>
           <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printReleasesReport()">⎙ PDF</button>
           <button class="btn-sm" onclick="loadReleases()">↺ Refresh</button>
         </div>
@@ -3674,29 +3674,29 @@ tr:hover .edit-btn{display:inline}
       <!-- Email Pitch Templates -->
       <div class="panel" style="overflow-y:auto;max-height:280px">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:#f472b6"></div>Pitch Email Templates</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:#f472b6"></div><span data-i18n="pr_pitch_templates">Pitch Email Templates</span></div>
         </div>
         <div style="padding:8px 12px;display:flex;flex-direction:column;gap:4px">
-          <div style="font-size:8px;color:var(--muted3);margin-bottom:4px">Click to generate · edit the [brackets] · copy and send</div>
+          <div style="font-size:8px;color:var(--muted3);margin-bottom:4px"><span data-i18n="pr_pitch_subtitle">Click to generate · edit the [brackets] · copy and send</span></div>
           <div onclick="generatePitchEmail('radio')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
-            <div style="font-weight:700;color:var(--text);margin-bottom:2px">📻 Radio Pitch</div>
-            <div style="color:var(--muted3)">Rock FM, Antena 3, local stations</div>
+            <div style="font-weight:700;color:var(--text);margin-bottom:2px"><span data-i18n="pr_pitch_radio">📻 Radio Pitch</span></div>
+            <div style="color:var(--muted3)"><span data-i18n="pr_pitch_radio_d">Rock FM, Antena 3, local stations</span></div>
           </div>
           <div onclick="generatePitchEmail('blog')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
-            <div style="font-weight:700;color:var(--text);margin-bottom:2px">✍ Blog / Magazine Pitch</div>
-            <div style="color:var(--muted3)">Blitz, Loud!, Whiplash, international blogs</div>
+            <div style="font-weight:700;color:var(--text);margin-bottom:2px"><span data-i18n="pr_pitch_blog">✍ Blog / Magazine Pitch</span></div>
+            <div style="color:var(--muted3)"><span data-i18n="pr_pitch_blog_d">Blitz, Loud!, Whiplash, international blogs</span></div>
           </div>
           <div onclick="generatePitchEmail('sync')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
-            <div style="font-weight:700;color:var(--text);margin-bottom:2px">🎬 Sync Licensing Pitch</div>
-            <div style="color:var(--muted3)">Music supervisors, libraries, agencies</div>
+            <div style="font-weight:700;color:var(--text);margin-bottom:2px"><span data-i18n="pr_pitch_sync">🎬 Sync Licensing Pitch</span></div>
+            <div style="color:var(--muted3)"><span data-i18n="pr_pitch_sync_d">Music supervisors, libraries, agencies</span></div>
           </div>
           <div onclick="generatePitchEmail('playlist')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
-            <div style="font-weight:700;color:var(--text);margin-bottom:2px">🎧 Playlist Curator Pitch</div>
-            <div style="color:var(--muted3)">Independent Spotify/Apple curators</div>
+            <div style="font-weight:700;color:var(--text);margin-bottom:2px"><span data-i18n="pr_pitch_playlist">🎧 Playlist Curator Pitch</span></div>
+            <div style="color:var(--muted3)"><span data-i18n="pr_pitch_playlist_d">Independent Spotify/Apple curators</span></div>
           </div>
           <div onclick="generatePitchEmail('followup')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
-            <div style="font-weight:700;color:var(--text);margin-bottom:2px">🔄 Follow-Up Email</div>
-            <div style="color:var(--muted3)">Polite nudge after no response</div>
+            <div style="font-weight:700;color:var(--text);margin-bottom:2px"><span data-i18n="pr_pitch_followup">🔄 Follow-Up Email</span></div>
+            <div style="color:var(--muted3)"><span data-i18n="pr_pitch_followup_d">Polite nudge after no response</span></div>
           </div>
           <div id="press-pitch-output" style="display:none;background:var(--bg4);padding:8px 10px;border-radius:2px;font-size:9px;color:var(--text);line-height:1.6;border:1px solid var(--border2);position:relative;margin-top:4px;white-space:pre-wrap">
             <div id="press-pitch-text"></div>
@@ -3708,10 +3708,10 @@ tr:hover .edit-btn{display:inline}
       <!-- EPK Quick-Link Generator -->
       <div class="panel" style="overflow-y:auto;max-height:280px">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>EPK Quick Builder</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div><span data-i18n="pr_epk_builder">EPK Quick Builder</span></div>
         </div>
         <div style="padding:8px 12px;display:flex;flex-direction:column;gap:6px;font-size:9px">
-          <div style="font-size:8px;color:var(--muted3);margin-bottom:2px">Essential links to include in every pitch email</div>
+          <div style="font-size:8px;color:var(--muted3);margin-bottom:2px"><span data-i18n="pr_epk_subtitle">Essential links to include in every pitch email</span></div>
           <div style="display:grid;grid-template-columns:90px 1fr;gap:4px;align-items:center">
             <div style="font-size:8px;font-weight:700;color:var(--accent);letter-spacing:.06em">SPOTIFY</div>
             <input id="epk-spotify" class="login-input" style="font-size:9px;padding:3px 6px" placeholder="https://open.spotify.com/artist/..." value="">
@@ -3736,7 +3736,7 @@ tr:hover .edit-btn{display:inline}
             <div style="font-size:8px;font-weight:700;color:var(--amber2);letter-spacing:.06em">CONTACT</div>
             <input id="epk-contact" class="login-input" style="font-size:9px;padding:3px 6px" placeholder="mendonza@theginskeys.com" value="">
           </div>
-          <button onclick="copyEPKBlock()" style="background:var(--accent);color:#fff;border:none;padding:5px 12px;cursor:pointer;font-size:8px;font-weight:700;letter-spacing:.06em;border-radius:1px;margin-top:4px">COPY EPK LINK BLOCK</button>
+          <button onclick="copyEPKBlock()" style="background:var(--accent);color:#fff;border:none;padding:5px 12px;cursor:pointer;font-size:8px;font-weight:700;letter-spacing:.06em;border-radius:1px;margin-top:4px"><span data-i18n="pr_epk_copy">COPY EPK LINK BLOCK</span></button>
           <div style="font-size:7.5px;color:var(--muted);margin-top:2px;line-height:1.6">
             ▸ Fill these once — they auto-populate into pitch email templates<br>
             ▸ Press Kit link should contain: hi-res photos, bio (PT + EN), logo, tech rider PDF
@@ -3753,7 +3753,7 @@ tr:hover .edit-btn{display:inline}
           <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="press_add">Add Press / Sync Contact</span></div>
         </div>
         <div class="panel-body" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">OUTLET *</div><input id="pr-outlet" class="login-input" style="width:100%" placeholder="Rock FM Portugal"></div>
+          <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px"><span data-i18n="pr_outlet">OUTLET</span> *</div><input id="pr-outlet" class="login-input" style="width:100%" placeholder="Rock FM Portugal"></div>
           <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">TYPE</div>
             <select id="pr-type" class="login-input" style="width:100%">
               <option value="press">Press</option><option value="radio">Radio</option>
@@ -3763,7 +3763,7 @@ tr:hover .edit-btn{display:inline}
             </select></div>
           <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">CONTACT NAME</div><input id="pr-contact" class="login-input" placeholder="Editor name"></div>
           <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">EMAIL</div><input id="pr-email" class="login-input" type="email" placeholder="press@rockfm.pt"></div>
-          <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">PITCHING FOR</div><input id="pr-release" class="login-input" style="width:100%" placeholder="Single #1 — All I See"></div>
+          <div style="grid-column:1/-1"><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px"><span data-i18n="pr_pitching_for">PITCHING FOR</span></div><input id="pr-release" class="login-input" style="width:100%" placeholder="Single #1 — All I See"></div>
           <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">STAGE</div>
             <select id="pr-stage" class="login-input" style="width:100%">
               <option value="target">Target</option><option value="pitched">Pitched</option>
@@ -4127,7 +4127,7 @@ tr:hover .edit-btn{display:inline}
       <!-- REHEARSAL SCHEDULER -->
       <div class="panel" style="display:flex;flex-direction:column;min-height:0">
         <div class="panel-header" style="flex-shrink:0">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Rehearsal Log</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div><span data-i18n="mem_rehearsal_log">Rehearsal Log</span></div>
           <button class="btn-sm" onclick="openRehearsalModal()" style="font-size:9px">+ Log</button>
         </div>
         <div class="panel-body" style="flex:1;overflow-y:auto;padding:0">
@@ -4140,7 +4140,7 @@ tr:hover .edit-btn{display:inline}
       <!-- VOTING / DECISION LOG -->
       <div class="panel" style="display:flex;flex-direction:column;min-height:0">
         <div class="panel-header" style="flex-shrink:0">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Band Decisions</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="mem_band_decisions">Band Decisions</span></div>
           <button class="btn-sm" onclick="openVoteModal()" style="font-size:9px">+ Log</button>
         </div>
         <div class="panel-body" style="flex:1;overflow-y:auto;padding:0">
@@ -4153,7 +4153,7 @@ tr:hover .edit-btn{display:inline}
       <!-- BAND AGREEMENT -->
       <div class="panel" style="display:flex;flex-direction:column;min-height:0">
         <div class="panel-header" style="flex-shrink:0">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Band Agreement</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div><span data-i18n="mem_band_agreement">Band Agreement</span></div>
           <button class="btn-sm" onclick="membersExportAgreement()" style="font-size:9px;color:var(--accent);border-color:var(--accent)">⎙ PDF</button>
         </div>
         <div class="panel-body" style="flex:1;overflow-y:auto">
@@ -4376,7 +4376,7 @@ tr:hover .edit-btn{display:inline}
       <!-- Show-by-show table -->
       <div class="panel" style="flex:1;min-height:0;overflow-y:auto">
         <div class="panel-header" style="flex-shrink:0">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Show Budget vs Actual</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="bgt_show_budget">Show Budget vs Actual</span></div>
         </div>
         <div style="overflow-x:auto">
           <table style="width:100%;border-collapse:collapse;font-size:10px" id="budget-table">
@@ -4403,7 +4403,7 @@ tr:hover .edit-btn{display:inline}
       <!-- Monthly breakdown -->
       <div class="panel" style="flex-shrink:0">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Monthly Budget vs Actual</div>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="bgt_monthly">Monthly Budget vs Actual</span></div>
         </div>
         <div id="budget-monthly" style="padding:10px 12px"></div>
       </div>
@@ -4806,7 +4806,7 @@ async function loadReleases() {
 function renderReleasesList() {
   const el = document.getElementById('releases-list');
   if (!el) return;
-  if (!RELEASES_DATA.length) { el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted3);font-size:10px">No releases yet.</div>'; return; }
+  if (!RELEASES_DATA.length) { el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted3);font-size:10px"><span data-i18n="rel_no_releases">No releases yet.</span></div>'; return; }
   el.innerHTML = RELEASES_DATA.map(r => {
     const checks = [{label:'Artwork',done:r.artwork_done},{label:'Video',done:r.video_done},{label:'Press',done:r.press_pitched},{label:'Spotify',done:r.spotify_pitched},{label:'Social',done:r.social_media}];
     const doneCount = checks.filter(c=>c.done).length;
@@ -8429,11 +8429,11 @@ function _initAll_old_1() {
 
     <!-- Sub-tabs -->
     <div class="prod-tab-bar" style="flex-shrink:0">
-      <div class="prod-tab pt-active" onclick="switchProdTab('advance',this)">Show Advance</div>
+      <div class="prod-tab pt-active" onclick="switchProdTab('advance',this)"><span data-i18n="prod_show_advance">Show Advance</span></div>
       <div class="prod-tab" onclick="switchProdTab('rider',this)">Tech Rider</div>
-      <div class="prod-tab" onclick="switchProdTab('stageplot',this)">Stage Plot</div>
+      <div class="prod-tab" onclick="switchProdTab('stageplot',this)"><span data-i18n="prod_stage_plot">Stage Plot</span></div>
       <div class="prod-tab" onclick="switchProdTab('setlist',this)">Setlist</div>
-      <div class="prod-tab" onclick="switchProdTab('checklist',this)">Show Checklist</div>
+      <div class="prod-tab" onclick="switchProdTab('checklist',this)"><span data-i18n="prod_show_checklist">Show Checklist</span></div>
     </div>
 
     <!-- ── SHOW ADVANCE ── -->
@@ -8771,19 +8771,19 @@ function _initAll_old_1() {
             <!-- Selected element properties -->
             <div style="padding:10px 12px;border-bottom:1px solid var(--border2)">
               <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px">ELEMENT PROPERTIES</div>
-              <div id="splot-props" style="font-size:10px;color:var(--muted3)">Select an element</div>
+              <div id="splot-props" style="font-size:10px;color:var(--muted3)"><span data-i18n="prod_select_element">Select an element</span></div>
             </div>
 
             <!-- Stage settings -->
             <div style="padding:10px 12px;border-bottom:1px solid var(--border2)">
-              <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px">STAGE SIZE</div>
+              <div style="font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:8px"><span data-i18n="prod_stage_size">STAGE SIZE</span></div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px">
                 <div>
-                  <div style="font-size:8px;color:var(--muted3);margin-bottom:3px">WIDTH (m)</div>
+                  <div style="font-size:8px;color:var(--muted3);margin-bottom:3px"><span data-i18n="prod_width">WIDTH (m)</span></div>
                   <input id="splot-stage-w" type="number" value="12" min="4" max="40" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:4px 6px;font-family:var(--mono);font-size:10px" onchange="splotDrawAll()">
                 </div>
                 <div>
-                  <div style="font-size:8px;color:var(--muted3);margin-bottom:3px">DEPTH (m)</div>
+                  <div style="font-size:8px;color:var(--muted3);margin-bottom:3px"><span data-i18n="prod_depth">DEPTH (m)</span></div>
                   <input id="splot-stage-d" type="number" value="8" min="3" max="20" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:4px 6px;font-family:var(--mono);font-size:10px" onchange="splotDrawAll()">
                 </div>
               </div>
@@ -8796,13 +8796,13 @@ function _initAll_old_1() {
                 <span id="splot-ch-count" style="color:var(--accent)">0 CH</span>
               </div>
               <div id="splot-ch-list" style="font-size:9px;color:var(--muted2);display:flex;flex-direction:column;gap:2px">
-                <div style="color:var(--muted3)">Add elements to auto-generate.</div>
+                <div style="color:var(--muted3)"><span data-i18n="prod_add_elements">Add elements to auto-generate.</span></div>
               </div>
             </div>
 
             <!-- Legend -->
             <div style="padding:8px 12px;border-top:1px solid var(--border2);font-size:8px;color:var(--muted3);line-height:1.8">
-              <div style="color:var(--muted);letter-spacing:.1em;margin-bottom:4px">CONTROLS</div>
+              <div style="color:var(--muted);letter-spacing:.1em;margin-bottom:4px"><span data-i18n="prod_controls">CONTROLS</span></div>
               Drag to move · Dbl-click to rename<br>
               Del key to delete · D to duplicate<br>
               Drag corner to resize · Right-click menu
@@ -8875,7 +8875,7 @@ function _initAll_old_1() {
           <!-- Most played songs -->
           <div class="panel" style="flex-shrink:0">
             <div class="panel-header">
-              <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Most Played Songs</div>
+              <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div><span data-i18n="sl_most_played">Most Played Songs</span></div>
             </div>
             <div id="sl-most-played" style="padding:8px 12px;font-size:10px;color:var(--muted3)">No setlists yet.</div>
           </div>
@@ -8895,7 +8895,7 @@ function _initAll_old_1() {
           <!-- Key distribution -->
           <div class="panel" style="flex-shrink:0">
             <div class="panel-header">
-              <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div>Key Distribution</div>
+              <div class="panel-title"><div class="panel-title-dot" style="background:var(--purple2)"></div><span data-i18n="sl_key_dist">Key Distribution</span></div>
             </div>
             <div id="sl-keys" style="padding:8px 12px;display:flex;flex-wrap:wrap;gap:6px;font-size:10px">
               <span style="color:var(--muted3)">No data yet.</span>
@@ -10951,6 +10951,165 @@ const TRANSLATIONS = {
     btn_import_csv:      'Import CSV',
     btn_save_txn:        'Save Transaction',
     btn_save_changes:    'Save Changes',
+    // Social Media Toolkit
+    sm_caption_templates: 'Caption Templates',
+    sm_caption_select:    '<span data-i18n="sm_caption_select">Select a release, then click a template to copy</span>',
+    sm_caption_announce:  'Announcement',
+    sm_caption_announce_d:'New music coming. Title + date + pre-save',
+    sm_caption_teaser:    'Teaser',
+    sm_caption_teaser_d:  'Countdown snippet for Reels/TikTok',
+    sm_caption_drop:      'Release Day',
+    sm_caption_drop_d:    'IT\'S OUT. Stream now + link',
+    sm_caption_bts:       'Behind The Scenes',
+    sm_caption_bts_d:     'Studio / rehearsal / making-of',
+    sm_caption_gig:       'Gig Promo',
+    sm_caption_gig_d:     'Venue + date + link + CTA',
+    sm_caption_thankyou:  'Thank You',
+    sm_caption_thankyou_d:'Post-release / post-gig gratitude',
+    sm_hashtag_bank:      'Hashtag Bank',
+    sm_ht_core:           'CORE — always use',
+    sm_ht_genre:          'GENRE',
+    sm_ht_pt:             'PORTUGUESE SCENE',
+    sm_ht_release:        'RELEASE SPECIFIC',
+    sm_ht_discovery:      'DISCOVERY / REACH',
+    sm_copy_all_ht:       'COPY ALL HASHTAGS',
+    sm_weekly_grid:       'Weekly Content Grid',
+    sm_weekly_subtitle:   '<span data-i18n="sm_weekly_subtitle">Optimal posting schedule for algorithm growth</span>',
+    sm_weekly_day:        'DAY',
+    sm_weekly_ig:         'INSTAGRAM',
+    sm_weekly_tt:         'TIKTOK / YT',
+    sm_weekly_notes:      'Reels/TikTok: 3-4x week · Feed posts: 2x week · Stories: daily',
+    sm_weekly_notes2:     'Best times for PT audience: 12-14h and 18-21h',
+    sm_weekly_notes3:     'Friday = new music day on Spotify (Release Radar updates)',
+    // Weekly content descriptions
+    sm_mon_ig:            'Reel — studio/rehearsal clip',
+    sm_mon_tt:            'TikTok — trending audio + band',
+    sm_tue_ig:            'Story — poll/question sticker',
+    sm_wed_ig:            'Carousel — gear/process/tips',
+    sm_wed_tt:            'YT Short — riff/solo clip',
+    sm_thu_ig:            'Story — countdown/teaser',
+    sm_fri_ig:            'Reel — music content/performance',
+    sm_fri_tt:            'TikTok — hook/chorus clip',
+    sm_sat_ig:            'Feed post — photo/artwork',
+    sm_sat_tt:            'YT — full video/live session',
+    sm_sun_ig:            'Story — personal/casual',
+    sm_rest:              '— rest —',
+    // Release Engine
+    rel_engine:           'Release Engine',
+    rel_engine_select:    '— select release to generate launch plan —',
+    rel_engine_empty:     'Select a release with a date set to generate your 45-day launch plan.',
+    // Press Toolkit
+    pr_pitch_templates:   'Pitch Email Templates',
+    pr_pitch_subtitle:    '<span data-i18n="pr_pitch_subtitle">Click to generate · edit the [brackets] · copy and send</span>',
+    pr_pitch_radio:       'Radio Pitch',
+    pr_pitch_radio_d:     'Rock FM, Antena 3, local stations',
+    pr_pitch_blog:        'Blog / Magazine Pitch',
+    pr_pitch_blog_d:      'Blitz, Loud!, Whiplash, international blogs',
+    pr_pitch_sync:        'Sync Licensing Pitch',
+    pr_pitch_sync_d:      'Music supervisors, libraries, agencies',
+    pr_pitch_playlist:    'Playlist Curator Pitch',
+    pr_pitch_playlist_d:  'Independent Spotify/Apple curators',
+    pr_pitch_followup:    'Follow-Up Email',
+    pr_pitch_followup_d:  'Polite nudge after no response',
+    pr_epk_builder:       'EPK Quick Builder',
+    pr_epk_subtitle:      '<span data-i18n="pr_epk_subtitle">Essential links to include in every pitch email</span>',
+    pr_epk_copy:          'COPY EPK LINK BLOCK',
+    pr_epk_note1:         'Fill these once — they auto-populate into pitch email templates',
+    pr_epk_note2:         'Press Kit link should contain: hi-res photos, bio (PT + EN), logo, tech rider PDF',
+    // Production
+    prod_live:            'LIVE PRODUCTION',
+    prod_show_advance:    'Show Advance',
+    prod_tech_rider:      'Tech Rider',
+    prod_stage_plot:      'Stage Plot',
+    prod_setlist:         'Setlist',
+    prod_show_checklist:  'Show Checklist',
+    prod_select_element:  'Select an element',
+    prod_stage_size:      'STAGE SIZE',
+    prod_width:           'WIDTH (m)',
+    prod_depth:           'DEPTH (m)',
+    prod_input_list:      'INPUT LIST',
+    prod_add_elements:    'Add elements to auto-generate.',
+    prod_controls:        'CONTROLS',
+    prod_ctrl_drag:       'Drag to move · Dbl-click to rename',
+    prod_ctrl_del:        'Del key to delete · D to duplicate',
+    prod_ctrl_resize:     'Drag corner to resize · Right-click menu',
+    // Releases
+    rel_pipeline:         'RELEASE PIPELINE',
+    rel_pipeline_title:   'Release Pipeline',
+    rel_add:              'Add Release',
+    rel_no_releases:      'No releases yet.',
+    rel_no_scheduled:     'No releases scheduled yet.',
+    rel_title_label:      'TITLE',
+    rel_type_label:       'TYPE',
+    rel_stage_label:      'STAGE',
+    rel_date_label:       'RELEASE DATE',
+    rel_spotify_label:    'SPOTIFY URL',
+    rel_notes_label:      'NOTES',
+    rel_add_btn:          'Add Release',
+    // Overview
+    ov_band_health:       'BAND HEALTH SCORE',
+    ov_priority_actions:  'PRIORITY ACTIONS',
+    ov_timeline:          '12-Month Activity Timeline',
+    ov_financial_health:  'FINANCIAL HEALTH',
+    ov_live_activity:     'LIVE ACTIVITY',
+    ov_release_velocity:  'RELEASE VELOCITY',
+    ov_booking_pipeline:  'BOOKING PIPELINE',
+    ov_press_media:       'PRESS & MEDIA',
+    ov_streaming_health:  'STREAMING HEALTH',
+    ov_revenue_div:       'REVENUE DIVERSIFICATI...',
+    ov_strategic:         'STRATEGIC MOMENTUM',
+    ov_struggling:        'STRUGGLING',
+    ov_developing:        'DEVELOPING',
+    ov_growing:           'GROWING',
+    ov_thriving:          'THRIVING',
+    // Members / Access
+    acc_users_roles:      'USERS & ROLES',
+    acc_active_members:   'ACTIVE MEMBERS',
+    acc_pending_invites:  'PENDING INVITES',
+    acc_no_invites:       'No pending invites.',
+    acc_keyboard:         'KEYBOARD SHORTCUTS',
+    acc_navigation:       'NAVIGATION',
+    acc_actions:          'ACTIONS',
+    acc_role_perms:       'Role Permissions',
+    acc_admin_desc:       'Full + user management',
+    acc_coadmin_desc:     'Full, no user mgmt',
+    acc_manager_desc:     'All views, add+edit',
+    acc_accountant_desc:  'Ledger + add only',
+    acc_viewer_desc:      'Read-only',
+    acc_smadvisor_desc:   'Releases + Press only',
+    // Press
+    pr_pipeline:          'PRESS & SYNC PIPELINE',
+    pr_add_contact:       'Add Press / Sync Contact',
+    pr_outlet:            'OUTLET',
+    pr_type:              'TYPE',
+    pr_contact_name:      'CONTACT NAME',
+    pr_email:             'EMAIL',
+    pr_pitching_for:      'PITCHING FOR',
+    pr_stage:             'STAGE',
+    pr_follow_up:         'FOLLOW UP',
+    pr_notes:             'NOTES',
+    pr_add_btn:           'Add Contact',
+    // Members panels
+    mem_rehearsal_log:    'Rehearsal Log',
+    mem_band_decisions:   'Band Decisions',
+    mem_band_agreement:   'Band Agreement',
+    // Setlist panels
+    sl_most_played:       'Most Played Songs',
+    sl_key_dist:          'Key Distribution',
+    sl_energy_flow:       'Energy Flow — Latest Setlist',
+    // Budget
+    bgt_show_budget:      'Show Budget vs Actual',
+    bgt_monthly:          'Monthly Budget vs Actual',
+    // General
+    gen_refresh:          'Refresh',
+    gen_pdf:              'PDF',
+    gen_save:             'Save',
+    gen_delete:           'Delete',
+    gen_cancel:           'Cancel',
+    gen_copy:             'COPY',
+    gen_copied:           'COPIED!',
+    gen_items:            'items',
+    gen_no_data:          'No data available.',
   },
   pt: {
     // Tabs
@@ -11170,6 +11329,165 @@ const TRANSLATIONS = {
     btn_import_csv:      'Importar CSV',
     btn_save_txn:        'Guardar Transação',
     btn_save_changes:    'Guardar Alterações',
+    // Social Media Toolkit
+    sm_caption_templates: 'Modelos de Legendas',
+    sm_caption_select:    'Seleciona um lançamento e clica num modelo para copiar',
+    sm_caption_announce:  'Anúncio',
+    sm_caption_announce_d:'Música nova a caminho. Título + data + pre-save',
+    sm_caption_teaser:    'Teaser',
+    sm_caption_teaser_d:  'Snippet de contagem para Reels/TikTok',
+    sm_caption_drop:      'Dia de Lançamento',
+    sm_caption_drop_d:    'JÁ SAIU. Ouve agora + link',
+    sm_caption_bts:       'Bastidores',
+    sm_caption_bts_d:     'Estúdio / ensaio / making-of',
+    sm_caption_gig:       'Promoção de Concerto',
+    sm_caption_gig_d:     'Local + data + link + CTA',
+    sm_caption_thankyou:  'Agradecimento',
+    sm_caption_thankyou_d:'Pós-lançamento / pós-concerto',
+    sm_hashtag_bank:      'Banco de Hashtags',
+    sm_ht_core:           'ESSENCIAIS — usar sempre',
+    sm_ht_genre:          'GÉNERO',
+    sm_ht_pt:             'CENA PORTUGUESA',
+    sm_ht_release:        'ESPECÍFICAS DO LANÇAMENTO',
+    sm_ht_discovery:      'DESCOBERTA / ALCANCE',
+    sm_copy_all_ht:       'COPIAR TODAS AS HASHTAGS',
+    sm_weekly_grid:       'Grelha Semanal de Conteúdo',
+    sm_weekly_subtitle:   'Calendário de publicações optimizado para crescimento algorítmico',
+    sm_weekly_day:        'DIA',
+    sm_weekly_ig:         'INSTAGRAM',
+    sm_weekly_tt:         'TIKTOK / YT',
+    sm_weekly_notes:      'Reels/TikTok: 3-4x semana · Posts no feed: 2x semana · Stories: diário',
+    sm_weekly_notes2:     'Melhores horas para público PT: 12-14h e 18-21h',
+    sm_weekly_notes3:     'Sexta = dia de música nova no Spotify (Release Radar atualiza)',
+    // Weekly content descriptions
+    sm_mon_ig:            'Reel — clip de estúdio/ensaio',
+    sm_mon_tt:            'TikTok — áudio em tendência + banda',
+    sm_tue_ig:            'Story — sondagem/sticker de pergunta',
+    sm_wed_ig:            'Carrossel — equipamento/processo/dicas',
+    sm_wed_tt:            'YT Short — clip de riff/solo',
+    sm_thu_ig:            'Story — contagem/teaser',
+    sm_fri_ig:            'Reel — conteúdo musical/performance',
+    sm_fri_tt:            'TikTok — clip do refrão/hook',
+    sm_sat_ig:            'Post no feed — foto/artwork',
+    sm_sat_tt:            'YT — vídeo completo/sessão ao vivo',
+    sm_sun_ig:            'Story — pessoal/casual',
+    sm_rest:              '— descanso —',
+    // Release Engine
+    rel_engine:           'Motor de Lançamento',
+    rel_engine_select:    '— seleciona lançamento para gerar plano —',
+    rel_engine_empty:     'Seleciona um lançamento com data definida para gerar o plano de 45 dias.',
+    // Press Toolkit
+    pr_pitch_templates:   'Modelos de Email de Pitch',
+    pr_pitch_subtitle:    'Clica para gerar · edita os [parêntesis] · copia e envia',
+    pr_pitch_radio:       'Pitch para Rádio',
+    pr_pitch_radio_d:     'Rock FM, Antena 3, rádios locais',
+    pr_pitch_blog:        'Pitch para Blog / Revista',
+    pr_pitch_blog_d:      'Blitz, Loud!, Whiplash, blogs internacionais',
+    pr_pitch_sync:        'Pitch de Sync Licensing',
+    pr_pitch_sync_d:      'Supervisores musicais, bibliotecas, agências',
+    pr_pitch_playlist:    'Pitch para Curador de Playlist',
+    pr_pitch_playlist_d:  'Curadores independentes Spotify/Apple',
+    pr_pitch_followup:    'Email de Follow-Up',
+    pr_pitch_followup_d:  'Lembrete educado após sem resposta',
+    pr_epk_builder:       'Construtor Rápido de EPK',
+    pr_epk_subtitle:      'Links essenciais para incluir em cada email de pitch',
+    pr_epk_copy:          'COPIAR BLOCO DE LINKS EPK',
+    pr_epk_note1:         'Preenche uma vez — auto-preenchem nos modelos de email de pitch',
+    pr_epk_note2:         'O link do Press Kit deve conter: fotos hi-res, bio PT + EN, logo, tech rider PDF',
+    // Production
+    prod_live:            'PRODUÇÃO AO VIVO',
+    prod_show_advance:    'Avanço do Show',
+    prod_tech_rider:      'Rider Técnico',
+    prod_stage_plot:      'Mapa de Palco',
+    prod_setlist:         'Setlist',
+    prod_show_checklist:  'Checklist do Show',
+    prod_select_element:  'Seleciona um elemento',
+    prod_stage_size:      'TAMANHO DO PALCO',
+    prod_width:           'LARGURA (m)',
+    prod_depth:           'PROFUNDIDADE (m)',
+    prod_input_list:      'LISTA DE INPUTS',
+    prod_add_elements:    'Adiciona elementos para gerar automaticamente.',
+    prod_controls:        'CONTROLOS',
+    prod_ctrl_drag:       'Arrastar para mover · Duplo-clique para renomear',
+    prod_ctrl_del:        'Del para apagar · D para duplicar',
+    prod_ctrl_resize:     'Arrastar canto para redimensionar · Menu botão direito',
+    // Releases
+    rel_pipeline:         'PIPELINE DE LANÇAMENTOS',
+    rel_pipeline_title:   'Pipeline de Lançamentos',
+    rel_add:              'Adicionar Lançamento',
+    rel_no_releases:      'Sem lançamentos.',
+    rel_no_scheduled:     'Sem lançamentos agendados.',
+    rel_title_label:      'TÍTULO',
+    rel_type_label:       'TIPO',
+    rel_stage_label:      'FASE',
+    rel_date_label:       'DATA DE LANÇAMENTO',
+    rel_spotify_label:    'URL SPOTIFY',
+    rel_notes_label:      'NOTAS',
+    rel_add_btn:          'Adicionar Lançamento',
+    // Overview
+    ov_band_health:       'SAÚDE DA BANDA',
+    ov_priority_actions:  'AÇÕES PRIORITÁRIAS',
+    ov_timeline:          'Cronograma de Atividade — 12 Meses',
+    ov_financial_health:  'SAÚDE FINANCEIRA',
+    ov_live_activity:     'ATIVIDADE AO VIVO',
+    ov_release_velocity:  'VELOCIDADE DE LANÇAMENTOS',
+    ov_booking_pipeline:  'PIPELINE DE RESERVAS',
+    ov_press_media:       'IMPRENSA & MÉDIA',
+    ov_streaming_health:  'SAÚDE DE STREAMING',
+    ov_revenue_div:       'DIVERSIFICAÇÃO DE REC...',
+    ov_strategic:         'MOMENTUM ESTRATÉGICO',
+    ov_struggling:        'EM DIFICULDADE',
+    ov_developing:        'EM DESENVOLVIMENTO',
+    ov_growing:           'EM CRESCIMENTO',
+    ov_thriving:          'A PROSPERAR',
+    // Members / Access
+    acc_users_roles:      'UTILIZADORES & FUNÇÕES',
+    acc_active_members:   'MEMBROS ACTIVOS',
+    acc_pending_invites:  'CONVITES PENDENTES',
+    acc_no_invites:       'Sem convites pendentes.',
+    acc_keyboard:         'ATALHOS DE TECLADO',
+    acc_navigation:       'NAVEGAÇÃO',
+    acc_actions:          'AÇÕES',
+    acc_role_perms:       'Permissões por Função',
+    acc_admin_desc:       'Total + gestão de utilizadores',
+    acc_coadmin_desc:     'Total, sem gestão de utilizadores',
+    acc_manager_desc:     'Todas as vistas, adicionar+editar',
+    acc_accountant_desc:  'Livro + adicionar apenas',
+    acc_viewer_desc:      'Apenas leitura',
+    acc_smadvisor_desc:   'Lançamentos + Imprensa apenas',
+    // Press
+    pr_pipeline:          'PIPELINE DE IMPRENSA & SYNC',
+    pr_add_contact:       'Adicionar Contacto de Imprensa / Sync',
+    pr_outlet:            'MEIO',
+    pr_type:              'TIPO',
+    pr_contact_name:      'NOME DO CONTACTO',
+    pr_email:             'EMAIL',
+    pr_pitching_for:      'PITCH PARA',
+    pr_stage:             'FASE',
+    pr_follow_up:         'FOLLOW UP',
+    pr_notes:             'NOTAS',
+    pr_add_btn:           'Adicionar Contacto',
+    // Members panels
+    mem_rehearsal_log:    'Registo de Ensaios',
+    mem_band_decisions:   'Decisões da Banda',
+    mem_band_agreement:   'Acordo da Banda',
+    // Setlist panels
+    sl_most_played:       'Músicas Mais Tocadas',
+    sl_key_dist:          'Distribuição de Tonalidades',
+    sl_energy_flow:       'Fluxo de Energia — Última Setlist',
+    // Budget
+    bgt_show_budget:      'Orçamento vs Real — por Show',
+    bgt_monthly:          'Orçamento vs Real — Mensal',
+    // General
+    gen_refresh:          'Atualizar',
+    gen_pdf:              'PDF',
+    gen_save:             'Guardar',
+    gen_delete:           'Eliminar',
+    gen_cancel:           'Cancelar',
+    gen_copy:             'COPIAR',
+    gen_copied:           'COPIADO!',
+    gen_items:            'itens',
+    gen_no_data:          'Sem dados disponíveis.',
   }
 };
 
@@ -12027,7 +12345,7 @@ function _renderUsersHtml(el, allUsers, rawInvites, roleColors, canManage){
     expires: i.expires_at ? new Date(i.expires_at).getTime() : (i.expires || 0),
   }));
   el.innerHTML=`
-    <div class="section-head">Active Members (${allUsers.length})</div>
+    <div class="section-head"><span data-i18n="acc_active_members">${t('acc_active_members')}</span> (${allUsers.length})</div>
     ${allUsers.map(u=>`
       <div class="role-row">
         <div class="role-avatar" style="background:${(roleColors[u.role]||'var(--muted3)')}22;color:${roleColors[u.role]||'var(--muted3)'}">${u.initials}</div>
@@ -12040,7 +12358,7 @@ function _renderUsersHtml(el, allUsers, rawInvites, roleColors, canManage){
         ${canManage&&u.email!==SESSION?.email?`<button class="edit-btn" style="display:inline" onclick="openEditUser('${u.email}','${u.name}','${u.role}')">&#x270E;</button>`:''}
       </div>
     `).join('')}
-    <div class="section-head" style="margin-top:12px">Pending Invites (${pendingInvites.length})</div>
+    <div class="section-head" style="margin-top:12px"><span data-i18n="acc_pending_invites">${t('acc_pending_invites')}</span> (${pendingInvites.length})</div>
     ${pendingInvites.length ? pendingInvites.map(i=>`
       <div class="role-row">
         <div class="role-avatar" style="background:rgba(255,92,26,.1);color:var(--accent)">&#x2709;</div>
@@ -12051,7 +12369,7 @@ function _renderUsersHtml(el, allUsers, rawInvites, roleColors, canManage){
         <div class="role-badge-pill ${i.role}">${i.role.replace('-',' ').toUpperCase()}</div>
         ${canManage?`<button class="edit-btn del" style="display:inline" onclick="revokeInvite('${i.token}')">&#x2715; Revoke</button>`:''}
       </div>
-    `).join('') : '<div style="font-size:9px;color:var(--muted3);padding:6px 0">No pending invites.</div>'}
+    `).join('') : '<div style="font-size:9px;color:var(--muted3);padding:6px 0"><span data-i18n="acc_no_invites">${t('acc_no_invites')}</span></div>'}
   `;
   const btnInv=document.getElementById('btn-invite');
   if(btnInv) btnInv.style.display=can('createInvite')?'inline-flex':'none';
