@@ -9347,25 +9347,35 @@ let TOUR_DATA = [];
 
 // Maps a DB tour row → the shape renderToursList / openTourDrawer expect
 function _mapTourRow(r) {
+  // Determine city/location from whichever field is populated
+  let cities = '';
+  if (r.booking_location) {
+    cities = r.booking_location;
+  } else if (r.notes && r.notes.startsWith('Location: ')) {
+    cities = r.notes.slice(10);
+  } else if (r.notes) {
+    cities = r.notes;
+  }
+
   return {
     id:       r.id,
     name:     r.name,
     start:    r.start_date || '',
     end:      r.end_date   || '',
-    cities:   // notes field stores "Location: X" from auto-create, or use booking_location
-              r.booking_location ||
-              (r.notes && r.notes.startsWith('Location: ') ? r.notes.slice(10) : (r.notes || '')),
+    cities,
     status:   r.status     || 'planned',
-    budget:   parseFloat(r.budget || 0),
-    revenue:  parseFloat(r.revenue || 0),
-    costs:    parseFloat(r.costs   || 0),
+    budget:   parseFloat(r.budget    || r.booking_fee || 0),
+    revenue:  parseFloat(r.revenue   || 0),
+    costs:    parseFloat(r.costs     || 0),
     shows:    1,
     // extra DB fields kept for API calls
-    _id:      r.id,
-    _booking_id:    r.booking_id    || null,
-    _booking_stage: r.booking_stage || null,
-    _booking_fee:   parseFloat(r.booking_fee || 0),
-    _notes:         r.notes || '',
+    _id:             r.id,
+    _booking_id:     r.booking_id    || null,
+    _booking_stage:  r.booking_stage || null,
+    _booking_fee:    parseFloat(r.booking_fee || 0),
+    _notes:          r.notes || '',
+    // true = this row came from booking_contacts directly, no tours row yet
+    _from_booking_only: r.from_booking_only === true || r.from_booking_only === 't',
   };
 }
 
@@ -10615,6 +10625,8 @@ function renderToursList() {
         <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:3px">
           <div style="font-size:11px;font-weight:700;color:${isPast?'var(--text2)':'var(--white)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.name}</div>
           <span style="font-size:8px;font-weight:700;color:${sc};text-transform:uppercase;flex-shrink:0">${t.status}</span>
+          ${t._booking_stage ? `<span style="font-size:8px;font-weight:700;color:var(--green3);text-transform:uppercase;flex-shrink:0;padding:1px 5px;border:1px solid var(--green3);border-radius:1px">${t._booking_stage}</span>` : ''}
+          ${t._from_booking_only ? `<span style="font-size:8px;color:var(--accent);flex-shrink:0" title="From Booking Pipeline">◎</span>` : ''}
         </div>
         <div style="font-size:9px;color:var(--muted3);margin-bottom:6px">${t.cities}${t.shows>1?' · '+t.shows+' shows':''}</div>
         <!-- P&L bar -->
@@ -10722,9 +10734,11 @@ function openTourDrawer(idx) {
       <div class="drawer-info-row"><span>Venue / Event</span><span>${t.name}</span></div>
       <div class="drawer-info-row"><span>Date</span><span>${t.start}</span></div>
       <div class="drawer-info-row"><span>City</span><span>${t.cities}</span></div>
+      ${t._booking_stage ? `<div class="drawer-info-row"><span>Booking Stage</span><span style="color:${t._booking_stage==='confirmed'?'var(--green3)':'var(--green2)'};font-weight:700;text-transform:uppercase">${t._booking_stage}</span></div>` : ''}
+      ${t._from_booking_only ? `<div style="margin:6px 0 2px;padding:5px 10px;background:rgba(255,85,0,.1);border-left:2px solid var(--accent);font-size:9px;color:var(--accent)">Sourced from Booking Pipeline — no separate Tour record yet</div>` : ''}
       <div class="drawer-info-row"><span>Revenue</span><span style="color:var(--green3)">${fmtMoney(t.revenue)}</span></div>
       <div class="drawer-info-row"><span>Costs</span><span style="color:var(--red3)">${fmtMoney(t.costs)}</span></div>
-      <div class="drawer-info-row"><span>Budget</span><span>${fmtMoney(t.budget||0)}</span></div>
+      <div class="drawer-info-row"><span>Budget / Fee</span><span>${fmtMoney(t.budget||t._booking_fee||0)}</span></div>
       <div class="drawer-info-row"><span>Number of sets</span><span>${t.shows}</span></div>
     </div>
 
@@ -10805,20 +10819,34 @@ async function saveTourFromDrawer(idx) {
     budget:    parseFloat(get('td-revenue')) || 0,
   };
 
-  if (idx !== null && TOUR_DATA[idx]?._id) {
-    // Edit existing — PUT /api/tours/:id
-    try {
-      if (API_BASE && SESSION?.token) {
-        await _apiFetch('PUT', '/tours/' + TOUR_DATA[idx]._id, payload);
-      } else {
-        // Offline fallback
-        const obj = { ...TOUR_DATA[idx], name, start: startDate||TOUR_DATA[idx].start,
-          cities: get('td-cities'), revenue: parseFloat(get('td-revenue'))||0,
-          costs: parseFloat(get('td-costs'))||0, status: get('td-status')||'planned' };
-        TOUR_DATA[idx] = obj;
-      }
+  if (idx !== null && TOUR_DATA[idx]) {
+    const t = TOUR_DATA[idx];
+
+    if (t._from_booking_only && API_BASE && SESSION?.token) {
+      // This is a virtual row from a confirmed booking — promote it to a real tour
+      try {
+        const saved = await apiPost('/tours', payload);
+        // Link the booking to the new tour
+        if (t._booking_id) {
+          await _apiFetch('PUT', '/booking/' + t._booking_id, { tour_id: saved.id });
+        }
+        showToast('Show saved to Tours', 'ok');
+      } catch(e) { showToast('Save failed: ' + e.message, 'err'); return; }
+
+    } else if (t._id && API_BASE && SESSION?.token) {
+      // Edit existing real tour
+      try {
+        await _apiFetch('PUT', '/tours/' + t._id, payload);
+        showToast('Show updated', 'ok');
+      } catch(e) { showToast('Update failed: ' + e.message, 'err'); return; }
+
+    } else {
+      // Offline fallback
+      TOUR_DATA[idx] = { ...t, name, start: startDate || t.start,
+        cities: get('td-cities'), revenue: parseFloat(get('td-revenue'))||0,
+        costs: parseFloat(get('td-costs'))||0, status: get('td-status')||'planned' };
       showToast('Show updated', 'ok');
-    } catch(e) { showToast('Update failed: ' + e.message, 'err'); return; }
+    }
   } else {
     // New show — POST /api/tours
     try {
@@ -10829,7 +10857,7 @@ async function saveTourFromDrawer(idx) {
         TOUR_DATA.unshift({ id: 'T'+Date.now(), name, start: startDate||'', end: startDate||'',
           cities: get('td-cities'), revenue: parseFloat(get('td-revenue'))||0,
           costs: parseFloat(get('td-costs'))||0, status: get('td-status')||'planned',
-          shows: 1, budget: 0, _id: 'T'+Date.now() });
+          shows: 1, budget: 0, _id: 'T'+Date.now(), _from_booking_only: false });
       }
       showToast('Show added', 'ok');
     } catch(e) { showToast('Add failed: ' + e.message, 'err'); return; }
@@ -10845,6 +10873,16 @@ async function deleteTourFromDrawer(idx) {
   if (!confirm(`Delete show "${t.name}"? This cannot be undone.`)) return;
 
   try {
+    if (t._from_booking_only) {
+      // No real tour row exists — nothing to DELETE in tours table
+      // Just remove from local array; the booking remains in confirmed stage
+      TOUR_DATA.splice(idx, 1);
+      closeDrawer();
+      renderToursList();
+      renderTourBannerKpis();
+      showToast('Removed from Tours view', 'ok');
+      return;
+    }
     if (API_BASE && SESSION?.token && t._id) {
       await apiDelete('/tours/' + t._id);
     } else {
