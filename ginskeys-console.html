@@ -676,7 +676,7 @@ body::after{
 .role-badge-pill.manager{background:rgba(22,163,74,.12);color:var(--green3);border:1px solid rgba(22,163,74,.3)}
 .role-badge-pill.accountant{background:rgba(45,127,255,.12);color:var(--blue2);border:1px solid rgba(45,127,255,.3)}
 .role-badge-pill.viewer{background:rgba(217,119,6,.12);color:var(--amber3);border:1px solid rgba(217,119,6,.3)}
-.role-badge-pill.social_media_manager{background:rgba(236,72,153,.12);color:#f472b6;border:1px solid rgba(236,72,153,.3)}
+.role-badge-pill.social_media_advisor{background:rgba(236,72,153,.12);color:#f472b6;border:1px solid rgba(236,72,153,.3)}
 .role-online{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 
 /* ─── SHORTCUTS ──────────────────────────────────── */
@@ -1393,7 +1393,7 @@ tr:hover .edit-btn{display:inline}
           <option value="manager">Manager — View + add/edit transactions, no delete, no user mgmt</option>
           <option value="accountant">Accountant — View + add transactions only</option>
           <option value="viewer">Viewer — Read-only dashboard</option>
-          <option value="social_media_manager">Social Media Manager — Releases + Press only</option>
+          <option value="social_media_advisor">Social Media Advisor — Releases + Press only</option>
         </select>
       </div>
       <div class="form-field">
@@ -2018,7 +2018,7 @@ tr:hover .edit-btn{display:inline}
           <option value="manager">Manager — all views, add+edit transactions</option>
           <option value="accountant">Accountant — ledger + add transactions</option>
           <option value="viewer">Viewer — read only</option>
-          <option value="social_media_manager">Social Media Manager — releases + press only</option>
+          <option value="social_media_advisor">Social Media Advisor — releases + press only</option>
         </select>
       </div>
       <div class="form-field">
@@ -2890,7 +2890,7 @@ tr:hover .edit-btn{display:inline}
         <div class="shortcut-row"><span class="shortcut-desc">Manager</span><span class="shortcut-key" style="color:var(--green3);border-color:var(--green)">All views, add+edit</span></div>
         <div class="shortcut-row"><span class="shortcut-desc">Accountant</span><span class="shortcut-key" style="color:var(--blue2);border-color:var(--blue)">Ledger + add only</span></div>
         <div class="shortcut-row"><span class="shortcut-desc">Viewer</span><span class="shortcut-key" style="color:var(--amber3);border-color:var(--amber)">Read-only</span></div>
-        <div class="shortcut-row"><span class="shortcut-desc">Social Media Manager</span><span class="shortcut-key" style="color:#f472b6;border-color:#ec4899">Releases + Press only</span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Social Media Advisor</span><span class="shortcut-key" style="color:#f472b6;border-color:#ec4899">Releases + Press only</span></div>
       </div>
     </div>
   </div>
@@ -3344,6 +3344,7 @@ tr:hover .edit-btn{display:inline}
       <div class="panel" style="overflow-y:auto;max-height:320px">
         <div class="panel-header">
           <div class="panel-title"><div class="panel-title-dot" style="background:var(--accent)"></div>Release Engine</div>
+          <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printReleaseEngine()" title="Export launch plan as PDF">⎙ PDF</button>
         </div>
         <div style="padding:4px 12px 8px">
           <select id="rel-engine-picker" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-family:var(--mono);font-size:9px;padding:3px 6px;width:100%" onchange="renderReleaseEngine()">
@@ -3354,6 +3355,137 @@ tr:hover .edit-btn{display:inline}
           <div style="color:var(--muted3);font-size:9px;padding:4px 0">Select a release with a date set to generate your 45-day launch plan.</div>
         </div>
       </div>
+    </div>
+
+    <!-- Social Media Toolkit -->
+    <div style="flex-shrink:0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+
+      <!-- Caption Templates -->
+      <div class="panel" style="overflow-y:auto;max-height:280px">
+        <div class="panel-header">
+          <div class="panel-title"><div class="panel-title-dot" style="background:#f472b6"></div>Caption Templates</div>
+        </div>
+        <div style="padding:8px 12px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:8px;color:var(--muted3);margin-bottom:2px">Select a release, then click a template to copy</div>
+          <select id="rel-caption-picker" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-family:var(--mono);font-size:9px;padding:3px 6px;width:100%;margin-bottom:4px">
+            <option value="">— select release —</option>
+          </select>
+          <div id="rel-caption-templates" style="display:flex;flex-direction:column;gap:4px">
+            <div onclick="copyCaptionTemplate('announce')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
+              <div style="font-weight:700;color:var(--text);margin-bottom:2px">📢 Announcement</div>
+              <div style="color:var(--muted3)">New music coming. Title + date + pre-save</div>
+            </div>
+            <div onclick="copyCaptionTemplate('teaser')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
+              <div style="font-weight:700;color:var(--text);margin-bottom:2px">🔥 Teaser</div>
+              <div style="color:var(--muted3)">Countdown snippet for Reels/TikTok</div>
+            </div>
+            <div onclick="copyCaptionTemplate('drop')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
+              <div style="font-weight:700;color:var(--text);margin-bottom:2px">▶ Release Day</div>
+              <div style="color:var(--muted3)">IT'S OUT. Stream now + link</div>
+            </div>
+            <div onclick="copyCaptionTemplate('bts')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
+              <div style="font-weight:700;color:var(--text);margin-bottom:2px">🎬 Behind The Scenes</div>
+              <div style="color:var(--muted3)">Studio / rehearsal / making-of</div>
+            </div>
+            <div onclick="copyCaptionTemplate('gig')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
+              <div style="font-weight:700;color:var(--text);margin-bottom:2px">🎸 Gig Promo</div>
+              <div style="color:var(--muted3)">Venue + date + link + CTA</div>
+            </div>
+            <div onclick="copyCaptionTemplate('thankyou')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
+              <div style="font-weight:700;color:var(--text);margin-bottom:2px">🙏 Thank You</div>
+              <div style="color:var(--muted3)">Post-release / post-gig gratitude</div>
+            </div>
+          </div>
+          <div id="rel-caption-output" style="display:none;background:var(--bg4);padding:8px 10px;border-radius:2px;font-size:9px;color:var(--text);line-height:1.6;border:1px solid var(--border2);position:relative;margin-top:4px">
+            <div id="rel-caption-text"></div>
+            <button onclick="copyCaptionToClipboard()" style="position:absolute;top:4px;right:4px;background:var(--accent);color:#fff;border:none;font-size:7px;padding:2px 6px;cursor:pointer;border-radius:1px;font-weight:700">COPY</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hashtag Bank -->
+      <div class="panel" style="overflow-y:auto;max-height:280px">
+        <div class="panel-header">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Hashtag Bank</div>
+        </div>
+        <div style="padding:8px 12px;display:flex;flex-direction:column;gap:8px;font-size:9px">
+          <div>
+            <div style="font-size:8px;color:var(--accent);letter-spacing:.1em;font-weight:700;margin-bottom:4px">CORE — always use</div>
+            <div id="ht-core" style="display:flex;flex-wrap:wrap;gap:3px"></div>
+          </div>
+          <div>
+            <div style="font-size:8px;color:var(--purple2);letter-spacing:.1em;font-weight:700;margin-bottom:4px">GENRE</div>
+            <div id="ht-genre" style="display:flex;flex-wrap:wrap;gap:3px"></div>
+          </div>
+          <div>
+            <div style="font-size:8px;color:var(--green3);letter-spacing:.1em;font-weight:700;margin-bottom:4px">PORTUGUESE SCENE</div>
+            <div id="ht-pt" style="display:flex;flex-wrap:wrap;gap:3px"></div>
+          </div>
+          <div>
+            <div style="font-size:8px;color:var(--blue2);letter-spacing:.1em;font-weight:700;margin-bottom:4px">RELEASE SPECIFIC</div>
+            <div id="ht-release" style="display:flex;flex-wrap:wrap;gap:3px"></div>
+          </div>
+          <div>
+            <div style="font-size:8px;color:var(--amber2);letter-spacing:.1em;font-weight:700;margin-bottom:4px">DISCOVERY / REACH</div>
+            <div id="ht-discovery" style="display:flex;flex-wrap:wrap;gap:3px"></div>
+          </div>
+          <button onclick="copyAllHashtags()" style="background:var(--accent);color:#fff;border:none;padding:5px 12px;cursor:pointer;font-size:8px;font-weight:700;letter-spacing:.06em;border-radius:1px;margin-top:4px">COPY ALL HASHTAGS</button>
+        </div>
+      </div>
+
+      <!-- Content Calendar -->
+      <div class="panel" style="overflow-y:auto;max-height:280px">
+        <div class="panel-header">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Weekly Content Grid</div>
+        </div>
+        <div style="padding:8px 12px;display:flex;flex-direction:column;gap:3px;font-size:9px">
+          <div style="font-size:8px;color:var(--muted3);margin-bottom:4px">Optimal posting schedule for algorithm growth</div>
+          <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:4px 0;border-bottom:1px solid var(--border2);font-size:7.5px;font-weight:700;color:var(--muted);letter-spacing:.08em">
+            <div>DAY</div><div>INSTAGRAM</div><div>TIKTOK / YT</div>
+          </div>
+          <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:5px 0;border-bottom:1px solid var(--border1)">
+            <div style="font-weight:700;color:var(--accent);font-size:9px">MON</div>
+            <div style="color:var(--muted2);font-size:8px">Reel — studio/rehearsal clip<br><span style="color:var(--muted)">18:00-20:00</span></div>
+            <div style="color:var(--muted2);font-size:8px">TikTok — trending audio + band<br><span style="color:var(--muted)">19:00-21:00</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:5px 0;border-bottom:1px solid var(--border1)">
+            <div style="font-weight:700;color:var(--text);font-size:9px">TUE</div>
+            <div style="color:var(--muted2);font-size:8px">Story — poll/question sticker<br><span style="color:var(--muted)">12:00-14:00</span></div>
+            <div style="color:var(--muted3);font-size:8px">— rest —</div>
+          </div>
+          <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:5px 0;border-bottom:1px solid var(--border1)">
+            <div style="font-weight:700;color:var(--accent);font-size:9px">WED</div>
+            <div style="color:var(--muted2);font-size:8px">Carousel — gear/process/tips<br><span style="color:var(--muted)">18:00-20:00</span></div>
+            <div style="color:var(--muted2);font-size:8px">YT Short — riff/solo clip<br><span style="color:var(--muted)">17:00-19:00</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:5px 0;border-bottom:1px solid var(--border1)">
+            <div style="font-weight:700;color:var(--text);font-size:9px">THU</div>
+            <div style="color:var(--muted2);font-size:8px">Story — countdown/teaser<br><span style="color:var(--muted)">12:00-14:00</span></div>
+            <div style="color:var(--muted3);font-size:8px">— rest —</div>
+          </div>
+          <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:5px 0;border-bottom:1px solid var(--border1)">
+            <div style="font-weight:700;color:var(--accent);font-size:9px">FRI</div>
+            <div style="color:var(--muted2);font-size:8px">Reel — music content/performance<br><span style="color:var(--muted)">17:00-19:00</span></div>
+            <div style="color:var(--muted2);font-size:8px">TikTok — hook/chorus clip<br><span style="color:var(--muted)">18:00-21:00</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:5px 0;border-bottom:1px solid var(--border1)">
+            <div style="font-weight:700;color:var(--text);font-size:9px">SAT</div>
+            <div style="color:var(--muted2);font-size:8px">Feed post — photo/artwork<br><span style="color:var(--muted)">11:00-13:00</span></div>
+            <div style="color:var(--muted2);font-size:8px">YT — full video/live session<br><span style="color:var(--muted)">14:00-16:00</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;padding:5px 0">
+            <div style="font-weight:700;color:var(--text);font-size:9px">SUN</div>
+            <div style="color:var(--muted2);font-size:8px">Story — personal/casual<br><span style="color:var(--muted)">10:00-12:00</span></div>
+            <div style="color:var(--muted3);font-size:8px">— rest —</div>
+          </div>
+          <div style="font-size:7.5px;color:var(--muted);margin-top:4px;line-height:1.6;padding:4px 0;border-top:1px solid var(--border2)">
+            ▸ Reels/TikTok: 3-4x week · Feed posts: 2x week · Stories: daily<br>
+            ▸ Best times for PT audience: 12-14h and 18-21h<br>
+            ▸ Friday = new music day on Spotify (Release Radar updates)
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Add Release + Pipeline -->
@@ -3534,6 +3666,84 @@ tr:hover .edit-btn{display:inline}
       <div class="panel" style="padding:10px 12px;text-align:center"><div style="font-size:8px;color:var(--muted);letter-spacing:.1em">RESPONDED</div><div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--blue2)" id="pr-responded">0</div></div>
       <div class="panel" style="padding:10px 12px;text-align:center"><div style="font-size:8px;color:var(--muted);letter-spacing:.1em">PUBLISHED</div><div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--green3)" id="pr-published">0</div></div>
       <div class="panel" style="padding:10px 12px;text-align:center"><div style="font-size:8px;color:var(--muted);letter-spacing:.1em">EST. VALUE</div><div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green3)" id="pr-value">€0</div></div>
+    </div>
+
+    <!-- Press & Outreach Toolkit -->
+    <div style="flex-shrink:0;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+
+      <!-- Email Pitch Templates -->
+      <div class="panel" style="overflow-y:auto;max-height:280px">
+        <div class="panel-header">
+          <div class="panel-title"><div class="panel-title-dot" style="background:#f472b6"></div>Pitch Email Templates</div>
+        </div>
+        <div style="padding:8px 12px;display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:8px;color:var(--muted3);margin-bottom:4px">Click to generate · edit the [brackets] · copy and send</div>
+          <div onclick="generatePitchEmail('radio')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
+            <div style="font-weight:700;color:var(--text);margin-bottom:2px">📻 Radio Pitch</div>
+            <div style="color:var(--muted3)">Rock FM, Antena 3, local stations</div>
+          </div>
+          <div onclick="generatePitchEmail('blog')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
+            <div style="font-weight:700;color:var(--text);margin-bottom:2px">✍ Blog / Magazine Pitch</div>
+            <div style="color:var(--muted3)">Blitz, Loud!, Whiplash, international blogs</div>
+          </div>
+          <div onclick="generatePitchEmail('sync')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
+            <div style="font-weight:700;color:var(--text);margin-bottom:2px">🎬 Sync Licensing Pitch</div>
+            <div style="color:var(--muted3)">Music supervisors, libraries, agencies</div>
+          </div>
+          <div onclick="generatePitchEmail('playlist')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
+            <div style="font-weight:700;color:var(--text);margin-bottom:2px">🎧 Playlist Curator Pitch</div>
+            <div style="color:var(--muted3)">Independent Spotify/Apple curators</div>
+          </div>
+          <div onclick="generatePitchEmail('followup')" class="splot-btn" style="text-align:left;padding:6px 8px;font-size:8px;cursor:pointer;display:block;width:100%">
+            <div style="font-weight:700;color:var(--text);margin-bottom:2px">🔄 Follow-Up Email</div>
+            <div style="color:var(--muted3)">Polite nudge after no response</div>
+          </div>
+          <div id="press-pitch-output" style="display:none;background:var(--bg4);padding:8px 10px;border-radius:2px;font-size:9px;color:var(--text);line-height:1.6;border:1px solid var(--border2);position:relative;margin-top:4px;white-space:pre-wrap">
+            <div id="press-pitch-text"></div>
+            <button onclick="copyPitchToClipboard()" style="position:absolute;top:4px;right:4px;background:var(--accent);color:#fff;border:none;font-size:7px;padding:2px 6px;cursor:pointer;border-radius:1px;font-weight:700">COPY</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EPK Quick-Link Generator -->
+      <div class="panel" style="overflow-y:auto;max-height:280px">
+        <div class="panel-header">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>EPK Quick Builder</div>
+        </div>
+        <div style="padding:8px 12px;display:flex;flex-direction:column;gap:6px;font-size:9px">
+          <div style="font-size:8px;color:var(--muted3);margin-bottom:2px">Essential links to include in every pitch email</div>
+          <div style="display:grid;grid-template-columns:90px 1fr;gap:4px;align-items:center">
+            <div style="font-size:8px;font-weight:700;color:var(--accent);letter-spacing:.06em">SPOTIFY</div>
+            <input id="epk-spotify" class="login-input" style="font-size:9px;padding:3px 6px" placeholder="https://open.spotify.com/artist/..." value="">
+          </div>
+          <div style="display:grid;grid-template-columns:90px 1fr;gap:4px;align-items:center">
+            <div style="font-size:8px;font-weight:700;color:var(--red2);letter-spacing:.06em">YOUTUBE</div>
+            <input id="epk-youtube" class="login-input" style="font-size:9px;padding:3px 6px" placeholder="https://youtube.com/@theginskeys" value="">
+          </div>
+          <div style="display:grid;grid-template-columns:90px 1fr;gap:4px;align-items:center">
+            <div style="font-size:8px;font-weight:700;color:var(--purple2);letter-spacing:.06em">INSTAGRAM</div>
+            <input id="epk-instagram" class="login-input" style="font-size:9px;padding:3px 6px" placeholder="https://instagram.com/theginskeys" value="">
+          </div>
+          <div style="display:grid;grid-template-columns:90px 1fr;gap:4px;align-items:center">
+            <div style="font-size:8px;font-weight:700;color:var(--blue2);letter-spacing:.06em">PRESS KIT</div>
+            <input id="epk-presskit" class="login-input" style="font-size:9px;padding:3px 6px" placeholder="Google Drive / Dropbox link to photos + bio" value="">
+          </div>
+          <div style="display:grid;grid-template-columns:90px 1fr;gap:4px;align-items:center">
+            <div style="font-size:8px;font-weight:700;color:var(--green3);letter-spacing:.06em">WEBSITE</div>
+            <input id="epk-website" class="login-input" style="font-size:9px;padding:3px 6px" placeholder="https://theginskeys.com" value="">
+          </div>
+          <div style="display:grid;grid-template-columns:90px 1fr;gap:4px;align-items:center">
+            <div style="font-size:8px;font-weight:700;color:var(--amber2);letter-spacing:.06em">CONTACT</div>
+            <input id="epk-contact" class="login-input" style="font-size:9px;padding:3px 6px" placeholder="mendonza@theginskeys.com" value="">
+          </div>
+          <button onclick="copyEPKBlock()" style="background:var(--accent);color:#fff;border:none;padding:5px 12px;cursor:pointer;font-size:8px;font-weight:700;letter-spacing:.06em;border-radius:1px;margin-top:4px">COPY EPK LINK BLOCK</button>
+          <div style="font-size:7.5px;color:var(--muted);margin-top:2px;line-height:1.6">
+            ▸ Fill these once — they auto-populate into pitch email templates<br>
+            ▸ Press Kit link should contain: hi-res photos, bio (PT + EN), logo, tech rider PDF
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Add Contact + Pipeline -->
@@ -7815,6 +8025,235 @@ function generateLaunchPlan(title, type, releaseDate, today, r) {
   return plan;
 }
 
+function printReleaseEngine() {
+  var picker = document.getElementById('rel-engine-picker');
+  var id = picker ? picker.value : '';
+  var r = id ? RELEASES_DATA.find(function(x){ return x.id === id; }) : null;
+  if (!r || !r.release_date) { alert('Select a release with a date first.'); return; }
+
+  var releaseDate = new Date(r.release_date);
+  var today = new Date(); today.setHours(0,0,0,0);
+  var plan = generateLaunchPlan(r.title, r.type, releaseDate, today, r);
+  var dateStr = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
+  var daysToRelease = Math.ceil((releaseDate - today) / 86400000);
+
+  var rows = plan.map(function(item) {
+    var isPast = item.date < today;
+    var isToday = item.date.toDateString() === today.toDateString();
+    var isRelDay = item.date.toDateString() === releaseDate.toDateString();
+    var tagColors = {spotify:'#22c55e',social:'#a855f7',press:'#f59e0b',content:'#3b82f6',drop:'#ff5500'};
+    var tc = tagColors[item.category] || '#888';
+    return '<tr style="opacity:'+(isPast&&!isToday?'0.5':'1')+';background:'+(isRelDay?'rgba(255,85,0,.06)':isToday?'rgba(74,222,128,.06)':'')+'">'+
+      '<td style="font-family:monospace;font-size:8px;color:#888;white-space:nowrap">'+item.date.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})+'</td>'+
+      '<td style="font-size:8.5px;font-weight:'+(isToday||isRelDay?'700':'400')+';color:'+(isRelDay?'#ff5500':isToday?'#22c55e':'#222')+'">'+(isToday?'→ ':'')+item.action+'</td>'+
+      '<td style="font-size:7.5px;color:#888">'+(item.detail||'')+'</td>'+
+      '<td style="font-size:7px;font-weight:700;color:'+tc+';letter-spacing:.08em;white-space:nowrap">'+item.tag+'</td>'+
+      '</tr>';
+  }).join('');
+
+  var w = window.open('','_blank');
+  w.document.write('<!DOCTYPE html><html><head><title>Release Engine — '+r.title+'</title>'+
+  '<style>'+
+  '@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap");'+
+  '*{box-sizing:border-box;margin:0;padding:0}'+
+  'body{font-family:Inter,system-ui,sans-serif;font-size:10px;color:#111;background:#fff;max-width:210mm;margin:0 auto}'+
+  '@page{margin:10mm 12mm;size:A4}'+
+  '.hdr{background:#0a0a0a;color:#fff;padding:16px 24px;display:flex;align-items:center;gap:16px}'+
+  '.hdr-logo{height:34px;width:auto;filter:brightness(1.1)}'+
+  '.hdr-info{flex:1}'+
+  '.hdr-title{font-size:10px;font-weight:800;letter-spacing:.2em;color:#ff5500}'+
+  '.hdr-sub{font-size:8px;color:#999;letter-spacing:.1em;margin-top:2px}'+
+  '.hdr-sub b{color:#ccc}'+
+  '.hdr-right{text-align:right;font-family:"JetBrains Mono",monospace;font-size:8px;color:#666}'+
+  '.bd{padding:14px 24px 20px}'+
+  '.meta{display:flex;gap:20px;margin-bottom:12px;padding:10px 14px;background:#f8f8fa;border-left:3px solid #ff5500;border-radius:0 2px 2px 0}'+
+  '.meta-item{font-size:9px;color:#555}'+
+  '.meta-item b{color:#111;font-size:10px}'+
+  'table{width:100%;border-collapse:collapse}'+
+  'th{font-size:7.5px;letter-spacing:.12em;color:#888;font-weight:600;text-align:left;padding:5px 8px;border-bottom:2px solid #e0e0e0}'+
+  'td{padding:5px 8px;border-bottom:1px solid #eee;font-size:9px;vertical-align:top}'+
+  '.ft{background:#0a0a0a;color:#888;padding:10px 24px;display:flex;justify-content:space-between;font-size:7.5px;letter-spacing:.06em}'+
+  '.ft b{color:#ff5500}'+
+  '@media print{.hdr{padding:12px 0}.bd{padding:10px 0}.ft{padding:8px 0}}'+
+  '</style></head><body>'+
+
+  '<div class="hdr">'+
+  (typeof GINSKEYS_LOGO_B64!=="undefined"?'<img class="hdr-logo" src="'+GINSKEYS_LOGO_B64+'">':'')+
+  '<div class="hdr-info"><div class="hdr-title">RELEASE ENGINE — 45 DAY LAUNCH PLAN</div>'+
+  '<div class="hdr-sub"><b>'+r.title.toUpperCase()+'</b> · '+r.type+' · '+(daysToRelease>0?daysToRelease+' days to release':'Released')+'</div></div>'+
+  '<div class="hdr-right">'+dateStr+'</div>'+
+  '</div>'+
+
+  '<div class="bd">'+
+  '<div class="meta">'+
+  '<div class="meta-item"><b>'+r.title+'</b></div>'+
+  '<div class="meta-item">Type: <b>'+r.type+'</b></div>'+
+  '<div class="meta-item">Release: <b>'+releaseDate.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+'</b></div>'+
+  '<div class="meta-item">Actions: <b>'+plan.length+'</b></div>'+
+  '<div class="meta-item">Stage: <b>'+r.stage+'</b></div>'+
+  '</div>'+
+  '<table><thead><tr><th>DATE</th><th>ACTION</th><th>DETAILS</th><th>CATEGORY</th></tr></thead><tbody>'+rows+'</tbody></table>'+
+  '</div>'+
+
+  '<div class="ft"><div><b>THE GINSKEYS</b> · Release Engine · Launch Plan</div><div>Generated '+dateStr+'</div></div>'+
+
+  '</body></html>');
+  w.document.close();
+  setTimeout(function(){ w.print(); }, 700);
+}
+
+// ── SOCIAL MEDIA TOOLKIT ────────────────────────────────
+
+var SM_HASHTAGS = {
+  core: ['#TheGinskeys','#HardRock','#Sines','#Portugal','#RockPortugues','#NewMusic'],
+  genre: ['#HardRockBand','#RockAndRoll','#ClassicRock','#BluesRock','#GrungeRock','#RockNacional','#IndieRock','#LiveRock'],
+  pt: ['#MusicaPortuguesa','#RockPortugal','#BandasPortuguesas','#AlentejanoRock','#SinesPortugal','#CulturaPortuguesa','#MusicaPT','#FestivaisPortugal'],
+  release: ['#NewSingle','#NewRelease','#OutNow','#StreamNow','#NowPlaying','#NewMusicFriday','#JustDropped'],
+  discovery: ['#UnsignedArtist','#IndependentMusic','#SupportLocalMusic','#EmergingArtist','#UndergroundRock','#BandLife','#RockCommunity','#LiveMusic']
+};
+
+function initHashtagBank() {
+  Object.keys(SM_HASHTAGS).forEach(function(cat) {
+    var el = document.getElementById('ht-' + cat);
+    if (!el) return;
+    el.innerHTML = SM_HASHTAGS[cat].map(function(tag) {
+      return '<span onclick="toggleHashtag(this)" style="cursor:pointer;padding:2px 6px;background:var(--bg4);border:1px solid var(--border2);border-radius:1px;font-size:8px;color:var(--text);transition:all .1s;user-select:none" data-selected="true">' + tag + '</span>';
+    }).join('');
+  });
+}
+
+function toggleHashtag(el) {
+  var sel = el.dataset.selected === 'true';
+  el.dataset.selected = sel ? 'false' : 'true';
+  el.style.opacity = sel ? '0.3' : '1';
+  el.style.textDecoration = sel ? 'line-through' : 'none';
+}
+
+function copyAllHashtags() {
+  var tags = [];
+  document.querySelectorAll('[id^="ht-"] span[data-selected="true"]').forEach(function(el) {
+    tags.push(el.textContent);
+  });
+  var text = tags.join(' ');
+  navigator.clipboard.writeText(text).then(function() {
+    alert('Copied ' + tags.length + ' hashtags!');
+  }).catch(function() {
+    prompt('Copy these hashtags:', text);
+  });
+}
+
+function initCaptionPicker() {
+  var picker = document.getElementById('rel-caption-picker');
+  if (!picker) return;
+  var cur = picker.value;
+  picker.innerHTML = '<option value="">— select release —</option>' +
+    RELEASES_DATA.map(function(r) {
+      return '<option value="' + r.id + '"' + (r.id === cur ? ' selected' : '') + '>' + r.title + '</option>';
+    }).join('');
+}
+
+function copyCaptionTemplate(type) {
+  var picker = document.getElementById('rel-caption-picker');
+  var id = picker ? picker.value : '';
+  var r = id ? RELEASES_DATA.find(function(x){ return x.id === id; }) : null;
+  var title = r ? r.title : '[TITLE]';
+  var date = r && r.release_date ? new Date(r.release_date).toLocaleDateString('pt-PT',{day:'numeric',month:'long'}) : '[DATA]';
+  var spotifyUrl = r && r.spotify_url ? r.spotify_url : '[LINK]';
+  var type2 = r ? r.type : 'single';
+
+  var templates = {
+    announce: '🔥 NEW ' + type2.toUpperCase() + ' ALERT 🔥\n\n"' + title + '" drops ' + date + '.\n\nPre-save now 👉 Link in bio\n\n' + SM_HASHTAGS.core.slice(0,3).join(' ') + ' ' + SM_HASHTAGS.release.slice(0,3).join(' '),
+    teaser: '👀 Something\'s coming...\n\n"' + title + '" · ' + date + '\n\nAre you ready? 🎸\n\n' + SM_HASHTAGS.core.slice(0,2).join(' ') + ' #ComingSoon #NewMusic',
+    drop: '▶ IT\'S OUT NOW.\n\n"' + title + '" is live everywhere.\n\nStream, share, add to your playlists 🖤\n\n🎧 ' + spotifyUrl + '\n\n' + SM_HASHTAGS.core.join(' ') + ' #OutNow #StreamNow',
+    bts: '🎬 Behind the scenes of "' + title + '"\n\nThe making of this track was [describe moment]. Can\'t wait for you to hear the final version.\n\n' + SM_HASHTAGS.core.slice(0,3).join(' ') + ' #BTS #StudioLife #BandLife',
+    gig: '🎸 LIVE SHOW 🎸\n\n📍 [VENUE] · [CITY]\n📅 [DATE] · [TIME]\n🎟 [TICKET LINK / Free entry]\n\nCome hear "' + title + '" live for the first time.\n\n' + SM_HASHTAGS.core.slice(0,2).join(' ') + ' #LiveMusic #ConcertosPortugal',
+    thankyou: '🙏 Thank you.\n\n"' + title + '" has reached [X] streams in [X] days. Every play, every share, every message means the world to us.\n\nThis is just the beginning. 🖤\n\n' + SM_HASHTAGS.core.slice(0,3).join(' ')
+  };
+
+  var caption = templates[type] || '';
+  var outputEl = document.getElementById('rel-caption-output');
+  var textEl = document.getElementById('rel-caption-text');
+  if (outputEl && textEl) {
+    textEl.textContent = caption;
+    outputEl.style.display = 'block';
+  }
+}
+
+function copyCaptionToClipboard() {
+  var textEl = document.getElementById('rel-caption-text');
+  if (!textEl) return;
+  navigator.clipboard.writeText(textEl.textContent).then(function() {
+    var btn = textEl.parentElement.querySelector('button');
+    if (btn) { btn.textContent = 'COPIED!'; setTimeout(function(){ btn.textContent = 'COPY'; }, 1500); }
+  }).catch(function() {
+    prompt('Copy this caption:', textEl.textContent);
+  });
+}
+
+// Hook into releases load to init social media tools
+var _origUpdateReleasesBanner = updateReleasesBanner;
+updateReleasesBanner = function() {
+  _origUpdateReleasesBanner();
+  initHashtagBank();
+  initCaptionPicker();
+};
+
+// ── PRESS PITCH TEMPLATES ───────────────────────────────
+function getEPKLinks() {
+  return {
+    spotify: (document.getElementById('epk-spotify')||{}).value || '[SPOTIFY LINK]',
+    youtube: (document.getElementById('epk-youtube')||{}).value || '[YOUTUBE LINK]',
+    instagram: (document.getElementById('epk-instagram')||{}).value || '[INSTAGRAM LINK]',
+    presskit: (document.getElementById('epk-presskit')||{}).value || '[PRESS KIT LINK]',
+    website: (document.getElementById('epk-website')||{}).value || '[WEBSITE]',
+    contact: (document.getElementById('epk-contact')||{}).value || '[EMAIL]'
+  };
+}
+
+function generatePitchEmail(type) {
+  var epk = getEPKLinks();
+  var templates = {
+    radio: 'Subject: The Ginskeys — New Single for Your Consideration\n\nHi [NAME],\n\nI\'m reaching out from The Ginskeys, a hard rock band from Sines, Portugal. We\'ve just released our new single "[TITLE]" and believe it would be a great fit for your programming.\n\nThe track is a [describe: high-energy / melodic / heavy] hard rock song about [theme]. We\'ve been active in the Portuguese live circuit with shows at [venue names] and our previous release garnered [X] streams.\n\nHere are the key links:\n🎧 Spotify: ' + epk.spotify + '\n📺 YouTube: ' + epk.youtube + '\n📸 Instagram: ' + epk.instagram + '\n📁 Press Kit (photos, bio, logo): ' + epk.presskit + '\n🌐 Website: ' + epk.website + '\n\nWe\'d be grateful for any airplay consideration. Happy to provide any additional materials.\n\nBest regards,\nTiago Mendonça\nThe Ginskeys\n' + epk.contact,
+
+    blog: 'Subject: The Ginskeys — New Hard Rock from Portugal [Review/Feature Request]\n\nHi [NAME],\n\nThe Ginskeys are a 4-piece hard rock band from Sines, Portugal, and we\'d love to be featured on [OUTLET NAME].\n\nOur new single "[TITLE]" drops on [DATE]. It\'s [describe the sound and what makes it stand out]. We\'re part of a growing wave of Portuguese rock bands bringing raw energy back to the scene.\n\nKey links:\n🎧 ' + epk.spotify + '\n📺 ' + epk.youtube + '\n📁 Press Kit: ' + epk.presskit + '\n\nWe can provide exclusive quotes, behind-the-scenes content, or an interview if you\'re interested.\n\nThank you for your time,\nTiago Mendonça · ' + epk.contact,
+
+    sync: 'Subject: Hard Rock Catalog Available for Sync — The Ginskeys\n\nHi [NAME],\n\nI\'m writing to submit The Ginskeys\' catalog for sync licensing consideration. We\'re a Portuguese hard rock band with high-energy, guitar-driven tracks ideal for:\n\n• Action/sports scenes\n• Trailer music\n• Gaming soundtracks\n• Automotive/lifestyle advertising\n\nOur music is [describe: raw, punchy, cinematic, anthemic]. All tracks are professionally recorded, mixed and mastered.\n\n🎧 Listen: ' + epk.spotify + '\n📺 Video: ' + epk.youtube + '\n📁 Stems available on request\n\nWe\'re open to non-exclusive licensing and can clear rights quickly (self-published, no label).\n\nBest,\nTiago Mendonça · ' + epk.contact,
+
+    playlist: 'Subject: Submission — The Ginskeys "[TITLE]"\n\nHi [CURATOR NAME],\n\nI\'d love to submit our new track "[TITLE]" for your playlist [PLAYLIST NAME].\n\nGenre: Hard Rock / Blues Rock\nMood: [energetic / dark / anthemic / raw]\nBPM: [BPM]\nSimilar to: [2-3 comparable artists]\n\n🎧 ' + epk.spotify + '\n\nThe track was released on [DATE] and has [X] saves in its first week. We believe it fits the vibe of your playlist perfectly.\n\nThank you,\nTiago · ' + epk.contact,
+
+    followup: 'Subject: Re: The Ginskeys — Friendly Follow-Up\n\nHi [NAME],\n\nJust a quick follow-up on my previous email about The Ginskeys\' new single "[TITLE]". I understand you receive many submissions, so no pressure at all.\n\nSince my last message, the track has reached [X streams / been featured on Y / received Z reviews]. Happy to provide any additional info if helpful.\n\n🎧 Quick listen: ' + epk.spotify + '\n\nThank you for your time,\nTiago Mendonça · ' + epk.contact
+  };
+
+  var text = templates[type] || '';
+  var outputEl = document.getElementById('press-pitch-output');
+  var textEl = document.getElementById('press-pitch-text');
+  if (outputEl && textEl) {
+    textEl.textContent = text;
+    outputEl.style.display = 'block';
+  }
+}
+
+function copyPitchToClipboard() {
+  var textEl = document.getElementById('press-pitch-text');
+  if (!textEl) return;
+  navigator.clipboard.writeText(textEl.textContent).then(function() {
+    var btn = textEl.parentElement.querySelector('button');
+    if (btn) { btn.textContent = 'COPIED!'; setTimeout(function(){ btn.textContent = 'COPY'; }, 1500); }
+  }).catch(function() {
+    prompt('Copy this pitch:', textEl.textContent);
+  });
+}
+
+function copyEPKBlock() {
+  var epk = getEPKLinks();
+  var block = '🎧 Spotify: ' + epk.spotify + '\n📺 YouTube: ' + epk.youtube + '\n📸 Instagram: ' + epk.instagram + '\n📁 Press Kit: ' + epk.presskit + '\n🌐 Website: ' + epk.website + '\n✉ Contact: ' + epk.contact;
+  navigator.clipboard.writeText(block).then(function() {
+    alert('EPK link block copied!');
+  }).catch(function() {
+    prompt('Copy this EPK block:', block);
+  });
+}
+
 function updateSplitsMiddle() {
   if (!SPLITS_DATA.length) return;
   const totalFund = SPLITS_DATA.reduce((s,sp)=>s+parseFloat(sp.band_fund_eur||0),0);
@@ -11036,7 +11475,7 @@ const ROLE_PERMS = {
   'manager':   {viewDashboard:true,viewLedger:true,viewTours:true,viewStreaming:true,viewAccess:false,viewAudit:false,viewAlerts:true,viewSettings:false,addTransaction:true,editTransaction:true,deleteTransaction:false,createInvite:false,manageUsers:false,editTour:true,deleteTour:false,editAlertRule:false,importData:false,changeSetting:false,viewReleases:true,viewPress:true,viewBooking:true,viewProduction:true,viewSplits:true,viewMembers:true,viewInvoices:true,viewFinanceTools:false},
   'accountant':{viewDashboard:true,viewLedger:true,viewTours:true,viewStreaming:false,viewAccess:false,viewAudit:true,viewAlerts:false,viewSettings:false,addTransaction:true,editTransaction:false,deleteTransaction:false,createInvite:false,manageUsers:false,editTour:false,deleteTour:false,editAlertRule:false,importData:false,changeSetting:false,viewReleases:false,viewPress:false,viewBooking:false,viewProduction:false,viewSplits:false,viewMembers:false,viewInvoices:true,viewFinanceTools:true},
   'viewer':    {viewDashboard:true,viewLedger:true,viewTours:false,viewStreaming:false,viewAccess:false,viewAudit:false,viewAlerts:false,viewSettings:false,addTransaction:false,editTransaction:false,deleteTransaction:false,createInvite:false,manageUsers:false,editTour:false,deleteTour:false,editAlertRule:false,importData:false,changeSetting:false,viewReleases:true,viewPress:false,viewBooking:false,viewProduction:false,viewSplits:false,viewMembers:false,viewInvoices:false,viewFinanceTools:false},
-  'social_media_manager':{viewDashboard:false,viewLedger:false,viewTours:false,viewStreaming:false,viewAccess:false,viewAudit:false,viewAlerts:false,viewSettings:false,addTransaction:false,editTransaction:false,deleteTransaction:false,createInvite:false,manageUsers:false,editTour:false,deleteTour:false,editAlertRule:false,importData:false,changeSetting:false,viewReleases:true,viewPress:true,viewBooking:false,viewProduction:false,viewSplits:false,viewMembers:false,viewInvoices:false,viewFinanceTools:false},
+  'social_media_advisor':{viewDashboard:false,viewLedger:false,viewTours:false,viewStreaming:false,viewAccess:false,viewAudit:false,viewAlerts:false,viewSettings:false,addTransaction:false,editTransaction:false,deleteTransaction:false,createInvite:false,manageUsers:false,editTour:false,deleteTour:false,editAlertRule:false,importData:false,changeSetting:false,viewReleases:true,viewPress:true,viewBooking:false,viewProduction:false,viewSplits:false,viewMembers:false,viewInvoices:false,viewFinanceTools:false},
 };
 
 // Whitelist of pre-approved emails (would be server-side in production)
@@ -11397,7 +11836,7 @@ function enterApp(){
   var roleDisplay = {
     'admin':'ADMIN','co-admin':'CO-ADMIN','manager':'MANAGER',
     'accountant':'ACCOUNTANT','viewer':'VIEWER',
-    'social_media_manager':'SOCIAL MEDIA'
+    'social_media_advisor':'SM ADVISOR'
   };
   var roleName = roleDisplay[SESSION.role] || SESSION.role.toUpperCase();
   const badge=document.getElementById('tb-role-badge');
@@ -11471,7 +11910,7 @@ function applyRolePermissions(){
     b.style.display=perms.viewLedger?'':'none';
   });
 
-  // ── For social_media_manager: auto-switch to releases tab since overview is hidden ──
+  // ── For social_media_advisor: auto-switch to releases tab since overview is hidden ──
   if(!perms.viewDashboard && perms.viewReleases){
     // Find first visible tab and switch to it
     var firstTab = document.getElementById('tab-releases');
@@ -11541,11 +11980,11 @@ async function generateInvite(){
 // ─── RENDER: USERS (with real invite list) ─────────────
 const BASE_USERS=[];
 // Role display colors map (used in renderUsers and elsewhere)
-const ROLE_COLORS={'admin':'var(--accent)','co-admin':'var(--accent3)','manager':'var(--green2)','accountant':'var(--blue2)','viewer':'var(--amber2)','social_media_manager':'#f472b6'};
+const ROLE_COLORS={'admin':'var(--accent)','co-admin':'var(--accent3)','manager':'var(--green2)','accountant':'var(--blue2)','viewer':'var(--amber2)','social_media_advisor':'#f472b6'};
 function renderUsers(){
   const el=document.getElementById('access-users-panel');
   if(!el) return;
-  const roleColors={admin:'var(--accent)','co-admin':'var(--accent3)',manager:'var(--green2)',accountant:'var(--blue2)',viewer:'var(--amber2)','social_media_manager':'#f472b6'};
+  const roleColors={admin:'var(--accent)','co-admin':'var(--accent3)',manager:'var(--green2)',accountant:'var(--blue2)',viewer:'var(--amber2)','social_media_advisor':'#f472b6'};
   const canManage=can('manageUsers');
 
   if (API_BASE && SESSION?.token) {

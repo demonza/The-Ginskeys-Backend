@@ -164,10 +164,10 @@ async function start() {
     process.exit(1);
   }
 
-  // Migrate: add social_media_manager to users role CHECK constraint (non-fatal)
+  // Migrate: add social_media_advisor to users role CHECK constraint (non-fatal)
   try {
     await pool.query(`ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check`);
-    await pool.query(`ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ('admin','co-admin','manager','accountant','viewer','social_media_manager'))`);
+    await pool.query(`ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ('admin','co-admin','manager','accountant','viewer','social_media_advisor'))`);
     console.log('  ✔ users role constraint updated');
   } catch (err) {
     console.warn('⚠ users role constraint update skipped:', err.message);
