@@ -13,14 +13,21 @@ router.get('/', requireAuth, requirePerm('viewLedger'), async (req, res, next) =
     const { rows } = await pool.query(`
       SELECT
         t.*,
+        b.id          AS booking_id,
+        b.stage       AS booking_stage,
+        b.location    AS booking_location,
+        b.contact_name AS booking_contact,
+        b.contact_email AS booking_email,
+        b.fee_eur     AS booking_fee,
         COALESCE(SUM(CASE WHEN tx.type='income'  THEN tx.amount_eur ELSE 0 END),0) AS revenue,
         COALESCE(SUM(CASE WHEN tx.type='expense' THEN tx.amount_eur ELSE 0 END),0) AS costs,
         COALESCE(SUM(CASE WHEN tx.type='income'  THEN tx.amount_eur
                           WHEN tx.type='expense' THEN -tx.amount_eur ELSE 0 END),0) AS net_profit,
-        COUNT(tx.id) AS transaction_count
+        COUNT(tx.id)  AS transaction_count
       FROM tours t
+      LEFT JOIN booking_contacts b ON b.tour_id = t.id
       LEFT JOIN transactions tx ON tx.tour_id = t.id
-      GROUP BY t.id
+      GROUP BY t.id, b.id
       ORDER BY t.start_date DESC NULLS LAST
     `);
     res.json(rows);
@@ -75,7 +82,8 @@ router.put('/:id', requireAuth, requirePerm('editTxn'), async (req, res, next) =
          end_date   = COALESCE($3, end_date),
          budget     = COALESCE($4, budget),
          status     = COALESCE($5, status),
-         notes      = COALESCE($6, notes)
+         notes      = COALESCE($6, notes),
+         updated_at = now()
        WHERE id = $7 RETURNING *`,
       [name||null, startDate||null, endDate||null,
        budget ? parseFloat(budget) : null, status||null, notes||null, req.params.id]

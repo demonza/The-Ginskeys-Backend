@@ -71,10 +71,31 @@ router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
 
 // PUT /api/booking/:id
 router.put('/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
+  const client = await pool.connect();
   try {
-    const { name,type,location,contact_email,contact_name,
-            stage,fee_eur,date,notes,follow_up_date,contacted_at } = req.body;
-    const { rows } = await pool.query(
+    await client.query('BEGIN');
+
+    const { name, type, location, contact_email, contact_name,
+            stage, fee_eur, date, notes, follow_up_date, contacted_at } = req.body;
+
+    // Fetch current booking to detect stage transition
+    const { rows: current } = await client.query(
+      'SELECT * FROM booking_contacts WHERE id = $1', [req.params.id]
+    );
+    if (!current[0]) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Contact not found' });
+    }
+    const prev = current[0];
+
+    // Validate stage
+    if (stage && !STAGES.includes(stage)) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ error: 'Invalid stage' });
+    }
+
+    // Update the booking
+    const { rows } = await client.query(
       `UPDATE booking_contacts SET
          name=COALESCE($1,name), type=COALESCE($2,type), location=COALESCE($3,location),
          contact_email=COALESCE($4,contact_email), contact_name=COALESCE($5,contact_name),
@@ -82,14 +103,92 @@ router.put('/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) =>
          notes=COALESCE($9,notes), follow_up_date=COALESCE($10,follow_up_date),
          contacted_at=COALESCE($11,contacted_at), updated_at=now()
        WHERE id=$12 RETURNING *`,
-      [name||null,type||null,location||null,contact_email||null,contact_name||null,
-       stage||null,fee_eur?parseFloat(fee_eur):null,date||null,notes||null,
-       follow_up_date||null,contacted_at||null,req.params.id]
+      [name||null, type||null, location||null, contact_email||null, contact_name||null,
+       stage||null, fee_eur ? parseFloat(fee_eur) : null, date||null, notes||null,
+       follow_up_date||null, contacted_at||null, req.params.id]
     );
-    if (!rows[0]) return res.status(404).json({ error: 'Contact not found' });
-    await writeAudit(req,'BOOKING_UPDATE',{entityType:'booking',entityId:req.params.id,details:`Stage → ${stage}`});
-    res.json(rows[0]);
-  } catch (err) { next(err); }
+    const booking = rows[0];
+
+    // ── Auto-create or update tour on stage → confirmed ────────────────
+    const newStage = stage || prev.stage;
+    const wasConfirmed = ['confirmed', 'completed'].includes(prev.stage);
+    const nowConfirmed = ['confirmed', 'completed'].includes(newStage);
+
+    let tourRow = null;
+
+    if (nowConfirmed && !wasConfirmed && !prev.tour_id) {
+      // Transitioning INTO confirmed for the first time — create a tour
+      const tourName = booking.name;
+      const tourDate = booking.date || null;
+      const tourCity = booking.location || null;
+      const tourBudget = booking.fee_eur || null;
+
+      const { rows: newTour } = await client.query(
+        `INSERT INTO tours (name, start_date, end_date, budget, status, notes)
+         VALUES ($1, $2, $2, $3, 'planned', $4) RETURNING *`,
+        [tourName, tourDate, tourBudget, tourCity ? `Location: ${tourCity}` : null]
+      );
+      tourRow = newTour[0];
+
+      // Link the booking back to the tour
+      await client.query(
+        'UPDATE booking_contacts SET tour_id = $1 WHERE id = $2',
+        [tourRow.id, booking.id]
+      );
+      booking.tour_id = tourRow.id;
+
+      await writeAudit(req, 'TOUR_AUTO_CREATE', {
+        entityType: 'tour',
+        entityId: tourRow.id,
+        details: `Auto-created from booking: ${tourName}`,
+      });
+    } else if (nowConfirmed && prev.tour_id) {
+      // Already linked — sync the tour with any updated booking fields
+      const updateFields = [];
+      const updateParams = [];
+      let p = 1;
+
+      if (name  && name  !== prev.name)  { updateFields.push(`name=$${p++}`);       updateParams.push(name); }
+      if (date  && date  !== prev.date)  { updateFields.push(`start_date=$${p++}`); updateParams.push(date);
+                                           updateFields.push(`end_date=$${p++}`);   updateParams.push(date); }
+      if (fee_eur !== undefined && parseFloat(fee_eur) !== parseFloat(prev.fee_eur || 0)) {
+        updateFields.push(`budget=$${p++}`);
+        updateParams.push(parseFloat(fee_eur));
+      }
+
+      if (updateFields.length > 0) {
+        updateParams.push(prev.tour_id);
+        const { rows: updatedTour } = await client.query(
+          `UPDATE tours SET ${updateFields.join(', ')}, updated_at=now()
+           WHERE id=$${p} RETURNING *`,
+          updateParams
+        );
+        tourRow = updatedTour[0] || null;
+      } else {
+        // Just return the existing tour
+        const { rows: existingTour } = await client.query(
+          'SELECT * FROM tours WHERE id = $1', [prev.tour_id]
+        );
+        tourRow = existingTour[0] || null;
+      }
+    }
+
+    await client.query('COMMIT');
+
+    await writeAudit(req, 'BOOKING_UPDATE', {
+      entityType: 'booking',
+      entityId: req.params.id,
+      details: `Stage → ${newStage}`,
+    });
+
+    // Return booking with tour data attached if applicable
+    res.json({ ...booking, tour: tourRow || null });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    next(err);
+  } finally {
+    client.release();
+  }
 });
 
 // DELETE /api/booking/:id
