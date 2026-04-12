@@ -31,7 +31,7 @@ const PERMS = {
   'manager':    ['viewLedger','addTxn','editTxn'],
   'accountant': ['viewLedger','addTxn','viewAudit'],
   'viewer':     ['viewLedger'],
-  'social_media_manager': ['viewReleases','viewPress'],
+  'social_media_advisor': ['viewReleases','viewPress'],
 };
 
 function requirePerm(perm) {
