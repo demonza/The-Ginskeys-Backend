@@ -3325,7 +3325,7 @@ tr:hover .edit-btn{display:inline}
           <div style="color:var(--muted3)"><span data-i18n="rel_no_scheduled">No releases scheduled yet.</span></div>
         </div>
         <div style="padding:8px 12px;border-top:1px solid var(--border2);font-size:9px;color:var(--muted2)">
-          <span style="color:var(--amber2)">Rule:</span> min 6 weeks between release date and pitch deadline
+          <span style="color:var(--amber2)" data-i18n="rel_rule_label">Rule:</span> <span data-i18n="rel_rule_text">min 6 weeks between release date and pitch deadline</span>
         </div>
       </div>
       <div class="panel">
@@ -7889,7 +7889,7 @@ function renderReleaseChecklist() {
   var enginePicker = document.getElementById('rel-engine-picker');
   if (enginePicker) {
     var ecur = enginePicker.value;
-    enginePicker.innerHTML = '<option value="">— select release to generate launch plan —</option>' +
+    enginePicker.innerHTML = '<option value="">' + t('rel_engine_select') + '</option>' +
       RELEASES_DATA.filter(function(rel){ return rel.release_date; }).map(function(rel){
         return '<option value="'+rel.id+'"'+(rel.id===ecur?' selected':'')+'>'+rel.title+' ('+rel.release_date?.slice(0,10)+')</option>';
       }).join('');
@@ -7898,7 +7898,7 @@ function renderReleaseChecklist() {
 
   if (!el) return;
   const r = id ? RELEASES_DATA.find(x=>x.id===id) : null;
-  if (!r) { el.innerHTML='<div style="color:var(--muted3);font-size:9px">Select a release to see its checklist status.</div>'; return; }
+  if (!r) { el.innerHTML='<div style="color:var(--muted3);font-size:9px">'+t('rel_checklist_empty')+'</div>'; return; }
 
   const checks = [
     {label:'Recording complete',  done: ['recorded','mixed','mastered','artwork','submitted','scheduled','released'].includes(r.stage)},
@@ -8160,16 +8160,27 @@ function copyCaptionTemplate(type) {
   var date = r && r.release_date ? new Date(r.release_date).toLocaleDateString('pt-PT',{day:'numeric',month:'long'}) : '[DATA]';
   var spotifyUrl = r && r.spotify_url ? r.spotify_url : '[LINK]';
   var type2 = r ? r.type : 'single';
+  var ht = SM_HASHTAGS;
 
-  var templates = {
-    announce: '🔥 NEW ' + type2.toUpperCase() + ' ALERT 🔥\n\n"' + title + '" drops ' + date + '.\n\nPre-save now 👉 Link in bio\n\n' + SM_HASHTAGS.core.slice(0,3).join(' ') + ' ' + SM_HASHTAGS.release.slice(0,3).join(' '),
-    teaser: '👀 Something\'s coming...\n\n"' + title + '" · ' + date + '\n\nAre you ready? 🎸\n\n' + SM_HASHTAGS.core.slice(0,2).join(' ') + ' #ComingSoon #NewMusic',
-    drop: '▶ IT\'S OUT NOW.\n\n"' + title + '" is live everywhere.\n\nStream, share, add to your playlists 🖤\n\n🎧 ' + spotifyUrl + '\n\n' + SM_HASHTAGS.core.join(' ') + ' #OutNow #StreamNow',
-    bts: '🎬 Behind the scenes of "' + title + '"\n\nThe making of this track was [describe moment]. Can\'t wait for you to hear the final version.\n\n' + SM_HASHTAGS.core.slice(0,3).join(' ') + ' #BTS #StudioLife #BandLife',
-    gig: '🎸 LIVE SHOW 🎸\n\n📍 [VENUE] · [CITY]\n📅 [DATE] · [TIME]\n🎟 [TICKET LINK / Free entry]\n\nCome hear "' + title + '" live for the first time.\n\n' + SM_HASHTAGS.core.slice(0,2).join(' ') + ' #LiveMusic #ConcertosPortugal',
-    thankyou: '🙏 Thank you.\n\n"' + title + '" has reached [X] streams in [X] days. Every play, every share, every message means the world to us.\n\nThis is just the beginning. 🖤\n\n' + SM_HASHTAGS.core.slice(0,3).join(' ')
+  var templates_en = {
+    announce: '🔥 NEW ' + type2.toUpperCase() + ' ALERT 🔥\n\n"' + title + '" drops ' + date + '.\n\nPre-save now 👉 Link in bio\n\n' + ht.core.slice(0,3).join(' ') + ' ' + ht.release.slice(0,3).join(' '),
+    teaser: '👀 Something\'s coming...\n\n"' + title + '" · ' + date + '\n\nAre you ready? 🎸\n\n' + ht.core.slice(0,2).join(' ') + ' #ComingSoon #NewMusic',
+    drop: '▶ IT\'S OUT NOW.\n\n"' + title + '" is live everywhere.\n\nStream, share, add to your playlists 🖤\n\n🎧 ' + spotifyUrl + '\n\n' + ht.core.join(' ') + ' #OutNow #StreamNow',
+    bts: '🎬 Behind the scenes of "' + title + '"\n\nThe making of this track was [describe moment]. Can\'t wait for you to hear the final version.\n\n' + ht.core.slice(0,3).join(' ') + ' #BTS #StudioLife #BandLife',
+    gig: '🎸 LIVE SHOW 🎸\n\n📍 [VENUE] · [CITY]\n📅 [DATE] · [TIME]\n🎟 [TICKET LINK / Free entry]\n\nCome hear "' + title + '" live for the first time.\n\n' + ht.core.slice(0,2).join(' ') + ' #LiveMusic #ConcertosPortugal',
+    thankyou: '🙏 Thank you.\n\n"' + title + '" has reached [X] streams in [X] days. Every play, every share, every message means the world to us.\n\nThis is just the beginning. 🖤\n\n' + ht.core.slice(0,3).join(' ')
   };
 
+  var templates_pt = {
+    announce: '🔥 NOVO ' + type2.toUpperCase() + ' 🔥\n\n"' + title + '" sai a ' + date + '.\n\nGuarda já 👉 Link na bio\n\n' + ht.core.slice(0,3).join(' ') + ' ' + ht.release.slice(0,3).join(' '),
+    teaser: '👀 Algo está a chegar...\n\n"' + title + '" · ' + date + '\n\nEstão prontos? 🎸\n\n' + ht.core.slice(0,2).join(' ') + ' #EmBreve #MúsicaNova',
+    drop: '▶ JÁ SAIU.\n\n"' + title + '" está disponível em todas as plataformas.\n\nOuve, partilha, adiciona às tuas playlists 🖤\n\n🎧 ' + spotifyUrl + '\n\n' + ht.core.join(' ') + ' #JáSaiu #OuveAgora',
+    bts: '🎬 Bastidores de "' + title + '"\n\nA criação desta faixa foi [descreve o momento]. Mal podemos esperar que ouçam a versão final.\n\n' + ht.core.slice(0,3).join(' ') + ' #Bastidores #VidaDeEstúdio #VidaDeBanda',
+    gig: '🎸 CONCERTO AO VIVO 🎸\n\n📍 [LOCAL] · [CIDADE]\n📅 [DATA] · [HORA]\n🎟 [LINK BILHETES / Entrada livre]\n\nVem ouvir "' + title + '" ao vivo pela primeira vez.\n\n' + ht.core.slice(0,2).join(' ') + ' #MúsicaAoVivo #ConcertosPortugal',
+    thankyou: '🙏 Obrigado.\n\n"' + title + '" atingiu [X] reproduções em [X] dias. Cada play, cada partilha, cada mensagem significa o mundo para nós.\n\nIsto é só o começo. 🖤\n\n' + ht.core.slice(0,3).join(' ')
+  };
+
+  var templates = ACTIVE_LANG === 'pt' ? templates_pt : templates_en;
   var caption = templates[type] || '';
   var outputEl = document.getElementById('rel-caption-output');
   var textEl = document.getElementById('rel-caption-text');
@@ -8184,9 +8195,9 @@ function copyCaptionToClipboard() {
   if (!textEl) return;
   navigator.clipboard.writeText(textEl.textContent).then(function() {
     var btn = textEl.parentElement.querySelector('button');
-    if (btn) { btn.textContent = 'COPIED!'; setTimeout(function(){ btn.textContent = 'COPY'; }, 1500); }
+    if (btn) { btn.textContent = t('gen_copied'); setTimeout(function(){ btn.textContent = t('gen_copy'); }, 1500); }
   }).catch(function() {
-    prompt('Copy this caption:', textEl.textContent);
+    prompt('Copy:', textEl.textContent);
   });
 }
 
@@ -8212,18 +8223,27 @@ function getEPKLinks() {
 
 function generatePitchEmail(type) {
   var epk = getEPKLinks();
-  var templates = {
-    radio: 'Subject: The Ginskeys — New Single for Your Consideration\n\nHi [NAME],\n\nI\'m reaching out from The Ginskeys, a hard rock band from Sines, Portugal. We\'ve just released our new single "[TITLE]" and believe it would be a great fit for your programming.\n\nThe track is a [describe: high-energy / melodic / heavy] hard rock song about [theme]. We\'ve been active in the Portuguese live circuit with shows at [venue names] and our previous release garnered [X] streams.\n\nHere are the key links:\n🎧 Spotify: ' + epk.spotify + '\n📺 YouTube: ' + epk.youtube + '\n📸 Instagram: ' + epk.instagram + '\n📁 Press Kit (photos, bio, logo): ' + epk.presskit + '\n🌐 Website: ' + epk.website + '\n\nWe\'d be grateful for any airplay consideration. Happy to provide any additional materials.\n\nBest regards,\nTiago Mendonça\nThe Ginskeys\n' + epk.contact,
+  var links = '\n🎧 Spotify: ' + epk.spotify + '\n📺 YouTube: ' + epk.youtube + '\n📸 Instagram: ' + epk.instagram + '\n📁 Press Kit: ' + epk.presskit + '\n🌐 Website: ' + epk.website;
+  var linksShort = '\n🎧 ' + epk.spotify + '\n📺 ' + epk.youtube + '\n📁 Press Kit: ' + epk.presskit;
+  var sign = '\nTiago Mendonça\nThe Ginskeys\n' + epk.contact;
 
-    blog: 'Subject: The Ginskeys — New Hard Rock from Portugal [Review/Feature Request]\n\nHi [NAME],\n\nThe Ginskeys are a 4-piece hard rock band from Sines, Portugal, and we\'d love to be featured on [OUTLET NAME].\n\nOur new single "[TITLE]" drops on [DATE]. It\'s [describe the sound and what makes it stand out]. We\'re part of a growing wave of Portuguese rock bands bringing raw energy back to the scene.\n\nKey links:\n🎧 ' + epk.spotify + '\n📺 ' + epk.youtube + '\n📁 Press Kit: ' + epk.presskit + '\n\nWe can provide exclusive quotes, behind-the-scenes content, or an interview if you\'re interested.\n\nThank you for your time,\nTiago Mendonça · ' + epk.contact,
-
-    sync: 'Subject: Hard Rock Catalog Available for Sync — The Ginskeys\n\nHi [NAME],\n\nI\'m writing to submit The Ginskeys\' catalog for sync licensing consideration. We\'re a Portuguese hard rock band with high-energy, guitar-driven tracks ideal for:\n\n• Action/sports scenes\n• Trailer music\n• Gaming soundtracks\n• Automotive/lifestyle advertising\n\nOur music is [describe: raw, punchy, cinematic, anthemic]. All tracks are professionally recorded, mixed and mastered.\n\n🎧 Listen: ' + epk.spotify + '\n📺 Video: ' + epk.youtube + '\n📁 Stems available on request\n\nWe\'re open to non-exclusive licensing and can clear rights quickly (self-published, no label).\n\nBest,\nTiago Mendonça · ' + epk.contact,
-
+  var templates_en = {
+    radio: 'Subject: The Ginskeys — New Single for Your Consideration\n\nHi [NAME],\n\nI\'m reaching out from The Ginskeys, a hard rock band from Sines, Portugal. We\'ve just released our new single "[TITLE]" and believe it would be a great fit for your programming.\n\nThe track is a [describe: high-energy / melodic / heavy] hard rock song about [theme]. We\'ve been active in the Portuguese live circuit with shows at [venue names] and our previous release garnered [X] streams.\n\nHere are the key links:' + links + '\n\nWe\'d be grateful for any airplay consideration. Happy to provide any additional materials.\n\nBest regards,' + sign,
+    blog: 'Subject: The Ginskeys — New Hard Rock from Portugal [Review/Feature Request]\n\nHi [NAME],\n\nThe Ginskeys are a 4-piece hard rock band from Sines, Portugal, and we\'d love to be featured on [OUTLET NAME].\n\nOur new single "[TITLE]" drops on [DATE]. It\'s [describe the sound and what makes it stand out]. We\'re part of a growing wave of Portuguese rock bands bringing raw energy back to the scene.\n\nKey links:' + linksShort + '\n\nWe can provide exclusive quotes, behind-the-scenes content, or an interview if you\'re interested.\n\nThank you for your time,' + sign,
+    sync: 'Subject: Hard Rock Catalog Available for Sync — The Ginskeys\n\nHi [NAME],\n\nI\'m writing to submit The Ginskeys\' catalog for sync licensing consideration. We\'re a Portuguese hard rock band with high-energy, guitar-driven tracks ideal for:\n\n• Action/sports scenes\n• Trailer music\n• Gaming soundtracks\n• Automotive/lifestyle advertising\n\nOur music is [describe: raw, punchy, cinematic, anthemic]. All tracks are professionally recorded, mixed and mastered.\n\n🎧 Listen: ' + epk.spotify + '\n📺 Video: ' + epk.youtube + '\n📁 Stems available on request\n\nWe\'re open to non-exclusive licensing and can clear rights quickly (self-published, no label).\n\nBest,' + sign,
     playlist: 'Subject: Submission — The Ginskeys "[TITLE]"\n\nHi [CURATOR NAME],\n\nI\'d love to submit our new track "[TITLE]" for your playlist [PLAYLIST NAME].\n\nGenre: Hard Rock / Blues Rock\nMood: [energetic / dark / anthemic / raw]\nBPM: [BPM]\nSimilar to: [2-3 comparable artists]\n\n🎧 ' + epk.spotify + '\n\nThe track was released on [DATE] and has [X] saves in its first week. We believe it fits the vibe of your playlist perfectly.\n\nThank you,\nTiago · ' + epk.contact,
-
-    followup: 'Subject: Re: The Ginskeys — Friendly Follow-Up\n\nHi [NAME],\n\nJust a quick follow-up on my previous email about The Ginskeys\' new single "[TITLE]". I understand you receive many submissions, so no pressure at all.\n\nSince my last message, the track has reached [X streams / been featured on Y / received Z reviews]. Happy to provide any additional info if helpful.\n\n🎧 Quick listen: ' + epk.spotify + '\n\nThank you for your time,\nTiago Mendonça · ' + epk.contact
+    followup: 'Subject: Re: The Ginskeys — Friendly Follow-Up\n\nHi [NAME],\n\nJust a quick follow-up on my previous email about The Ginskeys\' new single "[TITLE]". I understand you receive many submissions, so no pressure at all.\n\nSince my last message, the track has reached [X streams / been featured on Y / received Z reviews]. Happy to provide any additional info if helpful.\n\n🎧 Quick listen: ' + epk.spotify + '\n\nThank you for your time,' + sign
   };
 
+  var templates_pt = {
+    radio: 'Assunto: The Ginskeys — Novo Single para Vossa Consideração\n\nBom dia [NOME],\n\nContacto da parte dos The Ginskeys, uma banda de hard rock de Sines, Portugal. Acabámos de lançar o nosso novo single "[TÍTULO]" e acreditamos que se enquadra na vossa programação.\n\nA faixa é uma canção de hard rock [descrever: enérgica / melódica / pesada] sobre [tema]. Temos estado activos no circuito ao vivo português com concertos em [nomes dos locais] e o nosso lançamento anterior atingiu [X] reproduções.\n\nLinks principais:' + links + '\n\nFicaríamos gratos por qualquer consideração de airplay. Disponíveis para fornecer materiais adicionais.\n\nCom os melhores cumprimentos,' + sign,
+    blog: 'Assunto: The Ginskeys — Novo Hard Rock de Portugal [Pedido de Review/Feature]\n\nBom dia [NOME],\n\nOs The Ginskeys são uma banda de hard rock de 4 elementos de Sines, Portugal, e gostaríamos de ser destacados no [NOME DO MEIO].\n\nO nosso novo single "[TÍTULO]" sai a [DATA]. É [descrever o som e o que o destaca]. Fazemos parte de uma vaga crescente de bandas de rock portuguesas que trazem energia crua de volta à cena.\n\nLinks:' + linksShort + '\n\nPodemos fornecer declarações exclusivas, conteúdo de bastidores, ou uma entrevista se tiverem interesse.\n\nObrigado pelo vosso tempo,' + sign,
+    sync: 'Assunto: Catálogo de Hard Rock Disponível para Sync — The Ginskeys\n\nBom dia [NOME],\n\nEscrevo para submeter o catálogo dos The Ginskeys para consideração de sync licensing. Somos uma banda portuguesa de hard rock com faixas enérgicas e guitar-driven ideais para:\n\n• Cenas de acção/desporto\n• Música para trailers\n• Bandas sonoras de videojogos\n• Publicidade automóvel/lifestyle\n\nA nossa música é [descrever: crua, punchy, cinemática, anthemic]. Todas as faixas são profissionalmente gravadas, misturadas e masterizadas.\n\n🎧 Ouvir: ' + epk.spotify + '\n📺 Vídeo: ' + epk.youtube + '\n📁 Stems disponíveis a pedido\n\nEstamos abertos a licenciamento não-exclusivo e podemos limpar direitos rapidamente (auto-publicados, sem editora).\n\nCumprimentos,' + sign,
+    playlist: 'Assunto: Submissão — The Ginskeys "[TÍTULO]"\n\nBom dia [NOME DO CURADOR],\n\nGostaria de submeter a nossa nova faixa "[TÍTULO]" para a vossa playlist [NOME DA PLAYLIST].\n\nGénero: Hard Rock / Blues Rock\nMood: [enérgico / sombrio / anthemic / cru]\nBPM: [BPM]\nSemelhante a: [2-3 artistas comparáveis]\n\n🎧 ' + epk.spotify + '\n\nA faixa foi lançada a [DATA] e tem [X] saves na primeira semana. Acreditamos que se enquadra perfeitamente na vibe da vossa playlist.\n\nObrigado,\nTiago · ' + epk.contact,
+    followup: 'Assunto: Re: The Ginskeys — Follow-Up\n\nBom dia [NOME],\n\nApenas um breve follow-up ao meu email anterior sobre o novo single dos The Ginskeys "[TÍTULO]". Compreendo que recebem muitas submissões, sem pressão.\n\nDesde a minha última mensagem, a faixa atingiu [X reproduções / foi destacada em Y / recebeu Z reviews]. Disponível para fornecer informação adicional se útil.\n\n🎧 Ouvir: ' + epk.spotify + '\n\nObrigado pelo vosso tempo,' + sign
+  };
+
+  var templates = ACTIVE_LANG === 'pt' ? templates_pt : templates_en;
   var text = templates[type] || '';
   var outputEl = document.getElementById('press-pitch-output');
   var textEl = document.getElementById('press-pitch-text');
@@ -8238,9 +8258,9 @@ function copyPitchToClipboard() {
   if (!textEl) return;
   navigator.clipboard.writeText(textEl.textContent).then(function() {
     var btn = textEl.parentElement.querySelector('button');
-    if (btn) { btn.textContent = 'COPIED!'; setTimeout(function(){ btn.textContent = 'COPY'; }, 1500); }
+    if (btn) { btn.textContent = t('gen_copied'); setTimeout(function(){ btn.textContent = t('gen_copy'); }, 1500); }
   }).catch(function() {
-    prompt('Copy this pitch:', textEl.textContent);
+    prompt('Copy:', textEl.textContent);
   });
 }
 
@@ -8248,9 +8268,9 @@ function copyEPKBlock() {
   var epk = getEPKLinks();
   var block = '🎧 Spotify: ' + epk.spotify + '\n📺 YouTube: ' + epk.youtube + '\n📸 Instagram: ' + epk.instagram + '\n📁 Press Kit: ' + epk.presskit + '\n🌐 Website: ' + epk.website + '\n✉ Contact: ' + epk.contact;
   navigator.clipboard.writeText(block).then(function() {
-    alert('EPK link block copied!');
+    alert(ACTIVE_LANG === 'pt' ? 'Bloco de links EPK copiado!' : 'EPK link block copied!');
   }).catch(function() {
-    prompt('Copy this EPK block:', block);
+    prompt('Copy:', block);
   });
 }
 
@@ -11110,6 +11130,9 @@ const TRANSLATIONS = {
     gen_copied:           'COPIED!',
     gen_items:            'items',
     gen_no_data:          'No data available.',
+    rel_rule_label:       'Rule:',
+    rel_rule_text:        'min 6 weeks between release date and pitch deadline',
+    rel_checklist_empty:  'Select a release to see its checklist status.',
   },
   pt: {
     // Tabs
@@ -11488,6 +11511,9 @@ const TRANSLATIONS = {
     gen_copied:           'COPIADO!',
     gen_items:            'itens',
     gen_no_data:          'Sem dados disponíveis.',
+    rel_rule_label:       'Regra:',
+    rel_rule_text:        'mín 6 semanas entre data de lançamento e deadline de pitch',
+    rel_checklist_empty:  'Seleciona um lançamento para ver o estado da checklist.',
   }
 };
 
