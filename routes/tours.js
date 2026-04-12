@@ -8,30 +8,113 @@ const { requireAuth, requirePerm } = require('../middleware/auth');
 const { writeAudit } = require('../middleware/audit');
 
 // ─── GET /api/tours ────────────────────────────────
+// Returns:
+//  1. All rows from the tours table (with booking join for linked ones)
+//  2. All confirmed/completed booking_contacts that have NO tour_id yet
+//     — these appear as virtual "pending" tour rows so the frontend can
+//       display them immediately without waiting for a stage-change event
 router.get('/', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
   try {
     const { rows } = await pool.query(`
+      -- Real tour rows (may be linked to a booking)
       SELECT
-        t.*,
-        b.id          AS booking_id,
-        b.stage       AS booking_stage,
-        b.location    AS booking_location,
-        b.contact_name AS booking_contact,
+        t.id,
+        t.name,
+        t.start_date,
+        t.end_date,
+        t.budget,
+        t.status,
+        t.notes,
+        t.created_at,
+        b.id            AS booking_id,
+        b.stage         AS booking_stage,
+        b.location      AS booking_location,
+        b.contact_name  AS booking_contact,
         b.contact_email AS booking_email,
-        b.fee_eur     AS booking_fee,
+        b.fee_eur       AS booking_fee,
         COALESCE(SUM(CASE WHEN tx.type='income'  THEN tx.amount_eur ELSE 0 END),0) AS revenue,
         COALESCE(SUM(CASE WHEN tx.type='expense' THEN tx.amount_eur ELSE 0 END),0) AS costs,
-        COALESCE(SUM(CASE WHEN tx.type='income'  THEN tx.amount_eur
-                          WHEN tx.type='expense' THEN -tx.amount_eur ELSE 0 END),0) AS net_profit,
-        COUNT(tx.id)  AS transaction_count
+        COUNT(tx.id)    AS transaction_count,
+        false           AS from_booking_only
       FROM tours t
-      LEFT JOIN booking_contacts b ON b.tour_id = t.id
-      LEFT JOIN transactions tx ON tx.tour_id = t.id
+      LEFT JOIN booking_contacts b  ON b.tour_id = t.id
+      LEFT JOIN transactions     tx ON tx.tour_id = t.id
       GROUP BY t.id, b.id
-      ORDER BY t.start_date DESC NULLS LAST
+
+      UNION ALL
+
+      -- Confirmed/completed bookings NOT yet linked to any tour row
+      SELECT
+        b.id            AS id,
+        b.name          AS name,
+        b.date          AS start_date,
+        b.date          AS end_date,
+        b.fee_eur       AS budget,
+        'planned'       AS status,
+        b.location      AS notes,
+        b.created_at    AS created_at,
+        b.id            AS booking_id,
+        b.stage         AS booking_stage,
+        b.location      AS booking_location,
+        b.contact_name  AS booking_contact,
+        b.contact_email AS booking_email,
+        b.fee_eur       AS booking_fee,
+        0               AS revenue,
+        0               AS costs,
+        0               AS transaction_count,
+        true            AS from_booking_only
+      FROM booking_contacts b
+      WHERE b.stage IN ('confirmed', 'completed')
+        AND b.tour_id IS NULL
+
+      ORDER BY start_date DESC NULLS LAST
     `);
     res.json(rows);
   } catch (err) { next(err); }
+});
+
+// ─── POST /api/tours/backfill ──────────────────────
+// One-time: create real tour rows for all confirmed bookings
+// that don't have one yet, and link them.
+router.post('/backfill', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows: unlinked } = await client.query(`
+      SELECT * FROM booking_contacts
+      WHERE stage IN ('confirmed','completed')
+        AND tour_id IS NULL
+    `);
+
+    let created = 0;
+    for (const b of unlinked) {
+      const { rows: newTour } = await client.query(
+        `INSERT INTO tours (name, start_date, end_date, budget, status, notes)
+         VALUES ($1, $2, $2, $3, $4, $5) RETURNING id`,
+        [
+          b.name,
+          b.date || null,
+          b.fee_eur ? parseFloat(b.fee_eur) : null,
+          b.stage === 'completed' ? 'completed' : 'planned',
+          b.location ? `Location: ${b.location}` : null,
+        ]
+      );
+      await client.query(
+        'UPDATE booking_contacts SET tour_id = $1 WHERE id = $2',
+        [newTour[0].id, b.id]
+      );
+      created++;
+    }
+
+    await client.query('COMMIT');
+    res.json({ backfilled: created, message: `Created ${created} tour rows from confirmed bookings` });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    next(err);
+  } finally {
+    client.release();
+  }
 });
 
 // ─── GET /api/tours/:id ────────────────────────────
