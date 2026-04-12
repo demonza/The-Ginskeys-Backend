@@ -1378,7 +1378,7 @@ tr:hover .edit-btn{display:inline}
 <div class="overlay-bg" id="invite-overlay">
   <div class="overlay-box">
     <div class="overlay-hdr">
-      <span class="overlay-title">⚿ Send Invite — Admin Only</span>
+      <span class="overlay-title" data-i18n="modal_invite">⚿ Send Invite — Admin Only</span>
       <button class="overlay-close" onclick="closeInvite()">✕</button>
     </div>
     <div class="overlay-body">
@@ -1419,7 +1419,7 @@ tr:hover .edit-btn{display:inline}
 <div id="txn-modal" class="overlay-bg">
   <div class="overlay-box" style="width:520px">
     <div class="overlay-hdr">
-      <span class="overlay-title">◉ New Transaction</span>
+      <span class="overlay-title" data-i18n="modal_new_txn">◉ New Transaction</span>
       <button class="overlay-close" onclick="closeModal()">✕</button>
     </div>
     <div class="overlay-body">
@@ -1477,7 +1477,7 @@ tr:hover .edit-btn{display:inline}
 <div id="invoice-modal" class="overlay-bg" onclick="if(event.target===this)closeInvoiceModal()">
   <div class="overlay-box" style="width:680px;max-height:90vh;overflow-y:auto">
     <div class="overlay-hdr">
-      <span class="overlay-title">⎙ Generate Invoice</span>
+      <span class="overlay-title" data-i18n="modal_invoice">⎙ Generate Invoice</span>
       <button class="overlay-close" onclick="closeInvoiceModal()">✕</button>
     </div>
     <div class="overlay-body" style="display:flex;flex-direction:column;gap:16px">
@@ -1585,7 +1585,7 @@ tr:hover .edit-btn{display:inline}
 <div id="contract-modal" class="overlay-bg" onclick="if(event.target===this)closeContractModal()">
   <div class="overlay-box" style="width:700px;max-height:92vh;overflow-y:auto">
     <div class="overlay-hdr">
-      <span class="overlay-title">⎙ Performance Contract</span>
+      <span class="overlay-title" data-i18n="modal_contract">⎙ Performance Contract</span>
       <button class="overlay-close" onclick="closeContractModal()">✕</button>
     </div>
     <div class="overlay-body" style="display:flex;flex-direction:column;gap:16px">
@@ -1717,19 +1717,19 @@ tr:hover .edit-btn{display:inline}
 <div id="rehearsal-modal" class="overlay-bg" onclick="if(event.target===this)closeRehearsalModal()">
   <div class="overlay-box" style="width:500px">
     <div class="overlay-hdr">
-      <span class="overlay-title">● Log Rehearsal</span>
+      <span class="overlay-title" data-i18n="modal_rehearsal">● Log Rehearsal</span>
       <button class="overlay-close" onclick="closeRehearsalModal()">✕</button>
     </div>
     <div class="overlay-body" style="display:flex;flex-direction:column;gap:12px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="form-field"><label>Date *</label><input class="form-input" id="reh-date" type="date"></div>
-        <div class="form-field"><label>Location</label><input class="form-input" id="reh-location" placeholder="Sala de ensaio, Sines"></div>
-        <div class="form-field" style="grid-column:span 2"><label>Focus / Objective</label><input class="form-input" id="reh-focus" placeholder="New songs, setlist run, pre-show prep…"></div>
-        <div class="form-field"><label>Duration (h)</label><input class="form-input" id="reh-duration" type="number" step="0.5" min="0.5" value="2" placeholder="2"></div>
-        <div class="form-field"><label>Next rehearsal date</label><input class="form-input" id="reh-next" type="date"></div>
+        <div class="form-field"><label data-i18n="reh_lbl_date">Date *</label><input class="form-input" id="reh-date" type="date"></div>
+        <div class="form-field"><label data-i18n="reh_lbl_location">Location</label><input class="form-input" id="reh-location" placeholder="Sala de ensaio, Sines"></div>
+        <div class="form-field" style="grid-column:span 2"><label data-i18n="reh_lbl_focus">Focus / Objective</label><input class="form-input" id="reh-focus" placeholder="New songs, setlist run, pre-show prep…"></div>
+        <div class="form-field"><label data-i18n="reh_lbl_duration">Duration (h)</label><input class="form-input" id="reh-duration" type="number" step="0.5" min="0.5" value="2" placeholder="2"></div>
+        <div class="form-field"><label data-i18n="reh_lbl_next">Next rehearsal date</label><input class="form-input" id="reh-next" type="date"></div>
       </div>
       <div>
-        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:8px">ATTENDANCE</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:8px" data-i18n="reh_lbl_attendance">ATTENDANCE</div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:10px">
             <input type="checkbox" id="reh-att-fabio" checked> <span style="color:var(--accent)">Fábio</span>
@@ -1745,13 +1745,13 @@ tr:hover .edit-btn{display:inline}
           </label>
         </div>
       </div>
-      <div class="form-field"><label>Notes</label>
+      <div class="form-field"><label data-i18n="reh_lbl_notes">Notes</label>
         <textarea class="form-input" id="reh-notes" rows="3" style="resize:vertical" placeholder="What was covered, issues, songs worked on…"></textarea>
       </div>
     </div>
     <div class="overlay-hdr" style="justify-content:flex-end;border-top:1px solid var(--border);border-bottom:none;gap:8px">
-      <button class="btn-sm ghost" onclick="closeRehearsalModal()">Cancel</button>
-      <button class="btn-sm primary" onclick="saveRehearsal()">Save Rehearsal</button>
+      <button class="btn-sm ghost" onclick="closeRehearsalModal()" data-i18n="gen_cancel">Cancel</button>
+      <button class="btn-sm primary" onclick="saveRehearsal()" data-i18n="reh_btn_save">Save Rehearsal</button>
     </div>
   </div>
 </div>
@@ -1760,66 +1760,66 @@ tr:hover .edit-btn{display:inline}
 <div id="vote-modal" class="overlay-bg" onclick="if(event.target===this)closeVoteModal()">
   <div class="overlay-box" style="width:520px">
     <div class="overlay-hdr">
-      <span class="overlay-title">◈ Log Band Decision</span>
+      <span class="overlay-title" data-i18n="modal_vote">◈ Log Band Decision</span>
       <button class="overlay-close" onclick="closeVoteModal()">✕</button>
     </div>
     <div class="overlay-body" style="display:flex;flex-direction:column;gap:12px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="form-field"><label>Date *</label><input class="form-input" id="vote-date" type="date"></div>
+        <div class="form-field"><label data-i18n="reh_lbl_date">Date *</label><input class="form-input" id="vote-date" type="date"></div>
         <div class="form-field">
-          <label>Category</label>
+          <label data-i18n="vote_lbl_category">Category</label>
           <select class="form-select" id="vote-category">
-            <option value="financial">Financial</option>
-            <option value="creative">Creative / Artistic</option>
-            <option value="booking">Booking / Shows</option>
-            <option value="lineup">Lineup / Personnel</option>
-            <option value="equipment">Equipment</option>
-            <option value="strategy">Strategy / Direction</option>
-            <option value="other">Other</option>
+            <option value="financial" data-i18n="vote_cat_financial">Financial</option>
+            <option value="creative" data-i18n="vote_cat_creative">Creative / Artistic</option>
+            <option value="booking" data-i18n="vote_cat_booking">Booking / Shows</option>
+            <option value="lineup" data-i18n="vote_cat_lineup">Lineup / Personnel</option>
+            <option value="equipment" data-i18n="vote_cat_equipment">Equipment</option>
+            <option value="strategy" data-i18n="vote_cat_strategy">Strategy / Direction</option>
+            <option value="other" data-i18n="vote_cat_other">Other</option>
           </select>
         </div>
         <div class="form-field" style="grid-column:span 2">
-          <label>Decision / Topic *</label>
+          <label data-i18n="vote_lbl_topic">Decision / Topic *</label>
           <input class="form-input" id="vote-topic" placeholder="e.g. Record EP in July at Studio X for €2,000">
         </div>
       </div>
       <div>
-        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:8px">VOTES</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:8px" data-i18n="vote_lbl_attendance">VOTES</div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
           <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
             <span style="font-size:9px;color:var(--accent);font-weight:700">Fábio</span>
             <select id="vote-v-fabio" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:3px 6px;width:100%" onchange="voteUpdate()">
-              <option value="yes">✓ Yes</option>
-              <option value="no">✗ No</option>
-              <option value="abstain">— Abstain</option>
-              <option value="absent">Absent</option>
+              <option value="yes" data-i18n="vote_yes">✓ Yes</option>
+              <option value="no" data-i18n="vote_no">✗ No</option>
+              <option value="abstain" data-i18n="vote_abstain">— Abstain</option>
+              <option value="absent" data-i18n="vote_absent">Absent</option>
             </select>
           </div>
           <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
             <span style="font-size:9px;color:var(--blue2);font-weight:700">Pedro</span>
             <select id="vote-v-pedro" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:3px 6px;width:100%" onchange="voteUpdate()">
-              <option value="yes">✓ Yes</option>
-              <option value="no">✗ No</option>
-              <option value="abstain">— Abstain</option>
-              <option value="absent">Absent</option>
+              <option value="yes" data-i18n="vote_yes">✓ Yes</option>
+              <option value="no" data-i18n="vote_no">✗ No</option>
+              <option value="abstain" data-i18n="vote_abstain">— Abstain</option>
+              <option value="absent" data-i18n="vote_absent">Absent</option>
             </select>
           </div>
           <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
             <span style="font-size:9px;color:var(--green3);font-weight:700">Manuel</span>
             <select id="vote-v-manuel" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:3px 6px;width:100%" onchange="voteUpdate()">
-              <option value="yes">✓ Yes</option>
-              <option value="no">✗ No</option>
-              <option value="abstain">— Abstain</option>
-              <option value="absent">Absent</option>
+              <option value="yes" data-i18n="vote_yes">✓ Yes</option>
+              <option value="no" data-i18n="vote_no">✗ No</option>
+              <option value="abstain" data-i18n="vote_abstain">— Abstain</option>
+              <option value="absent" data-i18n="vote_absent">Absent</option>
             </select>
           </div>
           <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
             <span style="font-size:9px;color:var(--purple2);font-weight:700">Tiago</span>
             <select id="vote-v-tiago" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-size:9px;padding:3px 6px;width:100%" onchange="voteUpdate()">
-              <option value="yes">✓ Yes</option>
-              <option value="no">✗ No</option>
-              <option value="abstain">— Abstain</option>
-              <option value="absent">Absent</option>
+              <option value="yes" data-i18n="vote_yes">✓ Yes</option>
+              <option value="no" data-i18n="vote_no">✗ No</option>
+              <option value="abstain" data-i18n="vote_abstain">— Abstain</option>
+              <option value="absent" data-i18n="vote_absent">Absent</option>
             </select>
           </div>
         </div>
@@ -1827,13 +1827,13 @@ tr:hover .edit-btn{display:inline}
           Result: —
         </div>
       </div>
-      <div class="form-field"><label>Notes / Context</label>
+      <div class="form-field"><label data-i18n="vote_lbl_notes">Notes / Context</label>
         <textarea class="form-input" id="vote-notes" rows="2" style="resize:vertical" placeholder="Background, alternatives considered, implementation notes…"></textarea>
       </div>
     </div>
     <div class="overlay-hdr" style="justify-content:flex-end;border-top:1px solid var(--border);border-bottom:none;gap:8px">
-      <button class="btn-sm ghost" onclick="closeVoteModal()">Cancel</button>
-      <button class="btn-sm primary" onclick="saveVote()">Save Decision</button>
+      <button class="btn-sm ghost" onclick="closeVoteModal()" data-i18n="gen_cancel">Cancel</button>
+      <button class="btn-sm primary" onclick="saveVote()" data-i18n="vote_btn_save">Save Decision</button>
     </div>
   </div>
 </div>
@@ -1841,7 +1841,7 @@ tr:hover .edit-btn{display:inline}
 <div class="overlay-bg" id="import-modal" onclick="if(event.target===this)closeImport()">
   <div class="overlay-box" style="width:500px">
     <div class="overlay-hdr">
-      <span class="overlay-title">⬆ Import Transactions — CSV</span>
+      <span class="overlay-title" data-i18n="modal_import_csv">⬆ Import Transactions — CSV</span>
       <button class="overlay-close" onclick="closeImport()">✕</button>
     </div>
     <div class="overlay-body">
@@ -1874,7 +1874,7 @@ tr:hover .edit-btn{display:inline}
 <div class="overlay-bg" id="edit-txn-modal" onclick="if(event.target===this)closeEditTxn()">
   <div class="overlay-box" style="width:520px">
     <div class="overlay-hdr">
-      <span class="overlay-title">✎ Edit Transaction</span>
+      <span class="overlay-title" data-i18n="modal_edit_txn">✎ Edit Transaction</span>
       <button class="overlay-close" onclick="closeEditTxn()">✕</button>
     </div>
     <div class="overlay-body">
@@ -1941,7 +1941,7 @@ tr:hover .edit-btn{display:inline}
 <div class="overlay-bg" id="tour-modal" onclick="if(event.target===this)closeTourModal()">
   <div class="overlay-box" style="width:480px">
     <div class="overlay-hdr">
-      <span class="overlay-title" id="tour-modal-title">◉ New Tour / Show</span>
+      <span class="overlay-title" id="tour-modal-title" data-i18n="modal_tour">◉ New Tour / Show</span>
       <button class="overlay-close" onclick="closeTourModal()">✕</button>
     </div>
     <div class="overlay-body">
@@ -2001,7 +2001,7 @@ tr:hover .edit-btn{display:inline}
 <div class="overlay-bg" id="edit-user-modal" onclick="if(event.target===this)closeEditUser()">
   <div class="overlay-box" style="width:380px">
     <div class="overlay-hdr">
-      <span class="overlay-title">✎ Edit User</span>
+      <span class="overlay-title" data-i18n="modal_edit_user">✎ Edit User</span>
       <button class="overlay-close" onclick="closeEditUser()">✕</button>
     </div>
     <div class="overlay-body">
@@ -2041,7 +2041,7 @@ tr:hover .edit-btn{display:inline}
 <div class="overlay-bg" id="alert-rule-modal" onclick="if(event.target===this)closeAlertRule()">
   <div class="overlay-box" style="width:420px">
     <div class="overlay-hdr">
-      <span class="overlay-title">+ Alert Rule</span>
+      <span class="overlay-title" data-i18n="modal_alert_rule">+ Alert Rule</span>
       <button class="overlay-close" onclick="closeAlertRule()">✕</button>
     </div>
     <div class="overlay-body">
@@ -2093,7 +2093,7 @@ tr:hover .edit-btn{display:inline}
 <div class="overlay-bg" id="edit-release-modal" onclick="if(event.target===this)closeEditRelease()">
   <div class="overlay-box" style="width:520px">
     <div class="overlay-hdr">
-      <span class="overlay-title">✎ Edit Release</span>
+      <span class="overlay-title" data-i18n="modal_edit_release">✎ Edit Release</span>
       <button class="overlay-close" onclick="closeEditRelease()">✕</button>
     </div>
     <div class="overlay-body">
@@ -3178,40 +3178,40 @@ tr:hover .edit-btn{display:inline}
     <!-- Banner -->
     <div style="flex-shrink:0;background:linear-gradient(90deg,rgba(0,230,118,.06) 0%,transparent 100%);border-left:3px solid var(--green3);padding:12px 16px;display:grid;grid-template-columns:1fr repeat(5,auto);gap:16px;align-items:center">
       <div>
-        <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--green3);letter-spacing:.08em">INVOICE TRACKER</div>
-        <div style="font-size:9px;color:var(--muted2);margin-top:2px">All issued invoices — status, follow-up, payment tracking</div>
+        <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--green3);letter-spacing:.08em" data-i18n="inv_tracker_title">INVOICE TRACKER</div>
+        <div style="font-size:9px;color:var(--muted2);margin-top:2px" data-i18n="inv_tracker_sub">All issued invoices — status, follow-up, payment tracking</div>
       </div>
       <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
         <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--text)" id="inv-banner-total">0</div>
-        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">TOTAL</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em" id="inv-banner-total-label" data-i18n="inv_banner_total">TOTAL</div>
       </div>
       <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
         <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--amber2)" id="inv-banner-outstanding">€0</div>
-        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">OUTSTANDING</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em" id="inv-banner-outstanding-label" data-i18n="inv_banner_outstanding">OUTSTANDING</div>
       </div>
       <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
         <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--red3)" id="inv-banner-overdue">€0</div>
-        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">OVERDUE</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em" id="inv-banner-overdue-label" data-i18n="inv_banner_overdue">OVERDUE</div>
       </div>
       <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
         <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green3)" id="inv-banner-collected">€0</div>
-        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">COLLECTED</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em" id="inv-banner-collected-label" data-i18n="inv_banner_collected">COLLECTED</div>
       </div>
       <div style="padding:0 12px;border-left:1px solid var(--border2)">
-        <button class="btn-sm" onclick="openInvoiceModal()" style="color:var(--green3);border-color:var(--green3);white-space:nowrap">+ New Invoice</button>
+        <button class="btn-sm" onclick="openInvoiceModal()" style="color:var(--green3);border-color:var(--green3);white-space:nowrap" data-i18n="inv_btn_new">+ New Invoice</button>
       </div>
     </div>
 
     <!-- Filter bar -->
     <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">FILTER</div>
-      <button class="btn-sm inv-filter-btn active" onclick="invFilter('all',this)">All</button>
-      <button class="btn-sm inv-filter-btn" onclick="invFilter('draft',this)" style="color:var(--muted2)">Draft</button>
-      <button class="btn-sm inv-filter-btn" onclick="invFilter('sent',this)" style="color:var(--blue2)">Sent</button>
-      <button class="btn-sm inv-filter-btn" onclick="invFilter('overdue',this)" style="color:var(--red3)">Overdue</button>
-      <button class="btn-sm inv-filter-btn" onclick="invFilter('paid',this)" style="color:var(--green3)">Paid</button>
+      <div style="font-size:8px;color:var(--muted);letter-spacing:.1em" data-i18n="filter">FILTER</div>
+      <button class="btn-sm inv-filter-btn active" data-filter="all" onclick="invFilter('all',this)" data-i18n="inv_filter_all">All</button>
+      <button class="btn-sm inv-filter-btn" data-filter="draft" onclick="invFilter('draft',this)" style="color:var(--muted2)" data-i18n="inv_filter_draft">Draft</button>
+      <button class="btn-sm inv-filter-btn" data-filter="sent" onclick="invFilter('sent',this)" style="color:var(--blue2)" data-i18n="inv_filter_sent">Sent</button>
+      <button class="btn-sm inv-filter-btn" data-filter="overdue" onclick="invFilter('overdue',this)" style="color:var(--red3)" data-i18n="inv_filter_overdue">Overdue</button>
+      <button class="btn-sm inv-filter-btn" data-filter="paid" onclick="invFilter('paid',this)" style="color:var(--green3)" data-i18n="inv_filter_paid">Paid</button>
       <div style="flex:1"></div>
-      <button class="btn-sm" onclick="invExportSummary()" style="color:var(--muted2)">⎙ Export Summary</button>
+      <button class="btn-sm" onclick="invExportSummary()" style="color:var(--muted2)" data-i18n="inv_btn_export">⎙ Export Summary</button>
     </div>
 
     <!-- Invoice table -->
@@ -3219,15 +3219,15 @@ tr:hover .edit-btn{display:inline}
       <table style="width:100%;border-collapse:collapse;font-size:10px">
         <thead style="position:sticky;top:0;z-index:1">
           <tr style="background:var(--bg4);font-size:8px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">
-            <th style="padding:8px 10px;text-align:left">Invoice #</th>
-            <th style="padding:8px 10px;text-align:left">Client</th>
-            <th style="padding:8px 10px;text-align:left">Show / Service</th>
-            <th style="padding:8px 10px;text-align:right">Amount</th>
-            <th style="padding:8px 10px;text-align:left">Issued</th>
-            <th style="padding:8px 10px;text-align:left">Due</th>
-            <th style="padding:8px 10px;text-align:center">Status</th>
-            <th style="padding:8px 10px;text-align:left">Notes</th>
-            <th style="padding:8px 10px;text-align:right">Actions</th>
+            <th style="padding:8px 10px;text-align:left" data-i18n="inv_col_number">Invoice #</th>
+            <th style="padding:8px 10px;text-align:left" data-i18n="inv_col_client">Client</th>
+            <th style="padding:8px 10px;text-align:left" data-i18n="inv_col_show">Show / Service</th>
+            <th style="padding:8px 10px;text-align:right" data-i18n="inv_col_amount">Amount</th>
+            <th style="padding:8px 10px;text-align:left" data-i18n="inv_col_issued">Issued</th>
+            <th style="padding:8px 10px;text-align:left" data-i18n="inv_col_due">Due</th>
+            <th style="padding:8px 10px;text-align:center" data-i18n="inv_col_status">Status</th>
+            <th style="padding:8px 10px;text-align:left" data-i18n="inv_col_notes">Notes</th>
+            <th style="padding:8px 10px;text-align:right" data-i18n="inv_col_actions">Actions</th>
           </tr>
         </thead>
         <tbody id="inv-tracker-tbody">
@@ -3245,44 +3245,44 @@ tr:hover .edit-btn{display:inline}
 <div id="inv-status-modal" class="overlay-bg" onclick="if(event.target===this)closeInvStatusModal()">
   <div class="overlay-box" style="width:440px">
     <div class="overlay-hdr">
-      <span class="overlay-title" id="inv-status-modal-title">Update Invoice</span>
+      <span class="overlay-title" id="inv-status-modal-title" data-i18n="modal_inv_status">Update Invoice</span>
       <button class="overlay-close" onclick="closeInvStatusModal()">✕</button>
     </div>
     <div class="overlay-body" style="display:flex;flex-direction:column;gap:12px">
       <input type="hidden" id="inv-status-modal-id">
       <div class="form-field">
-        <label>Status</label>
+        <label data-i18n="inv_modal_status">Status</label>
         <select class="form-select" id="inv-status-select" onchange="invStatusTogglePaidFields()">
-          <option value="draft">Draft</option>
-          <option value="sent">Sent</option>
-          <option value="paid">Paid ✓</option>
-          <option value="cancelled">Cancelled</option>
+          <option value="draft" data-i18n="inv_status_draft">Draft</option>
+          <option value="sent" data-i18n="inv_status_sent">Sent</option>
+          <option value="paid" data-i18n="inv_status_paid">Paid ✓</option>
+          <option value="cancelled" data-i18n="inv_status_cancelled">Cancelled</option>
         </select>
       </div>
       <div class="form-field" id="inv-paid-date-field" style="display:none">
-        <label>Payment Date</label>
+        <label data-i18n="inv_modal_paid_date">Payment Date</label>
         <input class="form-input" id="inv-paid-date" type="date">
       </div>
       <div class="form-field">
-        <label>Payment Method</label>
+        <label data-i18n="inv_modal_method">Payment Method</label>
         <select class="form-select" id="inv-paid-method">
           <option value="">—</option>
-          <option value="transfer">Bank Transfer</option>
-          <option value="cash">Cash</option>
-          <option value="mbway">MBWay</option>
-          <option value="check">Cheque</option>
+          <option value="transfer" data-i18n="inv_method_transfer">Bank Transfer</option>
+          <option value="cash" data-i18n="inv_method_cash">Cash</option>
+          <option value="mbway" data-i18n="inv_method_mbway">MBWay</option>
+          <option value="check" data-i18n="inv_method_check">Cheque</option>
         </select>
       </div>
       <div class="form-field">
-        <label>Internal Notes</label>
+        <label data-i18n="inv_modal_notes">Internal Notes</label>
         <input class="form-input" id="inv-status-notes" placeholder="e.g. Paid in full, ref. TRF2026...">
       </div>
     </div>
     <div class="overlay-hdr" style="justify-content:space-between;border-top:1px solid var(--border);border-bottom:none">
-      <button class="btn-sm ghost" style="color:var(--red3);border-color:var(--red2)" onclick="invDelete(document.getElementById('inv-status-modal-id').value)">Delete</button>
+      <button class="btn-sm ghost" style="color:var(--red3);border-color:var(--red2)" onclick="invDelete(document.getElementById('inv-status-modal-id').value)" data-i18n="inv_btn_delete">Delete</button>
       <div style="display:flex;gap:8px">
-        <button class="btn-sm ghost" onclick="closeInvStatusModal()">Cancel</button>
-        <button class="btn-sm primary" onclick="invSaveStatus()">Save</button>
+        <button class="btn-sm ghost" onclick="closeInvStatusModal()" data-i18n="gen_cancel">Cancel</button>
+        <button class="btn-sm primary" onclick="invSaveStatus()" data-i18n="inv_btn_save">Save</button>
       </div>
     </div>
   </div>
@@ -4308,8 +4308,8 @@ tr:hover .edit-btn{display:inline}
 
     <!-- Sub-tabs -->
     <div style="flex-shrink:0;display:flex;gap:0;border-bottom:1px solid var(--border2)">
-      <button class="prod-tab pt-active" onclick="switchFTTab('irs',this)" id="ft-tab-irs">⊟ IRS / Tax Summary</button>
-      <button class="prod-tab" onclick="switchFTTab('budget',this)" id="ft-tab-budget">◎ Budget vs Actual</button>
+      <button class="prod-tab pt-active" onclick="switchFTTab('irs',this)" id="ft-tab-irs" data-i18n="ft_tab_irs">⊟ IRS / Tax Summary</button>
+      <button class="prod-tab" onclick="switchFTTab('budget',this)" id="ft-tab-budget" data-i18n="ft_tab_budget">◎ Budget vs Actual</button>
     </div>
 
     <!-- ══ IRS TAB ══ -->
@@ -4416,23 +4416,23 @@ tr:hover .edit-btn{display:inline}
 <div id="budget-targets-modal" class="overlay-bg" onclick="if(event.target===this)closeBudgetTargets()">
   <div class="overlay-box" style="width:480px">
     <div class="overlay-hdr">
-      <span class="overlay-title">✎ Annual Budget Targets</span>
+      <span class="overlay-title" data-i18n="modal_budget_targets">✎ Annual Budget Targets</span>
       <button class="overlay-close" onclick="closeBudgetTargets()">✕</button>
     </div>
     <div class="overlay-body" style="display:flex;flex-direction:column;gap:12px">
       <div style="font-size:9px;color:var(--muted2)">Set targets for <span id="bt-year-label">2025</span>. These are compared against actual ledger data.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="form-field"><label>Target Annual Revenue (€)</label><input class="form-input" id="bt-revenue" type="number" placeholder="10000"></div>
-        <div class="form-field"><label>Target Annual Expenses (€)</label><input class="form-input" id="bt-expenses" type="number" placeholder="3000"></div>
-        <div class="form-field"><label>Target Gig Count</label><input class="form-input" id="bt-gigs" type="number" placeholder="12"></div>
-        <div class="form-field"><label>Target Avg Fee per Gig (€)</label><input class="form-input" id="bt-avg-fee" type="number" placeholder="800"></div>
-        <div class="form-field"><label>Target Net Income (€)</label><input class="form-input" id="bt-net" type="number" placeholder="7000"></div>
-        <div class="form-field"><label>Band Fund Target (€)</label><input class="form-input" id="bt-fund" type="number" placeholder="1200"></div>
+        <div class="form-field"><label data-i18n="ft_target_revenue">Target Annual Revenue (€)</label><input class="form-input" id="bt-revenue" type="number" placeholder="10000"></div>
+        <div class="form-field"><label data-i18n="ft_target_expenses">Target Annual Expenses (€)</label><input class="form-input" id="bt-expenses" type="number" placeholder="3000"></div>
+        <div class="form-field"><label data-i18n="ft_target_gigs">Target Gig Count</label><input class="form-input" id="bt-gigs" type="number" placeholder="12"></div>
+        <div class="form-field"><label data-i18n="ft_target_avg_fee">Target Avg Fee per Gig (€)</label><input class="form-input" id="bt-avg-fee" type="number" placeholder="800"></div>
+        <div class="form-field"><label data-i18n="ft_target_net">Target Net Income (€)</label><input class="form-input" id="bt-net" type="number" placeholder="7000"></div>
+        <div class="form-field"><label data-i18n="ft_target_fund">Band Fund Target (€)</label><input class="form-input" id="bt-fund" type="number" placeholder="1200"></div>
       </div>
     </div>
     <div class="overlay-hdr" style="justify-content:flex-end;border-top:1px solid var(--border);border-bottom:none;gap:8px">
       <button class="btn-sm ghost" onclick="closeBudgetTargets()">Cancel</button>
-      <button class="btn-sm primary" onclick="saveBudgetTargets()">Save Targets</button>
+      <button class="btn-sm primary" onclick="saveBudgetTargets()" data-i18n="ft_save_targets">Save Targets</button>
     </div>
   </div>
 </div>
@@ -5648,52 +5648,37 @@ function printInvoice() {
   _invoiceNum++;
 
   // Save to invoice tracker before printing
-  var invId = 'INV-' + Date.now();
+  // invRegister handles: API persistence + optional ledger posting + localStorage fallback
+  var postToLedgerChecked = !!(document.getElementById('inv-post-ledger')?.checked);
   invRegister({
-    id:          invId,
-    number:      invNum,
-    clientName:  clientName,
-    clientEmail: clientEmail,
-    venue:       venue,
-    showDate:    showDate,
-    description: description,
-    total:       total,
-    ivaRate:     ivaRate,
-    issued:      new Date().toISOString().slice(0,10),
-    paymentDays: 30,
-    notes:       notes,
+    id:            'INV-' + Date.now(),
+    number:        invNum,
+    clientName:    clientName,
+    clientEmail:   clientEmail,
+    clientNif:     document.getElementById('inv-client-nif')?.value || '',
+    clientAddress: document.getElementById('inv-client-address')?.value || '',
+    clientContact: document.getElementById('inv-client-contact')?.value || '',
+    venue:         venue,
+    showDate:      showDate,
+    description:   description,
+    baseFee:       parseFloat(document.getElementById('inv-fee')?.value || 0),
+    expenses:      parseFloat(document.getElementById('inv-expenses')?.value || 0),
+    total:         total,
+    ivaRate:       ivaRate,
+    issued:        new Date().toISOString().slice(0, 10),
+    paymentDays:   30,
+    notes:         notes,
+    bandNif:       document.getElementById('inv-band-nif')?.value || '',
+    bandIban:      document.getElementById('inv-iban')?.value || '',
+    bandEmail:     document.getElementById('inv-band-email')?.value || '',
+    postToLedger:  postToLedgerChecked,
+  }).then(function() {
+    // Refresh ledger view if it was posted (route handles the DB insert)
+    if (postToLedgerChecked) {
+      loadTransactions && loadTransactions();
+      updateFinancialKpis && updateFinancialKpis();
+    }
   });
-
-  // Post to ledger if checkbox is checked
-  var postToLedger = document.getElementById('inv-post-ledger');
-  if (postToLedger && postToLedger.checked && API_BASE && SESSION?.token) {
-    var ledgerDesc = 'Fatura ' + invNum + ' — ' + clientName + (venue ? ' / ' + venue : '');
-    apiPost('/transactions', {
-      date:        showDate || new Date().toISOString().slice(0,10),
-      type:        'income',
-      description: ledgerDesc,
-      amount:      Math.abs(total),
-      currency:    'EUR',
-      category:    'Espetáculo',
-      notes:       'invoice_id:' + invId,
-    }).then(function(data) {
-      // Add to local LEDGER_DATA
-      var signed = Math.abs(total);
-      var prev   = LEDGER_DATA[0];
-      var newBal = parseFloat(((prev ? prev.balance : 0) + signed).toFixed(2));
-      LEDGER_DATA.unshift({
-        id: data.id, date: showDate || new Date().toISOString().slice(0,10),
-        desc: ledgerDesc, type: 'income', cat: 'Espetáculo',
-        tags: ['invoice'], amount: signed, balance: newBal, reconciled: false,
-        notes: 'invoice_id:' + invId,
-      });
-      refreshLedger();
-      updateFinancialKpis();
-      showToast('Ledger updated — ' + fmtMoney(total) + ' income posted', 'ok');
-    }).catch(function(err) {
-      console.warn('Ledger post failed:', err.message);
-    });
-  }
 
   var w = window.open('', '_blank');
   w.document.write(html);
@@ -6136,44 +6121,98 @@ var STORAGE_REHEARSALS = 'gk_rehearsals';
 var STORAGE_DECISIONS  = 'gk_decisions';
 var STORAGE_AGREEMENT  = 'gk_agreement';
 
-function membersLoad() {
-  try { var r = localStorage.getItem(STORAGE_REHEARSALS); REHEARSAL_DATA = r ? JSON.parse(r) : []; } catch(e) { REHEARSAL_DATA = []; }
-  try { var d = localStorage.getItem(STORAGE_DECISIONS);  DECISION_DATA  = d ? JSON.parse(d)  : []; } catch(e) { DECISION_DATA  = []; }
+async function membersLoad() {
+  if (API_BASE && SESSION && SESSION.token) {
+    try {
+      const [reh, dec] = await Promise.all([
+        apiGet('/members/rehearsals'),
+        apiGet('/members/decisions'),
+      ]);
+      // Normalise rehearsal fields (DB uses rehearsal_date, local uses date)
+      REHEARSAL_DATA = reh.map(function(r) {
+        return {
+          id:         r.id,
+          date:       r.rehearsal_date,
+          location:   r.location || '',
+          focus:      r.notes || '',       // stored in notes column
+          duration:   2,
+          attendance: r.attendance || {},
+          notes:      r.notes || '',
+          _dbBacked:  true,
+        };
+      });
+      // Normalise decision fields (DB uses title/outcome/votes_for/votes_against, local uses topic/passed/votes)
+      DECISION_DATA = dec.map(function(d) {
+        return {
+          id:       d.id,
+          date:     d.decided_at,
+          topic:    d.title,
+          notes:    d.notes || '',
+          passed:   d.votes_for > d.votes_against,
+          votes:    {},   // individual votes not stored in DB currently
+          category: 'other',
+          _dbBacked: true,
+        };
+      });
+    } catch(e) {
+      console.warn('Members API load failed, falling back to localStorage:', e.message);
+      _membersLoadLocal();
+    }
+  } else {
+    _membersLoadLocal();
+  }
   membersLoadAgreement();
   renderRehearsals();
   renderDecisions();
   membersUpdateBanner();
 }
 
+function _membersLoadLocal() {
+  try { var r = localStorage.getItem(STORAGE_REHEARSALS); REHEARSAL_DATA = r ? JSON.parse(r) : []; } catch(e) { REHEARSAL_DATA = []; }
+  try { var d = localStorage.getItem(STORAGE_DECISIONS);  DECISION_DATA  = d ? JSON.parse(d)  : []; } catch(e) { DECISION_DATA  = []; }
+}
+
 function membersSave() {
+  // Keep localStorage as offline cache
   try { localStorage.setItem(STORAGE_REHEARSALS, JSON.stringify(REHEARSAL_DATA)); } catch(e) {}
   try { localStorage.setItem(STORAGE_DECISIONS,  JSON.stringify(DECISION_DATA));  } catch(e) {}
 }
 
-function membersLoadAgreement() {
-  try {
-    var a = localStorage.getItem(STORAGE_AGREEMENT);
-    if (!a) { agreeSplitUpdate(); return; }
-    var obj = JSON.parse(a);
-    var set = function(id, v) { var e = document.getElementById(id); if (e && v !== undefined) e.value = v; };
-    set('agree-split-fabio',  obj.splits && obj.splits.fabio);
-    set('agree-split-pedro',  obj.splits && obj.splits.pedro);
-    set('agree-split-manuel', obj.splits && obj.splits.manuel);
-    set('agree-split-tiago',  obj.splits && obj.splits.tiago);
-    set('agree-role-booking',     obj.roles && obj.roles.booking);
-    set('agree-role-social',      obj.roles && obj.roles.social);
-    set('agree-role-finances',    obj.roles && obj.roles.finances);
-    set('agree-role-production',  obj.roles && obj.roles.production);
-    set('agree-role-songwriting', obj.roles && obj.roles.songwriting);
-    set('agree-quorum',    obj.rules && obj.rules.quorum);
-    set('agree-tiebreak',  obj.rules && obj.rules.tiebreak);
-    set('agree-band-fund', obj.rules && obj.rules.bandFund);
-    set('agree-notes',     obj.notes);
-  } catch(e) {}
+async function membersLoadAgreement() {
+  var obj = null;
+  if (API_BASE && SESSION && SESSION.token) {
+    try {
+      const result = await apiGet('/members/settings/agreement');
+      if (result && result.value) obj = result.value;
+    } catch(e) {
+      console.warn('Agreement API load failed:', e.message);
+    }
+  }
+  if (!obj) {
+    try {
+      var a = localStorage.getItem(STORAGE_AGREEMENT);
+      if (a) obj = JSON.parse(a);
+    } catch(e) {}
+  }
+  if (!obj) { agreeSplitUpdate(); return; }
+  var set = function(id, v) { var e = document.getElementById(id); if (e && v !== undefined) e.value = v; };
+  set('agree-split-fabio',  obj.splits && obj.splits.fabio);
+  set('agree-split-pedro',  obj.splits && obj.splits.pedro);
+  set('agree-split-manuel', obj.splits && obj.splits.manuel);
+  set('agree-split-tiago',  obj.splits && obj.splits.tiago);
+  set('agree-role-booking',     obj.roles && obj.roles.booking);
+  set('agree-role-social',      obj.roles && obj.roles.social);
+  set('agree-role-finances',    obj.roles && obj.roles.finances);
+  set('agree-role-production',  obj.roles && obj.roles.production);
+  set('agree-role-songwriting', obj.roles && obj.roles.songwriting);
+  set('agree-quorum',    obj.rules && obj.rules.quorum);
+  set('agree-tiebreak',  obj.rules && obj.rules.tiebreak);
+  set('agree-band-fund', obj.rules && obj.rules.bandFund);
+  set('agree-notes',     obj.notes);
   agreeSplitUpdate();
 }
 
-function membersSaveAgreement() {
+async function membersSaveAgreement() {
   var get = function(id) { var e = document.getElementById(id); return e ? e.value : null; };
   var obj = {
     splits: { fabio:get('agree-split-fabio'), pedro:get('agree-split-pedro'), manuel:get('agree-split-manuel'), tiago:get('agree-split-tiago') },
@@ -6182,6 +6221,13 @@ function membersSaveAgreement() {
     notes:  get('agree-notes')
   };
   try { localStorage.setItem(STORAGE_AGREEMENT, JSON.stringify(obj)); } catch(e) {}
+  if (API_BASE && SESSION && SESSION.token) {
+    try {
+      await _apiFetch('PUT', '/members/settings/agreement', { value: obj });
+    } catch(e) {
+      console.warn('Agreement API save failed, saved locally only:', e.message);
+    }
+  }
 }
 
 function agreeSplitUpdate() {
@@ -6218,30 +6264,59 @@ function openRehearsalModal() {
 }
 function closeRehearsalModal() { document.getElementById('rehearsal-modal').classList.remove('open'); }
 
-function saveRehearsal() {
+async function saveRehearsal() {
   var get=function(id){ var e=document.getElementById(id); return e?e.value.trim():''; };
   var date=get('reh-date');
   if (!date) { showToast('Date required','err'); return; }
+  var attendance = {
+    fabio:  !!(document.getElementById('reh-att-fabio')  && document.getElementById('reh-att-fabio').checked),
+    pedro:  !!(document.getElementById('reh-att-pedro')  && document.getElementById('reh-att-pedro').checked),
+    manuel: !!(document.getElementById('reh-att-manuel') && document.getElementById('reh-att-manuel').checked),
+    tiago:  !!(document.getElementById('reh-att-tiago')  && document.getElementById('reh-att-tiago').checked),
+  };
+  var notes = [get('reh-focus'), get('reh-notes')].filter(Boolean).join(' — ');
   var r = {
     id: Date.now(), date:date, location:get('reh-location'), focus:get('reh-focus'),
     duration:parseFloat(get('reh-duration'))||2, next:get('reh-next'), notes:get('reh-notes'),
-    attendance:{
-      fabio:  !!(document.getElementById('reh-att-fabio')  && document.getElementById('reh-att-fabio').checked),
-      pedro:  !!(document.getElementById('reh-att-pedro')  && document.getElementById('reh-att-pedro').checked),
-      manuel: !!(document.getElementById('reh-att-manuel') && document.getElementById('reh-att-manuel').checked),
-      tiago:  !!(document.getElementById('reh-att-tiago')  && document.getElementById('reh-att-tiago').checked),
-    }
+    attendance: attendance, _dbBacked: false,
   };
+
+  if (API_BASE && SESSION && SESSION.token) {
+    try {
+      const saved = await apiPost('/members/rehearsals', {
+        rehearsal_date: date,
+        location:       get('reh-location') || null,
+        notes:          notes || null,
+        attendance:     attendance,
+      });
+      r.id        = saved.id;
+      r._dbBacked = true;
+      showToast(t('toast_reh_saved_db'), 'ok');
+    } catch(e) {
+      console.warn('Rehearsal API save failed:', e.message);
+      showToast(t('toast_reh_saved_local'), 'warn');
+    }
+  } else {
+    showToast('Rehearsal logged','ok');
+  }
+
   REHEARSAL_DATA.unshift(r);
   membersSave(); renderRehearsals(); membersUpdateBanner(); closeRehearsalModal();
-  showToast('Rehearsal logged','ok');
   ['reh-date','reh-location','reh-focus','reh-next','reh-notes'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
   var dur=document.getElementById('reh-duration'); if(dur) dur.value='2';
   ['fabio','pedro','manuel','tiago'].forEach(function(k){ var cb=document.getElementById('reh-att-'+k); if(cb) cb.checked=true; });
 }
 
-function deleteRehearsal(id) {
-  if (!confirm('Delete this rehearsal?')) return;
+async function deleteRehearsal(id) {
+  if (!confirm(t('confirm_delete_reh'))) return;
+  var r = REHEARSAL_DATA.find(function(x){ return x.id==id; });
+  if (r && r._dbBacked && API_BASE && SESSION && SESSION.token) {
+    try {
+      await apiDelete('/members/rehearsals/' + id);
+    } catch(e) {
+      console.warn('Rehearsal DELETE API failed:', e.message);
+    }
+  }
   REHEARSAL_DATA=REHEARSAL_DATA.filter(function(r){ return r.id!==id; });
   membersSave(); renderRehearsals(); membersUpdateBanner();
 }
@@ -6285,31 +6360,59 @@ function voteUpdate() {
   var required=quorum==='unanimous'?4:quorum==='majority'?2:3;
   var passed=votes.yes>=required;
   var p=document.getElementById('vote-result-preview');
-  if(p) p.innerHTML='<span style="color:'+(passed?'var(--green3)':'var(--red3)')+';font-weight:700">'+(passed?'✓ PASSED':'✗ FAILED')+'</span>'+
+  if(p) p.innerHTML='<span style="color:'+(passed?'var(--green3)':'var(--red3)')+';font-weight:700">'+(passed ? t('vote_passed') : t('vote_failed'))+'</span>'+
     ' &nbsp;·&nbsp; Yes: '+votes.yes+' &nbsp; No: '+votes.no+
     (votes.abstain?' &nbsp; Abstain: '+votes.abstain:'')+
     (votes.absent?' &nbsp; Absent: '+votes.absent:'')+
     ' &nbsp;·&nbsp; Quorum: '+quorum;
 }
 
-function saveVote() {
+async function saveVote() {
   var get=function(id){ var e=document.getElementById(id); return e?e.value.trim():''; };
   var topic=get('vote-topic'), date=get('vote-date');
   if (!topic||!date) { showToast('Topic and date required','err'); return; }
   var votes={};
   ['fabio','pedro','manuel','tiago'].forEach(function(k){ votes[k]=document.getElementById('vote-v-'+k) && document.getElementById('vote-v-'+k).value||'yes'; });
   var yesCount=Object.values(votes).filter(function(v){ return v==='yes'; }).length;
+  var noCount =Object.values(votes).filter(function(v){ return v==='no';  }).length;
   var quorum=document.getElementById('agree-quorum') && document.getElementById('agree-quorum').value||'3/4';
   var required=quorum==='unanimous'?4:quorum==='majority'?2:3;
-  var d={ id:Date.now(), date:date, topic:topic, category:get('vote-category'), votes:votes, passed:yesCount>=required, quorum:quorum, notes:get('vote-notes') };
+  var d={ id:Date.now(), date:date, topic:topic, category:get('vote-category'), votes:votes, passed:yesCount>=required, quorum:quorum, notes:get('vote-notes'), _dbBacked:false };
+
+  if (API_BASE && SESSION && SESSION.token) {
+    try {
+      const saved = await apiPost('/members/decisions', {
+        title:         topic,
+        outcome:       d.passed ? 'passed' : 'failed',
+        votes_for:     yesCount,
+        votes_against: noCount,
+        decided_at:    date,
+        notes:         get('vote-notes') || null,
+      });
+      d.id        = saved.id;
+      d._dbBacked = true;
+    } catch(e) {
+      console.warn('Decision API save failed:', e.message);
+      showToast(t('toast_dec_saved_local'), 'warn');
+    }
+  }
+
   DECISION_DATA.unshift(d);
   membersSave(); renderDecisions(); membersUpdateBanner(); closeVoteModal();
-  showToast('Decision logged — '+(d.passed?'PASSED':'FAILED'), d.passed?'ok':'warn');
+  showToast((d.passed ? t('vote_passed') : t('vote_failed')), d.passed ? 'ok' : 'warn');
   ['vote-date','vote-topic','vote-notes'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
 }
 
-function deleteDecision(id) {
-  if (!confirm('Delete this decision?')) return;
+async function deleteDecision(id) {
+  if (!confirm(t('confirm_delete_dec'))) return;
+  var d = DECISION_DATA.find(function(x){ return x.id==id; });
+  if (d && d._dbBacked && API_BASE && SESSION && SESSION.token) {
+    try {
+      await apiDelete('/members/decisions/' + id);
+    } catch(e) {
+      console.warn('Decision DELETE API failed:', e.message);
+    }
+  }
   DECISION_DATA=DECISION_DATA.filter(function(d){ return d.id!==id; });
   membersSave(); renderDecisions(); membersUpdateBanner();
 }
@@ -6329,7 +6432,7 @@ function renderDecisions() {
         '</div>'+
         '<div style="display:flex;align-items:center;gap:6px">'+
           '<span style="font-size:9px;font-weight:700;color:'+(d.passed?'var(--green3)':'var(--red3)')+'">'+
-            (d.passed?'✓ PASSED':'✗ FAILED')+'</span>'+
+            (d.passed ? t('vote_passed') : t('vote_failed'))+'</span>'+
           '<button onclick="deleteDecision('+d.id+')" style="background:none;border:none;color:var(--muted3);cursor:pointer;font-size:11px;padding:0">✕</button>'+
         '</div>'+
       '</div>'+
@@ -6431,8 +6534,22 @@ function switchFTTab(tab, btn) {
   if (tab === 'budget') budgetRender();
 }
 
-function financeToolsLoad() {
-  try { var b = localStorage.getItem(STORAGE_BUDGET); BUDGET_TARGETS = b ? JSON.parse(b) : {}; } catch(e) { BUDGET_TARGETS = {}; }
+async function financeToolsLoad() {
+  if (API_BASE && SESSION && SESSION.token) {
+    try {
+      const result = await apiGet('/members/settings/budget_targets');
+      if (result && result.value) {
+        BUDGET_TARGETS = result.value;
+      } else {
+        throw new Error('empty');
+      }
+    } catch(e) {
+      // Fall back to localStorage
+      try { var b = localStorage.getItem(STORAGE_BUDGET); BUDGET_TARGETS = b ? JSON.parse(b) : {}; } catch(e2) { BUDGET_TARGETS = {}; }
+    }
+  } else {
+    try { var b = localStorage.getItem(STORAGE_BUDGET); BUDGET_TARGETS = b ? JSON.parse(b) : {}; } catch(e) { BUDGET_TARGETS = {}; }
+  }
   irsRender();
 }
 
@@ -6763,14 +6880,24 @@ function budgetSetTargets() {
 
 function closeBudgetTargets() { document.getElementById('budget-targets-modal').classList.remove('open'); }
 
-function saveBudgetTargets() {
+async function saveBudgetTargets() {
   var year = document.getElementById('budget-year')?.value || '2025';
   var get = function(id){ var e=document.getElementById(id); return parseFloat(e&&e.value)||0; };
   BUDGET_TARGETS[year] = { revenue:get('bt-revenue'), expenses:get('bt-expenses'), gigs:get('bt-gigs'), avgFee:get('bt-avg-fee'), net:get('bt-net'), fund:get('bt-fund') };
+  // Always update localStorage as cache
   try { localStorage.setItem(STORAGE_BUDGET, JSON.stringify(BUDGET_TARGETS)); } catch(e){}
+  // Persist to DB
+  if (API_BASE && SESSION && SESSION.token) {
+    try {
+      await _apiFetch('PUT', '/members/settings/budget_targets', { value: BUDGET_TARGETS });
+    } catch(e) {
+      console.warn('Budget targets API save failed:', e.message);
+      showToast('Saved locally (API unavailable)', 'warn');
+    }
+  }
   closeBudgetTargets();
   budgetRender();
-  showToast('Budget targets saved', 'ok');
+  showToast(t('toast_budget_saved'), 'ok');
 }
 
 function budgetRender() {
@@ -7095,53 +7222,130 @@ window.renderSetlistDisplay = function() {
 
 var INVOICE_DATA = [];
 var INV_FILTER   = 'all';
-var STORAGE_INVOICES = 'gk_invoices';
+var STORAGE_INVOICES = 'gk_invoices'; // fallback only
 
-function invoiceTrackerLoad() {
-  try {
-    var raw = localStorage.getItem(STORAGE_INVOICES);
-    INVOICE_DATA = raw ? JSON.parse(raw) : [];
-  } catch(e) { INVOICE_DATA = []; }
+// ── Load: API first, localStorage fallback ──────
+async function invoiceTrackerLoad() {
+  if (API_BASE && SESSION && SESSION.token) {
+    try {
+      const rows = await apiGet('/invoices');
+      // Normalise field names from snake_case DB → camelCase used by renderer
+      INVOICE_DATA = rows.map(function(r) {
+        return {
+          id:          r.id,
+          number:      r.number,
+          clientName:  r.client_name,
+          clientEmail: r.client_email || '',
+          venue:       r.venue || '',
+          showDate:    r.show_date || '',
+          description: r.description || '',
+          total:       parseFloat(r.total) || 0,
+          ivaRate:     parseFloat(r.iva_rate) || 0,
+          issued:      r.issued_date || '',
+          due:         r.due_date || '',
+          status:      r.status || 'sent',
+          paidDate:    r.paid_date || '',
+          paidMethod:  r.paid_method || '',
+          notes:       r.notes || '',
+          booking_id:  r.booking_id || null,
+          _dbBacked:   true,
+        };
+      });
+    } catch(e) {
+      console.warn('Invoice API load failed, falling back to localStorage:', e.message);
+      _invoiceLoadFromLocal();
+    }
+  } else {
+    _invoiceLoadFromLocal();
+  }
   invoiceTrackerRender();
   invUpdateBanner();
   invUpdateOverdueBadge();
 }
 
-function invoiceTrackerSave() {
+function _invoiceLoadFromLocal() {
+  try {
+    var raw = localStorage.getItem(STORAGE_INVOICES);
+    INVOICE_DATA = raw ? JSON.parse(raw) : [];
+  } catch(e) { INVOICE_DATA = []; }
+}
+
+// ── Save: API if available, localStorage as local cache ──
+async function invoiceTrackerSave() {
   try { localStorage.setItem(STORAGE_INVOICES, JSON.stringify(INVOICE_DATA)); } catch(e) {}
 }
 
 // ── Called from printInvoice() to register the invoice ──
-function invRegister(data) {
-  // data: { id, number, clientName, clientEmail, venue, showDate, total, ivaRate, issued, paymentDays, notes }
+async function invRegister(data) {
+  // data: { id, number, clientName, clientEmail, clientNif, clientAddress,
+  //         venue, showDate, description, total, baseFee, expenses, ivaRate,
+  //         issued, paymentDays, notes, bandNif, bandIban, bandEmail,
+  //         postToLedger }
   var dueDate = '';
   if (data.issued && data.paymentDays) {
     var d = new Date(data.issued);
     d.setDate(d.getDate() + parseInt(data.paymentDays || 30));
     dueDate = d.toISOString().slice(0, 10);
   }
+
   var inv = {
-    id:            data.id || ('INV-' + Date.now()),
-    number:        data.number,
-    clientName:    data.clientName,
-    clientEmail:   data.clientEmail || '',
-    venue:         data.venue || '',
-    showDate:      data.showDate || '',
-    description:   data.description || '',
-    total:         parseFloat(data.total) || 0,
-    ivaRate:       parseFloat(data.ivaRate) || 0,
-    issued:        data.issued || new Date().toISOString().slice(0, 10),
-    due:           dueDate,
-    status:        'sent',   // auto-set to sent since we just printed it
-    paidDate:      '',
-    paidMethod:    '',
-    notes:         data.notes || '',
-    createdAt:     Date.now(),
+    id:          data.id || ('INV-' + Date.now()),
+    number:      data.number,
+    clientName:  data.clientName,
+    clientEmail: data.clientEmail || '',
+    venue:       data.venue || '',
+    showDate:    data.showDate || '',
+    description: data.description || '',
+    total:       parseFloat(data.total) || 0,
+    ivaRate:     parseFloat(data.ivaRate) || 0,
+    issued:      data.issued || new Date().toISOString().slice(0, 10),
+    due:         dueDate,
+    status:      'sent',
+    paidDate:    '',
+    paidMethod:  '',
+    notes:       data.notes || '',
+    _dbBacked:   false,
   };
-  // Remove duplicate if same invoice number already exists (reprint)
+
+  if (API_BASE && SESSION && SESSION.token) {
+    try {
+      const saved = await apiPost('/invoices', {
+        number:          inv.number,
+        client_name:     inv.clientName,
+        client_email:    inv.clientEmail || null,
+        client_nif:      data.clientNif || null,
+        client_address:  data.clientAddress || null,
+        client_contact:  data.clientContact || null,
+        venue:           inv.venue || null,
+        show_date:       inv.showDate || null,
+        description:     inv.description || null,
+        base_fee:        parseFloat(data.baseFee) || 0,
+        expenses:        parseFloat(data.expenses) || 0,
+        iva_rate:        inv.ivaRate,
+        total:           inv.total,
+        issued_date:     inv.issued,
+        due_date:        inv.due || null,
+        status:          'sent',
+        notes:           inv.notes || null,
+        band_nif:        data.bandNif || null,
+        band_iban:       data.bandIban || null,
+        band_email:      data.bandEmail || null,
+        post_to_ledger:  data.postToLedger || false,
+      });
+      // Use DB-assigned UUID instead of local fallback
+      inv.id        = saved.id;
+      inv._dbBacked = true;
+      showToast(t('toast_inv_saved_db'), 'ok');
+    } catch(e) {
+      console.warn('Invoice API save failed, saved locally only:', e.message);
+      showToast(t('toast_inv_saved_local'), 'warn');
+    }
+  }
+
+  // Keep local copy in sync (fallback + offline support)
   INVOICE_DATA = INVOICE_DATA.filter(function(x) { return x.number !== inv.number; });
   INVOICE_DATA.unshift(inv);
-  invoiceTrackerSave();
+  await invoiceTrackerSave();
   invoiceTrackerRender();
   invUpdateBanner();
   invUpdateOverdueBadge();
@@ -7162,11 +7366,11 @@ function invEffectiveStatus(inv) {
 }
 
 var INV_STATUS_STYLES = {
-  draft:     { color: 'var(--muted2)',  bg: 'rgba(255,255,255,.06)', label: 'Draft' },
-  sent:      { color: 'var(--blue2)',   bg: 'rgba(41,121,255,.12)',  label: 'Sent' },
-  overdue:   { color: 'var(--red3)',    bg: 'rgba(255,60,30,.12)',   label: 'Overdue' },
-  paid:      { color: 'var(--green3)',  bg: 'rgba(0,230,118,.12)',   label: 'Paid ✓' },
-  cancelled: { color: 'var(--muted3)', bg: 'rgba(255,255,255,.04)', label: 'Cancelled' },
+  draft:     { color: 'var(--muted2)',  bg: 'rgba(255,255,255,.06)', get label(){ return t('inv_status_draft'); } },
+  sent:      { color: 'var(--blue2)',   bg: 'rgba(41,121,255,.12)',  get label(){ return t('inv_status_sent'); } },
+  overdue:   { color: 'var(--red3)',    bg: 'rgba(255,60,30,.12)',   get label(){ return t('inv_status_overdue'); } },
+  paid:      { color: 'var(--green3)',  bg: 'rgba(0,230,118,.12)',   get label(){ return t('inv_status_paid'); } },
+  cancelled: { color: 'var(--muted3)', bg: 'rgba(255,255,255,.04)', get label(){ return t('inv_status_cancelled'); } },
 };
 
 // ── Banner ──
@@ -7215,8 +7419,7 @@ function invoiceTrackerRender() {
 
   if (!data.length) {
     tbody.innerHTML = '<tr><td colspan="9" style="padding:32px;text-align:center;color:var(--muted3)">' +
-      (INV_FILTER === 'all' ? 'No invoices yet. Generate one from the Booking tab.' :
-       'No ' + INV_FILTER + ' invoices.') + '</td></tr>';
+      (INV_FILTER === 'all' ? t('inv_empty') : t('inv_filter_' + INV_FILTER) + ' — ' + t('gen_no_data')) + '</td></tr>';
     return;
   }
 
@@ -7232,12 +7435,12 @@ function invoiceTrackerRender() {
     if (inv.due) {
       var daysLeft = Math.round((new Date(inv.due) - new Date()) / 86400000);
       if (eff === 'paid') {
-        dueLabel = inv.paidDate ? 'Paid ' + inv.paidDate : 'Paid';
+        dueLabel = inv.paidDate ? t('inv_status_paid') + ' ' + inv.paidDate : t('inv_status_paid');
       } else if (isOD) {
-        dueLabel = '<span style="color:var(--red3);font-weight:700">' + Math.abs(daysLeft) + 'd overdue</span>';
+        dueLabel = '<span style="color:var(--red3);font-weight:700">' + Math.abs(daysLeft) + t('inv_days_overdue') + '</span>';
       } else {
         dueLabel = '<span style="color:' + (daysLeft <= 7 ? 'var(--amber2)' : 'var(--muted3)') + '">' +
-          (daysLeft === 0 ? 'Due today' : daysLeft + 'd left') + '</span>';
+          (daysLeft === 0 ? t('inv_due_today') : daysLeft + t('inv_days_left')) + '</span>';
       }
     }
 
@@ -7287,26 +7490,33 @@ function invoiceTrackerRender() {
 }
 
 // ── Quick mark paid ──
-function invMarkPaid(id) {
+async function invMarkPaid(id) {
   var inv = INVOICE_DATA.find(function(i){ return i.id === id; });
   if (!inv) return;
-  inv.status    = 'paid';
-  inv.paidDate  = new Date().toISOString().slice(0, 10);
-  invoiceTrackerSave();
+
+  if (API_BASE && SESSION && SESSION.token && inv._dbBacked) {
+    try {
+      const updated = await _apiFetch('PATCH', '/invoices/' + id + '/status', {
+        status: 'paid',
+        paid_date: new Date().toISOString().slice(0, 10),
+      });
+      inv.status   = updated.status;
+      inv.paidDate = updated.paid_date || new Date().toISOString().slice(0, 10);
+    } catch(e) {
+      console.warn('Invoice status API failed:', e.message);
+      inv.status   = 'paid';
+      inv.paidDate = new Date().toISOString().slice(0, 10);
+    }
+  } else {
+    inv.status   = 'paid';
+    inv.paidDate = new Date().toISOString().slice(0, 10);
+  }
+
+  await invoiceTrackerSave();
   invoiceTrackerRender();
   invUpdateBanner();
   invUpdateOverdueBadge();
-  showToast('Invoice ' + inv.number + ' marked as paid ✓', 'ok');
-  // Update matching ledger entry reconciliation status if it exists
-  if (LEDGER_DATA) {
-    var ledgerEntry = LEDGER_DATA.find(function(e) {
-      return e.notes && e.notes.indexOf('invoice_id:' + id) !== -1;
-    });
-    if (ledgerEntry) {
-      ledgerEntry.reconciled = true;
-      refreshLedger();
-    }
-  }
+  showToast(t('toast_inv_overdue_pfx') + ' ' + inv.number + ' ' + t('toast_inv_paid'), 'ok');
 }
 
 // ── Status modal ──
@@ -7314,7 +7524,7 @@ function invOpenStatusModal(id) {
   var inv = INVOICE_DATA.find(function(i){ return i.id === id; });
   if (!inv) return;
   document.getElementById('inv-status-modal-id').value = id;
-  document.getElementById('inv-status-modal-title').textContent = 'Invoice ' + (inv.number || id) + ' — ' + (inv.clientName || '');
+  document.getElementById('inv-status-modal-title').textContent = t('toast_inv_overdue_pfx') + ' ' + (inv.number || id) + ' — ' + (inv.clientName || '');
   document.getElementById('inv-status-select').value  = inv.status || 'sent';
   document.getElementById('inv-paid-date').value      = inv.paidDate || new Date().toISOString().slice(0,10);
   document.getElementById('inv-paid-method').value   = inv.paidMethod || '';
@@ -7333,37 +7543,68 @@ function invStatusTogglePaidFields() {
   if (paidField) paidField.style.display = sel === 'paid' ? '' : 'none';
 }
 
-// invStatusTogglePaidFields triggered via onchange on the select element directly
-
-function invSaveStatus() {
+async function invSaveStatus() {
   var id     = document.getElementById('inv-status-modal-id').value;
   var inv    = INVOICE_DATA.find(function(i){ return i.id === id; });
   if (!inv) { closeInvStatusModal(); return; }
 
-  inv.status     = document.getElementById('inv-status-select').value;
-  inv.paidDate   = document.getElementById('inv-paid-date').value || '';
-  inv.paidMethod = document.getElementById('inv-paid-method').value || '';
-  inv.notes      = document.getElementById('inv-status-notes').value || '';
+  var newStatus     = document.getElementById('inv-status-select').value;
+  var newPaidDate   = document.getElementById('inv-paid-date').value || '';
+  var newPaidMethod = document.getElementById('inv-paid-method').value || '';
+  var newNotes      = document.getElementById('inv-status-notes').value || '';
 
-  invoiceTrackerSave();
+  if (API_BASE && SESSION && SESSION.token && inv._dbBacked) {
+    try {
+      const updated = await _apiFetch('PATCH', '/invoices/' + id + '/status', {
+        status:      newStatus,
+        paid_date:   newPaidDate || null,
+        paid_method: newPaidMethod || null,
+        notes:       newNotes || null,
+      });
+      inv.status     = updated.status;
+      inv.paidDate   = updated.paid_date || '';
+      inv.paidMethod = updated.paid_method || '';
+      inv.notes      = updated.notes || newNotes;
+    } catch(e) {
+      console.warn('Invoice status PATCH failed:', e.message);
+      inv.status = newStatus; inv.paidDate = newPaidDate;
+      inv.paidMethod = newPaidMethod; inv.notes = newNotes;
+      showToast('Saved locally (API unavailable)', 'warn');
+    }
+  } else {
+    inv.status = newStatus; inv.paidDate = newPaidDate;
+    inv.paidMethod = newPaidMethod; inv.notes = newNotes;
+  }
+
+  await invoiceTrackerSave();
   invoiceTrackerRender();
   invUpdateBanner();
   invUpdateOverdueBadge();
   closeInvStatusModal();
-  showToast('Invoice updated', 'ok');
+  showToast(t('toast_inv_updated'), 'ok');
 }
 
-function invDelete(id) {
+async function invDelete(id) {
   var inv = INVOICE_DATA.find(function(i){ return i.id === id; });
   if (!inv) return;
-  if (!confirm('Delete invoice ' + (inv.number || id) + '?')) return;
+  if (!confirm(t('confirm_delete_inv') + ' ' + (inv.number || id))) return;
+
+  if (API_BASE && SESSION && SESSION.token && inv._dbBacked) {
+    try {
+      await apiDelete('/invoices/' + id);
+    } catch(e) {
+      console.warn('Invoice DELETE API failed:', e.message);
+      showToast('Delete failed on server — removed locally only', 'warn');
+    }
+  }
+
   INVOICE_DATA = INVOICE_DATA.filter(function(i){ return i.id !== id; });
-  invoiceTrackerSave();
+  await invoiceTrackerSave();
   invoiceTrackerRender();
   invUpdateBanner();
   invUpdateOverdueBadge();
   closeInvStatusModal();
-  showToast('Invoice deleted', 'warn');
+  showToast(t('toast_inv_deleted'), 'warn');
 }
 
 // ── Export summary PDF ──
@@ -7379,7 +7620,7 @@ function invExportSummary() {
   var totalPaid = data.filter(function(i){return i.status==='paid';}).reduce(function(s,i){return s+i.total;},0);
   var totalOD   = data.filter(function(i){return invIsOverdue(i);}).reduce(function(s,i){return s+i.total;},0);
 
-  var INV_STATUS_LABELS = {draft:'Draft',sent:'Sent',paid:'Paid',overdue:'Overdue',cancelled:'Cancelled'};
+  var INV_STATUS_LABELS = {draft:t('inv_status_draft'),sent:t('inv_status_sent'),paid:t('inv_status_paid'),overdue:t('inv_status_overdue'),cancelled:t('inv_status_cancelled')};
 
   var doc = '<!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8"><title>Invoice Summary</title><style>'+
     '*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:10px;color:#1a1a1a;padding:20px 28px}'+
@@ -7408,7 +7649,7 @@ function invExportSummary() {
     data.map(function(inv){
       var eff=invEffectiveStatus(inv);
       var daysLeft = inv.due ? Math.round((new Date(inv.due)-new Date())/86400000) : null;
-      var dueStr = inv.due ? (eff==='paid'?(inv.paidDate||'Paid'):eff==='overdue'?Math.abs(daysLeft)+'d overdue':daysLeft+'d left') : '—';
+      var dueStr = inv.due ? (eff==='paid'?(inv.paidDate||t('inv_status_paid')):eff==='overdue'?Math.abs(daysLeft)+'d overdue':daysLeft+t('inv_days_left')) : '—';
       return '<tr>'+
         '<td style="font-family:monospace">'+(inv.number||'—')+'</td>'+
         '<td>'+inv.clientName+'</td>'+
@@ -10561,15 +10802,177 @@ function renderHeatmap(){
 // Full implementation is below near BASE_USERS — this stub is intentionally removed.
 
 // ─── RENDER: FULL ALERTS ──────────────────────────────
-function renderFullAlerts(){
-  const el=document.getElementById('full-alerts-panel');
-  if(!el)return;
-  el.innerHTML=`
-    <div class="alert-card warn"><div class="alert-card-title">Streaming — No trend data yet</div><div class="alert-card-body">CDBaby reports 2,200 Spotify streams total. Connect Spotify for Artists to enable MoM trend alerts.</div><div class="alert-ts">2026-03-19 · Setup required</div></div>
-    <div class="alert-card warn"><div class="alert-card-title">Cash Runway Warning</div><div class="alert-card-body" id="alert-runway-body-dynamic">At current burn rate, runway is being calculated — see Dashboard KPI strip.</div><div class="alert-ts">Auto-calculated · Triggered by: cash-runway rule</div></div>
-    <div class="alert-card info"><div class="alert-card-title">Distrokid charge — March 2026</div><div class="alert-card-body">Distribution renewal €27.40 on 2026-03-18. Verify coverage includes all active releases.</div><div class="alert-ts">2026-03-18 · Informational</div></div>
-    <div class="alert-card info"><div class="alert-card-title">Spotify streams flat</div><div class="alert-card-body">2,200 streams total (all-time) from CDBaby dashboard. No MoM data yet — connect Spotify for Artists for trends.</div><div class="alert-ts">2026-03-19 · Data gap</div></div>
-  `;
+function computeAlerts() {
+  // Returns array of { severity:'crit'|'warn'|'info', title, body, ts } computed
+  // from live data variables. Called by renderFullAlerts() and the ticker.
+  const alerts = [];
+  const now    = new Date();
+  const fmtE   = v => '€\u00a0' + Math.abs(v).toLocaleString('pt-PT', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const fmtD   = d => new Date(d).toLocaleDateString('pt-PT', {day:'2-digit', month:'short', year:'numeric'});
+
+  // ── 1. OVERDUE INVOICES ───────────────────────────────
+  if (typeof INVOICE_DATA !== 'undefined') {
+    const overdue = INVOICE_DATA.filter(i =>
+      i.status !== 'paid' && i.status !== 'cancelled' &&
+      i.due && new Date(i.due) < now
+    );
+    if (overdue.length > 0) {
+      const total = overdue.reduce((s, i) => s + i.total, 0);
+      const worst = overdue.reduce((a, b) => new Date(a.due) < new Date(b.due) ? a : b);
+      const daysOD = Math.round((now - new Date(worst.due)) / 86400000);
+      alerts.push({
+        severity: 'crit',
+        title:    `${overdue.length} ${overdue.length > 1 ? t('alert_overdue_inv_title_pl') : t('alert_overdue_inv_title')} — ${fmtE(total)}`,
+        body:     `${t('alert_overdue_inv_body')} ${worst.number} (${worst.clientName}) — ${daysOD} ${t('alert_overdue_inv_suffix')}`,
+        ts:       `Due ${fmtD(worst.due)} · ${daysOD}d overdue`,
+      });
+    }
+  }
+
+  // ── 2. NEGATIVE CASH BALANCE ─────────────────────────
+  if (typeof LEDGER_DATA !== 'undefined' && LEDGER_DATA.length > 0) {
+    const balance = LEDGER_DATA[0].balance;
+    if (balance < 0) {
+      alerts.push({
+        severity: 'crit',
+        title:    `${t('alert_neg_balance_title')} — ${fmtE(balance)}`,
+        body:     t('alert_neg_balance_body'),
+        ts:       `Balance as of ${fmtD(LEDGER_DATA[0].date)}`,
+      });
+    } else if (balance < 500) {
+      alerts.push({
+        severity: 'warn',
+        title:    `${t('alert_low_balance_title')} — ${fmtE(balance)}`,
+        body:     t('alert_low_balance_body'),
+        ts:       `Balance as of ${fmtD(LEDGER_DATA[0].date)}`,
+      });
+    }
+
+    // ── 3. CASH RUNWAY (burn rate over last 90 days) ────
+    const cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 90);
+    const recent = LEDGER_DATA.filter(e => new Date(e.date) >= cutoff);
+    const income  = recent.filter(e => e.amount > 0).reduce((s, e) => s + e.amount, 0);
+    const expense = recent.filter(e => e.amount < 0).reduce((s, e) => s + Math.abs(e.amount), 0);
+    const monthlyBurn = expense / 3;
+    if (monthlyBurn > 0 && balance > 0) {
+      const runwayMonths = balance / monthlyBurn;
+      if (runwayMonths < 3) {
+        alerts.push({
+          severity: runwayMonths < 1 ? 'crit' : 'warn',
+          title:    `${t('alert_runway_title')}: ${runwayMonths.toFixed(1)} ${t('alert_runway_months')}`,
+          body:     `${t('alert_runway_body1')} ${fmtE(monthlyBurn)}${t('alert_runway_body2')}${runwayMonths.toFixed(1)} ${t('alert_runway_body3')} ` +
+                    (income < expense ? t('alert_runway_deficit') : ''),
+          ts:       `90-day burn rate · Balance ${fmtE(balance)}`,
+        });
+      }
+    }
+  }
+
+  // ── 4. BOOKING FOLLOW-UPS OVERDUE ────────────────────
+  if (typeof BOOKING_DATA !== 'undefined') {
+    const overdueFollowups = BOOKING_DATA.filter(b =>
+      b.follow_up_date && new Date(b.follow_up_date) < now &&
+      !['completed','rejected'].includes(b.stage)
+    );
+    if (overdueFollowups.length > 0) {
+      alerts.push({
+        severity: 'warn',
+        title:    `${overdueFollowups.length} ${overdueFollowups.length > 1 ? t('alert_followups_title_pl') : t('alert_followups_title')}`,
+        body:     overdueFollowups.slice(0, 3).map(b =>
+          `${b.name}${b.location ? ' · ' + b.location : ''} (${b.stage})`
+        ).join('; ') + (overdueFollowups.length > 3 ? ' …' : ''),
+        ts:       `${overdueFollowups.length} ${t('alert_followups_suffix')}`,
+      });
+    }
+  }
+
+  // ── 5. RELEASES APPROACHING WITHOUT SOCIAL PLAN ──────
+  if (typeof RELEASES_DATA !== 'undefined') {
+    const soon = RELEASES_DATA.filter(r => {
+      if (!r.release_date || r.stage === 'released') return false;
+      const days = Math.round((new Date(r.release_date) - now) / 86400000);
+      return days >= 0 && days <= 30 && !r.social_media;
+    });
+    if (soon.length > 0) {
+      alerts.push({
+        severity: 'warn',
+        title:    `${soon.length} ${soon.length > 1 ? t('alert_releases_title_pl') : t('alert_releases_title')}`,
+        body:     soon.map(r => `"${r.title}" — ${t('alert_releases_drops')} ${fmtD(r.release_date)}`).join('; '),
+        ts:       `${soon.length} ${t('alert_followups_suffix').replace('Booking','Social')}`,
+      });
+    }
+  }
+
+  // ── 6. ALERT RULES (user-defined) ────────────────────
+  if (typeof ALERT_RULES !== 'undefined' && typeof LEDGER_DATA !== 'undefined') {
+    const balance = LEDGER_DATA.length > 0 ? LEDGER_DATA[0].balance : 0;
+    ALERT_RULES.filter(r => r.active).forEach(rule => {
+      let val = null;
+      if (rule.metric === 'balance')         val = balance;
+      if (rule.metric === 'invoice_overdue') {
+        val = (typeof INVOICE_DATA !== 'undefined')
+          ? INVOICE_DATA.filter(i => i.status !== 'paid' && i.status !== 'cancelled' && i.due && new Date(i.due) < now).length
+          : 0;
+      }
+      if (val === null) return;
+      const triggered =
+        rule.operator === '<'  ? val < rule.threshold  :
+        rule.operator === '>'  ? val > rule.threshold  :
+        rule.operator === '<=' ? val <= rule.threshold :
+        rule.operator === '>=' ? val >= rule.threshold : false;
+      if (triggered) {
+        alerts.push({
+          severity: rule.severity === 'critical' ? 'crit' : rule.severity === 'warning' ? 'warn' : 'info',
+          title:    rule.name,
+          body:     `${t('alert_rule_triggered')} ${rule.metric} ${rule.operator} ${rule.threshold} (${t('alert_rule_current')} ${val.toFixed(2)})`,
+          ts:       `User-defined rule · Auto-evaluated`,
+        });
+      }
+    });
+  }
+
+  return alerts;
+}
+
+function renderFullAlerts() {
+  const el = document.getElementById('full-alerts-panel');
+  if (!el) return;
+
+  const alerts = computeAlerts();
+
+  // Update nav badge
+  const critCount = alerts.filter(a => a.severity === 'crit').length;
+  const warnCount = alerts.filter(a => a.severity === 'warn').length;
+  const totalBadge = document.querySelector('#tab-alerts .tab-badge');
+  if (totalBadge) {
+    const count = critCount + warnCount;
+    totalBadge.textContent = count > 0 ? count : '';
+    totalBadge.style.display = count > 0 ? 'inline-block' : 'none';
+    totalBadge.style.background = critCount > 0 ? 'var(--red3)' : 'var(--amber2)';
+  }
+  // Update panel badge label
+  const panelBadge = document.querySelector('#view-alerts .panel-badge');
+  if (panelBadge) {
+    panelBadge.textContent = critCount > 0 ? `${critCount} CRITICAL` : warnCount > 0 ? `${warnCount} WARNING` : 'ALL CLEAR';
+    panelBadge.style.color = critCount > 0 ? 'var(--red3)' : warnCount > 0 ? 'var(--amber2)' : 'var(--green3)';
+  }
+
+  if (!alerts.length) {
+    el.innerHTML = `<div style="padding:24px;text-align:center;color:var(--green3);font-family:var(--mono);font-size:11px">
+      ✓ ALL CLEAR — No active alerts
+      <div style="font-size:9px;color:var(--muted3);margin-top:6px">All thresholds within normal range. Data refreshes when you navigate to this tab.</div>
+    </div>`;
+    return;
+  }
+
+  const cssClass = { crit: 'alert-card critical', warn: 'alert-card warn', info: 'alert-card info' };
+  el.innerHTML = alerts.map(a => `
+    <div class="${cssClass[a.severity] || 'alert-card info'}">
+      <div class="alert-card-title">${a.title}</div>
+      <div class="alert-card-body">${a.body}</div>
+      <div class="alert-ts">${a.ts}</div>
+    </div>
+  `).join('');
 }
 
 // ─── MODAL (overridden by auth-aware versions below) ──
@@ -10583,12 +10986,12 @@ const CMDS=[
   {group:'Navigate',icon:'◈',label:'Streaming',sub:'Platform breakdown',key:'F4',fn:()=>document.querySelector('[data-view=streaming]').click()},
   {group:'Navigate',icon:'◈',label:'Alerts',sub:'Live alert feed',key:'F5',fn:()=>document.querySelector('[data-view=alerts]').click()},
   {group:'Navigate',icon:'◈',label:'Settings',sub:'Account & integrations',key:'—',fn:()=>document.querySelector('[data-view=settings]').click()},
-  {group:'Actions',icon:'◉',label:'New Transaction',sub:'Add income or expense',key:'N',fn:()=>{closePalette();openModal()}},
-  {group:'Actions',icon:'◉',label:'Export Ledger CSV',sub:'Download all transactions',key:'E',fn:()=>alert('Exporting CSV…')},
-  {group:'Actions',icon:'◉',label:'Generate Monthly Report',sub:'PDF summary',key:'R',fn:()=>alert('Generating report…')},
+  {group:'Actions',icon:'◉',label:'New Transaction',sub:'Add income or expense',key:'N',fn:()=>{closePalette();openModal();}},
+  {group:'Actions',icon:'◉',label:'Export Ledger CSV',sub:'Download all transactions',key:'E',fn:()=>{closePalette();exportCSV();}},
+  {group:'Actions',icon:'◉',label:'Generate Monthly Report',sub:'PDF summary',key:'R',fn:()=>{closePalette();downloadFinancialPDF();}},
   {group:'Actions',icon:'◉',label:'Send Invite',sub:'Invite a band member',key:'I',fn:()=>{closePalette();openInvite();}},
-  {group:'Actions',icon:'◉',label:'Reconciliation View',sub:'Match transactions',key:'V',fn:()=>alert('Opening reconciliation…')},
-  {group:'Actions',icon:'◉',label:'Force Sync',sub:'Pull latest data',key:'—',fn:()=>alert('Syncing…')},
+  {group:'Actions',icon:'◉',label:'Reconciliation View',sub:'Match transactions',key:'V',fn:()=>{closePalette();document.querySelector('[data-view=ledger]').click();setTimeout(()=>{const rs=document.querySelector('.reconcile-strip');if(rs)rs.scrollIntoView({behavior:'smooth'});},400);}},
+  {group:'Actions',icon:'◉',label:'Force Sync',sub:'Pull latest data',key:'—',fn:()=>{closePalette();const btn=document.querySelector('[onclick*=forceSync]');if(btn)forceSync(btn);}},
 ];
 let cmdSel=0;let filteredCmds=[...CMDS];
 function openPalette(){
@@ -11133,6 +11536,243 @@ const TRANSLATIONS = {
     rel_rule_label:       'Rule:',
     rel_rule_text:        'min 6 weeks between release date and pitch deadline',
     rel_checklist_empty:  'Select a release to see its checklist status.',
+    // Missing tabs
+    tab_invoices:         '⎙ Invoices',
+    tab_members:          '◈ Members',
+    tab_finance_tools:    '⊟ Finance Tools',
+    // Modal titles
+    modal_invite:         '⚿ Send Invite — Admin Only',
+    modal_new_txn:        '◉ New Transaction',
+    modal_invoice:        '⎙ Generate Invoice',
+    modal_contract:       '⎙ Performance Contract',
+    modal_rehearsal:      '● Log Rehearsal',
+    modal_vote:           '◈ Log Band Decision',
+    modal_import_csv:     '⬆ Import Transactions — CSV',
+    modal_edit_txn:       '✎ Edit Transaction',
+    modal_tour:           '◉ New Tour / Show',
+    modal_edit_user:      '✎ Edit User',
+    modal_alert_rule:     '+ Alert Rule',
+    modal_edit_release:   '✎ Edit Release',
+    modal_budget_targets: '✎ Annual Budget Targets',
+    modal_inv_status:     'Update Invoice',
+    // Invoice tab
+    inv_tracker_title:    'INVOICE TRACKER',
+    inv_tracker_sub:      'All issued invoices — status, follow-up, payment tracking',
+    inv_banner_total:     'TOTAL',
+    inv_banner_outstanding:'OUTSTANDING',
+    inv_banner_overdue:   'OVERDUE',
+    inv_banner_collected: 'COLLECTED',
+    inv_btn_new:          '+ New Invoice',
+    inv_filter_all:       'All',
+    inv_filter_draft:     'Draft',
+    inv_filter_sent:      'Sent',
+    inv_filter_overdue:   'Overdue',
+    inv_filter_paid:      'Paid',
+    inv_btn_export:       '⎙ Export Summary',
+    inv_col_number:       'Invoice #',
+    inv_col_client:       'Client',
+    inv_col_show:         'Show / Service',
+    inv_col_amount:       'Amount',
+    inv_col_issued:       'Issued',
+    inv_col_due:          'Due',
+    inv_col_status:       'Status',
+    inv_col_notes:        'Notes',
+    inv_col_actions:      'Actions',
+    inv_empty:            'No invoices yet. Generate one from the Booking tab.',
+    inv_status_draft:     'Draft',
+    inv_status_sent:      'Sent',
+    inv_status_paid:      'Paid ✓',
+    inv_status_overdue:   'Overdue',
+    inv_status_cancelled: 'Cancelled',
+    inv_mark_paid:        t('inv_mark_paid'),
+    inv_due_today:        'Due today',
+    inv_days_left:        'd left',
+    inv_days_overdue:     'd overdue',
+    inv_modal_status:     'Status',
+    inv_modal_paid_date:  'Payment Date',
+    inv_modal_method:     'Payment Method',
+    inv_modal_notes:      'Internal Notes',
+    inv_method_transfer:  'Bank Transfer',
+    inv_method_cash:      'Cash',
+    inv_method_mbway:     'MBWay',
+    inv_method_check:     'Cheque',
+    inv_btn_delete:       'Delete',
+    inv_btn_save:         'Save',
+    // Invoice form labels
+    inv_sec_client:       'CLIENT',
+    inv_sec_service:      'SERVICE',
+    inv_sec_amounts:      'AMOUNTS',
+    inv_sec_band:         'BAND DETAILS (pre-filled, edit if needed)',
+    inv_lbl_client_name:  'Client / Venue Name *',
+    inv_lbl_contact:      'Contact Person',
+    inv_lbl_nif:          'Client NIF (Tax ID)',
+    inv_lbl_email:        'Client Email',
+    inv_lbl_address:      'Client Address',
+    inv_lbl_show_date:    'Show Date *',
+    inv_lbl_venue:        'Venue',
+    inv_lbl_desc:         'Service Description *',
+    inv_lbl_duration:     'Set Duration',
+    inv_lbl_inv_num:      'Invoice Number',
+    inv_lbl_fee:          'Base Fee (€) *',
+    inv_lbl_iva:          'IVA Rate',
+    inv_lbl_expenses:     'Travel / Expenses (€)',
+    inv_lbl_band_name:    'Band Name',
+    inv_lbl_band_nif:     'Band NIF',
+    inv_lbl_iban:         'IBAN',
+    inv_lbl_band_email:   'Email',
+    inv_lbl_band_address: 'Address',
+    inv_lbl_notes:        'Notes / Payment Terms',
+    inv_post_ledger:      'Post to Ledger as Income',
+    inv_post_ledger_sub:  'Automatically adds this invoice total as an income transaction in the Ledger when generated',
+    inv_btn_autofill:     '⚡ Auto-fill from Show',
+    inv_btn_generate:     '⎙ Generate PDF',
+    inv_iva_exempt:       '0% — Exempt (Art. 9º CIVA)',
+    inv_iva_reduced:      '6% — Reduced rate',
+    inv_iva_normal:       '23% — Standard rate',
+    // Members tab
+    mem_tab_title:        'BAND MEMBERS',
+    mem_avg_attendance:   'AVG ATTENDANCE',
+    mem_rehearsals_count: 'REHEARSALS',
+    mem_decisions_count:  'DECISIONS',
+    mem_btn_rehearsal:    '+ Log Rehearsal',
+    mem_btn_vote:         '+ Log Decision',
+    mem_btn_export_pdf:   '⎙ PDF',
+    mem_profit_share:     'PROFIT SHARE',
+    mem_roles:            'ROLES & RESPONSIBILITIES',
+    mem_decision_rules:   'DECISION RULES',
+    mem_booking_role:     'Booking',
+    mem_social_role:      'Social media',
+    mem_finances_role:    'Finances',
+    mem_production_role:  'Production',
+    mem_songwriting_role: 'Songwriting',
+    mem_quorum_label:     'Quorum for major decisions',
+    mem_tiebreak_label:   'Tie-breaking vote',
+    mem_bandfund_label:   'Band fund contribution',
+    mem_notes_label:      'NOTES / ADDITIONAL TERMS',
+    mem_no_tiebreak:      'No tie-break',
+    mem_no_rehearsals:    t('mem_no_rehearsals'),
+    mem_no_decisions:     t('mem_no_decisions'),
+    mem_unanimous:        'Unanimous',
+    mem_majority:         'Majority (2+)',
+    // Rehearsal modal labels
+    reh_lbl_date:         'Date *',
+    reh_lbl_location:     'Location',
+    reh_lbl_focus:        'Focus / Objective',
+    reh_lbl_duration:     'Duration (h)',
+    reh_lbl_next:         'Next rehearsal date',
+    reh_lbl_attendance:   'Attendance',
+    reh_lbl_notes:        'Notes',
+    reh_btn_save:         'Save Rehearsal',
+    // Vote modal labels
+    vote_lbl_topic:       'Decision / Topic *',
+    vote_lbl_date:        'Date *',
+    vote_lbl_category:    'Category',
+    vote_lbl_notes:       'Notes / Context',
+    vote_btn_save:        'Save Decision',
+    vote_cat_financial:   'Financial',
+    vote_cat_creative:    'Creative / Artistic',
+    vote_cat_booking:     'Booking / Shows',
+    vote_cat_lineup:      'Lineup / Personnel',
+    vote_cat_equipment:   'Equipment',
+    vote_cat_strategy:    'Strategy / Direction',
+    vote_cat_other:       'Other',
+    vote_yes:             'Yes ✓',
+    vote_no:              'No ✗',
+    vote_abstain:         'Abstain',
+    vote_absent:          'Absent',
+    vote_passed:          '✓ PASSED',
+    vote_failed:          '✗ FAILED',
+    vote_result_preview:  'Vote result will appear here',
+    // Finance Tools tab
+    ft_tab_irs:           'IRS / Tax Summary',
+    ft_tab_budget:        'Budget vs Actual',
+    ft_tax_year:          'TAX YEAR',
+    ft_all_members:       'All Members',
+    ft_member_col:        'MEMBER',
+    ft_year_col:          'YEAR',
+    ft_show_col:          'Show',
+    ft_actual_fee:        'Actual Fee',
+    ft_budget_fee:        'Budget Fee',
+    ft_actual_exp:        'Actual Exp.',
+    ft_budget_exp:        'Budget Exp.',
+    ft_actual_net:        'Actual Net',
+    ft_budget_net:        'Budget Net',
+    ft_variance:          'Variance',
+    ft_margin:            'Margin',
+    ft_save_targets:      'Save Targets',
+    ft_set_targets_for:   'Set targets for ',
+    ft_target_revenue:    'Target Annual Revenue (€)',
+    ft_target_expenses:   'Target Annual Expenses (€)',
+    ft_target_gigs:       'Target Gig Count',
+    ft_target_avg_fee:    'Target Avg Fee per Gig (€)',
+    ft_target_net:        'Target Net Income (€)',
+    ft_target_fund:       'Band Fund Target (€)',
+    // Alert strings (computeAlerts)
+    alert_overdue_inv_title:   'Overdue Invoice',
+    alert_overdue_inv_title_pl:'Overdue Invoices',
+    alert_overdue_inv_body:    'Oldest: Invoice',
+    alert_overdue_inv_suffix:  'days overdue. Go to Invoices tab to follow up.',
+    alert_neg_balance_title:   'Negative Band Balance',
+    alert_neg_balance_body:    'The band account is in deficit. Review recent expenses in the Ledger tab.',
+    alert_low_balance_title:   'Low Band Balance',
+    alert_low_balance_body:    'Balance is below €500. Consider upcoming expenses before committing to new costs.',
+    alert_runway_title:        'Cash Runway',
+    alert_runway_months:       'months',
+    alert_runway_body1:        'At current burn rate of',
+    alert_runway_body2:        '/month, funds last ~',
+    alert_runway_body3:        'months.',
+    alert_runway_deficit:      'Expenses exceed income over the last 90 days.',
+    alert_followups_title:     'Booking Follow-up',
+    alert_followups_title_pl:  'Booking Follow-ups Overdue',
+    alert_followups_suffix:    'pending → Booking tab',
+    alert_releases_title:      'Release',
+    alert_releases_title_pl:   'Releases Within 30 Days — No Social Plan',
+    alert_releases_drops:      'drops',
+    alert_rule_triggered:      'Rule triggered:',
+    alert_rule_current:        'current:',
+    alert_all_clear:           t('alert_all_clear'),
+    alert_all_clear_sub:       t('alert_all_clear_sub'),
+    // Form common
+    lbl_date:             'Date',
+    lbl_email:            'Email',
+    lbl_name:             'Full Name',
+    lbl_role:             'Role',
+    lbl_status:           'Status',
+    lbl_notes:            'Notes',
+    lbl_type:             'Type',
+    lbl_amount:           'Amount',
+    lbl_venue:            'Venue',
+    lbl_description:      'Description',
+    lbl_location:         'Location',
+    lbl_stage:            'Stage',
+    // Common select options
+    opt_all:              'All',
+    opt_draft:            'Draft',
+    opt_sent:             'Sent',
+    opt_paid:             'Paid ✓',
+    opt_cancelled:        'Cancelled',
+    opt_income:           'Income',
+    opt_expense:          'Expense',
+    opt_yes:              'Yes ✓',
+    opt_no:               'No — pending',
+    opt_active:           'Active',
+    opt_deactivated:      'Deactivated',
+    opt_english:          'English',
+    opt_portuguese:       'Português',
+    // Confirm/action phrases
+    confirm_delete_inv:   'Delete this invoice?',
+    confirm_delete_reh:   'Delete this rehearsal?',
+    confirm_delete_dec:   'Delete this decision?',
+    toast_inv_saved_db:   'Invoice saved to database ✓',
+    toast_inv_saved_local:'Invoice saved locally (API unavailable)',
+    toast_reh_saved_db:   'Rehearsal logged to database ✓',
+    toast_reh_saved_local:'Rehearsal saved locally (API unavailable)',
+    toast_dec_saved_local:'Decision saved locally (API unavailable)',
+    toast_inv_paid:       'marked as paid ✓',
+    toast_inv_updated:    'Invoice updated',
+    toast_inv_deleted:    'Invoice deleted',
+    toast_budget_saved:   'Budget targets saved',
+    toast_inv_overdue_pfx:'Invoice',
   },
   pt: {
     // Tabs
@@ -11514,6 +12154,243 @@ const TRANSLATIONS = {
     rel_rule_label:       'Regra:',
     rel_rule_text:        'mín 6 semanas entre data de lançamento e deadline de pitch',
     rel_checklist_empty:  'Seleciona um lançamento para ver o estado da checklist.',
+    // Missing tabs
+    tab_invoices:         '⎙ Faturas',
+    tab_members:          '◈ Membros',
+    tab_finance_tools:    '⊟ Ferramentas Financeiras',
+    // Modal titles
+    modal_invite:         '⚿ Enviar Convite — Apenas Admins',
+    modal_new_txn:        '◉ Nova Transação',
+    modal_invoice:        '⎙ Gerar Fatura',
+    modal_contract:       '⎙ Contrato de Espetáculo',
+    modal_rehearsal:      '● Registar Ensaio',
+    modal_vote:           '◈ Registar Decisão da Banda',
+    modal_import_csv:     '⬆ Importar Transações — CSV',
+    modal_edit_txn:       '✎ Editar Transação',
+    modal_tour:           '◉ Nova Digressão / Espetáculo',
+    modal_edit_user:      '✎ Editar Utilizador',
+    modal_alert_rule:     '+ Regra de Alerta',
+    modal_edit_release:   '✎ Editar Lançamento',
+    modal_budget_targets: '✎ Metas Anuais de Orçamento',
+    modal_inv_status:     'Atualizar Fatura',
+    // Invoice tab
+    inv_tracker_title:    'RASTREADOR DE FATURAS',
+    inv_tracker_sub:      'Todas as faturas emitidas — estado, seguimento, registo de pagamento',
+    inv_banner_total:     'TOTAL',
+    inv_banner_outstanding:'EM ABERTO',
+    inv_banner_overdue:   'EM ATRASO',
+    inv_banner_collected: 'COBRADO',
+    inv_btn_new:          '+ Nova Fatura',
+    inv_filter_all:       'Todas',
+    inv_filter_draft:     'Rascunho',
+    inv_filter_sent:      'Enviada',
+    inv_filter_overdue:   'Em Atraso',
+    inv_filter_paid:      'Paga',
+    inv_btn_export:       '⎙ Exportar Resumo',
+    inv_col_number:       'Fatura Nº',
+    inv_col_client:       'Cliente',
+    inv_col_show:         'Espetáculo / Serviço',
+    inv_col_amount:       'Valor',
+    inv_col_issued:       'Emitida',
+    inv_col_due:          'Vencimento',
+    inv_col_status:       'Estado',
+    inv_col_notes:        'Notas',
+    inv_col_actions:      'Ações',
+    inv_empty:            'Ainda sem faturas. Gera uma a partir do separador Reservas.',
+    inv_status_draft:     'Rascunho',
+    inv_status_sent:      'Enviada',
+    inv_status_paid:      'Paga ✓',
+    inv_status_overdue:   'Em Atraso',
+    inv_status_cancelled: 'Cancelada',
+    inv_mark_paid:        '✓ Paga',
+    inv_due_today:        'Vence hoje',
+    inv_days_left:        'd restantes',
+    inv_days_overdue:     'd em atraso',
+    inv_modal_status:     'Estado',
+    inv_modal_paid_date:  'Data de Pagamento',
+    inv_modal_method:     'Método de Pagamento',
+    inv_modal_notes:      'Notas Internas',
+    inv_method_transfer:  'Transferência Bancária',
+    inv_method_cash:      'Numerário',
+    inv_method_mbway:     'MBWay',
+    inv_method_check:     'Cheque',
+    inv_btn_delete:       'Eliminar',
+    inv_btn_save:         'Guardar',
+    // Invoice form labels
+    inv_sec_client:       'CLIENTE',
+    inv_sec_service:      'SERVIÇO',
+    inv_sec_amounts:      'VALORES',
+    inv_sec_band:         'DADOS DA BANDA (pré-preenchidos, edita se necessário)',
+    inv_lbl_client_name:  'Nome do Cliente / Local *',
+    inv_lbl_contact:      'Pessoa de Contacto',
+    inv_lbl_nif:          'NIF do Cliente',
+    inv_lbl_email:        'Email do Cliente',
+    inv_lbl_address:      'Morada do Cliente',
+    inv_lbl_show_date:    'Data do Espetáculo *',
+    inv_lbl_venue:        'Local',
+    inv_lbl_desc:         'Descrição do Serviço *',
+    inv_lbl_duration:     'Duração do Set',
+    inv_lbl_inv_num:      'Número da Fatura',
+    inv_lbl_fee:          'Cachê Base (€) *',
+    inv_lbl_iva:          'Taxa de IVA',
+    inv_lbl_expenses:     'Deslocação / Despesas (€)',
+    inv_lbl_band_name:    'Nome da Banda',
+    inv_lbl_band_nif:     'NIF da Banda',
+    inv_lbl_iban:         'IBAN',
+    inv_lbl_band_email:   'Email',
+    inv_lbl_band_address: 'Morada',
+    inv_lbl_notes:        'Notas / Condições de Pagamento',
+    inv_post_ledger:      'Registar no Livro como Receita',
+    inv_post_ledger_sub:  'Adiciona automaticamente o total desta fatura como transação de receita no Livro',
+    inv_btn_autofill:     '⚡ Preencher a partir do Espetáculo',
+    inv_btn_generate:     '⎙ Gerar PDF',
+    inv_iva_exempt:       '0% — Isento (Art. 9º CIVA)',
+    inv_iva_reduced:      '6% — Taxa reduzida',
+    inv_iva_normal:       '23% — Taxa normal',
+    // Members tab
+    mem_tab_title:        'MEMBROS DA BANDA',
+    mem_avg_attendance:   'ASSIDUIDADE MÉDIA',
+    mem_rehearsals_count: 'ENSAIOS',
+    mem_decisions_count:  'DECISÕES',
+    mem_btn_rehearsal:    '+ Registar Ensaio',
+    mem_btn_vote:         '+ Registar Decisão',
+    mem_btn_export_pdf:   '⎙ PDF',
+    mem_profit_share:     'REPARTIÇÃO DE LUCROS',
+    mem_roles:            'FUNÇÕES E RESPONSABILIDADES',
+    mem_decision_rules:   'REGRAS DE DECISÃO',
+    mem_booking_role:     'Reservas',
+    mem_social_role:      'Redes sociais',
+    mem_finances_role:    'Finanças',
+    mem_production_role:  'Produção',
+    mem_songwriting_role: 'Composição',
+    mem_quorum_label:     'Quórum para decisões importantes',
+    mem_tiebreak_label:   'Voto de desempate',
+    mem_bandfund_label:   'Contribuição para fundo de banda',
+    mem_notes_label:      'NOTAS / CONDIÇÕES ADICIONAIS',
+    mem_no_tiebreak:      'Sem desempate',
+    mem_no_rehearsals:    'Ainda sem ensaios registados.',
+    mem_no_decisions:     'Ainda sem decisões registadas.',
+    mem_unanimous:        'Unanimidade',
+    mem_majority:         'Maioria (2+)',
+    // Rehearsal modal labels
+    reh_lbl_date:         'Data *',
+    reh_lbl_location:     'Local',
+    reh_lbl_focus:        'Foco / Objetivo',
+    reh_lbl_duration:     'Duração (h)',
+    reh_lbl_next:         'Data do próximo ensaio',
+    reh_lbl_attendance:   'Assiduidade',
+    reh_lbl_notes:        'Notas',
+    reh_btn_save:         'Guardar Ensaio',
+    // Vote modal labels
+    vote_lbl_topic:       'Decisão / Tema *',
+    vote_lbl_date:        'Data *',
+    vote_lbl_category:    'Categoria',
+    vote_lbl_notes:       'Notas / Contexto',
+    vote_btn_save:        'Guardar Decisão',
+    vote_cat_financial:   'Financeiro',
+    vote_cat_creative:    'Criativo / Artístico',
+    vote_cat_booking:     'Reservas / Espetáculos',
+    vote_cat_lineup:      'Formação / Pessoal',
+    vote_cat_equipment:   'Equipamento',
+    vote_cat_strategy:    'Estratégia / Direção',
+    vote_cat_other:       'Outro',
+    vote_yes:             'Sim ✓',
+    vote_no:              'Não ✗',
+    vote_abstain:         'Abstenção',
+    vote_absent:          'Ausente',
+    vote_passed:          '✓ APROVADO',
+    vote_failed:          '✗ REJEITADO',
+    vote_result_preview:  'O resultado da votação aparecerá aqui',
+    // Finance Tools tab
+    ft_tab_irs:           'IRS / Resumo Fiscal',
+    ft_tab_budget:        'Orçamento vs Real',
+    ft_tax_year:          'ANO FISCAL',
+    ft_all_members:       'Todos os Membros',
+    ft_member_col:        'MEMBRO',
+    ft_year_col:          'ANO',
+    ft_show_col:          'Espetáculo',
+    ft_actual_fee:        'Cachê Real',
+    ft_budget_fee:        'Cachê Previsto',
+    ft_actual_exp:        'Despesas Reais',
+    ft_budget_exp:        'Despesas Previstas',
+    ft_actual_net:        'Líquido Real',
+    ft_budget_net:        'Líquido Previsto',
+    ft_variance:          'Variação',
+    ft_margin:            'Margem',
+    ft_save_targets:      'Guardar Metas',
+    ft_set_targets_for:   'Definir metas para ',
+    ft_target_revenue:    'Meta de Receita Anual (€)',
+    ft_target_expenses:   'Meta de Despesas Anuais (€)',
+    ft_target_gigs:       'Meta de Nº de Espetáculos',
+    ft_target_avg_fee:    'Meta de Cachê Médio (€)',
+    ft_target_net:        'Meta de Rendimento Líquido (€)',
+    ft_target_fund:       'Meta do Fundo de Banda (€)',
+    // Alert strings
+    alert_overdue_inv_title:   'Fatura em Atraso',
+    alert_overdue_inv_title_pl:'Faturas em Atraso',
+    alert_overdue_inv_body:    'Mais antiga: Fatura',
+    alert_overdue_inv_suffix:  'dias em atraso. Vai ao separador Faturas.',
+    alert_neg_balance_title:   'Saldo Negativo da Banda',
+    alert_neg_balance_body:    'A conta da banda está em défice. Revê as despesas recentes no Livro.',
+    alert_low_balance_title:   'Saldo Baixo da Banda',
+    alert_low_balance_body:    'Saldo abaixo de €500. Considera as despesas previstas antes de assumir novos custos.',
+    alert_runway_title:        'Autonomia Financeira',
+    alert_runway_months:       'meses',
+    alert_runway_body1:        'Ao ritmo atual de consumo de',
+    alert_runway_body2:        '/mês, os fundos duram ~',
+    alert_runway_body3:        'meses.',
+    alert_runway_deficit:      'As despesas superam a receita nos últimos 90 dias.',
+    alert_followups_title:     'Seguimento de Reserva',
+    alert_followups_title_pl:  'Seguimentos de Reservas em Atraso',
+    alert_followups_suffix:    'pendentes → separador Reservas',
+    alert_releases_title:      'Lançamento',
+    alert_releases_title_pl:   'Lançamentos nos Próximos 30 Dias — Sem Plano Social',
+    alert_releases_drops:      'sai a',
+    alert_rule_triggered:      'Regra acionada:',
+    alert_rule_current:        'atual:',
+    alert_all_clear:           '✓ TUDO EM ORDEM — Sem alertas ativos',
+    alert_all_clear_sub:       'Todos os limites dentro do normal. Os dados atualizam quando navegas para este separador.',
+    // Form common
+    lbl_date:             'Data',
+    lbl_email:            'Email',
+    lbl_name:             'Nome Completo',
+    lbl_role:             'Função',
+    lbl_status:           'Estado',
+    lbl_notes:            'Notas',
+    lbl_type:             'Tipo',
+    lbl_amount:           'Valor',
+    lbl_venue:            'Local',
+    lbl_description:      'Descrição',
+    lbl_location:         'Localização',
+    lbl_stage:            'Fase',
+    // Common select options
+    opt_all:              'Todas',
+    opt_draft:            'Rascunho',
+    opt_sent:             'Enviada',
+    opt_paid:             'Paga ✓',
+    opt_cancelled:        'Cancelada',
+    opt_income:           'Receita',
+    opt_expense:          'Despesa',
+    opt_yes:              'Sim ✓',
+    opt_no:               'Não — pendente',
+    opt_active:           'Ativo',
+    opt_deactivated:      'Desativado',
+    opt_english:          'English',
+    opt_portuguese:       'Português',
+    // Confirm/action phrases
+    confirm_delete_inv:   'Eliminar esta fatura?',
+    confirm_delete_reh:   'Eliminar este ensaio?',
+    confirm_delete_dec:   'Eliminar esta decisão?',
+    toast_inv_saved_db:   'Fatura guardada na base de dados ✓',
+    toast_inv_saved_local:'Fatura guardada localmente (API indisponível)',
+    toast_reh_saved_db:   'Ensaio registado na base de dados ✓',
+    toast_reh_saved_local:'Ensaio guardado localmente (API indisponível)',
+    toast_dec_saved_local:'Decisão guardada localmente (API indisponível)',
+    toast_inv_paid:       'marcada como paga ✓',
+    toast_inv_updated:    'Fatura atualizada',
+    toast_inv_deleted:    'Fatura eliminada',
+    toast_budget_saved:   'Metas de orçamento guardadas',
+    toast_inv_overdue_pfx:'Fatura',
   }
 };
 
@@ -11543,6 +12420,7 @@ function applyTranslations() {
     alerts: 'tab_alerts', settings: 'tab_settings', booking: 'tab_booking',
     releases: 'tab_releases', press: 'tab_press', splits: 'tab_splits',
     agent: 'tab_agent', production: 'tab_production',
+    invoices: 'tab_invoices', members: 'tab_members', 'finance-tools': 'tab_finance_tools',
   };
   document.querySelectorAll('.tb-tab[data-view]').forEach(tab => {
     const view = tab.getAttribute('data-view');
@@ -11577,6 +12455,60 @@ function applyTranslations() {
 
   // Re-translate rider show picker placeholder
   if (typeof populateRiderShowPicker === 'function') populateRiderShowPicker();
+
+  // ── Modal overlay titles ──────────────────────────────
+  const modalTitleMap = {
+    'invite-modal':          'modal_invite',
+    'txn-modal':             'modal_new_txn',
+    'invoice-modal':         'modal_invoice',
+    'contract-modal':        'modal_contract',
+    'rehearsal-modal':       'modal_rehearsal',
+    'vote-modal':            'modal_vote',
+    'import-modal':          'modal_import_csv',
+    'edit-txn-modal':        'modal_edit_txn',
+    'tour-modal':            'modal_tour',
+    'edit-user-modal':       'modal_edit_user',
+    'alert-rule-modal':      'modal_alert_rule',
+    'edit-release-modal':    'modal_edit_release',
+    'budget-targets-modal':  'modal_budget_targets',
+  };
+  Object.entries(modalTitleMap).forEach(([id, key]) => {
+    const modal = document.getElementById(id);
+    if (!modal) return;
+    const titleEl = modal.querySelector('.overlay-title');
+    if (titleEl && !titleEl.id) titleEl.textContent = t(key);
+  });
+  // inv-status-modal title is dynamic (set per-invoice), translate the fallback
+  const invStatusTitle = document.getElementById('inv-status-modal-title');
+  if (invStatusTitle && (invStatusTitle.textContent === 'Update Invoice' || invStatusTitle.textContent === t('modal_inv_status'))) {
+    invStatusTitle.textContent = t('modal_inv_status');
+  }
+
+  // ── Invoice tab static elements ───────────────────────
+  const invBannerTitleEl = document.querySelector('#view-invoices .panel-title span');
+  if (invBannerTitleEl) invBannerTitleEl.textContent = t('inv_tracker_title');
+  [
+    ['inv-banner-total-label',       'inv_banner_total'],
+    ['inv-banner-outstanding-label', 'inv_banner_outstanding'],
+    ['inv-banner-overdue-label',     'inv_banner_overdue'],
+    ['inv-banner-collected-label',   'inv_banner_collected'],
+  ].forEach(([id, key]) => { const e = document.getElementById(id); if (e) e.textContent = t(key); });
+  // Filter buttons
+  document.querySelectorAll('.inv-filter-btn[data-filter]').forEach(btn => {
+    const f = btn.getAttribute('data-filter');
+    const keyMap = { all:'inv_filter_all', draft:'inv_filter_draft', sent:'inv_filter_sent', overdue:'inv_filter_overdue', paid:'inv_filter_paid' };
+    if (keyMap[f]) btn.textContent = t(keyMap[f]);
+  });
+
+  // ── Members tab static elements ───────────────────────
+  if (typeof renderRehearsals === 'function') renderRehearsals();
+  if (typeof renderDecisions  === 'function') renderDecisions();
+
+  // ── Finance Tools tab ─────────────────────────────────
+  if (typeof budgetRender === 'function' && document.getElementById('view-finance-tools')?.style.display !== 'none') budgetRender();
+
+  // ── Alerts tab ────────────────────────────────────────
+  if (typeof renderFullAlerts === 'function') renderFullAlerts();
 
   // ── Booking KPI labels ────────────────────────────────
   const bkLabels = {
@@ -12573,10 +13505,11 @@ function switchView(view, tab){
   }
   if(tab) tab.classList.add('active');
   if(view==='streaming') initStreamChart();
-  if(view==='members') membersLoad();
-  if(view==='finance-tools') financeToolsLoad();
-  if(view==='invoices') invoiceTrackerLoad();
+  if(view==='members') membersLoad();         // async, fire-and-forget
+  if(view==='finance-tools') financeToolsLoad(); // async, fire-and-forget
+  if(view==='invoices') invoiceTrackerLoad(); // async, fire-and-forget
   if(view==='audit'){ renderAuditLog(); showEmailTemplate('invite',document.querySelector('.email-tab')); }
+  if(view==='alerts') renderFullAlerts();
   if(view==='mgmt') setTimeout(renderMgmtDashboard, 0);
 }
 

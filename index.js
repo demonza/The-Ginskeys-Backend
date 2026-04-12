@@ -30,6 +30,8 @@ const agentRoutes       = require('./routes/agent');
 const productionRoutes  = require('./routes/production');
 const fxRoutes          = require('./routes/fx');
 const reportRoutes      = require('./routes/reports');
+const invoiceRoutes     = require('./routes/invoices');
+const membersRoutes     = require('./routes/members');
 
 const app = express();
 
@@ -111,6 +113,8 @@ app.use('/api/agent',        agentRoutes);
 app.use('/api/production',   productionRoutes);
 app.use('/api/fx',           fxRoutes);
 app.use('/api/reports',      reportRoutes);
+app.use('/api/invoices',    invoiceRoutes);
+app.use('/api/members',     membersRoutes);
 
 // ─── HEALTH ───────────────────────────────────────────
 app.get('/api/health', async (_req, res) => {
