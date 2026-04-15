@@ -2175,7 +2175,7 @@ tr:hover .edit-btn{display:inline}
     <!-- MONEY -->
     <div class="tb-tab" data-view="dashboard" onclick="switchView('dashboard',this)" id="tab-dashboard">$ Financials</div>
     <div class="tb-tab" data-view="ledger" onclick="switchView('ledger',this)" id="tab-ledger">≡ Ledger</div>
-    <div class="tb-tab" data-view="splits" onclick="switchView('splits',this)" id="tab-splits">÷ Splits</div>
+    <div class="tb-tab" data-view="splits" onclick="switchView('splits',this)" id="tab-splits">◈ Treasury</div>
     <div class="tb-tab" data-view="members" onclick="switchView('members',this)" id="tab-members">◈ Members</div>
     <div class="tb-nav-sep"></div>
     <!-- LIVE -->
@@ -2436,7 +2436,7 @@ tr:hover .edit-btn{display:inline}
 
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div><span data-i18n="splits_fund_title">Splits Fund</span></div>
+        <div class="panel-title"><div class="panel-title-dot" style="background:var(--green2)"></div><span data-i18n="splits_fund_title">Treasury</span></div>
         <button class="btn-sm" onclick="switchView('splits',document.querySelector('[data-view=splits]'))">→</button>
       </div>
       <div id="mgmt-splits-summary" style="font-size:10px"></div>
@@ -3799,115 +3799,45 @@ tr:hover .edit-btn{display:inline}
 </div>
 
 <!-- ═══════════════════════════════════════════════════════
-     GIG SPLITS VIEW
+     TREASURY VIEW — Central revenue pool + manual allocation
 ════════════════════════════════════════════════════════ -->
 <div id="view-splits" class="view new-view">
   <div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">
 
     <!-- Banner -->
-    <div style="flex-shrink:0;background:linear-gradient(90deg,rgba(255,171,0,.08) 0%,transparent 100%);border-left:3px solid var(--amber2);padding:12px 16px;border-radius:0 2px 2px 0;display:grid;grid-template-columns:1fr repeat(3,auto);gap:16px;align-items:center">
+    <div style="flex-shrink:0;background:linear-gradient(90deg,rgba(255,171,0,.08) 0%,transparent 100%);border-left:3px solid var(--amber2);padding:12px 16px;border-radius:0 2px 2px 0;display:grid;grid-template-columns:1fr repeat(4,auto);gap:16px;align-items:center">
       <div>
-        <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--amber2);letter-spacing:.08em">GIG SPLITS</div>
-        <div style="font-size:9px;color:var(--muted2);margin-top:2px">10% band fund per gig · after 12 gigs = <span style="color:var(--green3)">€1,332 reserved</span> for next recording</div>
+        <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--amber2);letter-spacing:.08em">TREASURY</div>
+        <div style="font-size:9px;color:var(--muted2);margin-top:2px">All revenue pools here before manual allocation to members &amp; band fund</div>
       </div>
       <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
-        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--text)" id="sp-banner-total">0</div>
-        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">GIGS LOGGED</div>
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--accent)" id="tr-banner-unallocated">€0</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">UNALLOCATED</div>
       </div>
       <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
-        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green3)" id="sp-banner-earned">€0</div>
-        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">TOTAL EARNED</div>
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--green3)" id="tr-banner-allocated">€0</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">ALLOCATED</div>
       </div>
       <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
-        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--accent)" id="sp-banner-fund">€0</div>
-        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">BAND FUND</div>
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--text)" id="tr-banner-total">€0</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">TOTAL NET</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid var(--border2)">
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--text)" id="tr-banner-items">0</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:.1em">ITEMS</div>
       </div>
     </div>
 
-    <!-- Intelligence row -->
-    <div style="flex-shrink:0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div><span data-i18n="splits_member_earn">Member Earnings</span></div>
-        </div>
-        <div id="sp-member-history" style="padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:10px">
-          <div style="color:var(--muted3)">Save gig splits to see per-member earnings.</div>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_fund">Band Fund Tracker</span></div>
-        </div>
-        <div class="panel-body" style="display:flex;flex-direction:column;gap:8px">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <div style="background:var(--bg4);padding:10px;border-radius:2px;text-align:center">
-              <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px">ACCUMULATED</div>
-              <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--amber2)" id="sp-fund-total">€0</div>
-            </div>
-            <div style="background:var(--bg4);padding:10px;border-radius:2px;text-align:center">
-              <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px">TARGET</div>
-              <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--text)" id="sp-fund-target">€400</div>
-            </div>
-          </div>
-          <div>
-            <div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px">PROGRESS TO RECORDING SESSION</div>
-            <div style="height:8px;background:var(--bg4);border-radius:1px;overflow:hidden;margin-bottom:4px">
-              <div id="sp-fund-bar" style="height:100%;background:linear-gradient(90deg,var(--amber2),var(--accent));width:0%;transition:width .5s"></div>
-            </div>
-            <div style="font-size:8px;color:var(--muted2)" id="sp-fund-progress-text">€0 of €400 target</div>
-          </div>
-          <div style="font-size:9px;color:var(--muted2);padding:8px;background:var(--bg4);border-radius:2px;line-height:1.6">
-            <span style="color:var(--amber2)">Rule:</span> 10% per gig. At €1,100 avg → €400 after <strong style="color:var(--text)">4 gigs</strong>.
-          </div>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div><span data-i18n="splits_roic">ROIC by Gig Type</span></div>
-        </div>
-        <div style="display:flex;flex-direction:column">
-          <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:10px">
-            <div style="font-weight:700;color:var(--text)">Wedding / corporate</div>
-            <div style="color:var(--red3);font-size:9px">€200</div>
-            <div style="color:var(--green3)">€2,000 avg</div>
-            <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--amber2)">900%</div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:10px">
-            <div style="font-weight:700;color:var(--text)">Local festival</div>
-            <div style="color:var(--red3);font-size:9px">€150</div>
-            <div style="color:var(--green3)">€1,100 avg</div>
-            <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--accent)">633%</div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:10px">
-            <div style="font-weight:700;color:var(--text)">Algarve tourist bar</div>
-            <div style="color:var(--red3);font-size:9px">€200</div>
-            <div style="color:var(--green3)">€1,200 avg</div>
-            <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--green3)">500%</div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:10px">
-            <div style="font-weight:700;color:var(--text)">Lisbon rock club</div>
-            <div style="color:var(--red3);font-size:9px">€250</div>
-            <div style="color:var(--green3)">€500 avg</div>
-            <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--blue2)">100%</div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:7px 12px;align-items:center;font-size:10px">
-            <div style="font-weight:700;color:var(--text)">Support slot</div>
-            <div style="color:var(--red3);font-size:9px">€100</div>
-            <div style="color:var(--green3)">€200 avg</div>
-            <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--muted2)">100%</div>
-          </div>
-        </div>
-      </div>
+    <!-- Source breakdown row -->
+    <div style="flex-shrink:0;display:grid;grid-template-columns:repeat(5,1fr);gap:8px" id="tr-source-cards">
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:12px;text-align:center;color:var(--muted3);font-size:9px;grid-column:1/-1">Loading treasury…</div>
     </div>
-
-
-    <!-- ── MEMBER ACCOUNTS ENGINE ───────────────────────────── -->
 
     <!-- ── MEMBER ACCOUNTS ENGINE ───────────────────────────── -->
     <div style="flex-shrink:0" id="member-accounts-panel">
       <div style="font-family:var(--display);font-size:11px;font-weight:700;color:var(--amber2);letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         MEMBER ACCOUNTS
-        <span style="font-size:9px;color:var(--muted2);font-family:var(--mono);font-weight:400;letter-spacing:.04em">Live balances — connected to total band ledger</span>
+        <span style="font-size:9px;color:var(--muted2);font-family:var(--mono);font-weight:400;letter-spacing:.04em">Live balances — fed by treasury allocations</span>
         <button class="btn-sm" onclick="loadMemberAccounts()" style="margin-left:auto">&#8634; Refresh</button>
         <button class="btn-sm" onclick="showMemberWithdrawModal()" style="color:var(--red3);border-color:var(--red3)">&#8595; Log Withdrawal</button>
         <button class="btn-sm" onclick="showMemberDepositModal()" style="color:var(--green3);border-color:var(--green3)">&#8593; Log Deposit</button>
@@ -3993,61 +3923,121 @@ tr:hover .edit-btn{display:inline}
         </div>
       </div>
     </div>
-    <!-- Calculator + History -->
-    <div style="flex:1;display:grid;grid-template-columns:380px 1fr;gap:10px;min-height:180px">
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_calculator">Gig Split Calculator</span></div>
+
+    <!-- Allocate Modal -->
+    <div id="treasury-allocate-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:8000;align-items:center;justify-content:center">
+      <div style="background:var(--bg2);border:1px solid var(--amber2);border-radius:3px;padding:24px;min-width:480px;max-width:560px;font-family:var(--mono)">
+        <div style="font-size:13px;font-weight:700;color:var(--amber2);letter-spacing:.1em;margin-bottom:4px">ALLOCATE FUNDS</div>
+        <div style="font-size:10px;color:var(--muted2);margin-bottom:16px" id="ta-item-info">—</div>
+        <div style="display:flex;flex-direction:column;gap:6px" id="ta-member-rows"></div>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border2)">
+          <div style="font-size:9px;color:var(--muted);letter-spacing:.08em">TOTAL ALLOCATING</div>
+          <div style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--green3)" id="ta-total">€0.00</div>
+          <div style="font-size:9px;color:var(--muted)">of <span id="ta-available" style="color:var(--accent)">€0.00</span> available</div>
+          <div style="flex:1"></div>
+          <div id="ta-status" style="font-size:10px;color:var(--red3);min-height:14px"></div>
         </div>
-        <div class="panel-body" style="display:flex;flex-direction:column;gap:8px">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">GIG NAME</div><input id="sp-name" class="login-input" placeholder="Tasquinhas — Mar 2026"></div>
-            <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">DATE</div><input id="sp-date" class="login-input" type="date"></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">GROSS (€)</div><input id="sp-gross" class="login-input" type="number" placeholder="1100" oninput="calcSplitPreview()"></div>
-            <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">BAND FUND %</div><input id="sp-fund-pct" class="login-input" type="number" value="10" oninput="calcSplitPreview()"></div>
-          </div>
-          <div>
-            <div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:4px">EXPENSES</div>
-            <div id="sp-expenses-list" style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px"></div>
-            <div style="display:flex;gap:6px">
-              <input id="sp-exp-label" class="login-input" placeholder="Fuel" style="flex:1">
-              <input id="sp-exp-amt" class="login-input" type="number" placeholder="€" style="width:70px">
-              <button class="btn-sm" onclick="addSplitExpense()">+</button>
-            </div>
-          </div>
-          <div>
-            <div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:4px">MEMBERS</div>
-            <div id="sp-members-list" style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px"></div>
-            <div style="display:flex;gap:6px">
-              <input id="sp-member-name" class="login-input" placeholder="Tiago, Fábio, Pedro, Manuel" style="flex:1">
-              <button class="btn-sm" onclick="addSplitMember()">+</button>
-            </div>
-          </div>
-          <div id="sp-result" style="background:var(--bg4);border-radius:2px;padding:10px;display:none">
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;text-align:center;margin-bottom:8px">
-              <div><div style="font-size:8px;color:var(--muted);letter-spacing:.1em">GROSS</div><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--text)" id="sp-r-gross">€0</div></div>
-              <div><div style="font-size:8px;color:var(--muted);letter-spacing:.1em">EXPENSES</div><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--red3)" id="sp-r-exp">€0</div></div>
-              <div><div style="font-size:8px;color:var(--muted);letter-spacing:.1em">BAND FUND</div><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--amber2)" id="sp-r-fund">€0</div></div>
-              <div><div style="font-size:8px;color:var(--muted);letter-spacing:.1em">PER MEMBER</div><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--green3)" id="sp-r-per">€0</div></div>
-            </div>
-            <div id="sp-member-breakdown" style="font-size:9px;color:var(--muted2);margin-bottom:8px"></div>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <button class="btn-sm" onclick="calcSplitPreview()" style="background:var(--bg4)">Calculate</button>
-            <button class="login-btn" style="width:auto;padding:0 16px" onclick="saveSplit()">Save Split</button>
-            <div style="font-size:9px;color:var(--muted3)" id="sp-save-status"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;justify-content:space-between">
+          <button class="btn-sm" onclick="treasuryAllocateEqual()" style="color:var(--blue2);border-color:var(--blue2)">÷ Split Equal</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn-sm" onclick="closeTreasuryAllocateModal()">Cancel</button>
+            <button class="btn-sm" onclick="saveTreasuryAllocation()" style="background:var(--amber2);color:#000;font-weight:700;border-color:var(--amber2)">Allocate</button>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Treasury Pool + Add Revenue (bottom grid) -->
+    <div style="flex:1;display:grid;grid-template-columns:380px 1fr;gap:10px;min-height:180px">
+
+      <!-- Add Revenue panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--green3)"></div>Add Revenue</div>
+        </div>
+        <div class="panel-body" style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">SOURCE TYPE</div>
+              <select id="tr-source-type" class="login-input" style="width:100%">
+                <option value="gig">Gig</option>
+                <option value="streaming">Streaming</option>
+                <option value="merch">Merch</option>
+                <option value="sync">Sync License</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">DATE</div><input id="tr-rev-date" class="login-input" type="date"></div>
+          </div>
+          <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">DESCRIPTION</div><input id="tr-rev-desc" class="login-input" placeholder="Tasquinhas — Mar 2026"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">GROSS (€)</div><input id="tr-rev-gross" class="login-input" type="number" placeholder="1100" oninput="calcTreasuryPreview()"></div>
+            <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">EXPENSES (€)</div><input id="tr-rev-expenses" class="login-input" type="number" placeholder="0" value="0" oninput="calcTreasuryPreview()"></div>
+          </div>
+          <div id="tr-rev-preview" style="background:var(--bg4);border-radius:2px;padding:10px;display:none">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+              <div><div style="font-size:8px;color:var(--muted);letter-spacing:.1em">GROSS</div><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--text)" id="tr-p-gross">€0</div></div>
+              <div><div style="font-size:8px;color:var(--muted);letter-spacing:.1em">EXPENSES</div><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--red3)" id="tr-p-exp">€0</div></div>
+              <div><div style="font-size:8px;color:var(--muted);letter-spacing:.1em">NET TO POOL</div><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--green3)" id="tr-p-net">€0</div></div>
+            </div>
+          </div>
+          <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">NOTES</div><input id="tr-rev-notes" class="login-input" placeholder="optional"></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="login-btn" style="width:auto;padding:0 16px" onclick="saveTreasuryItem()">Add to Treasury</button>
+            <div style="font-size:9px;color:var(--muted3)" id="tr-save-status"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Treasury Pool list -->
       <div class="panel" style="display:flex;flex-direction:column">
         <div class="panel-header">
-          <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div><span data-i18n="splits_history">Split History</span></div>
-          <button class="btn-sm" style="color:var(--accent);border-color:var(--accent)" onclick="printSplitsReport()">⎙ PDF</button>
-          <button class="btn-sm" onclick="loadSplits()">↺ Refresh</button>
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--amber2)"></div>Treasury Pool</div>
+          <select id="tr-filter-status" onchange="renderTreasuryPool()" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:2px 8px;font-family:var(--mono);font-size:9px">
+            <option value="">All</option>
+            <option value="unallocated">Unallocated</option>
+            <option value="partial">Partial</option>
+            <option value="allocated">Allocated</option>
+          </select>
+          <select id="tr-filter-source" onchange="renderTreasuryPool()" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:2px 8px;font-family:var(--mono);font-size:9px">
+            <option value="">All Sources</option>
+            <option value="gig">Gig</option>
+            <option value="streaming">Streaming</option>
+            <option value="merch">Merch</option>
+            <option value="sync">Sync</option>
+            <option value="other">Other</option>
+          </select>
+          <button class="btn-sm" onclick="loadTreasury()">↺ Refresh</button>
         </div>
-        <div id="splits-history" style="flex:1;overflow-y:auto;padding:8px"></div>
+        <div style="flex-shrink:0;padding:5px 10px;font-size:9px;color:var(--muted);letter-spacing:.08em;border-bottom:1px solid var(--border1);display:grid;grid-template-columns:90px 1fr 60px 80px 80px 80px 80px 70px;gap:6px">
+          <span>DATE</span><span>DESCRIPTION</span><span>SOURCE</span><span style="text-align:right">GROSS</span><span style="text-align:right">EXP</span><span style="text-align:right">NET</span><span style="text-align:right">ALLOC'D</span><span>STATUS</span>
+        </div>
+        <div id="treasury-pool-rows" style="flex:1;overflow-y:auto;padding:0"></div>
+      </div>
+    </div>
+
+    <!-- Gig Split Calculator (preserved, feeds into treasury) -->
+    <div style="flex-shrink:0">
+      <div class="panel">
+        <div class="panel-header" style="cursor:pointer" onclick="document.getElementById('sp-calc-body').style.display=document.getElementById('sp-calc-body').style.display==='none'?'flex':'none'">
+          <div class="panel-title"><div class="panel-title-dot" style="background:var(--blue2)"></div>Quick Gig Split Calculator</div>
+          <span style="font-size:9px;color:var(--muted2)">▾ expand</span>
+        </div>
+        <div id="sp-calc-body" class="panel-body" style="display:none;flex-direction:column;gap:8px">
+          <div style="font-size:9px;color:var(--muted2);padding:4px 0">Estimate splits before adding to treasury. This calculator does not save — use "Add Revenue" above to pool funds.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+            <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">GROSS (€)</div><input id="sp-gross" class="login-input" type="number" placeholder="1100" oninput="calcSplitPreview()"></div>
+            <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">BAND FUND %</div><input id="sp-fund-pct" class="login-input" type="number" value="10" oninput="calcSplitPreview()"></div>
+            <div><div style="font-size:8px;color:var(--muted3);letter-spacing:.1em;margin-bottom:3px">MEMBERS</div><input id="sp-member-count" class="login-input" type="number" value="4" min="1" oninput="calcSplitPreview()"></div>
+          </div>
+          <div id="sp-result" style="background:var(--bg4);border-radius:2px;padding:10px;display:none">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;text-align:center">
+              <div><div style="font-size:8px;color:var(--muted);letter-spacing:.1em">GROSS</div><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--text)" id="sp-r-gross">€0</div></div>
+              <div><div style="font-size:8px;color:var(--muted);letter-spacing:.1em">BAND FUND</div><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--amber2)" id="sp-r-fund">€0</div></div>
+              <div><div style="font-size:8px;color:var(--muted);letter-spacing:.1em">DISTRIBUTABLE</div><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--text)" id="sp-r-dist">€0</div></div>
+              <div><div style="font-size:8px;color:var(--muted);letter-spacing:.1em">PER MEMBER</div><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--green3)" id="sp-r-per">€0</div></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -5069,117 +5059,268 @@ async function updatePressStage(id, stage) {
   catch(e) { showToast('Failed: '+e.message,'err'); }
 }
 
-// ── SPLITS ─────────────────────────────────────────────────────────────────
-function calcSplitPreview() { calcSplit(); }
+// ── TREASURY + SPLITS ──────────────────────────────────────────────────────
 
-function calcSplit() {
-  const gross = parseFloat(document.getElementById('sp-gross')?.value||0);
-  const fundPct = parseFloat(document.getElementById('sp-fund-pct')?.value||10);
-  if (!gross) { const r=document.getElementById('sp-result'); if(r) r.style.display='none'; return; }
-  const totalExp = SP_EXPENSES.reduce((s,e)=>s+e.amount,0);
-  const fund = parseFloat((gross*fundPct/100).toFixed(2));
-  const distributable = parseFloat((gross-totalExp-fund).toFixed(2));
-  const perMember = SP_MEMBERS.length>0 ? parseFloat((distributable/SP_MEMBERS.length).toFixed(2)) : distributable;
-  const r = document.getElementById('sp-result');
+var TREASURY_DATA = [];
+
+// Quick calculator (simplified — no save, just preview)
+function calcSplitPreview() {
+  var gross = parseFloat(document.getElementById('sp-gross')?.value||0);
+  var fundPct = parseFloat(document.getElementById('sp-fund-pct')?.value||10);
+  var memberCount = parseInt(document.getElementById('sp-member-count')?.value||4);
+  if (!gross) { var r=document.getElementById('sp-result'); if(r) r.style.display='none'; return; }
+  var fund = parseFloat((gross*fundPct/100).toFixed(2));
+  var distributable = parseFloat((gross-fund).toFixed(2));
+  var perMember = memberCount > 0 ? parseFloat((distributable/memberCount).toFixed(2)) : distributable;
+  var r = document.getElementById('sp-result');
   if (r) r.style.display='block';
-  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  var set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
   set('sp-r-gross','€'+gross.toLocaleString('pt-PT',{minimumFractionDigits:2}));
-  set('sp-r-exp',  '-€'+totalExp.toLocaleString('pt-PT',{minimumFractionDigits:2}));
-  set('sp-r-fund', '€'+fund.toLocaleString('pt-PT',{minimumFractionDigits:2}));
-  set('sp-r-per',  '€'+perMember.toLocaleString('pt-PT',{minimumFractionDigits:2}));
-  const bd = document.getElementById('sp-member-breakdown');
-  if (bd) bd.innerHTML = SP_MEMBERS.map(m=>`
-    <div style="background:var(--bg4);border-radius:2px;padding:10px 14px;text-align:center;min-width:100px">
-      <div style="font-size:9px;color:var(--muted3);margin-bottom:4px">${m.name.toUpperCase()}</div>
-      <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--green3)">€${perMember.toLocaleString('pt-PT',{minimumFractionDigits:2})}</div>
-    </div>`).join('');
-  const fb = document.getElementById('sp-fund-bar');
-  if (fb) { const target=parseFloat(document.getElementById('sp-fund-target')?.textContent?.replace(/[^0-9.]/g,'')||400); fb.style.width=Math.min(100,fund/target*100)+'%'; }
+  set('sp-r-fund','€'+fund.toLocaleString('pt-PT',{minimumFractionDigits:2}));
+  set('sp-r-dist','€'+distributable.toLocaleString('pt-PT',{minimumFractionDigits:2}));
+  set('sp-r-per','€'+perMember.toLocaleString('pt-PT',{minimumFractionDigits:2}));
 }
 
-function addSplitExpense() {
-  const label=document.getElementById('sp-exp-label').value.trim();
-  const amount=parseFloat(document.getElementById('sp-exp-amt').value||0);
-  if (!label||!amount) return;
-  SP_EXPENSES.push({label,amount});
-  document.getElementById('sp-exp-label').value='';
-  document.getElementById('sp-exp-amt').value='';
-  const el=document.getElementById('sp-expenses-list');
-  if(el) el.innerHTML=SP_EXPENSES.map((e,i)=>`<div style="display:flex;gap:8px;align-items:center;font-size:10px;padding:4px 8px;background:var(--bg4);border-radius:2px"><span style="flex:1;color:var(--text)">${e.label}</span><span style="color:var(--red3)">-€${e.amount.toFixed(2)}</span><button class="btn-sm" onclick="SP_EXPENSES.splice(${i},1);addSplitExpense()" style="padding:0 6px">✕</button></div>`).join('');
-  calcSplit();
+// Treasury preview
+function calcTreasuryPreview() {
+  var gross = parseFloat(document.getElementById('tr-rev-gross')?.value||0);
+  var expenses = parseFloat(document.getElementById('tr-rev-expenses')?.value||0);
+  var prev = document.getElementById('tr-rev-preview');
+  if (!gross) { if(prev) prev.style.display='none'; return; }
+  if(prev) prev.style.display='block';
+  var net = parseFloat((gross - expenses).toFixed(2));
+  var set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+  set('tr-p-gross','€'+gross.toLocaleString('pt-PT',{minimumFractionDigits:2}));
+  set('tr-p-exp','-€'+expenses.toLocaleString('pt-PT',{minimumFractionDigits:2}));
+  set('tr-p-net','€'+net.toLocaleString('pt-PT',{minimumFractionDigits:2}));
 }
 
-function addSplitMember() {
-  const name=document.getElementById('sp-member-name').value.trim();
-  if (!name||SP_MEMBERS.find(m=>m.name===name)) return;
-  SP_MEMBERS.push({name});
-  document.getElementById('sp-member-name').value='';
-  const el=document.getElementById('sp-members-list');
-  if(el) el.innerHTML=SP_MEMBERS.map((m,i)=>`<div style="display:flex;gap:8px;align-items:center;font-size:10px;padding:4px 8px;background:var(--bg4);border-radius:2px"><span style="flex:1;color:var(--text)">${m.name}</span><button class="btn-sm" onclick="SP_MEMBERS.splice(${i},1);addSplitMember()" style="padding:0 6px">✕</button></div>`).join('');
-  calcSplit();
-}
-
-function resetSplit() {
-  SP_EXPENSES=[]; SP_MEMBERS=[];
-  ['sp-name','sp-date','sp-gross'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-  const fp=document.getElementById('sp-fund-pct'); if(fp) fp.value='10';
-  const el=document.getElementById('sp-expenses-list'); if(el) el.innerHTML='';
-  const ml=document.getElementById('sp-members-list'); if(ml) ml.innerHTML='';
-  const rs=document.getElementById('sp-result'); if(rs) rs.style.display='none';
-  const ss=document.getElementById('sp-save-status'); if(ss) ss.textContent='';
-}
-
-async function saveSplit() {
-  const gig_name=document.getElementById('sp-name').value.trim();
-  const gross_eur=document.getElementById('sp-gross').value;
-  const statusEl=document.getElementById('sp-save-status');
-  if (!gig_name||!gross_eur) { statusEl.textContent='Gig name and gross required'; return; }
-  statusEl.textContent='Saving…';
+// Save revenue to treasury
+async function saveTreasuryItem() {
+  var desc = document.getElementById('tr-rev-desc').value.trim();
+  var gross = document.getElementById('tr-rev-gross').value;
+  var statusEl = document.getElementById('tr-save-status');
+  if (!desc || !gross) { statusEl.textContent = 'Description and gross required'; return; }
+  statusEl.textContent = 'Saving…';
   try {
-    var splitPayload = {
-      gig_name, gross_eur:parseFloat(gross_eur),
-      gig_date:document.getElementById('sp-date').value||null,
-      band_fund_pct:parseFloat(document.getElementById('sp-fund-pct').value||10),
-      shared_expenses:SP_EXPENSES.map(e=>({label:e.label,amount:e.amount})),
-      members:SP_MEMBERS.map(m=>({name:m.name,personal_expenses:0})),
-    };
-    var savedSplit = await apiPost('/splits', splitPayload);
-    statusEl.textContent='✓ Saved';
-    await loadSplits();
-    // Auto-credit member accounts from the split
-    if (savedSplit && savedSplit.id) {
-      await postSplitToMemberAccounts({
-        gig_name: splitPayload.gig_name,
-        gig_date: splitPayload.gig_date,
-        per_member_eur: savedSplit.per_member_eur,
-        members: savedSplit.members || splitPayload.members
-      }, savedSplit.id);
-    }
-    showToast('Split saved — member accounts credited','ok');
-  } catch(e) { statusEl.textContent='✗ '+e.message; }
+    await apiPost('/treasury', {
+      source_type: document.getElementById('tr-source-type').value,
+      description: desc,
+      gross_eur: parseFloat(gross),
+      expenses_eur: parseFloat(document.getElementById('tr-rev-expenses').value||0),
+      revenue_date: document.getElementById('tr-rev-date').value || null,
+      notes: document.getElementById('tr-rev-notes').value || null
+    });
+    statusEl.textContent = '✓ Added';
+    // Reset form
+    ['tr-rev-desc','tr-rev-gross','tr-rev-notes'].forEach(function(id){
+      var e=document.getElementById(id);if(e)e.value='';
+    });
+    document.getElementById('tr-rev-expenses').value='0';
+    var prev=document.getElementById('tr-rev-preview');if(prev)prev.style.display='none';
+    await loadTreasury();
+    showToast('Revenue added to treasury','ok');
+  } catch(e) { statusEl.textContent = '✗ '+e.message; }
 }
 
-async function loadSplits() {
+// Load treasury
+async function loadTreasury() {
   if (!API_BASE || !SESSION?.token) return;
-  try { SPLITS_DATA=await apiGet('/splits'); renderSplitHistory(); updateSplitsBanner(); }
-  catch(e) { console.warn('loadSplits:', e.message); }
+  try {
+    TREASURY_DATA = await apiGet('/treasury');
+    renderTreasuryPool();
+    await loadTreasurySummary();
+  } catch(e) { console.warn('loadTreasury:', e.message); }
   await loadMemberAccounts();
 }
 
+async function loadTreasurySummary() {
+  try {
+    var summary = await apiGet('/treasury/summary');
+    var set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+    set('tr-banner-unallocated','€'+parseFloat(summary.total_unallocated||0).toLocaleString('pt-PT',{minimumFractionDigits:2}));
+    set('tr-banner-allocated','€'+parseFloat(summary.total_allocated||0).toLocaleString('pt-PT',{minimumFractionDigits:2}));
+    set('tr-banner-total','€'+parseFloat(summary.total_net||0).toLocaleString('pt-PT',{minimumFractionDigits:2}));
+    set('tr-banner-items', summary.item_count || 0);
 
+    // Source breakdown cards
+    var sourceColors = {gig:'var(--green3)',streaming:'var(--blue2)',merch:'var(--purple2)',sync:'var(--accent)',other:'var(--muted2)'};
+    var sourceIcons = {gig:'🎸',streaming:'📡',merch:'👕',sync:'🎬',other:'📦'};
+    var cards = document.getElementById('tr-source-cards');
+    if (cards) {
+      var sources = summary.by_source || [];
+      if (!sources.length) {
+        cards.innerHTML = '<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:12px;text-align:center;color:var(--muted3);font-size:9px;grid-column:1/-1">No revenue in treasury yet. Add your first revenue item below.</div>';
+      } else {
+        cards.innerHTML = sources.map(function(s) {
+          var unalloc = parseFloat(s.unallocated||0);
+          var total = parseFloat(s.total_net||0);
+          var pct = total > 0 ? (unalloc/total*100).toFixed(0) : 0;
+          return '<div style="background:var(--bg3);border:1px solid var(--border2);border-left:3px solid '+(sourceColors[s.source_type]||'var(--muted)')+';border-radius:2px;padding:12px;text-align:center">'+
+            '<div style="font-size:16px;margin-bottom:4px">'+(sourceIcons[s.source_type]||'')+'</div>'+
+            '<div style="font-size:9px;color:'+(sourceColors[s.source_type]||'var(--muted)')+';letter-spacing:.1em;font-weight:700;margin-bottom:4px">'+s.source_type.toUpperCase()+'</div>'+
+            '<div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--text)">€'+total.toLocaleString('pt-PT',{minimumFractionDigits:2})+'</div>'+
+            '<div style="font-size:9px;color:var(--muted);margin-top:2px">'+s.count+' items · '+pct+'% pending</div>'+
+          '</div>';
+        }).join('');
+      }
+    }
+  } catch(e) { console.warn('loadTreasurySummary:', e.message); }
+}
 
-function renderSplitHistory() {
-  const el=document.getElementById('splits-history');
+function renderTreasuryPool() {
+  var el = document.getElementById('treasury-pool-rows');
   if (!el) return;
-  if (!SPLITS_DATA.length) { el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted3);font-size:10px">No splits saved yet.</div>'; return; }
-  el.innerHTML=SPLITS_DATA.map((s,i)=>`
-    <div onclick="openSplitsDrawer(${i})" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:12px;padding:9px 12px;border-bottom:1px solid var(--border1);align-items:center;font-size:10px;cursor:pointer;transition:background .1s">
-      <div><div style="font-weight:700;color:var(--text)">${s.gig_name}</div><div style="font-size:9px;color:var(--muted3)">${fmtDate(s.gig_date)||'—'} · ${s.member_count||'?'} members</div></div>
-      <div style="text-align:right;color:var(--text)">€${parseFloat(s.gross_eur||0).toFixed(2)}</div>
-      <div style="text-align:right;color:var(--red3)">-€${parseFloat(s.total_expenses_eur||0).toFixed(2)}</div>
-      <div style="text-align:right;color:var(--amber2)">fund €${parseFloat(s.band_fund_eur||0).toFixed(2)}</div>
-      <div style="text-align:right;color:var(--green3);font-weight:700">€${parseFloat(s.per_member_eur||0).toFixed(2)}/mbr</div>
-    </div>`).join('');
+  var statusFilter = document.getElementById('tr-filter-status')?.value || '';
+  var sourceFilter = document.getElementById('tr-filter-source')?.value || '';
+  var filtered = TREASURY_DATA.filter(function(t) {
+    if (statusFilter && t.status !== statusFilter) return false;
+    if (sourceFilter && t.source_type !== sourceFilter) return false;
+    return true;
+  });
+  if (!filtered.length) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted3);font-size:10px">No treasury items match the filter.</div>';
+    return;
+  }
+  var statusColors = {unallocated:'var(--accent)',partial:'var(--amber2)',allocated:'var(--green3)'};
+  var sourceColors = {gig:'var(--green3)',streaming:'var(--blue2)',merch:'var(--purple2)',sync:'var(--accent)',other:'var(--muted2)'};
+  el.innerHTML = filtered.map(function(t) {
+    var net = parseFloat(t.net_eur||0);
+    var alloc = parseFloat(t.allocated_eur||0);
+    var remaining = net - alloc;
+    var canAllocate = remaining > 0.01;
+    return '<div style="display:grid;grid-template-columns:90px 1fr 60px 80px 80px 80px 80px 70px;gap:6px;padding:7px 10px;border-bottom:1px solid var(--border1);align-items:center;font-size:10px;transition:background .1s" onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'\'">'+
+      '<div style="color:var(--muted2)">'+(t.revenue_date ? t.revenue_date.slice(0,10) : '—')+'</div>'+
+      '<div style="display:flex;align-items:center;gap:8px">'+
+        '<span style="font-weight:700;color:var(--text)">'+t.description+'</span>'+
+        (canAllocate ? '<button class="btn-sm" onclick="openTreasuryAllocateModal(\''+t.id+'\')" style="color:var(--amber2);border-color:var(--amber2);font-size:8px;padding:1px 6px">ALLOCATE</button>' : '')+
+        (t.status==='unallocated' ? '<button class="btn-sm" onclick="deleteTreasuryItem(\''+t.id+'\')" style="color:var(--red3);border-color:var(--red3);font-size:8px;padding:1px 4px">✕</button>' : '')+
+      '</div>'+
+      '<div style="color:'+(sourceColors[t.source_type]||'var(--muted)')+';font-size:8px;letter-spacing:.05em">'+t.source_type.toUpperCase()+'</div>'+
+      '<div style="text-align:right;color:var(--text)">€'+parseFloat(t.gross_eur||0).toFixed(2)+'</div>'+
+      '<div style="text-align:right;color:var(--red3)">-€'+parseFloat(t.expenses_eur||0).toFixed(2)+'</div>'+
+      '<div style="text-align:right;color:var(--green3);font-weight:700">€'+net.toFixed(2)+'</div>'+
+      '<div style="text-align:right;color:'+(statusColors[t.status]||'var(--muted)')+';font-weight:700">€'+alloc.toFixed(2)+'</div>'+
+      '<div style="font-size:8px;letter-spacing:.05em;color:'+(statusColors[t.status]||'var(--muted)')+'">'+t.status.toUpperCase()+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+async function deleteTreasuryItem(id) {
+  if (!confirm('Delete this treasury item?')) return;
+  try {
+    await _apiFetch('DELETE','/treasury/'+id);
+    await loadTreasury();
+    showToast('Treasury item removed','ok');
+  } catch(e) { showToast('Failed: '+e.message,'err'); }
+}
+
+// ── Allocation Modal ──────────────────────────────────────────────────────
+var _allocTreasuryId = null;
+
+function openTreasuryAllocateModal(treasuryId) {
+  _allocTreasuryId = treasuryId;
+  var item = TREASURY_DATA.find(function(t){return t.id===treasuryId;});
+  if (!item) return;
+  var remaining = parseFloat(item.net_eur) - parseFloat(item.allocated_eur);
+  var info = document.getElementById('ta-item-info');
+  if (info) info.textContent = item.description + ' — €' + remaining.toFixed(2) + ' available';
+  var avail = document.getElementById('ta-available');
+  if (avail) avail.textContent = '€'+remaining.toFixed(2);
+
+  // Build member allocation rows
+  var rows = document.getElementById('ta-member-rows');
+  if (rows) {
+    rows.innerHTML = MEMBER_DEFS.map(function(m) {
+      return '<div style="display:grid;grid-template-columns:100px 1fr 80px;align-items:center;gap:8px">'+
+        '<span style="color:'+m.color+';font-weight:700;font-size:11px">'+m.name+'</span>'+
+        '<div style="height:4px;background:var(--bg4);border-radius:1px;overflow:hidden"><div class="ta-bar" data-key="'+m.key+'" style="height:100%;background:'+m.color+';width:0%;transition:width .3s"></div></div>'+
+        '<input type="number" min="0" step="0.01" value="0" data-member-key="'+m.key+'" data-member-name="'+m.name+'" class="ta-amount-input" oninput="updateAllocTotal()" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:2px;padding:4px 8px;font-family:var(--mono);font-size:11px;text-align:right;width:80px">'+
+      '</div>';
+    }).join('');
+  }
+  updateAllocTotal();
+  document.getElementById('ta-status').textContent = '';
+  document.getElementById('treasury-allocate-modal').style.display = 'flex';
+}
+
+function closeTreasuryAllocateModal() {
+  document.getElementById('treasury-allocate-modal').style.display = 'none';
+  _allocTreasuryId = null;
+}
+
+function updateAllocTotal() {
+  var inputs = document.querySelectorAll('.ta-amount-input');
+  var total = 0;
+  var item = TREASURY_DATA.find(function(t){return t.id===_allocTreasuryId;});
+  var remaining = item ? parseFloat(item.net_eur) - parseFloat(item.allocated_eur) : 0;
+  inputs.forEach(function(inp) {
+    var v = parseFloat(inp.value||0);
+    total += v;
+    // Update progress bar
+    var bar = document.querySelector('.ta-bar[data-key="'+inp.dataset.memberKey+'"]');
+    if (bar && remaining > 0) bar.style.width = Math.min(100, v/remaining*100)+'%';
+  });
+  var totalEl = document.getElementById('ta-total');
+  if (totalEl) {
+    totalEl.textContent = '€'+total.toFixed(2);
+    totalEl.style.color = total > remaining + 0.01 ? 'var(--red3)' : 'var(--green3)';
+  }
+}
+
+function treasuryAllocateEqual() {
+  var item = TREASURY_DATA.find(function(t){return t.id===_allocTreasuryId;});
+  if (!item) return;
+  var remaining = parseFloat(item.net_eur) - parseFloat(item.allocated_eur);
+  var inputs = document.querySelectorAll('.ta-amount-input');
+  var perMember = parseFloat((remaining / inputs.length).toFixed(2));
+  inputs.forEach(function(inp) { inp.value = perMember.toFixed(2); });
+  updateAllocTotal();
+}
+
+async function saveTreasuryAllocation() {
+  if (!_allocTreasuryId) return;
+  var statusEl = document.getElementById('ta-status');
+  var inputs = document.querySelectorAll('.ta-amount-input');
+  var allocations = [];
+  inputs.forEach(function(inp) {
+    var amt = parseFloat(inp.value||0);
+    if (amt > 0) {
+      allocations.push({
+        member_key: inp.dataset.memberKey,
+        member_name: inp.dataset.memberName,
+        amount: amt
+      });
+    }
+  });
+  if (!allocations.length) { statusEl.textContent = 'Enter at least one amount'; return; }
+  statusEl.textContent = 'Allocating…';
+  try {
+    await apiPost('/treasury/'+_allocTreasuryId+'/allocate', { allocations: allocations });
+    closeTreasuryAllocateModal();
+    await loadTreasury();
+    showToast('Funds allocated to '+allocations.length+' recipients','ok');
+  } catch(e) { statusEl.textContent = '✗ '+e.message; }
+}
+
+// Override loadSplits to load treasury + legacy splits data
+async function loadSplits() {
+  await loadTreasury();
+  // Also load legacy SPLITS_DATA for chart/report compatibility
+  try { SPLITS_DATA = await apiGet('/splits'); } catch(e) { /* ok */ }
+}
+
+function updateSplitsBanner() {
+  // Now handled by loadTreasurySummary — legacy banner IDs may not exist
+  try {
+    if (!SPLITS_DATA || !SPLITS_DATA.length) return;
+    var totalFund = SPLITS_DATA.reduce(function(s,sp){return s+parseFloat(sp.band_fund_eur||0);},0);
+    var totalEarned = SPLITS_DATA.reduce(function(s,sp){return s+parseFloat(sp.gross_eur||0);},0);
+    var el = function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+    el('sp-banner-total', SPLITS_DATA.length);
+    el('sp-banner-earned','€'+totalEarned.toFixed(2));
+    el('sp-banner-fund','€'+totalFund.toFixed(2));
+  } catch(e) { /* banner elements may not exist in new UI */ }
 }
 
 
@@ -5268,7 +5409,7 @@ function renderMemberAccounts() {
   var txns = MEMBER_ACCOUNTS_DATA.txns || [];
   if (!txns.length) {
     txnsEl.innerHTML = '<div style="padding:12px;color:var(--muted3);font-size:10px;text-align:center">' +
-      'No transactions yet. Save a gig split to auto-credit member accounts.</div>';
+      'No transactions yet. Allocate treasury funds to credit member accounts.</div>';
     return;
   }
 
@@ -5283,7 +5424,7 @@ function renderMemberAccounts() {
   });
 
   var typeColors = { split_credit: 'var(--green3)', withdrawal: 'var(--red3)', deposit: 'var(--blue2)' };
-  var typeLabels = { split_credit: 'GIG SPLIT', withdrawal: 'WITHDRAWAL', deposit: 'DEPOSIT' };
+  var typeLabels = { split_credit: 'TREASURY', withdrawal: 'WITHDRAWAL', deposit: 'DEPOSIT' };
 
   txnsEl.innerHTML = txns.map(function(t) {
     var def = MEMBER_DEFS.find(function(m) { return m.key === t.member_key; }) || { color: 'var(--muted)', name: t.member_name };
@@ -5360,39 +5501,11 @@ async function saveMemberTransaction(type) {
   }
 }
 
-async function postSplitToMemberAccounts(splitData, splitId) {
-  if (!splitData) return;
-  var members = splitData.members || [];
-  var date = splitData.gig_date || new Date().toISOString().split('T')[0];
-  var gigName = splitData.gig_name || 'Gig';
-  var perMember = parseFloat(splitData.per_member_eur || 0);
-  // Use per_member_eur if members array lacks individual amounts
-  for (var i = 0; i < members.length; i++) {
-    var m = members[i];
-    var memberName = m.member_name || m.name || 'Member';
-    var def = MEMBER_DEFS.find(function(d) {
-      return d.name.toLowerCase() === memberName.toLowerCase() || d.key === memberName.toLowerCase();
-    });
-    var key = def ? def.key : memberName.toLowerCase().replace(/[^a-z0-9]/g, '_');
-    var memberAmt = parseFloat(m.net_eur || m.base_share || perMember || 0);
-    if (memberAmt <= 0) continue;
-    try {
-      await apiPost('/splits/member-accounts/txn', {
-        member_key: key,
-        member_name: def ? def.name : memberName,
-        amount: memberAmt,
-        txn_type: 'split_credit',
-        description: gigName,
-        txn_date: date,
-        split_id: splitId
-      });
-    } catch(e) { console.warn('Credit failed for', memberName, e.message); }
-  }
-  await loadMemberAccounts();
-}
+// Legacy compat — old postSplitToMemberAccounts no longer auto-fires
+async function postSplitToMemberAccounts() { /* no-op — now use treasury allocation */ }
 
 document.addEventListener('DOMContentLoaded', function() {
-  ['member-withdraw-modal','member-deposit-modal'].forEach(function(id) {
+  ['member-withdraw-modal','member-deposit-modal','treasury-allocate-modal'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.addEventListener('click', function(e) { if (e.target === el) closeMemberModal(id); });
   });
@@ -11468,7 +11581,7 @@ const TRANSLATIONS = {
     booking_pipeline_title: 'Booking Pipeline',
     show_schedule:       'Show Schedule',
     setlists_title:      'Setlists',
-    splits_fund_title:   'Splits Fund',
+    splits_fund_title:   'Treasury',
     streaming_title:     'Streaming',
     // Financials
     valuation_title:     'Financial Intelligence — Valuation & Health',
@@ -12086,7 +12199,7 @@ const TRANSLATIONS = {
     booking_pipeline_title: 'Pipeline de Reservas',
     show_schedule:       'Agenda de Espetáculos',
     setlists_title:      'Alinhamentos',
-    splits_fund_title:   'Fundo da Banda',
+    splits_fund_title:   'Tesouraria',
     streaming_title:     'Streaming',
     // Financials
     valuation_title:     'Inteligência Financeira — Avaliação',
@@ -17340,29 +17453,30 @@ function mgmtPress() {
     </div>`).join('');
 }
 
-// ── Splits summary ─────────────────────────────────────────────────────────────
+// ── Treasury summary ─────────────────────────────────────────────────────────
 function mgmtSplits() {
   const el = document.getElementById('mgmt-splits-summary');
   if (!el) return;
-  if (!SPLITS_DATA.length) {
-    el.innerHTML = '<div style="padding:10px;color:var(--muted3)">No splits recorded.</div>';
+  if (!TREASURY_DATA || !TREASURY_DATA.length) {
+    el.innerHTML = '<div style="padding:10px;color:var(--muted3)">No revenue in treasury yet.</div>';
     return;
   }
-  const totalGross = SPLITS_DATA.reduce((s,sp)=>s+parseFloat(sp.gross_eur||0),0);
-  const totalFund  = SPLITS_DATA.reduce((s,sp)=>s+parseFloat(sp.band_fund_eur||0),0);
+  const totalNet = TREASURY_DATA.reduce((s,t)=>s+parseFloat(t.net_eur||0),0);
+  const totalAlloc = TREASURY_DATA.reduce((s,t)=>s+parseFloat(t.allocated_eur||0),0);
+  const unalloc = totalNet - totalAlloc;
   el.innerHTML = `
     <div style="padding:10px 12px;display:flex;flex-direction:column;gap:6px">
       <div style="display:flex;justify-content:space-between">
-        <span style="font-size:9px;color:var(--muted3)">Total earned (gross)</span>
-        <span style="font-size:10px;font-weight:700;color:var(--green3)">${fmtMoney(totalGross)}</span>
+        <span style="font-size:9px;color:var(--muted3)">Total net revenue</span>
+        <span style="font-size:10px;font-weight:700;color:var(--green3)">${fmtMoney(totalNet)}</span>
       </div>
       <div style="display:flex;justify-content:space-between">
-        <span style="font-size:9px;color:var(--muted3)">Band fund accumulated</span>
-        <span style="font-size:10px;font-weight:700;color:var(--accent)">${fmtMoney(totalFund)}</span>
+        <span style="font-size:9px;color:var(--muted3)">Unallocated</span>
+        <span style="font-size:10px;font-weight:700;color:var(--accent)">${fmtMoney(unalloc)}</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding-top:4px;border-top:1px solid var(--border1)">
-        <span style="font-size:9px;color:var(--muted3)">${SPLITS_DATA.length} gig${SPLITS_DATA.length!==1?'s':''} recorded</span>
-        <span style="font-size:9px;color:var(--muted3)">avg ${fmtMoney(totalFund/SPLITS_DATA.length)}/gig to fund</span>
+        <span style="font-size:9px;color:var(--muted3)">${TREASURY_DATA.length} item${TREASURY_DATA.length!==1?'s':''}</span>
+        <span style="font-size:9px;color:var(--muted3)">${TREASURY_DATA.filter(t=>t.status==='unallocated').length} pending allocation</span>
       </div>
     </div>`;
 }
