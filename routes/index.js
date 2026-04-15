@@ -30,6 +30,7 @@ const agentRoutes       = require('./routes/agent');
 const productionRoutes  = require('./routes/production');
 const fxRoutes          = require('./routes/fx');
 const reportRoutes      = require('./routes/reports');
+const treasuryRoutes    = require('./routes/treasury');
 
 const app = express();
 
@@ -111,6 +112,7 @@ app.use('/api/agent',        agentRoutes);
 app.use('/api/production',   productionRoutes);
 app.use('/api/fx',           fxRoutes);
 app.use('/api/reports',      reportRoutes);
+app.use('/api/treasury',     treasuryRoutes);
 
 // ─── HEALTH ───────────────────────────────────────────
 app.get('/api/health', async (_req, res) => {
