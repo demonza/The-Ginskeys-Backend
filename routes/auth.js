@@ -6,6 +6,7 @@ const bcrypt  = require('bcrypt');
 const jwt     = require('jsonwebtoken');
 const crypto  = require('crypto');
 const { v4: uuid } = require('uuid');
+const rateLimit = require('express-rate-limit');
 const pool    = require('../db/pool');
 const { requireAuth } = require('../middleware/auth');
 const { writeAudit }  = require('../middleware/audit');
@@ -14,7 +15,6 @@ const SALT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS || '10');
 const JWT_SECRET  = process.env.JWT_SECRET;
 
 // FIX: refuse to start if refresh secret is derived from access secret
-// (the original code did JWT_SECRET + '_refresh' which is predictable)
 const JWT_REFRESH = process.env.JWT_REFRESH_SECRET;
 if (!JWT_REFRESH) {
   console.warn('⚠️  JWT_REFRESH_SECRET not set — falling back to derived value. Set a separate secret in production.');
@@ -25,29 +25,73 @@ const ACCESS_TTL  = '8h';
 const REFRESH_TTL = '30d';
 const REFRESH_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
-// FIX: simple in-memory login rate limiter (per-IP, 10 attempts / 15 min)
-const loginAttempts = new Map();
-const LOGIN_WINDOW_MS = 15 * 60 * 1000;
-const LOGIN_MAX_ATTEMPTS = 10;
+// ─── RATE LIMITERS ────────────────────────────────
+// All three limits key by IP. Railway sets X-Forwarded-For correctly
+// because index.js has app.set('trust proxy', 1).
 
-function checkLoginRateLimit(ip) {
-  const now = Date.now();
-  const record = loginAttempts.get(ip);
-  if (!record || now - record.windowStart > LOGIN_WINDOW_MS) {
-    loginAttempts.set(ip, { windowStart: now, count: 1 });
-    return true;
-  }
-  record.count++;
-  return record.count <= LOGIN_MAX_ATTEMPTS;
-}
+// Login: 10 attempts per 15 minutes per IP
+const loginLimiter = rateLimit({
+  windowMs:         15 * 60 * 1000,
+  max:              10,
+  standardHeaders:  true,   // Return RateLimit-* headers
+  legacyHeaders:    false,
+  keyGenerator:     req => req.ip,
+  handler: (_req, res) => res.status(429).json({
+    error: 'Too many login attempts. Try again in 15 minutes.',
+  }),
+  skipSuccessfulRequests: true, // successful logins don't count toward limit
+});
 
-// Periodically clean up stale entries (every 30 min)
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, record] of loginAttempts) {
-    if (now - record.windowStart > LOGIN_WINDOW_MS) loginAttempts.delete(ip);
-  }
-}, 30 * 60 * 1000).unref();
+// Register: 5 attempts per hour per IP (invite-gated anyway, but belt+braces)
+const registerLimiter = rateLimit({
+  windowMs:        60 * 60 * 1000,
+  max:             5,
+  standardHeaders: true,
+  legacyHeaders:   false,
+  keyGenerator:    req => req.ip,
+  handler: (_req, res) => res.status(429).json({
+    error: 'Too many registration attempts. Try again in 1 hour.',
+  }),
+});
+
+// Password reset request: 5 per hour per IP
+// (prevents user enumeration via timing + bulk enumeration attacks)
+const resetRequestLimiter = rateLimit({
+  windowMs:        60 * 60 * 1000,
+  max:             5,
+  standardHeaders: true,
+  legacyHeaders:   false,
+  keyGenerator:    req => req.ip,
+  handler: (_req, res) => res.status(429).json({
+    error: 'Too many password reset requests. Try again in 1 hour.',
+  }),
+});
+
+// Password reset confirm: 10 per hour per IP
+const resetConfirmLimiter = rateLimit({
+  windowMs:        60 * 60 * 1000,
+  max:             10,
+  standardHeaders: true,
+  legacyHeaders:   false,
+  keyGenerator:    req => req.ip,
+  handler: (_req, res) => res.status(429).json({
+    error: 'Too many password reset attempts. Try again in 1 hour.',
+  }),
+});
+
+// Refresh token: 60 per hour per IP (normal app churn, but cap abuse)
+const refreshLimiter = rateLimit({
+  windowMs:        60 * 60 * 1000,
+  max:             60,
+  standardHeaders: true,
+  legacyHeaders:   false,
+  keyGenerator:    req => req.ip,
+  handler: (_req, res) => res.status(429).json({
+    error: 'Too many token refresh requests.',
+  }),
+});
+
+// ─── HELPERS ──────────────────────────────────────
 
 // FIX: basic email format validation
 function isValidEmail(email) {
@@ -81,16 +125,11 @@ async function storeRefreshToken(userId, token) {
 }
 
 // ─── POST /api/auth/login ──────────────────────────
-router.post('/login', async (req, res, next) => {
+router.post('/login', loginLimiter, async (req, res, next) => {
   try {
     const { email, password } = req.body;
     if (!email || !password)
       return res.status(400).json({ error: 'Email and password required' });
-
-    // FIX: rate limit login attempts
-    if (!checkLoginRateLimit(req.ip)) {
-      return res.status(429).json({ error: 'Too many login attempts. Try again in 15 minutes.' });
-    }
 
     // FIX: validate email format before querying DB
     if (!isValidEmail(email))
@@ -134,7 +173,7 @@ router.post('/login', async (req, res, next) => {
 });
 
 // ─── POST /api/auth/register (invite token required) ─
-router.post('/register', async (req, res, next) => {
+router.post('/register', registerLimiter, async (req, res, next) => {
   try {
     const { token, email, name, password } = req.body;
     if (!token || !email || !name || !password)
@@ -197,7 +236,7 @@ router.post('/register', async (req, res, next) => {
 });
 
 // ─── POST /api/auth/refresh ────────────────────────
-router.post('/refresh', async (req, res, next) => {
+router.post('/refresh', refreshLimiter, async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
     if (!refreshToken) return res.status(400).json({ error: 'Refresh token required' });
@@ -254,15 +293,10 @@ router.post('/logout', requireAuth, async (req, res, next) => {
 });
 
 // ─── POST /api/auth/password-reset/request ─────────
-router.post('/password-reset/request', async (req, res, next) => {
+router.post('/password-reset/request', resetRequestLimiter, async (req, res, next) => {
   try {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email required' });
-
-    // FIX: rate limit password reset requests
-    if (!checkLoginRateLimit(req.ip + ':reset')) {
-      return res.status(204).end(); // silent — don't reveal rate limiting
-    }
 
     const { rows } = await pool.query(
       'SELECT id FROM users WHERE email = $1 AND active = true',
@@ -286,7 +320,7 @@ router.post('/password-reset/request', async (req, res, next) => {
 });
 
 // ─── POST /api/auth/password-reset/confirm ─────────
-router.post('/password-reset/confirm', async (req, res, next) => {
+router.post('/password-reset/confirm', resetConfirmLimiter, async (req, res, next) => {
   try {
     const { token, newPassword } = req.body;
     if (!token || !newPassword)
