@@ -135,15 +135,24 @@ async function fetchWithTimeout(url, options, timeoutMs = AI_TIMEOUT_MS) {
   }
 }
 
-async function callAI(prompt, maxTokens = 2000) {
+async function callAI(prompt, maxTokens = 4000) {
   // FIX: wrap both providers in retry logic for transient failures
   let lastErr = 'No AI provider configured';
 
   // Try Gemini first (free tier)
   if (process.env.GEMINI_API_KEY) {
     const key = process.env.GEMINI_API_KEY;
-    // FIX: hardcoded fallback also prioritises 2.0-flash for the thinking-tokens reason
-    const models = await getGeminiModels(key) || ['gemini-2.0-flash', 'gemini-1.5-flash'];
+    // FIX: skip dynamic discovery. Gemini 2.0 Flash was deprecated in
+    // Feb 2026, and discovery was returning 2.0-flash-lite-001 (which has
+    // harsh rate limits). Use a curated, prioritised list instead:
+    //   1. gemini-2.5-flash      — current recommended model, 10 RPM / 500 RPD free
+    //   2. gemini-2.5-flash-lite — backup, tighter limits but works
+    //   3. gemini-1.5-flash      — legacy fallback
+    //
+    // We ask for thinkingBudget: 0 on 2.5 models to stop thinking tokens
+    // from eating the output budget, but Gemini sometimes still spends
+    // some — so we also bump maxTokens to give real slack.
+    const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-1.5-flash'];
 
     geminiLoop:
     for (const model of models) {
@@ -437,9 +446,10 @@ router.post('/pitch', requireAuth, requirePerm('addTxn'), async (req, res, next)
     const safeDate = sanitisePromptInput(proposed_date, 100);
 
     const prompt = buildPitchPrompt(venue, tone, language, safeDate, safeContext);
-    // FIX: bumped from 1200 → 2000. Portuguese is ~35% less token-efficient
-    // than English, so a full pitch email in PT was truncating mid-sentence.
-    const text = await callAI(prompt, 2000);
+    // FIX: bumped to 4000 because Gemini 2.5 may still spend ~1500 tokens on
+    // thinking even with thinkingBudget: 0, leaving only ~500 for output.
+    // 4000 guarantees enough real output tokens for a full PT pitch email.
+    const text = await callAI(prompt, 4000);
 
     const { subject, body } = parseAIResponse(text, `Live Music Booking — The Ginskeys`);
 
@@ -507,8 +517,8 @@ router.post('/followup', requireAuth, requirePerm('addTxn'), async (req, res, ne
     if (!contact) return res.status(404).json({ error: 'Booking contact not found' });
 
     const prompt = buildFollowupPrompt(contact, followupNum, language);
-    // FIX: 800 → 1200 for follow-ups (same PT token-efficiency reason)
-    const text = await callAI(prompt, 1200);
+    // FIX: 1200 → 2500 to absorb Gemini 2.5 thinking overhead
+    const text = await callAI(prompt, 2500);
     const { subject, body } = parseAIResponse(text, `Follow up — The Ginskeys`);
 
     // FIX: audit trail for followups (was missing)
@@ -583,8 +593,8 @@ router.post('/batch', requireAuth, requirePerm('addTxn'), async (req, res, next)
           checkAIRateLimit(req.user.id);
 
           const prompt = buildPitchPrompt(venue, tone, language, safeMonth, '');
-          // FIX: 800 → 1800 for batch pitches (PT token-efficiency)
-          const text = await callAI(prompt, 1800);
+          // FIX: 1800 → 3500 to absorb Gemini 2.5 thinking overhead
+          const text = await callAI(prompt, 3500);
           const { subject, body } = parseAIResponse(text, `Live Music — The Ginskeys`);
           return { venue, subject, body };
         })
