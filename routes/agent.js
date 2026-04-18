@@ -97,16 +97,21 @@ async function getGeminiModels(apiKey) {
       .map(m => m.name.replace('models/', ''))
       .filter(name => /gemini-(2|1\.5)/.test(name) && !name.includes('image') && !name.includes('vision'));
     supported.sort((a, b) => {
-      // FIX: prioritise 2.0-flash over 2.5-flash. Gemini 2.5 has a "thinking"
-      // feature that silently consumes tokens from maxOutputTokens even when
-      // thinkingBudget is set to 0, causing Portuguese pitches to truncate
-      // mid-sentence. 2.0-flash has no thinking mode, so the whole token
-      // budget goes to actual output text.
-      const score = n =>
-        n.includes('2.0-flash') ? 0 :
-        n.includes('1.5-flash') ? 1 :
-        n.includes('1.5-pro')   ? 2 :
-        n.includes('2.5-flash') ? 3 : 4;
+      // FIX: prioritise 2.0-flash (full) over 2.0-flash-lite (lite has
+      // much tighter rate limits on the free tier — hits 429 within a few
+      // requests). Full 2.0-flash has no thinking mode, so the whole token
+      // budget goes to actual output text. 2.5-flash last because its
+      // thinking-tokens feature silently consumes the output budget.
+      const score = n => {
+        // exact match for full 2.0-flash (not -lite)
+        if (n === 'gemini-2.0-flash' || n === 'gemini-2.0-flash-001') return 0;
+        if (n.includes('2.0-flash') && !n.includes('lite'))           return 1;
+        if (n.includes('1.5-flash'))                                  return 2;
+        if (n.includes('1.5-pro'))                                    return 3;
+        if (n.includes('2.0-flash-lite'))                             return 4;
+        if (n.includes('2.5-flash'))                                  return 5;
+        return 6;
+      };
       return score(a) - score(b);
     });
     _geminiModels = supported.slice(0, 3);
@@ -221,7 +226,15 @@ async function callAI(prompt, maxTokens = 2000) {
             break; // model gone — try next model
           }
 
-          // 429 or 5xx: retryable — wait with exponential backoff
+          // FIX: 429 (rate limit) is per-model per-minute on Gemini free tier.
+          // Retrying the same model within seconds will just hit the limit
+          // again. Skip straight to the next model — usually resolves instantly.
+          if (status === 429) {
+            console.warn(`[agent] Gemini ${model}: rate-limited (429), trying next model`);
+            break;
+          }
+
+          // 5xx: retryable — wait with exponential backoff
           if (attempt < AI_MAX_RETRIES) {
             await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)));
           }
