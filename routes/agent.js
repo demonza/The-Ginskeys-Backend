@@ -68,7 +68,9 @@ setInterval(() => {
 
 // ── AI HELPER ────────────────────────────────────────
 // FIX: Gemini model cache with TTL (was cached forever — if Google
-// deprecates a model, the app would keep trying it until restart)
+// deprecates a model, the app would keep trying it until restart).
+// Cache is in-memory, so a redeploy resets it — which is what we want
+// now that we've flipped the model priority.
 let _geminiModels = null;
 let _geminiModelsCachedAt = 0;
 const GEMINI_CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
@@ -95,11 +97,16 @@ async function getGeminiModels(apiKey) {
       .map(m => m.name.replace('models/', ''))
       .filter(name => /gemini-(2|1\.5)/.test(name) && !name.includes('image') && !name.includes('vision'));
     supported.sort((a, b) => {
+      // FIX: prioritise 2.0-flash over 2.5-flash. Gemini 2.5 has a "thinking"
+      // feature that silently consumes tokens from maxOutputTokens even when
+      // thinkingBudget is set to 0, causing Portuguese pitches to truncate
+      // mid-sentence. 2.0-flash has no thinking mode, so the whole token
+      // budget goes to actual output text.
       const score = n =>
-        n.includes('2.5-flash') ? 0 :
-        n.includes('2.0-flash') ? 1 :
-        n.includes('1.5-flash') ? 2 :
-        n.includes('1.5-pro')   ? 3 : 4;
+        n.includes('2.0-flash') ? 0 :
+        n.includes('1.5-flash') ? 1 :
+        n.includes('1.5-pro')   ? 2 :
+        n.includes('2.5-flash') ? 3 : 4;
       return score(a) - score(b);
     });
     _geminiModels = supported.slice(0, 3);
@@ -123,33 +130,77 @@ async function fetchWithTimeout(url, options, timeoutMs = AI_TIMEOUT_MS) {
   }
 }
 
-async function callAI(prompt, maxTokens = 1200) {
+async function callAI(prompt, maxTokens = 2000) {
   // FIX: wrap both providers in retry logic for transient failures
   let lastErr = 'No AI provider configured';
 
   // Try Gemini first (free tier)
   if (process.env.GEMINI_API_KEY) {
     const key = process.env.GEMINI_API_KEY;
-    const models = await getGeminiModels(key) || ['gemini-2.5-flash', 'gemini-2.0-flash'];
+    // FIX: hardcoded fallback also prioritises 2.0-flash for the thinking-tokens reason
+    const models = await getGeminiModels(key) || ['gemini-2.0-flash', 'gemini-1.5-flash'];
 
+    geminiLoop:
     for (const model of models) {
       for (let attempt = 0; attempt <= AI_MAX_RETRIES; attempt++) {
         try {
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+          // FIX: Gemini 2.5 spends "thinking tokens" from maxOutputTokens before
+          // writing. For a booking email we don't need reasoning — disabling
+          // thinking gives the whole budget to actual output. Without this,
+          // Portuguese pitches were truncating after one sentence because
+          // thinking ate ~60% of the 1200-token budget.
+          const body = {
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              maxOutputTokens: maxTokens,
+              temperature: 0.7,
+              // thinkingConfig is only accepted by 2.5 models; harmless for 2.0/1.5
+              thinkingConfig: { thinkingBudget: 0 },
+            },
+          };
           const res = await fetchWithTimeout(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
-            }),
+            body: JSON.stringify(body),
           });
 
           if (res.ok) {
             const data = await res.json();
-            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            const candidate = data.candidates?.[0];
+            const text = candidate?.content?.parts?.[0]?.text;
+            const finishReason = candidate?.finishReason;
+            const usage = data.usageMetadata || {};
+
+            // FIX: diagnostic logging — prints to Railway logs so we can see
+            // exactly what Gemini returned. Remove once stable.
+            console.log(`[agent] Gemini ${model} finishReason=${finishReason} ` +
+                        `prompt=${usage.promptTokenCount} ` +
+                        `output=${usage.candidatesTokenCount} ` +
+                        `thoughts=${usage.thoughtsTokenCount || 0} ` +
+                        `total=${usage.totalTokenCount} ` +
+                        `textLen=${text?.length || 0}`);
+
+            // FIX: detect truncation aggressively. A complete pitch always ends
+            // with punctuation (. ! ?) or a sign-off. If the text ends mid-word
+            // or mid-sentence, treat as truncated even if finishReason says STOP.
+            const looksTruncated =
+              finishReason === 'MAX_TOKENS' ||
+              finishReason === 'max_tokens' ||
+              (text && text.length > 50 && !/[.!?"\)\]]\s*$/.test(text.trim()));
+
+            if (looksTruncated) {
+              lastErr = `Gemini ${model}: output truncated at ${text?.length || 0} chars ` +
+                        `(finishReason=${finishReason}, thoughts=${usage.thoughtsTokenCount || 0} tokens). ` +
+                        `Trying Anthropic fallback.`;
+              console.warn('[agent]', lastErr);
+              // Break out of BOTH loops so we jump straight to Anthropic.
+              // The old `break` only exited the retry loop and then kept
+              // trying more Gemini models, never reaching Anthropic.
+              break geminiLoop;
+            }
             if (text) return text;
-            lastErr = `Gemini ${model}: empty response`;
+            lastErr = `Gemini ${model}: empty response (finishReason=${finishReason || 'unknown'})`;
             break; // empty response won't improve with retry
           }
 
@@ -207,6 +258,12 @@ async function callAI(prompt, maxTokens = 1200) {
 
         if (res.ok) {
           const data = await res.json();
+          // FIX: same truncation check as Gemini — Anthropic uses stop_reason
+          // "max_tokens" when the model ran out of budget mid-response.
+          if (data.stop_reason === 'max_tokens') {
+            lastErr = `Anthropic: output truncated (hit ${maxTokens} token limit).`;
+            break;
+          }
           return data.content?.[0]?.text || '';
         }
 
@@ -367,7 +424,9 @@ router.post('/pitch', requireAuth, requirePerm('addTxn'), async (req, res, next)
     const safeDate = sanitisePromptInput(proposed_date, 100);
 
     const prompt = buildPitchPrompt(venue, tone, language, safeDate, safeContext);
-    const text = await callAI(prompt, 1200);
+    // FIX: bumped from 1200 → 2000. Portuguese is ~35% less token-efficient
+    // than English, so a full pitch email in PT was truncating mid-sentence.
+    const text = await callAI(prompt, 2000);
 
     const { subject, body } = parseAIResponse(text, `Live Music Booking — The Ginskeys`);
 
@@ -435,7 +494,8 @@ router.post('/followup', requireAuth, requirePerm('addTxn'), async (req, res, ne
     if (!contact) return res.status(404).json({ error: 'Booking contact not found' });
 
     const prompt = buildFollowupPrompt(contact, followupNum, language);
-    const text = await callAI(prompt, 800);
+    // FIX: 800 → 1200 for follow-ups (same PT token-efficiency reason)
+    const text = await callAI(prompt, 1200);
     const { subject, body } = parseAIResponse(text, `Follow up — The Ginskeys`);
 
     // FIX: audit trail for followups (was missing)
@@ -510,7 +570,8 @@ router.post('/batch', requireAuth, requirePerm('addTxn'), async (req, res, next)
           checkAIRateLimit(req.user.id);
 
           const prompt = buildPitchPrompt(venue, tone, language, safeMonth, '');
-          const text = await callAI(prompt, 800);
+          // FIX: 800 → 1800 for batch pitches (PT token-efficiency)
+          const text = await callAI(prompt, 1800);
           const { subject, body } = parseAIResponse(text, `Live Music — The Ginskeys`);
           return { venue, subject, body };
         })
