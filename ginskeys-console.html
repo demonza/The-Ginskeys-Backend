@@ -8059,13 +8059,8 @@ function openPitchInGmail() {
   const to      = encodeURIComponent(AGENT_SELECTED_VENUE?.contact_email || '');
   window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`, '_blank');
 }
-function openFollowUpInGmail() {
-  const subj = document.getElementById('ag-fu-subject')?.textContent || '';
-  const body = document.getElementById('ag-fu-body')?.textContent || '';
-  const subject = encodeURIComponent(subj);
-  const bod     = encodeURIComponent(body);
-  window.open(`https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${bod}`, '_blank');
-}
+// NOTE: openFollowUpInGmail is defined below (near generateFollowUp) — this
+// older duplicate was reading from DOM text with the "✉ " prefix still in it.
 
 function copyPitch() {
   if (!AGENT_CURRENT_PITCH) return;
@@ -8115,22 +8110,28 @@ async function loadFollowupContacts() {
 function selectFollowupContact(id) {
   AGENT_FOLLOWUP_CONTACT = BOOKING_DATA.find(b => b.id === id);
   loadFollowupContacts();
-  document.getElementById('ag-followup-btn').disabled = !AGENT_FOLLOWUP_CONTACT;
+  // FIX: button id is ag-fu-btn, not ag-followup-btn
+  document.getElementById('ag-fu-btn').disabled = !AGENT_FOLLOWUP_CONTACT;
   document.getElementById('ag-followup-output').style.display = 'none';
 }
 
-async function generateFollowup() {
+// FIX: HTML button calls generateFollowUp (capital U); this used to be generateFollowup
+async function generateFollowUp() {
   if (!AGENT_FOLLOWUP_CONTACT) return;
-  const btn = document.getElementById('ag-followup-btn');
-  const status = document.getElementById('ag-followup-status');
+  // FIX: real IDs in the HTML are ag-fu-btn and ag-fu-status (not ag-followup-*)
+  const btn = document.getElementById('ag-fu-btn');
+  const status = document.getElementById('ag-fu-status');
   btn.disabled = true;
   btn.innerHTML = '<span class="loading-pulse">⚡ Writing follow-up...</span>';
 
   try {
     const result = await apiPost('/agent/followup', {
       booking_id: AGENT_FOLLOWUP_CONTACT.id,
-      followup_number: parseInt(document.getElementById('ag-followup-num').value),
-      language: document.getElementById('ag-followup-lang').value,
+      // FIX: there is no ag-fu-num selector in the HTML — default to 1.
+      // Add <select id="ag-fu-num"> later if you want 1/2/3 follow-up stages.
+      followup_number: parseInt(document.getElementById('ag-fu-num')?.value || '1'),
+      // FIX: real id is ag-fu-lang (not ag-followup-lang)
+      language: document.getElementById('ag-fu-lang').value,
     });
     AGENT_FOLLOWUP_PITCH = result;
     document.getElementById('ag-fu-subject').textContent = '✉ ' + result.subject;
@@ -8140,10 +8141,11 @@ async function generateFollowup() {
     document.getElementById('ag-pitches-gen').textContent = AGENT_PITCHES_GENERATED;
     status.textContent = '✓ Follow-up ready';
   } catch(e) { status.textContent = '✗ ' + e.message; }
-  finally { btn.textContent = '⚡ Generate Follow-Up'; btn.disabled = false; }
+  finally { btn.textContent = '🔁 GENERATE FOLLOW-UP'; btn.disabled = false; }
 }
 
-function openGmailFollowup() {
+// FIX: HTML button calls openFollowUpInGmail(); this used to be openGmailFollowup
+function openFollowUpInGmail() {
   if (!AGENT_FOLLOWUP_PITCH) return;
   const { subject, body } = AGENT_FOLLOWUP_PITCH;
   const email = AGENT_FOLLOWUP_CONTACT?.contact_email || '';
@@ -8151,7 +8153,8 @@ function openGmailFollowup() {
   window.open(url, '_blank');
 }
 
-function copyFollowup() {
+// FIX: HTML button calls copyFollowUp(); this used to be copyFollowup
+function copyFollowUp() {
   if (!AGENT_FOLLOWUP_PITCH) return;
   navigator.clipboard.writeText(`Subject: ${AGENT_FOLLOWUP_PITCH.subject}\n\n${AGENT_FOLLOWUP_PITCH.body}`).then(() => showToast('Copied', 'ok'));
 }
