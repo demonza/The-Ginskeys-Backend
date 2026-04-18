@@ -9,14 +9,34 @@ const { requireAuth, requirePerm } = require('../middleware/auth');
 const { writeAudit } = require('../middleware/audit');
 
 // ── CONSTANTS ────────────────────────────────────────
-const VALID_TONES = ['professional', 'casual', 'energetic'];
-const VALID_LANGUAGES = ['english', 'portuguese'];
-// FIX: map frontend display labels to API values
+// FIX: frontend sends short labels like "friendly", "bold", "humble" — backend must
+// accept the exact set of values the UI exposes, otherwise every pitch returns 400.
+const VALID_TONES = ['professional', 'friendly', 'bold', 'humble', 'casual', 'energetic'];
+const TONE_MAP = {
+  'professional': 'professional',
+  'friendly':     'friendly',
+  'bold':         'bold',
+  'humble':       'humble',
+  // legacy aliases
+  'casual':       'friendly',
+  'energetic':    'bold',
+};
+const VALID_LANGUAGES = ['english', 'portuguese', 'spanish'];
+// FIX: frontend sends ISO short codes ("pt", "en", "es"). Accept those plus
+// the full-name and native-label variants users might type.
 const LANGUAGE_MAP = {
-  'english': 'english',
-  'portuguese': 'portuguese',
-  'português': 'portuguese',
-  'inglês': 'english',
+  'en':           'english',
+  'english':      'english',
+  'inglês':       'english',
+  'ingles':       'english',
+  'pt':           'portuguese',
+  'portuguese':   'portuguese',
+  'português':    'portuguese',
+  'portugues':    'portuguese',
+  'es':           'spanish',
+  'spanish':      'spanish',
+  'español':      'spanish',
+  'espanol':      'spanish',
 };
 const AI_TIMEOUT_MS = 30_000;  // FIX: 30s timeout on AI calls (was unlimited)
 const AI_MAX_RETRIES = 2;      // FIX: retry once on transient failures
@@ -298,7 +318,7 @@ function normaliseLanguage(lang) {
 function normaliseTone(tone) {
   if (!tone) return 'professional';
   const t = tone.toLowerCase().trim();
-  return VALID_TONES.includes(t) ? t : null;
+  return TONE_MAP[t] || null;
 }
 
 
@@ -335,9 +355,9 @@ router.post('/pitch', requireAuth, requirePerm('addTxn'), async (req, res, next)
     const tone = normaliseTone(rawTone);
     const language = normaliseLanguage(rawLang);
     if (!tone)
-      return res.status(400).json({ error: 'tone must be one of: ' + VALID_TONES.join(', ') });
+      return res.status(400).json({ error: 'tone must be one of: ' + Object.keys(TONE_MAP).join(', ') });
     if (!language)
-      return res.status(400).json({ error: 'language must be one of: english, portuguese (or Português, Inglês)' });
+      return res.status(400).json({ error: 'language must be one of: en, pt, es (English, Portuguese, Spanish)' });
 
     const venue = VENUE_DATABASE.find(v => v.id === venue_id);
     if (!venue) return res.status(404).json({ error: 'Venue not found' });
@@ -404,7 +424,7 @@ router.post('/followup', requireAuth, requirePerm('addTxn'), async (req, res, ne
       return res.status(400).json({ error: 'booking_id required' });
     const language = normaliseLanguage(rawLang);
     if (!language)
-      return res.status(400).json({ error: 'language must be one of: english, portuguese (or Português, Inglês)' });
+      return res.status(400).json({ error: 'language must be one of: en, pt, es (English, Portuguese, Spanish)' });
 
     const followupNum = parseInt(followup_number);
     if (!isFinite(followupNum) || followupNum < 1 || followupNum > 3)
@@ -456,9 +476,9 @@ router.post('/batch', requireAuth, requirePerm('addTxn'), async (req, res, next)
     const tone = normaliseTone(rawTone);
     const language = normaliseLanguage(rawLang);
     if (!tone)
-      return res.status(400).json({ error: 'tone must be one of: ' + VALID_TONES.join(', ') });
+      return res.status(400).json({ error: 'tone must be one of: ' + Object.keys(TONE_MAP).join(', ') });
     if (!language)
-      return res.status(400).json({ error: 'language must be one of: english, portuguese (or Português, Inglês)' });
+      return res.status(400).json({ error: 'language must be one of: en, pt, es (English, Portuguese, Spanish)' });
 
     // Check rate limit for the whole batch
     const rateLimitRecord = aiUsage.get(req.user.id);
@@ -528,12 +548,23 @@ function parseAIResponse(text, defaultSubject) {
 // ── PROMPT BUILDERS ──────────────────────────────────
 function buildPitchPrompt(venue, tone, language, proposed_date, extra) {
   const band = BAND_PROFILE;
-  const isPortuguese = language === 'portuguese';
-  const lang = isPortuguese ? 'European Portuguese' : 'English';
+  // FIX: support all three UI languages (en/pt/es), not just two
+  const lang = language === 'portuguese' ? 'European Portuguese'
+             : language === 'spanish'    ? 'European Spanish'
+             : 'English';
 
-  const toneDesc = tone === 'professional' ? 'formal but warm'
-    : tone === 'casual' ? 'friendly and direct'
-    : 'energetic and enthusiastic';
+  // FIX: handle all four tone labels the frontend actually exposes.
+  // The old code only knew professional/casual/energetic, so 'friendly',
+  // 'bold', 'humble' all silently fell through.
+  const toneDesc =
+      tone === 'professional' ? 'formal but warm'
+    : tone === 'friendly'     ? 'friendly and direct'
+    : tone === 'bold'         ? 'confident and energetic, but never pushy'
+    : tone === 'humble'       ? 'modest and local, grounded in the Alentejo scene'
+    // legacy aliases (kept for compatibility):
+    : tone === 'casual'       ? 'friendly and direct'
+    : tone === 'energetic'    ? 'energetic and enthusiastic'
+    :                           'formal but warm';
 
   // FIX: the prompt now properly structures the request and avoids
   // leaking the venue's internal fee_bracket to the AI (which could
@@ -584,7 +615,10 @@ BODY:
 
 function buildFollowupPrompt(contact, followupNumber, language) {
   const band = BAND_PROFILE;
-  const lang = language === 'portuguese' ? 'European Portuguese' : 'English';
+  // FIX: support Spanish alongside English/Portuguese
+  const lang = language === 'portuguese' ? 'European Portuguese'
+             : language === 'spanish'    ? 'European Spanish'
+             : 'English';
   const followupText = followupNumber === 1
     ? 'first follow-up (sent 7 days after initial pitch)'
     : followupNumber === 2
