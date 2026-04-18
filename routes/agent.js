@@ -317,6 +317,9 @@ async function callAI(prompt, maxTokens = 4000) {
 
 
 // ── BAND PROFILE (used to personalise every pitch) ─
+// Highlights here feed directly into the AI prompt — anything listed may
+// show up in generated emails. Keep the band's identity separate from the
+// user's professional day job at Centro de Artes / FMM.
 const BAND_PROFILE = {
   name: 'The Ginskeys',
   genre: 'Hard Rock',
@@ -326,7 +329,7 @@ const BAND_PROFILE = {
     'Headlined Tasquinhas do Povo 2023 — sold out, 1,200+ attendance',
     'Performed at Semana da Juventude 2024',
     'Performed at Abril em Odemira 2024',
-    'FMM Sines connection — professional AV/stage background',
+    'Tight live act — professional production standards, no technical hassle for venues',
     'Self-produced singles releasing 2026',
     'Hard rock with Portuguese identity — rare in Alentejo/Algarve circuit',
   ],
@@ -691,6 +694,18 @@ Write a compelling, personalised pitch email that:
 7. Is appropriately concise — venue bookers are busy
 8. Does NOT mention that you are an AI or that this was auto-generated
 
+CRITICAL CONSTRAINTS — do not violate:
+- Represent The Ginskeys ONLY as a band. Never mention, hint at, or reference
+  any day job, employer, workplace, festival role, or professional background
+  of band members outside music.
+- Do NOT reference Festival Músicas do Mundo (FMM), Centro de Artes de Sines,
+  the Câmara de Sines as an employer, or any festival/venue production staff
+  role. The band member who plays guitar has a separate career — it must not
+  appear in a pitch email addressed to potential clients in the same industry.
+- If the band's AV/technical competence is relevant, phrase it as "tight,
+  professional live act" — never as professional production credentials from
+  another job.
+
 Format your response EXACTLY as:
 SUBJECT: [email subject line]
 BODY:
@@ -723,6 +738,9 @@ The follow-up should:
 - Have a clear, easy call-to-action
 - NOT be apologetic or desperate — confident and professional
 - NOT mention that you are an AI
+- NOT reference band members' day jobs, other employers, or any festival/venue
+  production role outside the band itself. Never mention FMM, Centro de Artes
+  de Sines, or similar. The Ginskeys is presented purely as a band.
 
 Format EXACTLY as:
 SUBJECT: [subject line]
