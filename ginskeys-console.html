@@ -2268,12 +2268,12 @@ tr:hover .edit-btn{display:inline}
   <div class="kpi-card" style="--after-bg:var(--blue2)">
     <div class="kpi-label" data-i18n="kpi_ebitda">EBITDA (trailing)</div>
     <div class="kpi-value white" id="kpi-ebitda">€ —</div>
-    <div class="kpi-sub neutral">12-month net</div>
+    <div class="kpi-sub neutral">12m op. income, excl. CapEx</div>
   </div>
   <div class="kpi-card" style="--after-bg:var(--green2)">
     <div class="kpi-label" data-i18n="kpi_fcf">Free Cash Flow</div>
     <div class="kpi-value white" id="kpi-fcf">€ —</div>
-    <div class="kpi-sub neutral" id="kpi-fcf-sub">trailing − capex</div>
+    <div class="kpi-sub neutral" id="kpi-fcf-sub">12m net after CapEx</div>
   </div>
 </div>
 
@@ -4691,6 +4691,9 @@ async function loadBooking() {
     set('bk-confirmed',   stats.confirmed || 0);
     set('bk-pipeline',    '€'+parseFloat(stats.pipeline_value||0).toLocaleString('pt-PT',{minimumFractionDigits:0}));
     set('bk-overdue',     stats.overdue_followups || 0);
+    // Make confirmed pipeline value available to the KPI strip
+    window._confirmedPipeline = parseFloat(stats.pipeline_value || 0);
+    if (typeof updateFinancialKpis === 'function') updateFinancialKpis();
     renderBookingList();
     updateBookingBanner();
   } catch(e) { console.warn('loadBooking:', e.message); }
@@ -10458,7 +10461,9 @@ function updateFinancialKpis(){
   const fi=getFinancialIntelligence();
   const runwayEl=document.getElementById('kpi-runway');
   const runwaySubEl=document.getElementById('kpi-runway-sub');
-  const runwayLabel=fi.runwayMonths===Infinity?'∞':`${fi.runwayMonths.toFixed(1)} mo`;
+  // Human-readable runway: raw months are misleading above ~24mo; convert to years
+  const _rm=fi.runwayMonths;
+  const runwayLabel=_rm===Infinity||_rm>=999?'∞':_rm>=60?`${Math.floor(_rm/12)}+ yr`:_rm>=24?`${(_rm/12).toFixed(1)} yr`:`${_rm.toFixed(1)} mo`;
   if(runwayEl) runwayEl.textContent=runwayLabel;
   if(runwaySubEl) runwaySubEl.textContent=`Op. burn ${fmtMoney(fi.opBurn)}/mo`;
 
@@ -10468,22 +10473,62 @@ function updateFinancialKpis(){
   const alertRunwayBody=document.getElementById('alert-runway-body');
   if(alertRunwayBody) alertRunwayBody.textContent=`Op. burn ${fmtMoney(fi.opBurn)}/mo → runway ${runwayLabel}.`;
 
-  // EBITDA + FCF
+  // ── EBITDA + FCF ───────────────────────────────────────────────────────────
+  // Both metrics share the same trailing-12m window. Three bugs fixed here:
+  //
+  //  BUG A — capex was pulled from `entries` (all-time), not `trailing12`. This
+  //           caused all historic gear purchases to be subtracted from a single
+  //           year of cash flow, producing the wildly-wrong -€1,239 FCF figure.
+  //
+  //  BUG B — `fcf = trailingNet - capex` double-subtracted capex. Equipment
+  //           purchases are already negative amounts inside trailingNet (they are
+  //           ledger expenses). Subtracting them again is an accounting error.
+  //
+  //  BUG C — EBITDA and FCF were set to the same value (trailingNet), making
+  //           two KPI cards say the same thing. Correct relationship is:
+  //           EBITDA = operating income before capex (higher)
+  //           FCF    = net cash after capex  (lower, = trailingNet)
+  //           They diverge by exactly the capex invested in the period, which
+  //           is the correct and informative EBITDA-to-FCF bridge.
+  //
   const trailing12Start=new Date(now);trailing12Start.setFullYear(trailing12Start.getFullYear()-1);
   const trailing12=entries.filter(e=>new Date(e.date)>=trailing12Start);
   const trailingNet=trailing12.reduce((s,e)=>s+e.amount,0);
-  const capex=entries.filter(e=>e.cat==='Equipamento'&&e.amount<0).reduce((s,e)=>s+Math.abs(e.amount),0);
-  const fcf=trailingNet-capex;
+
+  // CapEx scoped to trailing 12m only (fixes Bug A)
+  const trailing12Capex=trailing12
+    .filter(e=>e.cat==='Equipamento'&&e.amount<0)
+    .reduce((s,e)=>s+Math.abs(e.amount),0);
+
+  // EBITDA = profitability before gear investment: add capex back to net
+  // Answers: "what would our operating result be if we hadn't bought equipment?"
+  const ebitda=trailingNet+trailing12Capex;
+
+  // FCF = true trailing-12m net cash. No subtraction needed — capex is already
+  // captured in trailingNet as a negative cash flow (fixes Bugs B & C)
+  const fcf=trailingNet;
+
   const ebitdaEl=document.getElementById('kpi-ebitda');
   const fcfEl=document.getElementById('kpi-fcf');
   const fcfSubEl=document.getElementById('kpi-fcf-sub');
-  if(ebitdaEl) ebitdaEl.textContent=fmtMoney(trailingNet);
-  if(fcfEl) fcfEl.textContent=fmtMoney(fcf);
+  if(ebitdaEl) ebitdaEl.textContent=fmtMoney(ebitda);
+  if(fcfEl)    fcfEl.textContent=fmtMoney(fcf);
 
+  // YTD FCF — ytdNet already accounts for all outflows including capex;
+  // the old `ytdNet - ytdCapex` was the same double-subtraction bug (Bug B)
   const ytdEntries=entries.filter(e=>new Date(e.date).getFullYear()===year);
   const ytdNet=ytdEntries.reduce((s,e)=>s+e.amount,0);
   const ytdCapex=ytdEntries.filter(e=>e.cat==='Equipamento'&&e.amount<0).reduce((s,e)=>s+Math.abs(e.amount),0);
-  if(fcfSubEl) fcfSubEl.textContent=`YTD net: ${fmtMoney(ytdNet-ytdCapex)}`;
+  const capexNote=trailing12Capex>0?`CapEx(12m): ${fmtMoney(trailing12Capex)}`:'No CapEx this period';
+  if(fcfSubEl) fcfSubEl.textContent=`YTD: ${fmtMoney(ytdNet)} | ${capexNote}`;
+
+  // Append confirmed booking pipeline to YTD revenue sub-label when available
+  const _pipeline=window._confirmedPipeline||0;
+  const ytdRevChEl2=document.getElementById('kpi-ytd-rev-change');
+  if(ytdRevChEl2&&_pipeline>0){
+    const existing=ytdRevChEl2.textContent;
+    if(!existing.includes('confirmed')) ytdRevChEl2.textContent=existing+` | ≈${fmtMoney(_pipeline)} confirmed`;
+  }
 }
 // ─── RENDER: STREAMING CHART ──────────────────────────
 let streamChartInst=null;
@@ -12956,7 +13001,12 @@ function updateKpiMemberBreakdown() {
   var totalMemberBal = MEMBER_DEFS.reduce(function(s, m) { return s + (balMap[m.key] || 0); }, 0);
 
   if (balEl) balEl.textContent = fmtMoney(totalMemberBal);
-  if (subEl) { subEl.textContent = t('kpi_member_accounts_sub'); subEl.className = 'kpi-sub neutral'; }
+  // Show the fund/member split so Band Fund > Total Balance is not confusing
+  var bandFundBal = balMap['band_fund'] || 0;
+  var memberNetBal = MEMBER_DEFS.filter(function(m){return m.key!=='band_fund';})
+                                .reduce(function(s,m){return s+(balMap[m.key]||0);},0);
+  var balSubText = 'Fund: '+fmtMoney(bandFundBal)+' | Mbrs: '+fmtMoney(memberNetBal);
+  if (subEl) { subEl.textContent = balSubText; subEl.className = 'kpi-sub neutral'; }
   if (el)    { el.textContent = ''; }
 }
 
@@ -17938,7 +17988,8 @@ function updateSysTicker(dims, total, grade, topPriority, secondPriority) {
 
   // Runway — always show
   const fi = getFinancialIntelligence();
-  const runwayLabel = fi.runwayMonths === Infinity ? '∞' : fi.runwayMonths.toFixed(1) + ' mo';
+  const _rm2=fi.runwayMonths;
+  const runwayLabel = _rm2===Infinity||_rm2>=999?'∞':_rm2>=60?`${Math.floor(_rm2/12)}+ yr`:_rm2>=24?`${(_rm2/12).toFixed(1)} yr`:`${_rm2.toFixed(1)} mo`;
   const runwayCls = fi.runwayMonths < 6 ? 'danger' : fi.runwayMonths < 12 ? 'warn' : 'ok';
   items.push({ cls: runwayCls, text: `Cash runway: ${runwayLabel} at op. burn` });
 
