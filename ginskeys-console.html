@@ -13830,6 +13830,9 @@ function saveEditTxn(){
   t.date=document.getElementById('edit-txn-date').value;
   t.type=type;
   t.desc=document.getElementById('edit-txn-desc').value.trim();
+  // Adjust anchor BEFORE updating the amount — anchor is the final running balance,
+  // so editing this transaction's amount shifts it by the delta (new - old).
+  if (window._ledgerAnchorBalance !== undefined) window._ledgerAnchorBalance += (signed - old.amount);
   t.amount=signed;
   t.cat=document.getElementById('edit-txn-cat').value;
   t.tags=document.getElementById('edit-txn-tags').value.split(',').map(s=>s.trim()).filter(Boolean);
@@ -13846,11 +13849,29 @@ function saveEditTxn(){
   showToast('Transaction saved','ok');
 }
 
-function confirmDeleteTxn(idx){
+async function confirmDeleteTxn(idx){
   if(!can('deleteTransaction')){ showToast('Permission denied','err'); return; }
   const t=LEDGER_DATA[idx];
   if(!t) return;
   if(!confirm('Delete transaction: '+t.desc+' ('+fmtMoney(Math.abs(t.amount))+')?')) return;
+
+  // 1. Persist deletion to backend before touching local state
+  if (t.id && API_BASE && SESSION?.token) {
+    try {
+      await apiDelete('/transactions/' + t.id);
+    } catch(e) {
+      showToast('Delete failed: ' + e.message, 'err');
+      return;
+    }
+  }
+
+  // 2. Adjust the anchor BEFORE recalcBalances — anchor represents the
+  //    final running balance; removing this transaction reduces it by t.amount
+  //    (already signed: +income / -expense). Without this correction the
+  //    formula `running = anchor - totalMov` produces a stale starting point.
+  if (window._ledgerAnchorBalance !== undefined) window._ledgerAnchorBalance -= t.amount;
+
+  // 3. Remove from local cache and recompute
   LEDGER_DATA.splice(idx,1);
   recalcBalances();
   auditLog('TXN_DELETE','Deleted: '+t.desc,'€'+Math.abs(t.amount).toFixed(2),'');
@@ -13859,13 +13880,18 @@ function confirmDeleteTxn(idx){
   updateFinancialKpis();
   updateReconcileStrip();
   renderRevSource();
+
+  // 4. Reload member accounts so band-account balances stay in sync
+  //    (relevant when the deleted transaction was linked to a member via member_key)
+  if (typeof loadMemberAccounts === 'function') await loadMemberAccounts();
+
   showToast('Transaction deleted','warn');
 }
 
-function deleteCurrentTxn(){
+async function deleteCurrentTxn(){
   const idx=parseInt(document.getElementById('edit-txn-idx').value);
   closeEditTxn();
-  confirmDeleteTxn(idx);
+  await confirmDeleteTxn(idx);
 }
 
 function recalcBalances(){
