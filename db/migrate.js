@@ -158,6 +158,7 @@ async function migrate() {
         ('Impostos',     'expense'),
         ('Marketing',    'expense'),
         ('Artwork',      'expense'),
+        ('Ajustes',      'expense'),
         ('Outros',       'expense')
       ON CONFLICT (name) DO NOTHING;
     `);
