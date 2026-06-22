@@ -9439,14 +9439,23 @@ let LEDGER_DATA = (() => {
     {date:'2026-03-15',desc:'Cordas Baixo',type:'expense',cat:'Equipamento',tags:['Equipment'],amount:-24.4},
     {date:'2026-03-18',desc:'Portagens + Ponte',type:'expense',cat:'Transporte',tags:['transport'],amount:-11},
     {date:'2026-03-18',desc:'Distrokid',type:'expense',cat:'Distribuição',tags:['Stream','spotify'],amount:-27.4},
+
+    // ─── RECONCILIATION ADJUSTMENT ──────────────────────────────────────────
+    // The 43 recorded movements above sum to +€1,826.65 from a €0 opening, but the
+    // real cash on hand (Treasury) is €390.57. The €1,436.08 difference is an
+    // undocumented cash loss confirmed during the audit (date/nature unknown —
+    // "sometime in the past year"). Booked as a single transparent loss entry so
+    // the ledger closes at the real cash position: Ledger = Financials = Treasury.
+    // NOTE: amount assumes the live ledger total equals these 43 rows (+€1,826.65).
+    //       If the live total differs, set amount = realCash(390.57) − liveLedgerTotal.
+    {date:'2026-06-22',desc:'Perda de caixa não documentada (ajuste de reconciliação — auditoria)',type:'expense',cat:'Ajustes',tags:['adjustment','reconciliation'],amount:-1436.08},
   ];
 
-  // Balance is calculated so the final total matches the screenshot total (1626.65)
-  const totalMovement = txns.reduce((sum,t)=>sum+t.amount,0);
-  const targetEndBalance = 1626.65;
-  const startBalance = parseFloat((targetEndBalance - totalMovement).toFixed(2));
-
-  let running = startBalance;
+  // Opening balance is €0 (the band started with no funds). The running balance
+  // is computed honestly forward from zero; with the adjustment above, the final
+  // balance equals the Treasury cash position with no artificial anchor.
+  const OPENING_BALANCE = 0;
+  let running = OPENING_BALANCE;
   const ordered = txns
     .sort((a,b)=>a.date.localeCompare(b.date))
     .map(t=>{
@@ -12884,10 +12893,12 @@ setInterval(updateSessionExp,30000);
 function mapApiTxn(rows) {
   // Sort oldest first to calculate running balance
   const sorted = [...rows].sort((a,b) => new Date(a.date) - new Date(b.date));
-  // Determine start balance so final balance matches DB total
-  const totalMovement = sorted.reduce((s,t) => s + (t.type==='income' ? parseFloat(t.amount) : -parseFloat(t.amount)), 0);
-  const latestBalance = parseFloat(rows[0]?.balance ?? 1626.65);
-  let running = parseFloat((latestBalance - totalMovement).toFixed(2));
+  // Opening balance is €0 — the running balance is computed honestly forward from
+  // zero. Provided the ledger is complete (including the reconciliation adjustment
+  // for any cash loss), the final running balance equals the real cash position.
+  // No hardcoded anchor: a back-computed "end balance" hid undocumented losses.
+  const OPENING_BALANCE = 0;
+  let running = OPENING_BALANCE;
 
   const mapped = sorted.map((t, i) => {
     const amt = t.type === 'income' ? parseFloat(t.amount) : -parseFloat(t.amount);
@@ -12912,8 +12923,8 @@ function mapApiTxn(rows) {
   });
   // Most recent first for ledger view
   const result = mapped.reverse();
-  // Store anchor balance for recalcBalances
-  if (result.length) window._ledgerAnchorBalance = result[0].balance;
+  // Store the opening balance for recalcBalances (forward computation from €0)
+  window._ledgerOpeningBalance = OPENING_BALANCE;
   return result;
 }
 
@@ -13880,9 +13891,6 @@ function saveEditTxn(){
   t.date=document.getElementById('edit-txn-date').value;
   t.type=type;
   t.desc=document.getElementById('edit-txn-desc').value.trim();
-  // Adjust anchor BEFORE updating the amount — anchor is the final running balance,
-  // so editing this transaction's amount shifts it by the delta (new - old).
-  if (window._ledgerAnchorBalance !== undefined) window._ledgerAnchorBalance += (signed - old.amount);
   t.amount=signed;
   t.cat=document.getElementById('edit-txn-cat').value;
   t.tags=document.getElementById('edit-txn-tags').value.split(',').map(s=>s.trim()).filter(Boolean);
@@ -13915,13 +13923,7 @@ async function confirmDeleteTxn(idx){
     }
   }
 
-  // 2. Adjust the anchor BEFORE recalcBalances — anchor represents the
-  //    final running balance; removing this transaction reduces it by t.amount
-  //    (already signed: +income / -expense). Without this correction the
-  //    formula `running = anchor - totalMov` produces a stale starting point.
-  if (window._ledgerAnchorBalance !== undefined) window._ledgerAnchorBalance -= t.amount;
-
-  // 3. Remove from local cache and recompute
+  // 2. Remove from local cache and recompute running balances forward from €0
   LEDGER_DATA.splice(idx,1);
   recalcBalances();
   auditLog('TXN_DELETE','Deleted: '+t.desc,'€'+Math.abs(t.amount).toFixed(2),'');
@@ -13945,13 +13947,12 @@ async function deleteCurrentTxn(){
 }
 
 function recalcBalances(){
-  // Sort ascending by date, recompute running balance from scratch
+  // Sort ascending by date, recompute running balance forward from the opening balance.
+  // Opening balance is €0; the closing balance is therefore the true sum of all
+  // movements (which, with a complete ledger, equals the real cash position).
   const sorted=[...LEDGER_DATA].sort((a,b)=>a.date.localeCompare(b.date));
-  // Use 0 as starting balance — running balance is computed from net movement
-  const totalMov=sorted.reduce((s,t)=>s+t.amount,0);
-  // Anchor to latest known balance from API if available, else compute from net
-  const anchor = (window._ledgerAnchorBalance !== undefined) ? window._ledgerAnchorBalance : 0;
-  let running=parseFloat((anchor-totalMov).toFixed(2));
+  const opening = (window._ledgerOpeningBalance !== undefined) ? window._ledgerOpeningBalance : 0;
+  let running=opening;
   sorted.forEach(t=>{ running=parseFloat((running+t.amount).toFixed(2)); t.balance=running; });
   // Restore reverse order for display
   LEDGER_DATA.sort((a,b)=>b.date.localeCompare(a.date)||b.balance-a.balance);
