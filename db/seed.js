@@ -54,6 +54,13 @@ const RAW_TXNS = [
   { date:'2026-03-15', desc:'Cordas Baixo',                 type:'expense', cat:'Equipamento', tags:[],              amount: 24.40  },
   { date:'2026-03-18', desc:'Portagens + Ponte',            type:'expense', cat:'Transporte',  tags:['transport'],   amount: 11     },
   { date:'2026-03-18', desc:'Distrokid',                    type:'expense', cat:'Distribuição',tags:['distribution'],amount: 27.40  },
+  // ─── RECONCILIATION ADJUSTMENT (audit) ──────────────────────────────────
+  // Recorded movements above sum to +€1,826.65 from a €0 opening, but real cash
+  // (Treasury) is €390.57. The €1,436.08 difference is an undocumented cash loss
+  // confirmed during the audit — exact date/nature unknown ("sometime in the past
+  // year"). Booked as a single transparent loss entry so the ledger closes at the
+  // real cash position: Ledger = Financials = Treasury = €390.57.
+  { date:'2026-06-22', desc:'Perda de caixa não documentada (ajuste de reconciliação — auditoria)', type:'expense', cat:'Ajustes', tags:['adjustment','reconciliation'], amount: 1436.08 },
 ];
 
 async function seed() {
@@ -129,13 +136,11 @@ async function seed() {
       console.log('ℹ️  Transactions already exist — skipping transaction seed.');
     } else {
       const sorted = [...RAW_TXNS].sort((a, b) => a.date.localeCompare(b.date));
-      const TARGET_END_BALANCE = 1626.65;
-      const totalMovement = sorted.reduce((s, t) => s + (t.type === 'income' ? t.amount : -t.amount), 0);
-      let running = parseFloat((TARGET_END_BALANCE - totalMovement).toFixed(2));
+      // No anchored balance: transactions store positive amounts with `type`
+      // indicating direction. The running/closing balance is derived downstream
+      // (frontend, reports) by summing movements from a €0 opening — never hardcoded.
 
       for (const t of sorted) {
-        const signed = t.type === 'income' ? t.amount : -t.amount;
-        running = parseFloat((running + signed).toFixed(2));
         const catKey = t.cat.toLowerCase();
         const catId  = catMap[catKey] || null;
 
