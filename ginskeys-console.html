@@ -8883,7 +8883,7 @@ function _initAll_old_1() {
       <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid var(--accent)">
         <div style="display:flex;flex-direction:column;gap:4px">
           <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--text);letter-spacing:.12em">THE GINSKEYS</div>
-          <div style="font-size:10px;color:var(--muted2);letter-spacing:.1em"><span data-i18n="rider_subtitle">TECHNICAL RIDER · HARD ROCK · 4 PIECE · SINES, PORTUGAL · v2.0 2026</span></div>
+          <div style="font-size:10px;color:var(--muted2);letter-spacing:.1em"><span id="rider-subtitle">TECHNICAL RIDER · HARD ROCK · 4 PIECE · SINES, PORTUGAL · v2.0 2026</span></div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
           <!-- Show picker + New Show inline -->
@@ -11439,6 +11439,7 @@ function setLang(lang) {
   ACTIVE_LANG = lang;
   localStorage.setItem('gk_lang', lang);
   applyTranslations();
+  if (typeof updateRiderSubtitle === 'function') updateRiderSubtitle();
   if (LEDGER_DATA.length) {
     renderLedgerRows(LEDGER_DATA.slice(0,8), 'dash-ledger-body', false);
     renderLedgerRows(LEDGER_DATA, 'full-ledger-body', true);
@@ -14713,6 +14714,60 @@ function populateRiderShowPicker() {
     });
 }
 
+// ── DYNAMIC RIDER SUBTITLE ───────────────────────────────
+// City + date follow the selected show; member count follows the live lineup.
+function _riderFmtDate(raw) {
+  if (!raw) return '';
+  var d = new Date(raw);
+  var locale = (ACTIVE_LANG === 'pt') ? 'pt-PT' : 'en-GB';
+  return !isNaN(d.getTime())
+    ? d.toLocaleDateString(locale, {day:'2-digit', month:'2-digit', year:'numeric'})
+    : String(raw).slice(0, 10);
+}
+
+function updateRiderSubtitle() {
+  var el = document.getElementById('rider-subtitle');
+  if (!el) return;
+  var isPT = (ACTIVE_LANG === 'pt');
+
+  // Number of elements = live lineup row count.
+  var n = _riderMemberCount || _riderLineupDefaults.length;
+  var unit = isPT ? (n === 1 ? 'ELEMENTO' : 'ELEMENTOS') : 'PIECE';
+
+  // Resolve the currently selected show (if any).
+  var show = null;
+  if (_riderCurrentShowId && typeof PROD_SHOWS !== 'undefined' && PROD_SHOWS) {
+    show = PROD_SHOWS.find(function(s){ return String(s.id) === String(_riderCurrentShowId); });
+  }
+
+  var loc, tail;
+  if (show) {
+    loc  = (show.venue_address || show.venue_name || 'Sines, Portugal');
+    tail = _riderFmtDate(show.show_date) || 'v2.0 2026';
+  } else {
+    // Global Template — fall back to the band's home base + version tag.
+    loc  = 'Sines, Portugal';
+    tail = 'v2.0 2026';
+  }
+
+  var head = isPT ? 'RIDER TÉCNICO · HARD ROCK' : 'TECHNICAL RIDER · HARD ROCK';
+  el.textContent = head + ' · ' + n + ' ' + unit + ' · ' + loc.toUpperCase() + ' · ' + tail;
+}
+
+// Resolves the selected show's city + date for the print/PDF and copy-text headers.
+// Falls back to the band's home base + today's date for the Global Template.
+function _riderPrintMeta() {
+  var show = null;
+  if (_riderCurrentShowId && typeof PROD_SHOWS !== 'undefined' && PROD_SHOWS) {
+    show = PROD_SHOWS.find(function(s){ return String(s.id) === String(_riderCurrentShowId); });
+  }
+  var loc = show ? (show.venue_address || show.venue_name || 'Sines, Portugal') : 'Sines, Portugal';
+  var src = (show && show.show_date) ? new Date(show.show_date) : new Date();
+  if (isNaN(src.getTime())) src = new Date();
+  var dateStr = src.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}).toUpperCase();
+  return { loc: loc, locUpper: loc.toUpperCase(), dateStr: dateStr, hasShow: !!show };
+}
+
 function onRiderShowChange() {
   var picker = document.getElementById('rider-show-picker');
   _riderCurrentShowId = picker && picker.value ? picker.value : null;
@@ -14765,12 +14820,14 @@ async function loadRiderData() {
       var val = data[el.dataset.riderKey];
       if (val !== undefined && val !== '') el.innerHTML = val;
     });
+    updateRiderSubtitle();
     setRiderStatus(t('rider_click_edit'), 'var(--green3)');
   } catch(e) {
     console.warn('Rider load failed', e);
     // Render defaults even if load fails
     riderRenderMixes(null);
     riderRenderLineup(null);
+    updateRiderSubtitle();
     setRiderStatus(t('rider_click_edit'), 'var(--green3)');
   }
 }
@@ -15131,6 +15188,7 @@ function riderAddMember() {
   var tbody = document.getElementById('rider-lineup-body');
   if (tbody) tbody.appendChild(riderBuildMemberRow(_riderMemberCount, '', '', ''));
   saveRiderField('lineup_count', String(_riderMemberCount));
+  updateRiderSubtitle();
   // Focus the name cell of the new row
   var row = document.getElementById('rider-member-row-' + _riderMemberCount);
   if (row) { var el = row.querySelector('[data-rider-key]'); if (el) el.focus(); }
@@ -15155,6 +15213,7 @@ function riderRemoveMember(n) {
     if (btn) btn.setAttribute('onclick', 'riderRemoveMember(' + num + ')');
   });
   saveRiderField('lineup_count', String(_riderMemberCount));
+  updateRiderSubtitle();
 }
 
 // ── RIDER NEW SHOW MODAL ─────────────────────────────────
@@ -15191,6 +15250,7 @@ async function riderCreateShow() {
     _riderCurrentShowId = show.id;
     var picker = document.getElementById('rider-show-picker');
     if (picker) picker.value = show.id;
+    await loadRiderData();
     riderCloseModal();
     showToast('Show created — rider now linked to ' + (venue || date), 'ok');
     setRiderStatus('New show — start editing to save fields', 'var(--amber2)');
@@ -15230,7 +15290,8 @@ function printRider() {
 
   /* ── Dynamic data ── */
   var memberCount = document.querySelectorAll('#rider-lineup-body tr').length || 4;
-  var dateStr = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
+  var _pm = _riderPrintMeta();
+  var dateStr = _pm.dateStr;
   var inputCount = document.querySelectorAll('#rider-input-rows .input-row:not(.hdr-row)').length || _riderRowCount;
   var monCount = _riderMixCount || 4;
 
@@ -15398,7 +15459,7 @@ function printRider() {
     '<img class="hdr-logo" src="'+GINSKEYS_LOGO_B64+'" alt="The Ginskeys">'+
     '<div class="hdr-info">'+
       '<div class="hdr-title">TECHNICAL RIDER</div>'+
-      '<div class="hdr-sub"><b>HARD ROCK</b> &nbsp;·&nbsp; '+memberCount+' PIECE &nbsp;·&nbsp; SINES, PORTUGAL</div>'+
+      '<div class="hdr-sub"><b>HARD ROCK</b> &nbsp;·&nbsp; '+memberCount+' PIECE &nbsp;·&nbsp; '+_pm.locUpper+'</div>'+
     '</div>'+
     '<div class="hdr-date">'+dateStr+'<br><span style="font-size:7px;color:#555">v2.0</span></div>'+
   '</div>'+
@@ -15461,7 +15522,8 @@ function copyRiderText() {
   var monitorCount = _riderMixCount || 4;
   const lines = [
     'THE GINSKEYS — TECHNICAL RIDER',
-    'Hard Rock · ' + lineupLines.length + ' piece · Sines, Portugal',
+    'Hard Rock · ' + lineupLines.length + ' piece · ' + _riderPrintMeta().loc,
+    'Date: ' + _riderPrintMeta().dateStr,
     '',
     'BAND LINEUP:',
     ...lineupLines,
@@ -16889,7 +16951,8 @@ function printStagePlot() {
   var sw = (document.getElementById('splot-stage-w') || {}).value || 12;
   var sd = (document.getElementById('splot-stage-d') || {}).value || 8;
   var memberCount = document.querySelectorAll('#rider-lineup-body tr').length || 4;
-  var dateStr = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
+  var _pm = _riderPrintMeta();
+  var dateStr = _pm.dateStr;
 
   var w = window.open('', '_blank');
   w.document.write('<!DOCTYPE html><html><head><title>The Ginskeys — Stage Plot</title>'+
@@ -16943,7 +17006,7 @@ function printStagePlot() {
     '<img class="hdr-logo" src="'+GINSKEYS_LOGO_B64+'" alt="The Ginskeys">'+
     '<div class="hdr-info">'+
       '<div class="hdr-title">STAGE PLOT</div>'+
-      '<div class="hdr-sub"><b>HARD ROCK</b> &nbsp;·&nbsp; '+memberCount+' PIECE &nbsp;·&nbsp; SINES, PORTUGAL</div>'+
+      '<div class="hdr-sub"><b>HARD ROCK</b> &nbsp;·&nbsp; '+memberCount+' PIECE &nbsp;·&nbsp; '+_pm.locUpper+'</div>'+
     '</div>'+
     '<div class="hdr-right">'+
       '<div class="hdr-date">'+dateStr+'</div>'+
