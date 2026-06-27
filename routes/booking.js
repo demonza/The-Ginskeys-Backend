@@ -109,28 +109,48 @@ router.put('/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) =>
     );
     const booking = rows[0];
 
-    // ── Auto-create or update tour on stage → confirmed ────────────────
-    const newStage = stage || prev.stage;
+    // ── Keep the linked Tour record in sync with the booking lifecycle ──
+    //
+    // The booking pipeline (cold → … → confirmed → completed / rejected) is the
+    // single source of truth. Whenever a booking reaches a "real gig" stage we
+    // make sure a Tour row exists, and we ALWAYS mirror the booking's lifecycle
+    // onto the tour's status so Tour P&L never shows a finished gig as "planned"
+    // or keeps a dead deal alive as a ghost tour.
+    const newStage     = stage || prev.stage;
     const wasConfirmed = ['confirmed', 'completed'].includes(prev.stage);
     const nowConfirmed = ['confirmed', 'completed'].includes(newStage);
+
+    // Map a booking stage onto the equivalent tour lifecycle status.
+    const tourStatusFor = (s) =>
+      s === 'completed' ? 'completed' :
+      s === 'rejected'  ? 'cancelled' :
+      'planned';
+    const desiredTourStatus = tourStatusFor(newStage);
+
+    // Normalise dates to YYYY-MM-DD so a string from the request body never
+    // compares unequal to a Date object coming back from Postgres (which used
+    // to make every save fire a needless UPDATE).
+    const toDateStr = (d) => (d ? new Date(d).toISOString().slice(0, 10) : null);
+    const prevDateStr = toDateStr(prev.date);
+    const newDateStr  = date ? toDateStr(date) : prevDateStr;
 
     let tourRow = null;
 
     if (nowConfirmed && !wasConfirmed && !prev.tour_id) {
-      // Transitioning INTO confirmed for the first time — create a tour
-      const tourName = booking.name;
-      const tourDate = booking.date || null;
-      const tourCity = booking.location || null;
-      const tourBudget = booking.fee_eur || null;
-
+      // First transition into a real gig — create the tour.
       const { rows: newTour } = await client.query(
         `INSERT INTO tours (name, start_date, end_date, budget, status, notes)
-         VALUES ($1, $2, $2, $3, 'planned', $4) RETURNING *`,
-        [tourName, tourDate, tourBudget, tourCity ? `Location: ${tourCity}` : null]
+         VALUES ($1, $2, $2, $3, $4, $5) RETURNING *`,
+        [
+          booking.name,
+          booking.date || null,
+          booking.fee_eur || null,
+          desiredTourStatus,
+          booking.location ? `Location: ${booking.location}` : null,
+        ]
       );
       tourRow = newTour[0];
 
-      // Link the booking back to the tour
       await client.query(
         'UPDATE booking_contacts SET tour_id = $1 WHERE id = $2',
         [tourRow.id, booking.id]
@@ -140,20 +160,29 @@ router.put('/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) =>
       await writeAudit(req, 'TOUR_AUTO_CREATE', {
         entityType: 'tour',
         entityId: tourRow.id,
-        details: `Auto-created from booking: ${tourName}`,
+        details: `Auto-created from booking: ${booking.name}`,
       });
-    } else if (nowConfirmed && prev.tour_id) {
-      // Already linked — sync the tour with any updated booking fields
+    } else if (prev.tour_id) {
+      // Already linked — sync any changed booking fields AND the lifecycle
+      // status onto the tour, even when the booking leaves the confirmed set
+      // (e.g. confirmed → rejected should cancel the tour).
       const updateFields = [];
       const updateParams = [];
       let p = 1;
 
-      if (name  && name  !== prev.name)  { updateFields.push(`name=$${p++}`);       updateParams.push(name); }
-      if (date  && date  !== prev.date)  { updateFields.push(`start_date=$${p++}`); updateParams.push(date);
-                                           updateFields.push(`end_date=$${p++}`);   updateParams.push(date); }
+      if (name && name !== prev.name) {
+        updateFields.push(`name=$${p++}`); updateParams.push(name);
+      }
+      if (newDateStr && newDateStr !== prevDateStr) {
+        updateFields.push(`start_date=$${p++}`); updateParams.push(newDateStr);
+        updateFields.push(`end_date=$${p++}`);   updateParams.push(newDateStr);
+      }
       if (fee_eur !== undefined && parseFloat(fee_eur) !== parseFloat(prev.fee_eur || 0)) {
-        updateFields.push(`budget=$${p++}`);
-        updateParams.push(parseFloat(fee_eur));
+        updateFields.push(`budget=$${p++}`); updateParams.push(parseFloat(fee_eur));
+      }
+      // Always reconcile status when the stage actually changed.
+      if (newStage !== prev.stage) {
+        updateFields.push(`status=$${p++}`); updateParams.push(desiredTourStatus);
       }
 
       if (updateFields.length > 0) {
@@ -165,7 +194,6 @@ router.put('/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) =>
         );
         tourRow = updatedTour[0] || null;
       } else {
-        // Just return the existing tour
         const { rows: existingTour } = await client.query(
           'SELECT * FROM tours WHERE id = $1', [prev.tour_id]
         );
