@@ -2171,6 +2171,7 @@ tr:hover .edit-btn{display:inline}
     <div class="tb-tab active" data-view="mgmt" onclick="switchView('mgmt',this)" id="tab-mgmt">◉ Overview</div>
     <div class="tb-tab" data-view="alerts" onclick="switchView('alerts',this)" id="tab-alerts">⚡ Alerts <span class="tab-badge">3</span></div>
     <div class="tb-tab" data-view="agent" onclick="switchView('agent',this)" id="tab-agent" style="color:var(--accent)">✦ Agent</div>
+    <div class="tb-tab" data-view="greenroom" onclick="switchView('greenroom',this)" id="tab-greenroom" style="color:var(--green3)">☻ Green Room <span class="tab-badge" id="greenroom-badge" style="display:none;background:var(--green3)">0</span></div>
     <div class="tb-nav-sep"></div>
     <!-- MONEY -->
     <div class="tb-tab" data-view="dashboard" onclick="switchView('dashboard',this)" id="tab-dashboard">$ Financials</div>
@@ -2505,26 +2506,9 @@ tr:hover .edit-btn{display:inline}
       <span class="panel-shortcut">F5</span>
     </div>
     <div class="panel-body">
-       <div class="alert-card info">
-        <div class="alert-card-title">Potential booking at Centro de Artes de Sines</div>
-        <div class="alert-card-body">Potential booking for an album presentation at the Centro de Auditorium of Centro de Artes de Sines.</div>
-        <div class="alert-ts">Today, 23:11 GMT</div>
-      </div>
-      <div class="alert-card danger">
-        <div class="alert-card-title">Open a bank account!</div>
-        <div class="alert-card-body">You have not yet opened a bank account. Please do so as soon as possible.</div>
-        <div class="alert-ts">Today, 08:42 GMT</div>
-      </div>
-      <div class="alert-card warn">
-        <div class="alert-card-title">Open up a company?</div>
-        <div class="alert-card-body">You have not yet registered a company. Please do so as soon as possible.</div>
-        <div class="alert-ts">Yesterday, 22:15 GMT</div>
-      </div>
-      <div class="alert-card warn">
-        <div class="alert-card-title">Cash Runway</div>
-        <div class="alert-card-body" id="alert-runway-body">At current burn, runway is —.</div>
-        <div class="alert-ts">Mar 16, 09:00 GMT</div>
-      </div>
+       <div id="dash-alerts-feed" style="display:flex;flex-direction:column;gap:8px;padding:4px 0">
+         <div style="padding:18px;text-align:center;color:var(--muted3);font-family:var(--mono);font-size:9px">Loading live alerts…</div>
+       </div>
     </div>
   </div>
 
@@ -4646,6 +4630,131 @@ tr:hover .edit-btn{display:inline}
 
   </div>
 </div>
+
+<!-- ═ GREEN ROOM (band chat) ═══════════════════════════ -->
+<div id="view-greenroom" class="view new-view" style="display:none">
+<style>
+  #view-greenroom{--gr-bubble:var(--bg3);--gr-bubble-me:rgba(0,230,118,.10)}
+  .gr-shell{display:flex;flex-direction:column;height:100%;min-height:0;background:
+    radial-gradient(120% 80% at 50% -10%, rgba(0,230,118,.05), transparent 60%),var(--bg1)}
+  .gr-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;
+    border-bottom:1px solid var(--border1);background:var(--bg2)}
+  .gr-title{font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.04em;color:var(--text);display:flex;align-items:center;gap:8px}
+  .gr-title .dot{width:7px;height:7px;border-radius:50%;background:var(--green3);box-shadow:0 0 8px var(--green3);animation:grpulse 2.4s infinite}
+  @keyframes grpulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .gr-presence{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;color:var(--muted3)}
+  .gr-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-family:var(--display);font-size:10px;font-weight:700;color:#08110b;border:1px solid rgba(255,255,255,.12)}
+  .gr-pins{padding:6px 16px;border-bottom:1px solid var(--border1);background:rgba(255,180,0,.04);display:none}
+  .gr-feed{flex:1;min-height:0;overflow-y:auto;padding:18px 16px 10px;display:flex;flex-direction:column;gap:2px;scroll-behavior:smooth}
+  .gr-daysep{align-self:center;font-family:var(--mono);font-size:8px;letter-spacing:.16em;color:var(--muted3);
+    text-transform:uppercase;margin:12px 0 6px;padding:2px 12px;border:1px solid var(--border2);border-radius:20px;background:var(--bg2)}
+  .gr-msg{display:flex;gap:10px;padding:5px 6px;border-radius:6px;align-items:flex-start}
+  .gr-msg:hover{background:rgba(255,255,255,.018)}
+  .gr-msg.cont{padding-top:1px}
+  .gr-msg.cont .gr-msg-av{visibility:hidden;height:0}
+  .gr-msg-av{flex-shrink:0;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-family:var(--display);font-size:12px;font-weight:700;color:#08110b;margin-top:2px}
+  .gr-msg-main{flex:1;min-width:0}
+  .gr-msg-head{display:flex;align-items:baseline;gap:8px}
+  .gr-msg-name{font-family:var(--display);font-size:12px;font-weight:700;color:var(--text)}
+  .gr-msg-role{font-family:var(--mono);font-size:7px;letter-spacing:.12em;color:var(--muted3);text-transform:uppercase;
+    border:1px solid var(--border2);border-radius:3px;padding:0 4px}
+  .gr-msg-time{font-family:var(--mono);font-size:8px;color:var(--muted3)}
+  .gr-msg-body{font-size:12.5px;line-height:1.55;color:var(--text2);word-wrap:break-word;white-space:pre-wrap;margin-top:1px}
+  .gr-msg-body a{color:var(--blue2)}
+  .gr-msg-actions{display:none;gap:4px;margin-left:auto;align-self:center}
+  .gr-msg:hover .gr-msg-actions{display:flex}
+  .gr-iconbtn{background:var(--bg2);border:1px solid var(--border2);color:var(--muted2);font-size:11px;
+    width:24px;height:22px;border-radius:4px;cursor:pointer;line-height:1}
+  .gr-iconbtn:hover{color:var(--text);border-color:var(--green3)}
+  .gr-reacts{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+  .gr-react{display:inline-flex;align-items:center;gap:3px;font-size:11px;background:var(--bg2);
+    border:1px solid var(--border2);border-radius:11px;padding:1px 7px;cursor:pointer;font-family:var(--mono)}
+  .gr-react.mine{border-color:var(--green3);background:rgba(0,230,118,.10);color:var(--green3)}
+  .gr-react .n{font-size:9px;color:var(--muted2)}
+  /* embed card */
+  .gr-embed{margin-top:6px;border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:6px;
+    background:var(--bg2);overflow:hidden;max-width:420px;cursor:pointer;transition:border-color .12s}
+  .gr-embed:hover{border-color:var(--green3)}
+  .gr-embed-top{display:flex;align-items:center;gap:7px;padding:7px 10px;border-bottom:1px solid var(--border1)}
+  .gr-embed-kind{font-family:var(--mono);font-size:7px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .gr-embed-title{font-family:var(--display);font-size:12px;font-weight:700;color:var(--text)}
+  .gr-embed-rows{padding:6px 10px 9px;display:grid;grid-template-columns:1fr 1fr;gap:3px 14px}
+  .gr-embed-row{display:flex;justify-content:space-between;gap:8px;font-size:9.5px}
+  .gr-embed-row span:first-child{color:var(--muted3)}
+  .gr-embed-row span:last-child{color:var(--text2);text-align:right}
+  .gr-embed-open{font-family:var(--mono);font-size:8px;color:var(--green3);padding:0 10px 8px;letter-spacing:.1em}
+  /* composer */
+  .gr-compose{border-top:1px solid var(--border1);background:var(--bg2);padding:10px 14px}
+  .gr-attach-preview{display:none;align-items:center;gap:8px;margin-bottom:8px;padding:7px 10px;
+    background:var(--bg3);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:6px}
+  .gr-attach-preview .x{margin-left:auto;cursor:pointer;color:var(--muted3);font-size:13px}
+  .gr-compose-row{display:flex;align-items:flex-end;gap:8px}
+  .gr-input{flex:1;background:var(--bg1);border:1px solid var(--border2);border-radius:8px;color:var(--text);
+    font-family:var(--sans,inherit);font-size:13px;line-height:1.5;padding:9px 12px;resize:none;outline:none;max-height:140px}
+  .gr-input:focus{border-color:var(--green3)}
+  .gr-send{background:var(--green3);color:#06120a;border:none;border-radius:8px;font-family:var(--display);
+    font-weight:700;font-size:12px;letter-spacing:.04em;padding:0 16px;height:38px;cursor:pointer}
+  .gr-send:disabled{opacity:.4;cursor:default}
+  .gr-attbtn{background:var(--bg3);border:1px solid var(--border2);color:var(--muted2);border-radius:8px;
+    height:38px;width:42px;font-size:16px;cursor:pointer}
+  .gr-attbtn:hover{color:var(--green3);border-color:var(--green3)}
+  /* picker */
+  .gr-picker{position:absolute;left:0;right:0;bottom:62px;margin:0 14px;background:var(--bg2);
+    border:1px solid var(--green3);border-radius:10px;box-shadow:0 -8px 30px rgba(0,0,0,.5);
+    display:none;flex-direction:column;max-height:340px;overflow:hidden;z-index:30}
+  .gr-picker-tabs{display:flex;gap:0;border-bottom:1px solid var(--border1)}
+  .gr-picker-tab{flex:1;text-align:center;font-family:var(--mono);font-size:9px;letter-spacing:.08em;
+    text-transform:uppercase;padding:8px 4px;cursor:pointer;color:var(--muted3);border-bottom:2px solid transparent}
+  .gr-picker-tab.active{color:var(--green3);border-bottom-color:var(--green3)}
+  .gr-picker-list{overflow-y:auto;padding:6px}
+  .gr-pick-item{padding:8px 10px;border-radius:6px;cursor:pointer;border:1px solid transparent}
+  .gr-pick-item:hover{background:var(--bg3);border-color:var(--border2)}
+  .gr-pick-name{font-family:var(--display);font-size:12px;font-weight:700;color:var(--text)}
+  .gr-pick-sub{font-size:9px;color:var(--muted3);margin-top:1px}
+  .gr-empty{padding:40px 20px;text-align:center;color:var(--muted3);font-size:11px;font-family:var(--mono)}
+</style>
+<div class="gr-shell">
+  <div class="gr-top">
+    <div class="gr-title"><span class="dot"></span>THE GREEN ROOM
+      <span style="font-family:var(--mono);font-size:8px;color:var(--muted3);letter-spacing:.12em;font-weight:400">· BAND COMMS</span>
+    </div>
+    <div class="gr-presence" id="gr-presence"><span style="color:var(--muted3)">connecting…</span></div>
+  </div>
+  <div class="gr-pins" id="gr-pins"></div>
+  <div class="gr-feed" id="gr-feed">
+    <div class="gr-empty">Loading the room…</div>
+  </div>
+  <div style="position:relative">
+    <div class="gr-picker" id="gr-picker">
+      <div class="gr-picker-tabs">
+        <div class="gr-picker-tab active" data-pk="booking" onclick="grPickerTab('booking',this)">◎ Bookings</div>
+        <div class="gr-picker-tab" data-pk="show" onclick="grPickerTab('show',this)">🎚 Shows</div>
+        <div class="gr-picker-tab" data-pk="release" onclick="grPickerTab('release',this)">◈ Releases</div>
+        <div class="gr-picker-tab" data-pk="invoice" onclick="grPickerTab('invoice',this)">⎙ Invoices</div>
+        <div class="gr-picker-tab" data-pk="tour" onclick="grPickerTab('tour',this)">↗ Tours</div>
+      </div>
+      <div class="gr-picker-list" id="gr-picker-list"></div>
+    </div>
+    <div class="gr-compose">
+      <div class="gr-attach-preview" id="gr-attach-preview">
+        <span style="font-family:var(--mono);font-size:8px;letter-spacing:.14em;color:var(--accent)" id="gr-attach-kind"></span>
+        <span style="font-size:11px;color:var(--text);font-weight:700" id="gr-attach-label"></span>
+        <span class="x" onclick="grClearAttach()">✕</span>
+      </div>
+      <div class="gr-compose-row">
+        <button class="gr-attbtn" title="Attach from the console" onclick="grTogglePicker()">📎</button>
+        <textarea class="gr-input" id="gr-input" rows="1" placeholder="Message the band…  (Enter to send, Shift+Enter for newline)"
+          oninput="grAutogrow(this)" onkeydown="grKey(event)"></textarea>
+        <button class="gr-send" id="gr-send" onclick="grSend()">Send ▸</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<!-- /greenroom -->
+
 
 
 <script>
@@ -8782,6 +8891,9 @@ async function loadAllGrowthData() {
     loadSetlists().then(()=>{ updateProductionBanner(); }),
     loadTours(),
   ]);
+  // Alerts depend on booking/release/show/invoice data that just finished
+  // loading — recompute so the badge and feeds reflect live state.
+  if (typeof renderFullAlerts === 'function') renderFullAlerts();
 }
 
 function _initAll_old_1() {
@@ -11198,6 +11310,76 @@ function computeAlerts() {
     }
   }
 
+  // ── 5b. UPCOMING SHOW WITH NO SETLIST (prep risk) ────
+  if (typeof PROD_SHOWS !== 'undefined' && PROD_SHOWS.length) {
+    const setlists = (typeof PROD_SETLISTS !== 'undefined') ? PROD_SETLISTS : [];
+    const soonShows = PROD_SHOWS.filter(s => {
+      if (!s.show_date) return false;
+      const days = Math.round((new Date(s.show_date) - now) / 86400000);
+      return days >= 0 && days <= 14;
+    });
+    const unprepared = soonShows.filter(s => !setlists.some(sl => sl.show_id === s.id));
+    if (unprepared.length > 0) {
+      const next = unprepared.reduce((a, b) => new Date(a.show_date) < new Date(b.show_date) ? a : b);
+      const days = Math.round((new Date(next.show_date) - now) / 86400000);
+      alerts.push({
+        severity: days <= 5 ? 'crit' : 'warn',
+        title:    `Show prep: ${unprepared.length} upcoming ${unprepared.length > 1 ? 'shows have' : 'show has'} no setlist`,
+        body:     `${next.venue_name || 'Show'} is in ${days} ${days === 1 ? 'day' : 'days'} with no setlist linked. Lock the running order and tunings before load-in.`,
+        ts:       `Next: ${fmtD(next.show_date)} · ${days}d out`,
+      });
+    }
+  }
+
+  // ── 5c. REVENUE CLIFF — no confirmed gig in next 60 days
+  if (typeof BOOKING_DATA !== 'undefined') {
+    const horizon = new Date(now); horizon.setDate(horizon.getDate() + 60);
+    const upcomingConfirmed = BOOKING_DATA.filter(b =>
+      b.stage === 'confirmed' && b.date && new Date(b.date) >= now && new Date(b.date) <= horizon
+    );
+    if (upcomingConfirmed.length === 0) {
+      const pipeline = BOOKING_DATA.filter(b => ['contacted','negotiating'].includes(b.stage)).length;
+      alerts.push({
+        severity: 'warn',
+        title:    `Revenue cliff — no confirmed show in the next 60 days`,
+        body:     pipeline > 0
+          ? `${pipeline} ${pipeline > 1 ? 'leads are' : 'lead is'} in the pipeline but nothing is confirmed yet. Push the warmest one to close.`
+          : `Nothing confirmed and nothing in motion. Time to open new booking conversations.`,
+        ts:       `Booking pipeline · 60-day window`,
+      });
+    }
+  }
+
+  // ── 5d. COMPLETED GIG NOT YET INVOICED (money on the table)
+  if (typeof BOOKING_DATA !== 'undefined' && typeof INVOICE_DATA !== 'undefined') {
+    const invoicedBookingIds = new Set(INVOICE_DATA.map(i => i.booking_id).filter(Boolean));
+    const uninvoiced = BOOKING_DATA.filter(b =>
+      b.stage === 'completed' && parseFloat(b.fee_eur || 0) > 0 && !invoicedBookingIds.has(b.id)
+    );
+    if (uninvoiced.length > 0) {
+      const total = uninvoiced.reduce((s, b) => s + parseFloat(b.fee_eur || 0), 0);
+      alerts.push({
+        severity: 'warn',
+        title:    `${uninvoiced.length} completed ${uninvoiced.length > 1 ? 'gigs' : 'gig'} not yet invoiced — ${fmtE(total)}`,
+        body:     uninvoiced.slice(0, 3).map(b => `${b.name}${b.location ? ' · ' + b.location : ''}`).join('; ') + (uninvoiced.length > 3 ? ' …' : ''),
+        ts:       `Issue invoices to collect ${fmtE(total)}`,
+      });
+    }
+  }
+
+  // ── 5e. NEGOTIATION WITH NO FOLLOW-UP (deals going cold)
+  if (typeof BOOKING_DATA !== 'undefined') {
+    const stale = BOOKING_DATA.filter(b => b.stage === 'negotiating' && !b.follow_up_date);
+    if (stale.length > 0) {
+      alerts.push({
+        severity: 'info',
+        title:    `${stale.length} ${stale.length > 1 ? 'deals are' : 'deal is'} negotiating with no follow-up set`,
+        body:     stale.slice(0, 3).map(b => `${b.name}${b.fee_eur ? ' · €' + Number(b.fee_eur).toLocaleString('pt-PT') : ''}`).join('; ') + (stale.length > 3 ? ' …' : ''),
+        ts:       `Set a follow-up date so they don't go cold`,
+      });
+    }
+  }
+
   // ── 6. ALERT RULES (user-defined) ────────────────────
   if (typeof ALERT_RULES !== 'undefined' && typeof LEDGER_DATA !== 'undefined') {
     const balance = LEDGER_DATA.length > 0 ? LEDGER_DATA[0].balance : 0;
@@ -11268,6 +11450,29 @@ function renderFullAlerts() {
       <div class="alert-ts">${a.ts}</div>
     </div>
   `).join('');
+
+  renderDashAlerts(alerts);
+}
+
+// Mirror the most pressing alerts into the Financials dashboard mini-panel,
+// ranked critical → warning → info. Replaces the old hardcoded placeholder cards.
+function renderDashAlerts(alerts){
+  const box = document.getElementById('dash-alerts-feed');
+  if (!box) return;
+  if (!alerts){ try { alerts = computeAlerts(); } catch(_){ alerts = []; } }
+  const order = { crit:0, warn:1, info:2 };
+  const top = [...alerts].sort((a,b)=>(order[a.severity]??3)-(order[b.severity]??3)).slice(0,5);
+  const cssClass = { crit:'alert-card critical', warn:'alert-card warn', info:'alert-card info' };
+  if (!top.length){
+    box.innerHTML = `<div style="padding:16px;text-align:center;color:var(--green3);font-family:var(--mono);font-size:9px">✓ ALL CLEAR<div style="color:var(--muted3);font-size:8px;margin-top:4px">No active alerts from live data</div></div>`;
+    return;
+  }
+  box.innerHTML = top.map(a=>`
+    <div class="${cssClass[a.severity]||'alert-card info'}">
+      <div class="alert-card-title">${a.title}</div>
+      <div class="alert-card-body">${a.body}</div>
+      <div class="alert-ts">${a.ts}</div>
+    </div>`).join('');
 }
 
 // ─── MODAL (overridden by auth-aware versions below) ──
@@ -11275,6 +11480,7 @@ function renderFullAlerts() {
 // ─── COMMAND PALETTE ──────────────────────────────────
 const CMDS=[
   {group:'Navigate',icon:'◈',label:'Overview',sub:'Band management hub',key:'F1',fn:()=>document.querySelector('[data-view=mgmt]').click()},
+  {group:'Navigate',icon:'☻',label:'Green Room',sub:'Band chat — share & discuss',key:'—',fn:()=>document.querySelector('[data-view=greenroom]').click()},
   {group:'Navigate',icon:'◈',label:'Financials',sub:'P&L, KPIs, valuation',key:'—',fn:()=>document.querySelector('[data-view=dashboard]').click()},
   {group:'Navigate',icon:'◈',label:'Ledger',sub:'All transactions',key:'F2',fn:()=>document.querySelector('[data-view=ledger]').click()},
   {group:'Navigate',icon:'◈',label:'Tours',sub:'Tour P&L',key:'F3',fn:()=>document.querySelector('[data-view=tours]').click()},
@@ -13246,6 +13452,7 @@ async function doLogin(){
       SESSION = {
         token:   data.token,
         refresh: data.refreshToken,
+        userId:  data.user.id,
         email:   data.user.email,
         name:    data.user.name,
         role:    data.user.role,
@@ -13371,6 +13578,7 @@ async function doRegister(){
       SESSION = {
         token:   data.token,
         refresh: data.refreshToken,
+        userId:  data.user.id,
         email:   data.user.email,
         name:    data.user.name,
         role:    data.user.role,
@@ -13451,6 +13659,7 @@ function applyRolePermissions(){
 
   // ── Navigation tabs ──
   show('tab-mgmt',       perms.viewDashboard);
+  show('tab-greenroom',  true);   // the Green Room is for everyone in the band
   show('tab-alerts',     perms.viewAlerts);
   show('tab-agent',      perms.viewDashboard);
   show('tab-dashboard',  perms.viewLedger);
@@ -13812,9 +14021,12 @@ function switchView(view, tab){
   if(view==='members') membersLoad();         // async, fire-and-forget
   if(view==='finance-tools') financeToolsLoad(); // async, fire-and-forget
   if(view==='invoices') invoiceTrackerLoad(); // async, fire-and-forget
+  if(view==='dashboard' && typeof renderDashAlerts==='function') renderDashAlerts();
   if(view==='audit'){ renderAuditLog(); showEmailTemplate('invite',document.querySelector('.email-tab')); }
   if(view==='alerts') renderFullAlerts();
   if(view==='mgmt') setTimeout(renderMgmtDashboard, 0);
+  // Green Room: start live polling on enter, stop on leave
+  if(view==='greenroom'){ grEnter(); } else if (typeof grLeave==='function') { grLeave(); }
 }
 
 // ─── KEYBOARD: add I for invite ───────────────────────
@@ -14625,6 +14837,8 @@ function renderShowsList() {
         </div>
         <div style="display:flex;gap:6px;align-items:center">
           <span style="font-size:8px;padding:2px 8px;border-radius:1px;background:${isPast?'var(--bg4)':'rgba(255,60,30,.1)'};color:${isPast?'var(--muted)':'var(--accent)'}">${isPast?'PAST':'UPCOMING'}</span>
+          <button onclick="printDaySheet('${s.id}')" title="Print Day Sheet PDF" style="background:transparent;border:1px solid var(--border2);color:var(--green3);font-size:9px;padding:2px 7px;cursor:pointer;border-radius:1px">📄 Day Sheet</button>
+          <button onclick="shareDaySheetToGreenRoom('${s.id}')" title="Share to the Green Room" style="background:transparent;border:1px solid var(--border2);color:var(--muted2);font-size:10px;padding:2px 7px;cursor:pointer;border-radius:1px">☻</button>
           <button onclick="deleteShow('${s.id}','${(s.venue_name||'Show').replace(/'/g,"\\'")}' )" style="background:transparent;border:1px solid var(--border2);color:var(--muted3);font-size:10px;padding:2px 6px;cursor:pointer;border-radius:1px">✕</button>
         </div>
       </div>
@@ -18071,6 +18285,7 @@ function initAll() {
   if (API_BASE && SESSION?.token) {
     Promise.all([loadLedgerFromApi(), loadStreamingFromApi()]).then(()=>_renderAll());
     loadAllGrowthData();
+    if (typeof grStartBackground==='function') grStartBackground();
   } else { _renderAll(); }
   initCdbabyMonthSelect();
 }
@@ -20362,6 +20577,477 @@ tr:nth-child(even) td{background:#f9f9f9}
 <script>window.onload=()=>window.print()<\/script>
 </body></html>`);
   w.document.close();
+}
+
+// ══════════════════════════════════════════════════════════
+// THE GREEN ROOM — band chat (frontend)
+// ══════════════════════════════════════════════════════════
+let GR = {
+  messages: [],
+  byId: {},
+  lastTs: null,
+  attach: null,        // { type, id, label, data }
+  pickerType: 'booking',
+  pickerOpen: false,
+  msgTimer: null,
+  stateTimer: null,
+  active: false,       // is the Green Room view currently visible
+  loaded: false,
+};
+
+function grEsc(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+// Turn bare URLs into links, after escaping. Safe because grEsc ran first.
+function grLinkify(escaped){
+  return escaped.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+}
+function grInitials(name){
+  const p = String(name||'?').trim().split(/\s+/);
+  return ((p[0]?.[0]||'') + (p[1]?.[0]||'')).toUpperCase() || '?';
+}
+function grColor(name){
+  let h = 0; const s = String(name||'');
+  for (let i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) & 0xffffff;
+  const hue = Math.abs(h) % 360;
+  return `hsl(${hue},58%,62%)`;
+}
+function grFmtTime(ts){
+  return new Date(ts).toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+}
+function grDayKey(ts){ return new Date(ts).toISOString().slice(0,10); }
+function grFmtDay(ts){
+  const d = new Date(ts), today = new Date();
+  const k = grDayKey(ts), tk = grDayKey(today.toISOString());
+  const yk = grDayKey(new Date(today.getTime()-86400000).toISOString());
+  if (k===tk) return 'Today';
+  if (k===yk) return 'Yesterday';
+  return d.toLocaleDateString('pt-PT',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+}
+
+// ── Load + poll ──────────────────────────────────────────
+async function grLoad(){
+  if (!API_BASE || !SESSION?.token) {
+    document.getElementById('gr-feed').innerHTML =
+      '<div class="gr-empty">The Green Room needs the live backend. Sign in with your band account to chat.</div>';
+    return;
+  }
+  try {
+    const res = await apiGet('/chat');
+    GR.messages = res.messages || [];
+    GR.byId = {}; GR.messages.forEach(m=>GR.byId[m.id]=m);
+    GR.lastTs = res.server_time || (GR.messages.at(-1)?.created_at) || null;
+    GR.loaded = true;
+    grRenderFeed(true);
+    grMarkRead();
+  } catch(e){
+    document.getElementById('gr-feed').innerHTML =
+      '<div class="gr-empty">Could not reach the room — '+grEsc(e.message)+'</div>';
+  }
+}
+
+async function grPollMessages(){
+  if (!API_BASE || !SESSION?.token || !GR.lastTs) return;
+  try {
+    const res = await apiGet('/chat?since='+encodeURIComponent(GR.lastTs));
+    if (res.server_time) GR.lastTs = res.server_time;
+    const fresh = (res.messages||[]).filter(m=>!GR.byId[m.id]);
+    if (fresh.length){
+      fresh.forEach(m=>{ GR.byId[m.id]=m; GR.messages.push(m); });
+      const nearBottom = grIsNearBottom();
+      grRenderFeed(nearBottom);
+      if (GR.active) grMarkRead();
+    }
+  } catch(_){ /* transient */ }
+}
+
+async function grUpdateState(){
+  if (!API_BASE || !SESSION?.token) return;
+  try {
+    const st = await apiGet('/chat/state');
+    // unread badge on the nav tab
+    const badge = document.getElementById('greenroom-badge');
+    if (badge){
+      const n = GR.active ? 0 : (st.unread||0);
+      badge.textContent = n>99?'99+':n;
+      badge.style.display = n>0 ? 'inline-block' : 'none';
+    }
+    // presence
+    const pres = document.getElementById('gr-presence');
+    if (pres){
+      const people = st.present||[];
+      if (!people.length){ pres.innerHTML='<span style="color:var(--muted3)">no one else here right now</span>'; }
+      else {
+        const avs = people.slice(0,6).map(p=>
+          `<div class="gr-av" title="${grEsc(p.name)}" style="background:${grColor(p.name)}">${grInitials(p.name)}</div>`
+        ).join('');
+        pres.innerHTML = avs + `<span>${people.length} online</span>`;
+      }
+    }
+  } catch(_){ /* transient */ }
+}
+
+async function grMarkRead(){
+  try { await apiPost('/chat/read', {}); } catch(_){}
+  const badge = document.getElementById('greenroom-badge');
+  if (badge){ badge.style.display='none'; }
+}
+
+// ── Rendering ────────────────────────────────────────────
+function grIsNearBottom(){
+  const f = document.getElementById('gr-feed'); if (!f) return true;
+  return (f.scrollHeight - f.scrollTop - f.clientHeight) < 120;
+}
+function grScrollBottom(){
+  const f = document.getElementById('gr-feed'); if (f) f.scrollTop = f.scrollHeight;
+}
+
+function grRenderFeed(scroll){
+  const f = document.getElementById('gr-feed'); if (!f) return;
+  if (!GR.messages.length){
+    f.innerHTML = '<div class="gr-empty">🤘 The Green Room is empty.<br>Drop the first message — share a booking, a setlist, or just say what\'s up.</div>';
+    grRenderPins();
+    return;
+  }
+  let html = '', lastDay = '', lastName = '', lastTime = 0;
+  for (const m of GR.messages){
+    const day = grDayKey(m.created_at);
+    if (day !== lastDay){
+      html += `<div class="gr-daysep">${grFmtDay(m.created_at)}</div>`;
+      lastDay = day; lastName=''; lastTime=0;
+    }
+    const cont = (m.user_name===lastName) && ((new Date(m.created_at)-lastTime) < 5*60*1000);
+    html += grMsgHtml(m, cont);
+    lastName = m.user_name; lastTime = new Date(m.created_at);
+  }
+  f.innerHTML = html;
+  grRenderPins();
+  if (scroll) grScrollBottom();
+}
+
+function grMsgHtml(m, cont){
+  const mine = m.user_id && SESSION && (m.user_name===SESSION.name);
+  const canDelete = mine || ['admin','co-admin'].includes(SESSION?.role);
+  const role = m.user_role ? `<span class="gr-msg-role">${grEsc(m.user_role)}</span>` : '';
+  const head = cont ? '' :
+    `<div class="gr-msg-head">
+       <span class="gr-msg-name" style="color:${grColor(m.user_name)}">${grEsc(m.user_name)}</span>
+       ${role}<span class="gr-msg-time">${grFmtTime(m.created_at)}</span>
+     </div>`;
+  const body = m.body ? `<div class="gr-msg-body">${grLinkify(grEsc(m.body))}</div>` : '';
+  const embed = m.embed_type ? grEmbedHtml(m) : '';
+  const reacts = grReactsHtml(m);
+  const av = cont ? '<div class="gr-msg-av" style="visibility:hidden"></div>'
+    : `<div class="gr-msg-av" style="background:${grColor(m.user_name)}">${grInitials(m.user_name)}</div>`;
+  return `
+  <div class="gr-msg ${cont?'cont':''}" id="grm-${m.id}">
+    ${av}
+    <div class="gr-msg-main">
+      ${head}${body}${embed}${reacts}
+    </div>
+    <div class="gr-msg-actions">
+      <button class="gr-iconbtn" title="React" onclick="grQuickReact('${m.id}')">🔥</button>
+      <button class="gr-iconbtn" title="${m.pinned?'Unpin':'Pin'}" onclick="grPin('${m.id}')">${m.pinned?'📌':'📍'}</button>
+      ${canDelete?`<button class="gr-iconbtn" title="Delete" onclick="grDelete('${m.id}')">✕</button>`:''}
+    </div>
+  </div>`;
+}
+
+function grReactsHtml(m){
+  const r = m.reactions||{};
+  const keys = Object.keys(r).filter(k=>(r[k]||[]).length);
+  if (!keys.length) return '';
+  return '<div class="gr-reacts">' + keys.map(emo=>{
+    const list = r[emo]||[];
+    const mine = SESSION && list.includes(_grMyId());
+    return `<span class="gr-react ${mine?'mine':''}" onclick="grReact('${m.id}','${emo}')">${emo} <span class="n">${list.length}</span></span>`;
+  }).join('') + '</div>';
+}
+function _grMyId(){
+  return SESSION?.userId || '__me__';
+}
+
+const GR_EMBED_META = {
+  booking:  {icon:'◎', label:'BOOKING'},
+  show:     {icon:'🎚', label:'SHOW ADVANCE'},
+  release:  {icon:'◈', label:'RELEASE'},
+  invoice:  {icon:'⎙', label:'INVOICE'},
+  tour:     {icon:'↗', label:'TOUR'},
+  document: {icon:'📄', label:'DOCUMENT'},
+};
+function grEmbedHtml(m){
+  const meta = GR_EMBED_META[m.embed_type] || {icon:'◆',label:'ITEM'};
+  const d = m.embed_data || {};
+  let title = '', rows = [];
+  if (m.embed_type==='booking'){
+    title = d.name||'Booking';
+    rows = [['Stage',(d.stage||'—').toUpperCase()],['Fee', d.fee_eur?('€'+Number(d.fee_eur).toLocaleString('pt-PT')):'—'],
+            ['Date', fmtDate(d.date)],['Where', d.location||'—']];
+  } else if (m.embed_type==='show'){
+    title = d.venue_name||'Show';
+    rows = [['Date', fmtDate(d.show_date)],['Load-in', d.load_in_time||'—'],
+            ['Soundcheck', d.soundcheck_time||'—'],['Show', d.show_time||'—']];
+  } else if (m.embed_type==='release'){
+    title = d.title||'Release';
+    rows = [['Type',(d.type||'—').toUpperCase()],['Stage',(d.stage||'—').toUpperCase()],
+            ['Drops', fmtDate(d.release_date)]];
+  } else if (m.embed_type==='invoice'){
+    title = (d.number?('#'+d.number+' '):'')+(d.clientName||'Invoice');
+    rows = [['Amount', d.total?('€'+Number(d.total).toLocaleString('pt-PT')):'—'],
+            ['Status',(d.status||'—').toUpperCase()],['Due', fmtDate(d.due)]];
+  } else if (m.embed_type==='tour'){
+    title = d.name||'Tour';
+    rows = [['Status',(d.status||'—').toUpperCase()],['Budget', d.budget?('€'+Number(d.budget).toLocaleString('pt-PT')):'—'],
+            ['Starts', fmtDate(d.start_date||d.start)]];
+  } else if (m.embed_type==='document'){
+    title = d.title||'Document';
+    rows = [['Type', d.doc_type||'PDF'],['For', d.context||'—']];
+  }
+  const rowHtml = rows.map(r=>`<div class="gr-embed-row"><span>${grEsc(r[0])}</span><span>${grEsc(r[1])}</span></div>`).join('');
+  return `
+  <div class="gr-embed" onclick="grOpenEmbed('${m.embed_type}','${grEsc(m.embed_id)}')">
+    <div class="gr-embed-top"><span class="gr-embed-kind">${meta.icon} ${meta.label}</span>
+      <span class="gr-embed-title">${grEsc(title)}</span></div>
+    <div class="gr-embed-rows">${rowHtml}</div>
+    <div class="gr-embed-open">▸ OPEN IN CONSOLE</div>
+  </div>`;
+}
+
+function grOpenEmbed(type, id){
+  const go = (v)=>{ const tab=document.querySelector('[data-view="'+v+'"]'); if(tab) switchView(v, tab); };
+  if (type==='booking'){ go('booking'); if (typeof openBookingDrawer==='function') setTimeout(()=>openBookingDrawer(id),120); }
+  else if (type==='release'){ go('releases'); if (typeof openReleaseDrawer==='function') setTimeout(()=>openReleaseDrawer(id),120); }
+  else if (type==='show'){ go('production'); }
+  else if (type==='invoice'){ go('invoices'); }
+  else if (type==='tour'){ go('tours'); }
+  else if (type==='document'){ go('production'); }
+}
+
+// ── Pins ─────────────────────────────────────────────────
+function grRenderPins(){
+  const el = document.getElementById('gr-pins'); if (!el) return;
+  const pinned = GR.messages.filter(m=>m.pinned);
+  if (!pinned.length){ el.style.display='none'; return; }
+  el.style.display='block';
+  el.innerHTML = pinned.slice(-3).map(m=>
+    `<div style="display:flex;gap:8px;align-items:center;font-size:10px;color:var(--amber2);padding:2px 0">
+       <span>📌</span>
+       <span style="color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+         <b style="color:${grColor(m.user_name)}">${grEsc(m.user_name)}:</b> ${grEsc((m.body||(m.embed_type?('['+m.embed_type+']'):'')).slice(0,90))}</span>
+       <span style="margin-left:auto;cursor:pointer;color:var(--muted3)" onclick="grPin('${m.id}')">unpin</span>
+     </div>`
+  ).join('');
+}
+
+// ── Send / react / pin / delete ──────────────────────────
+async function grSend(){
+  const input = document.getElementById('gr-input');
+  const body = (input.value||'').trim();
+  if (!body && !GR.attach) return;
+  const payload = { body };
+  if (GR.attach){ payload.embed_type=GR.attach.type; payload.embed_id=GR.attach.id; payload.embed_data=GR.attach.data; }
+  input.value=''; grAutogrow(input); grClearAttach();
+  document.getElementById('gr-send').disabled = true;
+  try {
+    const m = await apiPost('/chat', payload);
+    if (m && !GR.byId[m.id]){ GR.byId[m.id]=m; GR.messages.push(m); GR.lastTs = m.created_at; grRenderFeed(true); }
+  } catch(e){ showToast('Message failed: '+e.message,'err'); input.value=body; }
+  finally { document.getElementById('gr-send').disabled = false; input.focus(); }
+}
+async function grReact(id, emoji){
+  try {
+    const m = await apiPost('/chat/'+id+'/react', {emoji});
+    if (m){ GR.byId[id]=m; const i=GR.messages.findIndex(x=>x.id===id); if(i>=0) GR.messages[i]=m; grRenderFeed(false); }
+  } catch(e){ showToast(e.message,'err'); }
+}
+function grQuickReact(id){ grReact(id,'🔥'); }
+async function grPin(id){
+  try {
+    const m = await apiPost('/chat/'+id+'/pin', {});
+    if (m){ GR.byId[id]=m; const i=GR.messages.findIndex(x=>x.id===id); if(i>=0) GR.messages[i]=m; grRenderFeed(false); }
+  } catch(e){ showToast(e.message,'err'); }
+}
+async function grDelete(id){
+  if (!confirm('Delete this message?')) return;
+  try {
+    await _apiFetch('DELETE','/chat/'+id);
+    GR.messages = GR.messages.filter(x=>x.id!==id); delete GR.byId[id];
+    grRenderFeed(false);
+  } catch(e){ showToast(e.message,'err'); }
+}
+
+// ── Composer helpers ─────────────────────────────────────
+function grAutogrow(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,140)+'px'; }
+function grKey(e){
+  if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); grSend(); }
+}
+
+// ── Embed picker ─────────────────────────────────────────
+function grTogglePicker(){
+  GR.pickerOpen = !GR.pickerOpen;
+  const p = document.getElementById('gr-picker');
+  p.style.display = GR.pickerOpen ? 'flex' : 'none';
+  if (GR.pickerOpen) grRenderPicker();
+}
+function grPickerTab(type, el){
+  GR.pickerType = type;
+  document.querySelectorAll('#gr-picker .gr-picker-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  grRenderPicker();
+}
+function grRenderPicker(){
+  const list = document.getElementById('gr-picker-list');
+  const type = GR.pickerType;
+  let items = [];
+  if (type==='booking'){
+    items = (typeof BOOKING_DATA!=='undefined'?BOOKING_DATA:[]).map(b=>({
+      id:b.id, name:b.name, sub:(b.stage||'').toUpperCase()+(b.date?(' · '+fmtDate(b.date)):'')+(b.fee_eur?(' · €'+Number(b.fee_eur).toLocaleString('pt-PT')):''),
+      data:{name:b.name,stage:b.stage,fee_eur:b.fee_eur,date:b.date,location:b.location,type:b.type}
+    }));
+  } else if (type==='show'){
+    items = (typeof PROD_SHOWS!=='undefined'?PROD_SHOWS:[]).map(s=>({
+      id:s.id, name:s.venue_name||'Show', sub:fmtDate(s.show_date)+(s.show_time?(' · '+s.show_time):''),
+      data:{venue_name:s.venue_name,show_date:s.show_date,load_in_time:s.load_in_time,soundcheck_time:s.soundcheck_time,doors_time:s.doors_time,show_time:s.show_time,venue_address:s.venue_address}
+    }));
+  } else if (type==='release'){
+    items = (typeof RELEASES_DATA!=='undefined'?RELEASES_DATA:[]).map(r=>({
+      id:r.id, name:r.title, sub:(r.type||'').toUpperCase()+' · '+(r.stage||'').toUpperCase()+(r.release_date?(' · '+fmtDate(r.release_date)):''),
+      data:{title:r.title,type:r.type,stage:r.stage,release_date:r.release_date}
+    }));
+  } else if (type==='invoice'){
+    items = (typeof INVOICE_DATA!=='undefined'?INVOICE_DATA:[]).map(i=>({
+      id:i.id, name:(i.number?('#'+i.number+' '):'')+(i.clientName||'Invoice'), sub:(i.status||'').toUpperCase()+' · €'+Number(i.total||0).toLocaleString('pt-PT')+(i.due?(' · due '+fmtDate(i.due)):''),
+      data:{number:i.number,clientName:i.clientName,total:i.total,status:i.status,due:i.due}
+    }));
+  } else if (type==='tour'){
+    items = (typeof TOUR_DATA!=='undefined'?TOUR_DATA:[]).map(tr=>({
+      id:tr._id||tr.id, name:tr.name, sub:(tr.status||'').toUpperCase()+(tr.budget?(' · €'+Number(tr.budget).toLocaleString('pt-PT')):''),
+      data:{name:tr.name,status:tr.status,budget:tr.budget,start_date:tr.start}
+    }));
+  }
+  if (!items.length){ list.innerHTML='<div class="gr-empty" style="padding:24px">Nothing here yet to attach.</div>'; return; }
+  list.innerHTML = items.map(it=>{
+    const args = JSON.stringify(type) + ',' + JSON.stringify(String(it.id)) + ',' +
+                 JSON.stringify(it.name||'') + ',' + JSON.stringify(it.data||{});
+    return `<div class="gr-pick-item" onclick='grPickItem(${grEsc(args)})'>
+       <div class="gr-pick-name">${grEsc(it.name)}</div>
+       <div class="gr-pick-sub">${grEsc(it.sub)}</div>
+     </div>`;
+  }).join('');
+}
+function grPickItem(type, id, label, data){
+  GR.attach = { type, id:String(id), label, data };
+  GR.pickerOpen = false;
+  document.getElementById('gr-picker').style.display='none';
+  const prev = document.getElementById('gr-attach-preview');
+  document.getElementById('gr-attach-kind').textContent = (GR_EMBED_META[type]?.label || 'ITEM');
+  document.getElementById('gr-attach-label').textContent = label;
+  prev.style.display='flex';
+  document.getElementById('gr-input').focus();
+}
+function grClearAttach(){
+  GR.attach = null;
+  const prev = document.getElementById('gr-attach-preview');
+  if (prev) prev.style.display='none';
+}
+
+// ── Lifecycle ────────────────────────────────────────────
+function grEnter(){
+  GR.active = true;
+  if (!GR.loaded) grLoad(); else { grRenderFeed(true); grMarkRead(); }
+  grUpdateState();
+  clearInterval(GR.msgTimer);
+  GR.msgTimer = setInterval(grPollMessages, 4000);
+  const badge=document.getElementById('greenroom-badge'); if(badge) badge.style.display='none';
+}
+function grLeave(){ GR.active=false; clearInterval(GR.msgTimer); GR.msgTimer=null; }
+function grStartBackground(){
+  // Unread badge + presence even when not on the tab.
+  clearInterval(GR.stateTimer);
+  grUpdateState();
+  GR.stateTimer = setInterval(grUpdateState, 20000);
+}
+
+// ── DAY SHEET PDF (show advance) ─────────────────────────
+function grBuildDaySheetHtml(s){
+  const F = (t)=> t || '—';
+  const setlist = (typeof PROD_SETLISTS!=='undefined' ? PROD_SETLISTS : [])
+    .find(x=>x.show_id===s.id);
+  const songs = setlist && Array.isArray(setlist.songs) ? setlist.songs : [];
+  const songRows = songs.length ? songs.map((sg,i)=>
+    `<tr><td>${i+1}</td><td>${grEsc(sg.title||'')}</td><td>${grEsc(sg.musical_key||sg.key||'')}</td><td>${sg.bpm||''}</td><td>${grEsc(sg.tuning||'')}</td></tr>`
+  ).join('') : '<tr><td colspan="5" style="color:#888">No setlist linked to this show.</td></tr>';
+  const dateStr = s.show_date ? new Date(s.show_date).toLocaleDateString('en-GB',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}) : '—';
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Day Sheet — ${grEsc(s.venue_name||'Show')}</title><style>
+    @page{margin:14mm;size:A4}
+    *{box-sizing:border-box}body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#111;margin:0;font-size:11px}
+    .hd{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #111;padding-bottom:8px;margin-bottom:14px}
+    .hd h1{font-family:'Oswald',sans-serif;font-size:24px;margin:0;letter-spacing:.04em;text-transform:uppercase}
+    .hd .sub{font-size:10px;color:#666;letter-spacing:.1em;text-transform:uppercase}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+    .box{border:1px solid #ddd;border-radius:4px;padding:10px 12px}
+    .box h2{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 8px;color:#111;border-bottom:1px solid #eee;padding-bottom:5px}
+    .row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dotted #eee}
+    .row span:first-child{color:#777}.row span:last-child{font-weight:600;text-align:right}
+    .times{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+    .tk{text-align:center;border:1px solid #ddd;border-radius:4px;padding:10px 4px}
+    .tk .v{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700}
+    .tk .l{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#888;margin-top:3px}
+    table{width:100%;border-collapse:collapse;font-size:10px}
+    th{background:#111;color:#fff;text-align:left;padding:6px 8px;font-size:8px;letter-spacing:.1em;text-transform:uppercase}
+    td{padding:6px 8px;border-bottom:1px solid #eee}
+    .note{margin-top:12px;padding:10px 12px;background:#fafafa;border-left:3px solid #111;font-size:10px;color:#444;line-height:1.6}
+    .ft{margin-top:24px;padding-top:8px;border-top:1px solid #ddd;display:flex;justify-content:space-between;font-size:8px;color:#aaa;letter-spacing:.1em;text-transform:uppercase}
+  </style></head><body>
+    <div class="hd"><div><h1>${grEsc(s.venue_name||'Show')}</h1><div class="sub">Day Sheet · The Ginskeys</div></div>
+      <div style="text-align:right"><div style="font-weight:700">${grEsc(dateStr)}</div><div class="sub">${grEsc(s.venue_address||'')}</div></div></div>
+    <div class="times">
+      <div class="tk"><div class="v">${F(s.load_in_time)}</div><div class="l">Load-in</div></div>
+      <div class="tk"><div class="v">${F(s.soundcheck_time)}</div><div class="l">Soundcheck</div></div>
+      <div class="tk"><div class="v">${F(s.doors_time)}</div><div class="l">Doors</div></div>
+      <div class="tk"><div class="v">${F(s.show_time)}</div><div class="l">Show</div></div>
+    </div>
+    <div class="grid">
+      <div class="box"><h2>Venue & Stage</h2>
+        <div class="row"><span>Venue</span><span>${grEsc(F(s.venue_name))}</span></div>
+        <div class="row"><span>Address</span><span>${grEsc(F(s.venue_address))}</span></div>
+        <div class="row"><span>Stage</span><span>${s.stage_width_m||'?'} × ${s.stage_depth_m||'?'} m</span></div>
+        <div class="row"><span>Set length</span><span>${s.set_length_min?(s.set_length_min+' min'):'—'}</span></div>
+      </div>
+      <div class="box"><h2>Audio</h2>
+        <div class="row"><span>PA system</span><span>${grEsc(F(s.pa_system))}</span></div>
+        <div class="row"><span>FOH console</span><span>${grEsc(F(s.console_foh))}</span></div>
+        <div class="row"><span>Mon console</span><span>${grEsc(F(s.console_mon))}</span></div>
+      </div>
+    </div>
+    <div class="box"><h2>Setlist</h2>
+      <table><thead><tr><th>#</th><th>Song</th><th>Key</th><th>BPM</th><th>Tuning</th></tr></thead><tbody>${songRows}</tbody></table>
+    </div>
+    ${s.notes?`<div class="note"><b>Notes:</b> ${grEsc(s.notes)}</div>`:''}
+    <div class="ft"><span>The Ginskeys — Day Sheet</span><span>Generated ${new Date().toLocaleDateString('en-GB')}</span></div>
+    <script>window.onload=()=>window.print()<\/script>
+  </body></html>`;
+}
+function printDaySheet(showId){
+  const s = (typeof PROD_SHOWS!=='undefined'?PROD_SHOWS:[]).find(x=>x.id===showId);
+  if (!s){ showToast('Show not found','err'); return; }
+  const w = window.open('','_blank');
+  w.document.write(grBuildDaySheetHtml(s));
+  w.document.close();
+}
+async function shareDaySheetToGreenRoom(showId){
+  const s = (typeof PROD_SHOWS!=='undefined'?PROD_SHOWS:[]).find(x=>x.id===showId);
+  if (!s){ showToast('Show not found','err'); return; }
+  try {
+    await apiPost('/chat', {
+      body: '📄 Day Sheet ready for '+(s.venue_name||'the show')+' — '+fmtDate(s.show_date),
+      embed_type:'show', embed_id:String(s.id),
+      embed_data:{venue_name:s.venue_name,show_date:s.show_date,load_in_time:s.load_in_time,soundcheck_time:s.soundcheck_time,doors_time:s.doors_time,show_time:s.show_time,venue_address:s.venue_address}
+    });
+    showToast('Shared to the Green Room ☻','ok');
+  } catch(e){ showToast('Share failed: '+e.message,'err'); }
 }
 </script>
 

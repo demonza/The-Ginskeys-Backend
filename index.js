@@ -33,6 +33,8 @@ const reportRoutes      = require('./routes/reports');
 const invoiceRoutes     = require('./routes/invoices');
 const membersRoutes     = require('./routes/members');
 const treasuryRoutes    = require('./routes/treasury');
+const chatRoutes        = require('./routes/chat');
+const { CHAT_DDL }      = require('./db/migrate_v9');
 
 const app = express();
 
@@ -117,6 +119,7 @@ app.use('/api/reports',      reportRoutes);
 app.use('/api/invoices',    invoiceRoutes);
 app.use('/api/members',     membersRoutes);
 app.use('/api/treasury',    treasuryRoutes);
+app.use('/api/chat',        chatRoutes);
 
 // ─── HEALTH ───────────────────────────────────────────
 app.get('/api/health', async (_req, res) => {
@@ -201,6 +204,14 @@ async function start() {
     console.log('  ✔ stage_plots table ready');
   } catch (err) {
     console.warn('⚠ stage_plots auto-create skipped:', err.message);
+  }
+
+  // Auto-create Green Room chat tables if missing (non-fatal)
+  try {
+    await pool.query(CHAT_DDL);
+    console.log('  ✔ Green Room chat tables ready');
+  } catch (err) {
+    console.warn('⚠ chat tables auto-create skipped:', err.message);
   }
 
   app.listen(PORT, '0.0.0.0', () => {
