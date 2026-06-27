@@ -1293,6 +1293,66 @@ tr:hover .edit-btn{display:inline}
 .drawer-note{padding:10px 12px;background:var(--bg3);border-left:3px solid var(--border3);font-size:10px;color:var(--muted2);line-height:1.6}
 .drawer-tag{display:inline-block;font-size:9px;padding:2px 8px;border-radius:1px;border:1px solid;margin-right:4px;margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
 
+/* ══════════════════════════════════════════════════════
+   MOBILE LAYER
+   Everything here lives inside max-width media queries, so the desktop
+   terminal is byte-for-byte unchanged. Goal: make the app fully usable on a
+   phone (navigable, nothing overflows the viewport), not a separate redesign.
+   The key unlock is collapsing the ~229 inline multi-column grids via an
+   attribute selector + !important (only !important beats an inline style).
+   ══════════════════════════════════════════════════════ */
+@media (max-width: 768px){
+  /* Dense inline grids (repeat(N)) → 2 readable columns. minmax(0,1fr) stops
+     wide content from blowing past the screen edge. Covers both `:repeat`
+     and `: repeat` spellings. */
+  [style*="grid-template-columns:repeat"],
+  [style*="grid-template-columns: repeat"]{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+  /* Wide fixed minimums that force a horizontal scrollbar on the whole page. */
+  [style*="min-width:360"],[style*="min-width:180"],[style*="min-width:160"]{ min-width:0 !important; }
+
+  /* Top bar: hand the width to the tab nav, shrink the chrome around it. */
+  .topbar{ height:44px; }
+  .tb-logo{ font-size:13px !important; padding:0 8px !important; }
+  .tb-nav{ -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; }
+  .tb-tab{ padding:0 12px; scroll-snap-align:start; }
+  .tb-nav-sep{ display:none; }
+  .tb-right{ padding:0 8px; gap:6px; }
+
+  /* Main dashboard grid → single column; release the fixed side rails. */
+  .main-grid{ grid-template-columns:1fr !important; }
+  .panel.col-span-2,.panel.col-span-3{ grid-column:auto !important; }
+  .panel.row-span-2{ grid-row:auto !important; }
+  .panel-body{ overflow-x:auto; }
+
+  /* Tables scroll inside their wrapper instead of pushing the page wide. */
+  .ledger-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  table{ max-width:none; }
+
+  /* Status bar: tighten and drop the keyboard hints (no keyboard on a phone). */
+  .statusbar{ gap:10px; font-size:9px; overflow-x:auto; white-space:nowrap; }
+  .sb-hint{ display:none; }
+
+  /* Drawer + modal go full-bleed and stay scrollable. */
+  .drawer{ width:100% !important; max-width:100% !important; border-left:none; }
+  .modal-box{ width:96vw !important; max-width:96vw !important; }
+
+  /* The Green Room, comfortable on a phone. 16px input kills iOS focus-zoom. */
+  #view-greenroom .gr-feed{ padding:14px 10px 8px; }
+  #view-greenroom .gr-embed{ max-width:100%; }
+  #view-greenroom .gr-input{ font-size:16px; }
+  #view-greenroom .gr-picker{ max-height:50vh; }
+}
+
+@media (max-width: 480px){
+  .kpi-strip{ grid-template-columns:repeat(2,1fr) !important; }
+  /* Bigger tap targets on the smallest screens. */
+  .tb-tab{ padding:0 14px; }
+  .btn-sm{ padding:7px 10px; }
+  body{ -webkit-text-size-adjust:100%; }
+}
+
 </style>
 </head>
 <body>
