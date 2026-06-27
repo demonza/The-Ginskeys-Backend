@@ -1294,37 +1294,51 @@ tr:hover .edit-btn{display:inline}
 .drawer-tag{display:inline-block;font-size:9px;padding:2px 8px;border-radius:1px;border:1px solid;margin-right:4px;margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
 
 /* ══════════════════════════════════════════════════════
-   MOBILE LAYER
-   Everything here lives inside max-width media queries, so the desktop
-   terminal is byte-for-byte unchanged. Goal: make the app fully usable on a
-   phone (navigable, nothing overflows the viewport), not a separate redesign.
-   The key unlock is collapsing the ~229 inline multi-column grids via an
-   attribute selector + !important (only !important beats an inline style).
+   MOBILE LAYER  (v2)
+   Lives entirely inside max-width media queries → desktop is byte-for-byte
+   unchanged. Goal: fully usable on a phone, nothing squeezed or off-screen.
+
+   Three classes of grid had to be handled separately, because they are written
+   differently in the markup and only !important can override an inline style:
+     • repeat(N,…)  → KPI tiles / data rows        → 2 columns
+     • 1fr 1fr 1fr… → 3+ columns of CONTENT         → 1 column (stacked)
+     • inline grid-column / grid-row on .panel      → pinned to the one column
+   "1fr auto" (label/value) and plain "1fr 1fr" are deliberately left alone.
    ══════════════════════════════════════════════════════ */
 @media (max-width: 768px){
-  /* Dense inline grids (repeat(N)) → 2 readable columns. minmax(0,1fr) stops
-     wide content from blowing past the screen edge. Covers both `:repeat`
-     and `: repeat` spellings. */
+  /* Repeat-based grids → 2 readable columns; minmax(0,1fr) stops overflow. */
   [style*="grid-template-columns:repeat"],
   [style*="grid-template-columns: repeat"]{
     grid-template-columns:repeat(2,minmax(0,1fr)) !important;
   }
-  /* Wide fixed minimums that force a horizontal scrollbar on the whole page. */
+  /* Explicit 3-/4-column content grids (Booking, Members, analysis blocks)
+     → single column. Substring match also catches the 4-col variant.
+     Does NOT match "1fr auto" or a plain two-up "1fr 1fr". */
+  [style*="grid-template-columns:1fr 1fr 1fr"]{
+    grid-template-columns:1fr !important;
+  }
+  /* Wide fixed minimums that would force a horizontal scrollbar. */
   [style*="min-width:360"],[style*="min-width:180"],[style*="min-width:160"]{ min-width:0 !important; }
 
-  /* Top bar: hand the width to the tab nav, shrink the chrome around it. */
+  /* Dashboard: the panels carry inline grid-column:2 / grid-row:1 / span 2,
+     which create phantom columns once the grid is a single track (that was the
+     squeezed-charts-next-to-alerts bug). Pin every panel to the one column. */
+  .main-grid{ grid-template-columns:1fr !important; }
+  .main-grid > .panel{ grid-column:1 / -1 !important; grid-row:auto !important; }
+  .panel.col-span-2,.panel.col-span-3{ grid-column:1 / -1 !important; }
+  .panel.row-span-2{ grid-row:auto !important; }
+  .panel-body{ overflow-x:auto; }
+
+  /* Top bar: give the tab nav the room. Drop the subtitle + stacked "THE". */
   .topbar{ height:44px; }
-  .tb-logo{ font-size:13px !important; padding:0 8px !important; }
+  .logo-console{ display:none !important; }
+  .logo-the{ display:none !important; }
+  .logo-band{ font-size:18px !important; }
+  .tb-logo{ padding:0 8px !important; gap:0 !important; }
   .tb-nav{ -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; }
   .tb-tab{ padding:0 12px; scroll-snap-align:start; }
   .tb-nav-sep{ display:none; }
   .tb-right{ padding:0 8px; gap:6px; }
-
-  /* Main dashboard grid → single column; release the fixed side rails. */
-  .main-grid{ grid-template-columns:1fr !important; }
-  .panel.col-span-2,.panel.col-span-3{ grid-column:auto !important; }
-  .panel.row-span-2{ grid-row:auto !important; }
-  .panel-body{ overflow-x:auto; }
 
   /* Tables scroll inside their wrapper instead of pushing the page wide. */
   .ledger-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
@@ -1347,8 +1361,8 @@ tr:hover .edit-btn{display:inline}
 
 @media (max-width: 480px){
   .kpi-strip{ grid-template-columns:repeat(2,1fr) !important; }
-  /* Bigger tap targets on the smallest screens. */
   .tb-tab{ padding:0 14px; }
+  .tb-clock{ font-size:11px !important; }
   .btn-sm{ padding:7px 10px; }
   body{ -webkit-text-size-adjust:100%; }
 }
@@ -14082,6 +14096,9 @@ function switchView(view, tab){
   if(view==='finance-tools') financeToolsLoad(); // async, fire-and-forget
   if(view==='invoices') invoiceTrackerLoad(); // async, fire-and-forget
   if(view==='dashboard' && typeof renderDashAlerts==='function') renderDashAlerts();
+  // On mobile, charts were sized while their panel was narrow; once the layout
+  // reflows to a single column, nudge Chart.js to refit to the new width.
+  setTimeout(function(){ try{ window.dispatchEvent(new Event('resize')); }catch(_){} }, 80);
   if(view==='audit'){ renderAuditLog(); showEmailTemplate('invite',document.querySelector('.email-tab')); }
   if(view==='alerts') renderFullAlerts();
   if(view==='mgmt') setTimeout(renderMgmtDashboard, 0);
