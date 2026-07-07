@@ -34,7 +34,9 @@ const invoiceRoutes     = require('./routes/invoices');
 const membersRoutes     = require('./routes/members');
 const treasuryRoutes    = require('./routes/treasury');
 const chatRoutes        = require('./routes/chat');
+const trustRoutes       = require('./routes/trust');
 const { CHAT_DDL }      = require('./db/migrate_v9');
+const { TRUST_DDL }     = require('./db/migrate_v10');
 
 const app = express();
 
@@ -120,6 +122,7 @@ app.use('/api/invoices',    invoiceRoutes);
 app.use('/api/members',     membersRoutes);
 app.use('/api/treasury',    treasuryRoutes);
 app.use('/api/chat',        chatRoutes);
+app.use('/api/trust',       trustRoutes);
 
 // ─── HEALTH ───────────────────────────────────────────
 app.get('/api/health', async (_req, res) => {
@@ -212,6 +215,14 @@ async function start() {
     console.log('  ✔ Green Room chat tables ready');
   } catch (err) {
     console.warn('⚠ chat tables auto-create skipped:', err.message);
+  }
+
+  // Auto-create Trust Engine tables (hash-chained audit + event store) if missing
+  try {
+    await pool.query(TRUST_DDL);
+    console.log('  ✔ Trust Engine tables ready (event store + hash-chained audit)');
+  } catch (err) {
+    console.warn('⚠ trust tables auto-create skipped:', err.message);
   }
 
   app.listen(PORT, '0.0.0.0', () => {

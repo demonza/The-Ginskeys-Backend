@@ -8,6 +8,7 @@ const { v4: uuid } = require('uuid');
 const pool   = require('../db/pool');
 const { requireAuth, requirePerm } = require('../middleware/auth');
 const { writeAudit } = require('../middleware/audit');
+const { appendEvent } = require('../lib/ledger');
 
 const VALID_SOURCES = ['gig','streaming','merch','sync','other'];
 
@@ -98,14 +99,39 @@ router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
     const net = parseFloat((gross - expenses).toFixed(2));
 
     const id = uuid();
-    const { rows } = await pool.query(`
-      INSERT INTO treasury_pool
-        (id, source_type, source_id, description, gross_eur, expenses_eur, net_eur,
-         allocated_eur, status, revenue_date, ledger_txn_id, notes, created_by)
-      VALUES ($1,$2,$3,$4,$5,$6,$7, 0, 'unallocated', $8,$9,$10,$11)
-      RETURNING *
-    `, [id, source_type, source_id || null, description.trim(), gross, expenses, net,
-        revenue_date || null, ledger_txn_id || null, notes || null, req.user.id]);
+    const client = await pool.connect();
+    let rows;
+    try {
+      await client.query('BEGIN');
+      const ins = await client.query(`
+        INSERT INTO treasury_pool
+          (id, source_type, source_id, description, gross_eur, expenses_eur, net_eur,
+           allocated_eur, status, revenue_date, ledger_txn_id, notes, created_by)
+        VALUES ($1,$2,$3,$4,$5,$6,$7, 0, 'unallocated', $8,$9,$10,$11)
+        RETURNING *
+      `, [id, source_type, source_id || null, description.trim(), gross, expenses, net,
+          revenue_date || null, ledger_txn_id || null, notes || null, req.user.id]);
+      rows = ins.rows;
+
+      // TRUST ENGINE: net revenue entering the band's cash position.
+      const revDate = revenue_date || new Date().toISOString().split('T')[0];
+      if (net > 0) {
+        await appendEvent(client, {
+          event_type: 'revenue_received',
+          amount_eur: net,
+          occurred_on: revDate,
+          description: `${source_type}: ${description.trim()}`,
+          source_table: 'treasury_pool',
+          source_id: id,
+        }, req.user.id);
+      }
+      await client.query('COMMIT');
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
 
     await writeAudit(req, 'TREASURY_ADD', {
       entityType: 'treasury', entityId: id,
@@ -174,6 +200,17 @@ router.post('/:id/allocate', requireAuth, requirePerm('addTxn'), async (req, res
         VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *
       `, [uuid(), item.id, alloc.member_key, alloc.member_name || alloc.member_key,
           amt, maTxn.id, req.user.id]);
+
+      // TRUST ENGINE: band cash → member wallet.
+      await appendEvent(client, {
+        event_type: 'treasury_allocated',
+        amount_eur: amt,
+        occurred_on: item.revenue_date || new Date().toISOString().split('T')[0],
+        description: `Treasury: ${item.description} → ${alloc.member_name || alloc.member_key}`,
+        source_table: 'member_account_txns',
+        source_id: maTxn.id,
+        metadata: { member_key: alloc.member_key, account: 'member:' + alloc.member_key },
+      }, req.user.id);
 
       results.push(allocRow);
     }

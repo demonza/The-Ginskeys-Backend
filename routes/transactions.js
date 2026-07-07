@@ -8,6 +8,7 @@ const csv     = require('csv-parse/sync');
 const pool    = require('../db/pool');
 const { requireAuth, requirePerm } = require('../middleware/auth');
 const { writeAudit } = require('../middleware/audit');
+const { toEur } = require('./fx');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
@@ -161,8 +162,8 @@ router.post('/bulk-import', requireAuth, requirePerm('addTxn'), upload.single('f
         if (!isFinite(amt) || amt <= 0)
           throw new Error('Amount must be a positive number');
 
-        const FX = { EUR: 1, USD: 0.92, GBP: 1.17 };
-        const amtEur = parseFloat((amt * (FX[currency.toUpperCase()] || 1)).toFixed(2));
+        // FIX: use live ECB rates (via fx proxy) instead of hardcoded, wrong-direction FX.
+        const amtEur = await toEur(amt, currency);
 
         let catId = null;
         if (category) {
@@ -211,29 +212,39 @@ router.get('/:id', requireAuth, requirePerm('viewLedger'), async (req, res, next
 // ─── POST /api/transactions ─────────────────────────
 router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
   try {
-    const { date, type, categoryId, amount, currency = 'EUR', description, source_dest, tourId, tags = [], notes } = req.body;
+    const { date, type, amount, currency = 'EUR', description, source_dest, tourId, tags = [], notes, category, reconciled } = req.body;
+    let { categoryId } = req.body;
     if (!date || !type || !amount || !description)
       return res.status(400).json({ error: 'date, type, amount and description are required' });
     if (!['income','expense'].includes(type))
       return res.status(400).json({ error: 'type must be income or expense' });
+
+    // FIX: allow creating with a category NAME (the console UI only knows names).
+    if (!categoryId && category) {
+      const { rows: cats } = await pool.query(
+        'SELECT id FROM categories WHERE name ILIKE $1 LIMIT 1', [category]
+      );
+      categoryId = cats[0]?.id || null;
+    }
 
     const amt = parseFloat(amount);
     // FIX: validate amount is finite and positive
     if (!isFinite(amt) || amt <= 0)
       return res.status(400).json({ error: 'amount must be a positive number' });
 
-    const FX = { EUR: 1, USD: 0.92, GBP: 1.17 };
-    const amountEur = parseFloat((amt * (FX[currency] || 1)).toFixed(2));
+    // FIX: live ECB rates via fx proxy (was hardcoded & inverted).
+    const amountEur = await toEur(amt, currency);
 
     const id = uuid();
     const { rows } = await pool.query(
       `INSERT INTO transactions
-         (id, date, type, category_id, amount, currency, amount_eur, description, source_dest, tour_id, tags, notes, created_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+         (id, date, type, category_id, amount, currency, amount_eur, description, source_dest, tour_id, tags, notes, reconciled, created_by)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
        RETURNING *`,
       [id, date, type, categoryId || null, amt, currency, amountEur,
        description.trim(), source_dest || null, tourId || null,
-       Array.isArray(tags) ? tags : [tags], notes || null, req.user.id]
+       Array.isArray(tags) ? tags : [tags], notes || null,
+       reconciled !== undefined ? !!reconciled : true, req.user.id]
     );
 
     await writeAudit(req, 'TXN_CREATE', {
@@ -251,46 +262,67 @@ router.put('/:id', requireAuth, requirePerm('editTxn'), async (req, res, next) =
     if (!existing[0]) return res.status(404).json({ error: 'Transaction not found' });
 
     const old = existing[0];
-    const { date, type, categoryId, amount, currency, description, source_dest, tourId, tags, notes, reconciled } = req.body;
+    const { date, type, amount, currency, description, source_dest, tourId, tags, notes, reconciled, category } = req.body;
+    let { categoryId } = req.body;
 
     // FIX: validate type if provided
     if (type && !['income','expense'].includes(type))
       return res.status(400).json({ error: 'type must be income or expense' });
 
-    const FX = { EUR: 1, USD: 0.92, GBP: 1.17 };
-    const newAmt    = amount     !== undefined ? parseFloat(amount)    : parseFloat(old.amount);
-    const newCcy    = currency   !== undefined ? currency              : old.currency;
+    // FIX: allow updating category by NAME (the console UI only knows names).
+    // A blank string ('') explicitly CLEARS the category; omitting the key leaves it.
+    let categoryProvided = false;
+    if (categoryId !== undefined) {
+      categoryProvided = true;
+    } else if (category !== undefined) {
+      categoryProvided = true;
+      if (category === null || category === '') {
+        categoryId = null;
+      } else {
+        const { rows: cats } = await pool.query(
+          'SELECT id FROM categories WHERE name ILIKE $1 LIMIT 1', [category]
+        );
+        categoryId = cats[0]?.id || null;
+      }
+    }
 
-    // FIX: validate amount if provided
-    if (amount !== undefined && (!isFinite(newAmt) || newAmt <= 0))
-      return res.status(400).json({ error: 'amount must be a positive number' });
+    // FIX: build the SET clause dynamically. Only fields actually present in the
+    // request body are updated; clearable fields (notes, tour_id, source_dest,
+    // category) can be set to NULL by sending null/''. Previously the COALESCE
+    // pattern made it impossible to ever clear a field once set.
+    const sets = [];
+    const vals = [];
+    const push = (col, val) => { vals.push(val); sets.push(`${col} = $${vals.length}`); };
 
-    const amountEur = parseFloat((newAmt * (FX[newCcy] || 1)).toFixed(2));
+    if (date !== undefined)        push('date', date);
+    if (type !== undefined)        push('type', type);
+    if (categoryProvided)          push('category_id', categoryId);
+    if (description !== undefined) push('description', String(description).trim());
+    if (source_dest !== undefined) push('source_dest', source_dest || null);
+    if (tourId !== undefined)      push('tour_id', tourId || null);
+    if (tags !== undefined)        push('tags', Array.isArray(tags) ? tags : [tags]);
+    if (notes !== undefined)       push('notes', notes === '' ? null : notes);
+    if (reconciled !== undefined)  push('reconciled', !!reconciled);
 
+    // amount / currency / amount_eur move together — recompute if either changed
+    if (amount !== undefined || currency !== undefined) {
+      const newAmt = amount   !== undefined ? parseFloat(amount) : parseFloat(old.amount);
+      const newCcy = currency !== undefined ? currency           : old.currency;
+      if (!isFinite(newAmt) || newAmt <= 0)
+        return res.status(400).json({ error: 'amount must be a positive number' });
+      const amountEur = await toEur(newAmt, newCcy);
+      push('amount', newAmt);
+      push('currency', newCcy);
+      push('amount_eur', amountEur);
+    }
+
+    if (!sets.length) return res.json(old); // nothing to change
+
+    sets.push('updated_at = now()');
+    vals.push(req.params.id);
     const { rows } = await pool.query(
-      `UPDATE transactions SET
-         date         = COALESCE($1, date),
-         type         = COALESCE($2, type),
-         category_id  = COALESCE($3, category_id),
-         amount       = $4,
-         currency     = $5,
-         amount_eur   = $6,
-         description  = COALESCE($7, description),
-         source_dest  = COALESCE($8, source_dest),
-         tour_id      = COALESCE($9, tour_id),
-         tags         = COALESCE($10, tags),
-         notes        = COALESCE($11, notes),
-         reconciled   = COALESCE($12, reconciled),
-         updated_at   = now()
-       WHERE id = $13 RETURNING *`,
-      [date || null, type || null, categoryId || null,
-       newAmt, newCcy, amountEur,
-       description ? description.trim() : null,
-       source_dest || null, tourId || null,
-       tags ? (Array.isArray(tags) ? tags : [tags]) : null,
-       notes !== undefined ? notes : null,
-       reconciled !== undefined ? reconciled : null,
-       req.params.id]
+      `UPDATE transactions SET ${sets.join(', ')} WHERE id = $${vals.length} RETURNING *`,
+      vals
     );
 
     await writeAudit(req, 'TXN_UPDATE', {

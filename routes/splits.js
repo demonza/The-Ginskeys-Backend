@@ -6,6 +6,7 @@ const { v4: uuid } = require('uuid');
 const pool   = require('../db/pool');
 const { requireAuth, requirePerm } = require('../middleware/auth');
 const { writeAudit } = require('../middleware/audit');
+const { appendEvent } = require('../lib/ledger');
 
 // ── GET /api/splits/member-accounts ───────────────────────
 // FIX: moved BEFORE '/:id' style routes to prevent Express matching
@@ -94,6 +95,29 @@ router.post('/member-accounts/txn', requireAuth, requirePerm('addTxn'), async (r
     const date = txn_date || new Date().toISOString().split('T')[0];
     const desc = description || null;
 
+    // GUARD: if this member movement mirrors an existing ledger transaction,
+    // the direction must be consistent — an 'expense' ledger txn can only pair
+    // with a 'withdrawal', and an 'income' ledger txn with a 'deposit' or
+    // 'split_credit'. This prevents the class of bug where income was mirrored
+    // as a withdrawal and silently drained a member's wallet.
+    if (ledger_txn_id) {
+      const { rows: [ledgerTxn] } = await client.query(
+        'SELECT type FROM transactions WHERE id = $1', [ledger_txn_id]
+      );
+      if (!ledgerTxn) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ error: 'ledger_txn_id does not reference an existing transaction' });
+      }
+      const expected = ledgerTxn.type === 'expense' ? ['withdrawal'] : ['deposit', 'split_credit'];
+      if (!expected.includes(txn_type)) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({
+          error: `Direction mismatch: ledger transaction is '${ledgerTxn.type}' but member txn_type is '${txn_type}'. ` +
+                 `Expected: ${expected.join(' or ')}.`
+        });
+      }
+    }
+
     // Check if ledger_txn_id column exists
     const colChk = await client.query(`
       SELECT 1 FROM information_schema.columns
@@ -162,6 +186,30 @@ router.post('/member-accounts/txn', requireAuth, requirePerm('addTxn'), async (r
           [newLedgerTxnId, rows[0].id]
         );
       }
+    }
+
+    // ── TRUST ENGINE ─────────────────────────────────────────────
+    // Mirror this movement into the append-only event store (same txn).
+    // split_credit / deposit → money INTO the member wallet.
+    // withdrawal            → money OUT of the member wallet.
+    try {
+      const evType = txn_type === 'withdrawal' ? 'member_withdrawal'
+                   : txn_type === 'split_credit' ? 'treasury_allocated'
+                   : 'member_deposit';
+      await appendEvent(client, {
+        event_type: evType,
+        amount_eur: amt,
+        occurred_on: date,
+        description: desc || (member_name || member_key),
+        source_table: 'member_account_txns',
+        source_id: rows[0].id,
+        metadata: { member_key, account: 'member:' + member_key },
+      }, req.user.id);
+    } catch (evErr) {
+      // A failed event mirror MUST fail the whole operation — otherwise the
+      // event store silently drifts from reality, which defeats its purpose.
+      await client.query('ROLLBACK');
+      return next(new Error('Trust-ledger write failed: ' + evErr.message));
     }
 
     await client.query('COMMIT');

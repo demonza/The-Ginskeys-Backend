@@ -202,3 +202,28 @@ You also asked for *more* PDF generators/archives and *more* input flexibility p
 show/formation/setting. I shipped the one PDF I could build correctly against your real data
 shape (the Day Sheet) rather than fake several. Broader templating + a documents archive is a
 clean next step — happy to do it as a focused follow-up.
+
+---
+
+## Trust Engine (v10) — event-sourced ledger + tamper-evident audit
+
+An additive integrity layer. The classic `transactions` / `treasury_pool` /
+`member_account_txns` tables are unchanged; alongside them the engine keeps an
+**append-only event store** whose balances are *derived*, not mutated, plus a
+**hash-chained audit log** where each entry seals the previous one.
+
+**Why (not a blockchain):** it gives the one genuinely useful property people
+reach for blockchains for — provable, un-secretly-alterable history — with zero
+wallets, gas, or external infra. Money is conserved by double-entry construction,
+so the class of bug where a wallet was silently debited instead of credited is
+now structurally impossible (an unbalanced event throws).
+
+### Deploy
+1. Ship the code (tables auto-create on boot; or run `node db/migrate_v10.js`).
+2. Seed history: `node db/backfill_events.js` (dry run), then `--apply`.
+3. Verify anytime: `GET /api/trust/verify` → audit chain + event chain + conservation.
+
+### Endpoints
+- `GET /api/trust/verify` — full integrity report (the "prove it" button).
+- `GET /api/trust/balances` — derived band_cash + per-member wallet balances.
+- `GET /api/trust/events` — append-only event feed.

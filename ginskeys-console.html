@@ -1528,8 +1528,8 @@ tr:hover .edit-btn{display:inline}
       </div>
         <div class="form-field" style="grid-column:span 2">
           <label style="display:flex;align-items:center;gap:6px">
-            From Member Account
-            <span style="font-size:9px;color:var(--muted3);font-weight:400">(optional — deducts from member balance)</span>
+            Member Account
+            <span style="font-size:9px;color:var(--muted3);font-weight:400">(optional — expense deducts, income credits the member wallet)</span>
           </label>
           <select class="form-select" id="txn-member-account">
             <option value="">— Band account / no deduction —</option>
@@ -1538,6 +1538,12 @@ tr:hover .edit-btn{display:inline}
             <option value="manuel">Manuel</option>
             <option value="tiago">Tiago</option>
           </select>
+        </div>
+        <div class="form-field" style="grid-column:span 2">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="txn-reconciled" checked style="width:auto;margin:0">
+            <span>Reconciled <span style="font-size:9px;color:var(--muted3);font-weight:400">(matched against bank/cash — uncheck if still pending)</span></span>
+          </label>
         </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
         <button class="btn-sm ghost" onclick="closeModal()">Cancel</button>
@@ -5454,10 +5460,20 @@ function updateAllocTotal() {
 function treasuryAllocateEqual() {
   var item = TREASURY_DATA.find(function(t){return t.id===_allocTreasuryId;});
   if (!item) return;
-  var remaining = parseFloat(item.net_eur) - parseFloat(item.allocated_eur);
+  var remaining = parseFloat((parseFloat(item.net_eur) - parseFloat(item.allocated_eur)).toFixed(2));
   var inputs = document.querySelectorAll('.ta-amount-input');
-  var perMember = parseFloat((remaining / inputs.length).toFixed(2));
-  inputs.forEach(function(inp) { inp.value = perMember.toFixed(2); });
+  var n = inputs.length;
+  if (!n) return;
+  // FIX: give each member the floored per-head share, then let the LAST member
+  // absorb the rounding remainder so the split always sums to exactly `remaining`
+  // (previously €100/3 left €0.01 stranded and blocked "fully allocated" status).
+  var per = Math.floor((remaining / n) * 100) / 100;
+  var allocated = 0;
+  inputs.forEach(function(inp, i) {
+    var v = (i === n - 1) ? parseFloat((remaining - allocated).toFixed(2)) : per;
+    allocated = parseFloat((allocated + v).toFixed(2));
+    inp.value = v.toFixed(2);
+  });
   updateAllocTotal();
 }
 
@@ -13196,7 +13212,7 @@ function mapApiTxn(rows) {
       tags:        Array.isArray(t.tags) ? t.tags : [],
       amount:      amt,
       balance:     running,
-      reconciled:  t.reconciled ?? true,
+      reconciled:  t.reconciled === true,
       tour_id:     t.tour_id || null,
       member_key:  mk,
       notes:       t.notes || null,
@@ -13212,9 +13228,23 @@ function mapApiTxn(rows) {
 async function loadLedgerFromApi() {
   if (!API_BASE || !SESSION?.token) return false;
   try {
-    const data = await apiGet('/transactions?limit=500&sortBy=date&sortDir=asc');
-    if (data?.data?.length) {
-      LEDGER_DATA = mapApiTxn(data.data);
+    // FIX: page through the full ledger instead of silently capping at 500.
+    // Beyond the cap, older rows vanished from the UI and running balances
+    // (computed forward from €0) came out wrong.
+    const PAGE = 500;
+    let page = 1, all = [], total = Infinity;
+    while (all.length < total) {
+      const data = await apiGet('/transactions?limit=' + PAGE + '&page=' + page + '&sortBy=date&sortDir=asc');
+      const batch = data?.data || [];
+      if (!batch.length) break;
+      all = all.concat(batch);
+      total = data?.pagination?.total ?? all.length;
+      if (batch.length < PAGE) break;
+      page++;
+      if (page > 100) break; // hard safety stop (~50k txns)
+    }
+    if (all.length) {
+      LEDGER_DATA = mapApiTxn(all);
       return true;
     }
   } catch(e) {
@@ -13305,11 +13335,17 @@ function updateKpiMemberBreakdown() {
 function updateReconcileStrip(){
   const total=LEDGER_DATA.length;
   const bal=LEDGER_DATA[0]?.balance??0;
+  // FIX: count the real reconciled flags — this was hardcoded to `total`,
+  // which hid pending transactions from the strip entirely.
+  const reconciledCount=LEDGER_DATA.filter(t=>t.reconciled!==false).length;
   const el_t=document.getElementById('rec-total');
   const el_r=document.getElementById('rec-reconciled');
   const el_b=document.getElementById('rec-balance');
   if(el_t) el_t.textContent=total;
-  if(el_r) el_r.textContent=total; // all are reconciled (no pending in real data)
+  if(el_r){
+    el_r.textContent = reconciledCount===total ? total : reconciledCount+' / '+total;
+    el_r.style.color = reconciledCount===total ? 'var(--green3)' : 'var(--amber2)';
+  }
   if(el_b) el_b.textContent='€ '+bal.toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
@@ -13430,6 +13466,7 @@ function showToast(msg, type='info'){
 }
 
 async function apiPost(path, body){ return _apiFetch('POST', path, body); }
+async function apiPut(path, body){ return _apiFetch('PUT', path, body); }
 async function apiGet(path){ return _apiFetch('GET', path, undefined); }
 async function apiDelete(path){ return _apiFetch('DELETE', path, undefined); }
 
@@ -13991,9 +14028,12 @@ async function submitTxn(){
     // ── API MODE ─────────────────────────────────────────
     btn.textContent = 'Saving…'; btn.disabled = true;
     const memberKey = document.getElementById('txn-member-account')?.value || '';
+    const reconciled = document.getElementById('txn-reconciled')?.checked !== false;
     try {
       const data = await apiPost('/transactions', {
         date, type, description: desc, amount: Math.abs(amt), currency: 'EUR',
+        category: cat,          // FIX: category was never sent — everything landed as NULL/"Outros"
+        reconciled: reconciled, // FIX: reconciled state now persisted at creation
         notes: memberKey ? 'member_account:' + memberKey : undefined,
       });
       // Map API response to local shape and prepend
@@ -14002,27 +14042,33 @@ async function submitTxn(){
       const newBal = parseFloat(((prev?.balance || 0) + signed).toFixed(2));
       LEDGER_DATA.unshift({
         id: data.id, date, desc: data.description, type,
-        cat, tags: [], amount: signed, balance: newBal, reconciled: false,
+        cat, tags: [], amount: signed, balance: newBal, reconciled: reconciled,
         member_key: memberKey || null,
       });
 
-      // If a member account was selected, mirror as a withdrawal from that account
+      // If a member account was selected, mirror the movement into that account.
+      // FIX: the direction MUST follow the ledger type — an expense paid from a
+      // member's wallet is a withdrawal; income routed to a member's wallet is a
+      // deposit. This was hardcoded to 'withdrawal', which silently SUBTRACTED
+      // income amounts from member wallets (e.g. −€2000 instead of +€2000).
       if (memberKey) {
         const MEMBER_NAMES = { fabio: 'Fábio', pedro: 'Pedro', manuel: 'Manuel', tiago: 'Tiago' };
+        const mirrorType = type === 'expense' ? 'withdrawal' : 'deposit';
         try {
           await apiPost('/splits/member-accounts/txn', {
             member_key: memberKey,
             member_name: MEMBER_NAMES[memberKey] || memberKey,
             amount: Math.abs(amt),
-            txn_type: 'withdrawal',
+            txn_type: mirrorType,
             description: desc,
             txn_date: date,
             ledger_txn_id: data.id,
           });
-          showToast('Ledger + ' + (MEMBER_NAMES[memberKey] || memberKey) + "'s account updated", 'ok');
+          showToast((MEMBER_NAMES[memberKey] || memberKey) + "'s account " +
+            (mirrorType === 'withdrawal' ? 'debited' : 'credited') + ' €' + Math.abs(amt).toFixed(2), 'ok');
           loadMemberAccounts();
         } catch(memberErr) {
-          console.warn('Member account deduction failed:', memberErr.message);
+          console.warn('Member account mirror failed:', memberErr.message);
           showToast('Ledger saved — member account update failed', 'warn');
         }
       }
@@ -14030,6 +14076,9 @@ async function submitTxn(){
       // Reset the member selector
       const memberSel = document.getElementById('txn-member-account');
       if (memberSel) memberSel.value = '';
+      // Reset the reconciled checkbox back to its default (checked)
+      const recChk = document.getElementById('txn-reconciled');
+      if (recChk) recChk.checked = true;
 
       auditLog('TXN_ADD', 'Saved via API: ' + desc + (memberKey ? ' [from ' + memberKey + ']' : ''));
     } catch(err){
@@ -14155,7 +14204,7 @@ function openEditTxn(idx){
     const MEMBER_NAMES = { fabio: 'Fábio', pedro: 'Pedro', manuel: 'Manuel', tiago: 'Tiago' };
     const mk = t.member_key || (t.notes && t.notes.startsWith('member_account:') ? t.notes.split(':')[1] : null);
     if (mk && MEMBER_NAMES[mk]) {
-      memberDisplay.textContent = MEMBER_NAMES[mk] + ' — deducted from member account';
+      memberDisplay.textContent = MEMBER_NAMES[mk] + ' — ' + (t.type === 'expense' ? 'debited from' : 'credited to') + ' member account';
       memberDisplay.style.color = 'var(--accent)';
     } else {
       memberDisplay.textContent = '— Band account (no member deduction)';
@@ -14170,21 +14219,51 @@ function openEditTxn(idx){
 }
 function closeEditTxn(){ document.getElementById('edit-txn-modal').classList.remove('open'); }
 
-function saveEditTxn(){
+async function saveEditTxn(){
   const idx=parseInt(document.getElementById('edit-txn-idx').value);
   const t=LEDGER_DATA[idx];
   if(!t){ closeEditTxn(); return; }
   const type=document.getElementById('edit-txn-type').value;
   const amt=parseFloat(document.getElementById('edit-txn-amount').value)||0;
+  const date=document.getElementById('edit-txn-date').value;
+  const desc=document.getElementById('edit-txn-desc').value.trim();
+  const cat=document.getElementById('edit-txn-cat').value;
+  const tags=document.getElementById('edit-txn-tags').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const reconciled=document.getElementById('edit-txn-reconciled').value==='true';
   const signed=type==='expense'?-Math.abs(amt):Math.abs(amt);
+
+  // FIX: persist the edit to the backend FIRST, then update local state.
+  // Previously this function only mutated the in-memory LEDGER_DATA, so every
+  // edit (including the reconciled flag) evaporated on page refresh.
+  if (t.id && API_BASE && SESSION?.token) {
+    const btn=document.querySelector('#edit-txn-modal .btn-sm.primary');
+    if(btn) btn.disabled=true;
+    try {
+      await apiPut('/transactions/'+t.id, {
+        date, type,
+        description: desc,
+        amount: Math.abs(amt),
+        currency: 'EUR',
+        tags,
+        category: cat,      // backend resolves the name to a category_id
+        reconciled: reconciled
+      });
+    } catch(e) {
+      if(btn) btn.disabled=false;
+      showToast('Save failed: '+e.message,'err');
+      return; // do NOT apply locally — keep UI and DB consistent
+    }
+    if(btn) btn.disabled=false;
+  }
+
   const old={...t};
-  t.date=document.getElementById('edit-txn-date').value;
+  t.date=date;
   t.type=type;
-  t.desc=document.getElementById('edit-txn-desc').value.trim();
+  t.desc=desc;
   t.amount=signed;
-  t.cat=document.getElementById('edit-txn-cat').value;
-  t.tags=document.getElementById('edit-txn-tags').value.split(',').map(s=>s.trim()).filter(Boolean);
-  t.reconciled=document.getElementById('edit-txn-reconciled').value==='true';
+  t.cat=cat;
+  t.tags=tags;
+  t.reconciled=reconciled;
   // Recalculate running balances from scratch
   recalcBalances();
   auditLog('TXN_EDIT','Edited: '+t.desc,JSON.stringify(old),JSON.stringify(t));

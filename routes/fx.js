@@ -149,4 +149,42 @@ router.get('/convert', async (req, res) => {
   }
 });
 
+// ── Shared rate accessor for other routes ──────────
+// Returns EUR-based rates (EUR=1, others = units of that ccy per 1 EUR),
+// refreshing the cache if stale. Falls back gracefully. This is what the
+// transactions routes use so amount_eur is computed from live ECB rates
+// instead of hardcoded guesses.
+async function getRates() {
+  const now = Date.now();
+  if (cachedRates && (now - cachedAt) < CACHE_TTL_MS) return cachedRates;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const response = await fetch(
+      `https://api.frankfurter.app/latest?base=EUR&symbols=${SUPPORTED_SYMBOLS.join(',')}`,
+      { signal: controller.signal }
+    );
+    clearTimeout(timeout);
+    if (response.ok) {
+      const data = await response.json();
+      cachedRates = { EUR: 1, ...data.rates };
+      cachedAt = now;
+    }
+  } catch { /* keep whatever we have */ }
+  return cachedRates || FALLBACK_RATES;
+}
+
+// Convert an amount in `currency` to EUR using live rates.
+// Frankfurter rates are "units per 1 EUR", so EUR = amount / rate.
+async function toEur(amount, currency) {
+  const ccy = (currency || 'EUR').toUpperCase();
+  if (ccy === 'EUR') return parseFloat(Number(amount).toFixed(2));
+  const rates = await getRates();
+  const rate = rates[ccy];
+  if (!rate) return parseFloat(Number(amount).toFixed(2)); // unknown ccy: treat 1:1, better than silently wrong
+  return parseFloat((Number(amount) / rate).toFixed(2));
+}
+
 module.exports = router;
+module.exports.getRates = getRates;
+module.exports.toEur = toEur;
