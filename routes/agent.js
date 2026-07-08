@@ -67,61 +67,6 @@ setInterval(() => {
 
 
 // ── AI HELPER ────────────────────────────────────────
-// FIX: Gemini model cache with TTL (was cached forever — if Google
-// deprecates a model, the app would keep trying it until restart).
-// Cache is in-memory, so a redeploy resets it — which is what we want
-// now that we've flipped the model priority.
-let _geminiModels = null;
-let _geminiModelsCachedAt = 0;
-const GEMINI_CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
-
-async function getGeminiModels(apiKey) {
-  const now = Date.now();
-  if (_geminiModels && (now - _geminiModelsCachedAt) < GEMINI_CACHE_TTL_MS) {
-    return _geminiModels;
-  }
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10_000);
-    const res = await fetch(
-      // FIX: API key in URL is acceptable for Gemini (it's their documented pattern)
-      // but we should at minimum not log the URL anywhere
-      `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}&pageSize=50`,
-      { signal: controller.signal }
-    );
-    clearTimeout(timeout);
-    if (!res.ok) return null;
-    const data = await res.json();
-    const supported = (data.models || [])
-      .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
-      .map(m => m.name.replace('models/', ''))
-      .filter(name => /gemini-(2|1\.5)/.test(name) && !name.includes('image') && !name.includes('vision'));
-    supported.sort((a, b) => {
-      // FIX: prioritise 2.0-flash (full) over 2.0-flash-lite (lite has
-      // much tighter rate limits on the free tier — hits 429 within a few
-      // requests). Full 2.0-flash has no thinking mode, so the whole token
-      // budget goes to actual output text. 2.5-flash last because its
-      // thinking-tokens feature silently consumes the output budget.
-      const score = n => {
-        // exact match for full 2.0-flash (not -lite)
-        if (n === 'gemini-2.0-flash' || n === 'gemini-2.0-flash-001') return 0;
-        if (n.includes('2.0-flash') && !n.includes('lite'))           return 1;
-        if (n.includes('1.5-flash'))                                  return 2;
-        if (n.includes('1.5-pro'))                                    return 3;
-        if (n.includes('2.0-flash-lite'))                             return 4;
-        if (n.includes('2.5-flash'))                                  return 5;
-        return 6;
-      };
-      return score(a) - score(b);
-    });
-    _geminiModels = supported.slice(0, 3);
-    _geminiModelsCachedAt = now;
-    return _geminiModels;
-  } catch (e) {
-    return null;
-  }
-}
-
 // FIX: fetch with timeout helper (original had no timeout — a hanging
 // AI call would hold the Express connection open forever)
 async function fetchWithTimeout(url, options, timeoutMs = AI_TIMEOUT_MS) {
@@ -154,7 +99,6 @@ async function callAI(prompt, maxTokens = 4000) {
     // some — so we also bump maxTokens to give real slack.
     const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-1.5-flash'];
 
-    geminiLoop:
     for (const model of models) {
       for (let attempt = 0; attempt <= AI_MAX_RETRIES; attempt++) {
         try {
@@ -195,23 +139,28 @@ async function callAI(prompt, maxTokens = 4000) {
                         `total=${usage.totalTokenCount} ` +
                         `textLen=${text?.length || 0}`);
 
-            // FIX: detect truncation aggressively. A complete pitch always ends
-            // with punctuation (. ! ?) or a sign-off. If the text ends mid-word
-            // or mid-sentence, treat as truncated even if finishReason says STOP.
-            const looksTruncated =
-              finishReason === 'MAX_TOKENS' ||
-              finishReason === 'max_tokens' ||
-              (text && text.length > 50 && !/[.!?"\)\]]\s*$/.test(text.trim()));
+            // FIX: only trust the model's own finishReason for truncation.
+            // The old heuristic ("doesn't end in .!?\")]") false-positived on
+            // completely fine output — an em dash, an ellipsis, a sign-off
+            // with no trailing period, an emoji — and every false positive
+            // silently escalated to the PAID Anthropic tier for no reason.
+            // finishReason is the only signal Gemini itself gives us; that's
+            // the only one worth trusting.
+            const hitMaxTokens = finishReason === 'MAX_TOKENS' || finishReason === 'max_tokens';
 
-            if (looksTruncated) {
-              lastErr = `Gemini ${model}: output truncated at ${text?.length || 0} chars ` +
-                        `(finishReason=${finishReason}, thoughts=${usage.thoughtsTokenCount || 0} tokens). ` +
-                        `Trying Anthropic fallback.`;
+            if (hitMaxTokens) {
+              // Genuinely ran out of budget. Before giving up on this model
+              // (still free), retry ONCE with double the token budget — that's
+              // the real fix for truncation, and it costs nothing extra.
+              if (maxTokens < 8000) {
+                console.warn(`[agent] Gemini ${model}: hit MAX_TOKENS at ${maxTokens} tokens, retrying same model at ${Math.min(maxTokens * 2, 8000)}`);
+                const retryText = await callAI(prompt, Math.min(maxTokens * 2, 8000));
+                if (retryText) return retryText;
+              }
+              lastErr = `Gemini ${model}: output truncated even at raised token budget ` +
+                        `(thoughts=${usage.thoughtsTokenCount || 0} tokens). Trying next free model.`;
               console.warn('[agent]', lastErr);
-              // Break out of BOTH loops so we jump straight to Anthropic.
-              // The old `break` only exited the retry loop and then kept
-              // trying more Gemini models, never reaching Anthropic.
-              break geminiLoop;
+              break; // move to the next free Gemini model — NOT to paid Anthropic
             }
             if (text) return text;
             lastErr = `Gemini ${model}: empty response (finishReason=${finishReason || 'unknown'})`;
@@ -225,13 +174,9 @@ async function callAI(prompt, maxTokens = 4000) {
 
           // Non-retryable errors
           if (status === 400 || status === 403) {
-            _geminiModels = null;
-            _geminiModelsCachedAt = 0;
             break; // bad key/request — no point retrying
           }
           if (status === 404) {
-            _geminiModels = null;
-            _geminiModelsCachedAt = 0;
             break; // model gone — try next model
           }
 
@@ -257,8 +202,14 @@ async function callAI(prompt, maxTokens = 4000) {
     }
   }
 
-  // Fallback to Anthropic
-  if (process.env.ANTHROPIC_API_KEY) {
+  // Fallback to Anthropic — PAID. Requires explicit opt-in via
+  // ALLOW_PAID_AI_FALLBACK=true so the console never spends money without
+  // someone having deliberately decided that's acceptable. Setting only
+  // ANTHROPIC_API_KEY is not enough on its own; both must be set.
+  const paidFallbackEnabled = process.env.ALLOW_PAID_AI_FALLBACK === 'true' && !!process.env.ANTHROPIC_API_KEY;
+
+  if (paidFallbackEnabled) {
+    console.warn('[agent] All free Gemini models failed — falling back to PAID Anthropic API (ALLOW_PAID_AI_FALLBACK=true)');
     for (let attempt = 0; attempt <= AI_MAX_RETRIES; attempt++) {
       try {
         const res = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
@@ -309,10 +260,21 @@ async function callAI(prompt, maxTokens = 4000) {
     }
   }
 
-  if (!process.env.GEMINI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
-    throw new Error('No AI API key configured. Add GEMINI_API_KEY (free) or ANTHROPIC_API_KEY to Railway Variables.');
+  if (!process.env.GEMINI_API_KEY && !paidFallbackEnabled) {
+    throw new Error(
+      process.env.ANTHROPIC_API_KEY
+        ? 'No GEMINI_API_KEY set, and paid fallback is disabled. Add GEMINI_API_KEY (free), or set ALLOW_PAID_AI_FALLBACK=true to allow the existing ANTHROPIC_API_KEY to be used (this will incur cost).'
+        : 'No AI API key configured. Add GEMINI_API_KEY (free) to Railway Variables.'
+    );
   }
-  throw new Error(`AI generation failed: ${lastErr}`);
+  // The free tier genuinely couldn't produce a result this time (rate-limited
+  // across all three models, or a real error) and paid fallback is either
+  // disabled or also failed. Fail honestly instead of pretending it worked.
+  throw new Error(
+    paidFallbackEnabled
+      ? `AI generation failed on free tier and paid fallback: ${lastErr}`
+      : `Free Gemini tier unavailable right now (${lastErr}). Try again shortly, or set ALLOW_PAID_AI_FALLBACK=true to allow paid fallback.`
+  );
 }
 
 
