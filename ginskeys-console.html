@@ -4455,6 +4455,27 @@ tr:hover .edit-btn{display:inline}
   </div>
 </div>
 
+<!-- ══ MEMBER TAX PROFILES MODAL ══════════════════════ -->
+<div id="tax-profiles-modal" class="overlay-bg" onclick="if(event.target===this)closeTaxProfiles()">
+  <div class="overlay-box" style="width:560px">
+    <div class="overlay-hdr">
+      <span class="overlay-title">✎ Perfis Fiscais dos Membros / Member Tax Profiles</span>
+      <button class="overlay-close" onclick="closeTaxProfiles()">✕</button>
+    </div>
+    <div class="overlay-body" style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:9px;color:var(--muted2);line-height:1.6">
+        Tax on gig revenue is a <strong>band cost</strong> — the band fund reimburses whoever invoices, so no one is punished for taking a turn.
+        These profiles let the tool pick the cheapest legal invoicer for the next gig.
+      </div>
+      <div id="tax-profiles-rows" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+    <div class="overlay-hdr" style="justify-content:flex-end;border-top:1px solid var(--border);border-bottom:none;gap:8px">
+      <button class="btn-sm ghost" onclick="closeTaxProfiles()">Cancel</button>
+      <button class="btn-sm primary" onclick="saveTaxProfiles()">Guardar / Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ BUDGET TARGETS MODAL ══════════════════════════ -->
 <div id="budget-targets-modal" class="overlay-bg" onclick="if(event.target===this)closeBudgetTargets()">
   <div class="overlay-box" style="width:480px">
@@ -6858,6 +6879,23 @@ function membersExportPDF() { membersExportAgreement(); }
 var BUDGET_TARGETS = {};
 var STORAGE_BUDGET = 'gk_budget_targets';
 
+// ── MEMBER TAX PROFILES ──────────────────────────────────────────────────────
+// Per-member tax situation, so the tool can recommend the cheapest LEGAL invoicer
+// for the next gig. Principle: gig tax is a BAND cost (reimbursed from the band
+// fund), so "who invoices" is a pure cost-minimisation choice, not a personal hit.
+//   profile: 'freelancer' (atividade aberta — invoices freely, own marginal rate)
+//            'employed'   (Cat. A elsewhere — ato isolado adds at their marginal rate)
+//            'none'       (no atividade — classic one ato isolado/year)
+//   marginalRate: rough IRS marginal rate (%) used to estimate their tax cost
+//   atoUsed: has this member spent their one ato isolado this tax year (per profile year)
+var MEMBER_TAX_PROFILES = {};
+var STORAGE_TAXPROF = 'gk_member_tax_profiles';
+var DEFAULT_TAX_PROFILE = { profile: 'none', marginalRate: 28.5, atoUsed: false };
+
+function taxProfileFor(mk) {
+  return Object.assign({}, DEFAULT_TAX_PROFILE, (MEMBER_TAX_PROFILES && MEMBER_TAX_PROFILES[mk]) || {});
+}
+
 function switchFTTab(tab, btn) {
   ['irs','budget'].forEach(function(t) {
     var el = document.getElementById('ft-' + t);
@@ -6870,7 +6908,19 @@ function switchFTTab(tab, btn) {
 }
 
 async function financeToolsLoad() {
+  // The custody/tax tools depend on member wallet data — make sure it's loaded
+  // even if the user lands here without visiting Treasury first.
+  if (typeof loadMemberAccounts === 'function' &&
+      (!MEMBER_ACCOUNTS_DATA || !MEMBER_ACCOUNTS_DATA.balances || !MEMBER_ACCOUNTS_DATA.balances.length)) {
+    try { await loadMemberAccounts(); } catch(e) { /* non-fatal */ }
+  }
   if (API_BASE && SESSION && SESSION.token) {
+    try {
+      const tp = await apiGet('/members/settings/member_tax_profiles');
+      MEMBER_TAX_PROFILES = (tp && tp.value) ? tp.value : {};
+    } catch(e) {
+      try { var tpl = localStorage.getItem(STORAGE_TAXPROF); MEMBER_TAX_PROFILES = tpl ? JSON.parse(tpl) : {}; } catch(e2) { MEMBER_TAX_PROFILES = {}; }
+    }
     try {
       const result = await apiGet('/members/settings/budget_targets');
       if (result && result.value) {
@@ -6918,101 +6968,206 @@ function _irsRenderCore(year, member) {
   var catDiv  = document.getElementById('irs-category-breakdown');
   if (!grid) return;
   var fmtE = function(v) { return '\u20ac\u00a0' + Math.abs(v).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var fmtS = function(v) { return (v>=0?'+':'\u2212') + '\u20ac\u00a0' + Math.abs(v).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}); };
 
-  var entries = (LEDGER_DATA||[]).filter(function(e){ return new Date(e.date).getFullYear()===year; });
-  var bandIncome   = entries.filter(function(e){ return e.amount>0; }).reduce(function(s,e){ return s+e.amount; },0);
-  var bandExpenses = entries.filter(function(e){ return e.amount<0; }).reduce(function(s,e){ return s+Math.abs(e.amount); },0);
-  var bandNet = bandIncome - bandExpenses;
+  var MK = ['fabio','pedro','manuel','tiago'];
 
-  var memberIncome = {fabio:0,pedro:0,manuel:0,tiago:0};
-  var memberGigs   = {fabio:0,pedro:0,manuel:0,tiago:0};
-  (SPLITS_DATA||[]).forEach(function(s) {
-    if (s.gig_date && new Date(s.gig_date).getFullYear()!==year) return;
-    var perM = parseFloat(s.per_member_eur||0);
-    if (perM>0) { Object.keys(memberIncome).forEach(function(k){ memberIncome[k]+=perM; memberGigs[k]++; }); }
+  // ── REAL DATA: wallet custody + gig income received per member ──────────────
+  // Custody = what each member is physically HOLDING (their wallet balance).
+  // This is band money parked in a personal account until a band account exists.
+  var custody = {fabio:0,pedro:0,manuel:0,tiago:0};
+  var balMap = {};
+  ((MEMBER_ACCOUNTS_DATA && MEMBER_ACCOUNTS_DATA.balances) || []).forEach(function(b){
+    balMap[b.member_key] = b;
+    if (custody[b.member_key] !== undefined) custody[b.member_key] = parseFloat(b.balance||0);
   });
 
-  var expByCat = {};
-  entries.filter(function(e){ return e.amount<0; }).forEach(function(e){
-    var cat=e.cat||'Outros'; expByCat[cat]=(expByCat[cat]||0)+Math.abs(e.amount);
+  // Gig income each member INVOICED this year (deposits into their wallet).
+  // txn_type deposit/split_credit = money in; we treat wallet deposits tied to
+  // gig income as the invoiced amount that lands on THAT member's tax record.
+  var invoiced = {fabio:0,pedro:0,manuel:0,tiago:0};
+  ((MEMBER_ACCOUNTS_DATA && MEMBER_ACCOUNTS_DATA.txns) || []).forEach(function(t){
+    if (t.txn_date && new Date(t.txn_date).getFullYear() !== year) return;
+    if (invoiced[t.member_key] === undefined) return;
+    if (t.txn_type === 'deposit' || t.txn_type === 'split_credit') {
+      invoiced[t.member_key] += parseFloat(t.amount||0);
+    }
   });
 
-  var members = member==='all' ? ['fabio','pedro','manuel','tiago'] : [member];
+  // Band fund balance (a member wallet keyed 'band' / band_fund, if present).
+  var bandFund = parseFloat((balMap['band']||balMap['band_fund']||{}).balance || 0);
+
+  // ── THE POOL: total band money = all member wallets + band fund ─────────────
+  var totalCustody = MK.reduce(function(s,k){ return s + custody[k]; }, 0);
+  var totalPool = totalCustody + bandFund;
+  var fairClaim = totalPool / 4;   // each member's equal 1/4 claim on the band pool
+
+  // ── TAX RISK: whoever invoiced income carries Cat.B exposure on THEIR name ──
+  // Portugal Cat. B simplified regime: coefficient 0.75, then IRS ~28.5% on base.
+  // This is the money that legally shows as THEIR income because they invoiced it.
+  // ── TAX COST MODEL (band-level, per member profile) ────────────────────────
+  // Principle: gig tax is a BAND cost, reimbursed from the band fund, so we pick
+  // the invoicer that costs the BAND the least while staying legal.
+  //   • none/employed: ato isolado — taxable base = gross × 0.75, taxed at their
+  //     marginal rate. 'none' has no other income stacked; 'employed' stacks on
+  //     salary (so their marginal rate is typically higher — you set it).
+  //   • freelancer: invoices freely (no ato limit) at their marginal rate, base
+  //     also × 0.75 coefficient under simplified regime.
+  // Returns the estimated tax (band cost) of routing `gross` through member mk.
+  function taxCostVia(mk, gross) {
+    var p = taxProfileFor(mk);
+    var base = Math.max(0, gross) * 0.75;
+    var rate = (p.marginalRate != null ? p.marginalRate : 28.5) / 100;
+    return base * rate;
+  }
+  // Legacy flat estimate kept for the simple per-member "exposure" display.
+  function taxRisk(gross){ return Math.max(0, gross) * 0.75 * 0.285; }
+
+  // Can this member legally invoice ANOTHER gig this year?
+  function canInvoice(mk) {
+    var p = taxProfileFor(mk);
+    if (p.profile === 'freelancer') return true;          // no ato limit
+    return !p.atoUsed;                                     // none/employed: one ato/year
+  }
+
+  var members = member==='all' ? MK : [member];
   grid.style.gridTemplateColumns = members.length===1 ? '1fr' : 'repeat(2,1fr)';
 
   grid.innerHTML = members.map(function(mk) {
-    var inc=memberIncome[mk]||0, gigs=memberGigs[mk]||0;
-    var deductible=0;
-    DEDUCTIBLE_CATS.forEach(function(cat){ deductible+=(expByCat[cat]||0)/4; });
-    var net=inc-deductible;
-    var taxableBase=Math.max(0,net)*0.75;
-    var estimatedTax=taxableBase*0.285;
-    var col=MEMBER_COLORS_FT[mk], name=MEMBER_NAMES_FT[mk];
+    var col = MEMBER_COLORS_FT[mk], name = MEMBER_NAMES_FT[mk];
+    var hold = custody[mk] || 0;             // custody: what they're holding
+    var inv  = invoiced[mk] || 0;            // gig income they invoiced this year
+    var net  = hold - fairClaim;             // net position vs fair 1/4 claim
+    var risk = taxRisk(inv);                 // tax exposure from invoicing
+    var netColor = Math.abs(net) < 0.01 ? 'var(--muted2)' : (net > 0 ? 'var(--amber2)' : 'var(--blue2)');
+    var netLabel = net > 0.01 ? 'owes the band' : (net < -0.01 ? 'owed by the band' : 'square');
 
     return '<div class="panel" style="border-top:3px solid '+col+';padding:14px">'+
-      '<div style="font-size:10px;font-weight:700;color:'+col+';letter-spacing:.1em;margin-bottom:12px">'+name.toUpperCase()+' — '+year+'</div>'+
+      '<div style="font-size:10px;font-weight:700;color:'+col+';letter-spacing:.1em;margin-bottom:12px">'+name.toUpperCase()+' \u2014 '+year+'</div>'+
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;font-size:10px;border:1px solid var(--border2);border-radius:2px;overflow:hidden;margin-bottom:12px">'+
         '<div style="padding:8px 10px;border-bottom:1px solid var(--border2);border-right:1px solid var(--border2)">'+
-          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">RENDIMENTO BRUTO / Gross Income</div>'+
-          '<div style="font-size:16px;font-weight:700;color:var(--green3)">'+fmtE(inc)+'</div>'+
-          '<div style="font-size:9px;color:var(--muted3);margin-top:2px">'+gigs+' espetáculos</div>'+
+          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">EM CUST\u00d3DIA / Holding now</div>'+
+          '<div style="font-size:16px;font-weight:700;color:'+col+'">'+fmtE(hold)+'</div>'+
+          '<div style="font-size:9px;color:var(--muted3);margin-top:2px">band money in wallet</div>'+
         '</div>'+
         '<div style="padding:8px 10px;border-bottom:1px solid var(--border2)">'+
-          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">DESPESAS DEDUTÍVEIS / Deductible</div>'+
-          '<div style="font-size:16px;font-weight:700;color:var(--red3)">-'+fmtE(deductible)+'</div>'+
-          '<div style="font-size:9px;color:var(--muted3)">quota-parte banda</div>'+
+          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">QUOTA JUSTA (1/4) / Fair claim</div>'+
+          '<div style="font-size:16px;font-weight:700;color:var(--text)">'+fmtE(fairClaim)+'</div>'+
+          '<div style="font-size:9px;color:var(--muted3)">of total band pool</div>'+
         '</div>'+
         '<div style="padding:8px 10px;border-right:1px solid var(--border2)">'+
-          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">RENDIMENTO LÍQUIDO / Net</div>'+
-          '<div style="font-size:15px;font-weight:700;color:var(--text)">'+fmtE(net)+'</div>'+
+          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">POSI\u00c7\u00c3O L\u00cdQUIDA / Net position</div>'+
+          '<div style="font-size:15px;font-weight:700;color:'+netColor+'">'+fmtS(net)+'</div>'+
+          '<div style="font-size:8px;color:'+netColor+'">'+netLabel+'</div>'+
         '</div>'+
         '<div style="padding:8px 10px">'+
-          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">BASE TRIBUTÁVEL (75%) / Taxable</div>'+
-          '<div style="font-size:15px;font-weight:700;color:var(--amber2)">'+fmtE(taxableBase)+'</div>'+
+          '<div style="font-size:8px;color:var(--muted3);margin-bottom:3px">FATURADO / Invoiced '+year+'</div>'+
+          '<div style="font-size:15px;font-weight:700;color:var(--green3)">'+fmtE(inv)+'</div>'+
+          '<div style="font-size:8px;color:var(--muted3)">on their name</div>'+
         '</div>'+
       '</div>'+
-      '<div style="background:var(--bg4);border-radius:2px;padding:10px 12px;font-size:10px">'+
+      '<div style="background:'+(risk>0?'rgba(255,143,0,.08)':'var(--bg4)')+';border-radius:2px;padding:10px 12px;font-size:10px;'+(risk>0?'border-left:3px solid var(--amber2)':'')+'">'+
         '<div style="display:flex;justify-content:space-between;margin-bottom:6px">'+
-          '<span style="color:var(--muted2)">IRS estimado (28,5%) / Est. tax</span>'+
-          '<span style="font-weight:700;color:var(--amber2)">'+fmtE(estimatedTax)+'</span>'+
+          '<span style="color:var(--muted2)">\u26a0 Risco fiscal Cat. B / Tax exposure</span>'+
+          '<span style="font-weight:700;color:var(--amber2)">'+fmtE(risk)+'</span>'+
         '</div>'+
         '<div style="font-size:8px;color:var(--muted3);line-height:1.6">'+
-          'Coeficiente Cat. B serviços: 0,75 &nbsp;·&nbsp; Regime simplificado &nbsp;·&nbsp; '+
-          'Declare em <strong>Anexo B</strong> da Mod. 3 &nbsp;·&nbsp; Prazo: 30 Jun '+(year+1)+
+          (inv>0
+            ? name+' invoiced '+fmtE(inv)+' this year \u2014 that income is on <strong>their</strong> Cat. B record, even though it\u2019s band money. Est. IRS at coef. 0,75 \u00d7 28,5%. Plan to cover this from the band fund until a band account exists.'
+            : name+' invoiced nothing this year \u2014 no personal tax exposure from gigs.')+
         '</div>'+
       '</div>'+
-      '<button onclick="irsPrintMember(\''+mk+'\','+year+')" style="margin-top:10px;width:100%;background:transparent;border:1px solid var(--border2);color:var(--muted2);font-size:9px;padding:5px;cursor:pointer;font-family:var(--mono)">⎙ PDF — '+name+'</button>'+
+      '<button onclick="irsPrintMember(\''+mk+'\','+year+')" style="margin-top:10px;width:100%;background:transparent;border:1px solid var(--border2);color:var(--muted2);font-size:9px;padding:5px;cursor:pointer;font-family:var(--mono)">\u2399 PDF \u2014 '+name+'</button>'+
     '</div>';
   }).join('');
 
+  // ── BAND POOL SUMMARY ───────────────────────────────────────────────────────
   if (bandDiv) {
     bandDiv.innerHTML='<div class="panel" style="padding:12px;margin-top:0">'+
-      '<div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:10px">BANDA — RESUMO '+year+'</div>'+
+      '<div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:10px">FUNDO DA BANDA \u2014 POOL TOTAL '+year+'</div>'+
       '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">'+
-        '<div><div style="font-size:8px;color:var(--muted3)">Receita total</div><div style="font-size:16px;font-weight:700;color:var(--green3)">'+fmtE(bandIncome)+'</div></div>'+
-        '<div><div style="font-size:8px;color:var(--muted3)">Despesas totais</div><div style="font-size:16px;font-weight:700;color:var(--red3)">-'+fmtE(bandExpenses)+'</div></div>'+
-        '<div><div style="font-size:8px;color:var(--muted3)">Resultado líquido</div><div style="font-size:16px;font-weight:700;color:'+(bandNet>=0?'var(--text)':'var(--red3)')+'" >'+fmtE(bandNet)+'</div></div>'+
-        '<div><div style="font-size:8px;color:var(--muted3)">Por membro</div><div style="font-size:16px;font-weight:700;color:var(--amber2)">'+fmtE(bandNet/4)+'</div></div>'+
+        '<div><div style="font-size:8px;color:var(--muted3)">Em cust\u00f3dia (wallets)</div><div style="font-size:16px;font-weight:700;color:var(--text)">'+fmtE(totalCustody)+'</div></div>'+
+        '<div><div style="font-size:8px;color:var(--muted3)">Fundo da banda</div><div style="font-size:16px;font-weight:700;color:var(--green3)">'+fmtE(bandFund)+'</div></div>'+
+        '<div><div style="font-size:8px;color:var(--muted3)">Pool total</div><div style="font-size:16px;font-weight:700;color:var(--accent)">'+fmtE(totalPool)+'</div></div>'+
+        '<div><div style="font-size:8px;color:var(--muted3)">Quota justa (1/4)</div><div style="font-size:16px;font-weight:700;color:var(--amber2)">'+fmtE(fairClaim)+'</div></div>'+
+      '</div>'+
+      '<div style="font-size:8px;color:var(--muted3);margin-top:10px;line-height:1.6;border-top:1px solid var(--border1);padding-top:8px">'+
+        'All gig money is band money for now. Each member holds a slice in their wallet until the band has its own bank account. '+
+        '<strong>Net position</strong> above shows who\u2019s currently holding more or less than their fair 1/4 \u2014 i.e. who would pay whom if you settled up today.'+
       '</div></div>';
   }
 
+  // ── NEXT-GIG INVOICER PLANNER (replaces category breakdown) ─────────────────
+  // For a representative next gig, estimate the BAND tax cost of routing it
+  // through each eligible member, and recommend the cheapest legal option.
   if (catDiv) {
-    var rows=Object.entries(expByCat).sort(function(a,b){return b[1]-a[1];});
+    var PROFILE_LABEL = { freelancer:'Freelancer (atividade)', employed:'Empregado (Cat. A)', none:'Sem atividade' };
+    var PROFILE_COLOR = { freelancer:'var(--blue2)', employed:'var(--amber2)', none:'var(--green3)' };
+
+    // Representative gig size = average invoiced this year, else a sensible default.
+    var totalInvAll = MK.reduce(function(s,k){ return s + (invoiced[k]||0); }, 0);
+    var nInv = MK.filter(function(k){ return invoiced[k]>0; }).length;
+    var sampleGig = nInv>0 ? (totalInvAll / nInv) : 1000;
+
+    // Build routing options for members who can still legally invoice.
+    var options = MK.map(function(mk){
+      var p = taxProfileFor(mk);
+      return {
+        mk: mk, name: MEMBER_NAMES_FT[mk], profile: p.profile,
+        rate: (p.marginalRate!=null?p.marginalRate:28.5),
+        eligible: canInvoice(mk),
+        cost: taxCostVia(mk, sampleGig),
+        atoUsed: p.atoUsed,
+      };
+    });
+    var eligible = options.filter(function(o){ return o.eligible; }).sort(function(a,b){ return a.cost - b.cost; });
+    var recommended = eligible.length ? eligible[0] : null;
+
+    var rows = options.sort(function(a,b){
+      // eligible first (by cost), then ineligible
+      if (a.eligible !== b.eligible) return a.eligible ? -1 : 1;
+      return a.cost - b.cost;
+    }).map(function(o){
+      var isRec = recommended && o.mk === recommended.mk;
+      var effRate = (o.cost / sampleGig * 100).toFixed(1);
+      return '<div style="display:grid;grid-template-columns:110px 130px 1fr 90px;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--border1);font-size:10px;'+(isRec?'background:rgba(0,200,120,.08);border-left:2px solid var(--green3)':'')+'">'+
+        '<div style="color:'+MEMBER_COLORS_FT[o.mk]+';font-weight:700">'+o.name+(isRec?' <span style="font-size:8px;color:var(--green3)">\u2190 best</span>':'')+'</div>'+
+        '<div style="font-size:8px;color:'+PROFILE_COLOR[o.profile]+'">'+PROFILE_LABEL[o.profile]+'</div>'+
+        '<div style="font-size:8px;color:var(--muted3)">'+
+          (o.eligible
+            ? 'tax on \u20ac'+sampleGig.toFixed(0)+' gig \u2248 '+effRate+'% @ marg. '+o.rate+'%'
+            : (o.profile!=='freelancer' && o.atoUsed ? '\u2717 ato isolado already used this year' : '\u2717 unavailable'))+
+        '</div>'+
+        '<div style="text-align:right;font-weight:700;color:'+(o.eligible?(isRec?'var(--green3)':'var(--amber2)'):'var(--muted3)')+'">'+(o.eligible?fmtE(o.cost):'\u2014')+'</div>'+
+      '</div>';
+    }).join('');
+
+    var recLine = recommended
+      ? '<div style="background:rgba(0,200,120,.08);border-left:3px solid var(--green3);border-radius:0 2px 2px 0;padding:10px 12px;margin-bottom:10px;font-size:10px">'+
+          '<span style="color:var(--green3);font-weight:700">\u2192 Next gig: '+recommended.name+' should invoice.</span> '+
+          '<span style="color:var(--muted2)">Lowest band tax cost ('+fmtE(recommended.cost)+' on a \u20ac'+sampleGig.toFixed(0)+' gig). '+
+          'The band fund reimburses their tax, so they\u2019re made whole.</span>'+
+        '</div>'
+      : '<div style="background:rgba(255,90,90,.08);border-left:3px solid var(--red3);padding:10px 12px;margin-bottom:10px;font-size:10px;color:var(--red3)">'+
+          '\u26a0 No member can legally invoice another gig this year (all atos isolados used, no freelancer). '+
+          'Time to open atividade or set up the band account.</div>';
+
     catDiv.innerHTML='<div class="panel" style="padding:12px;margin-top:0">'+
-      '<div style="font-size:8px;color:var(--muted);letter-spacing:.1em;margin-bottom:10px">DESPESAS POR CATEGORIA '+year+'</div>'+
-      (rows.length?rows.map(function(r){
-        var pct=bandExpenses>0?(r[1]/bandExpenses*100).toFixed(0):0;
-        var isDed=DEDUCTIBLE_CATS.indexOf(r[0])!==-1;
-        return '<div style="display:grid;grid-template-columns:160px 1fr 70px 60px;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border1);font-size:10px">'+
-          '<div style="color:var(--muted2)">'+(CAT_PT[r[0]]||r[0])+'</div>'+
-          '<div style="background:var(--bg4);border-radius:1px;height:4px;overflow:hidden">'+
-            '<div style="height:100%;width:'+pct+'%;background:'+(isDed?'var(--green3)':'var(--red3)')+';border-radius:1px"></div>'+
-          '</div>'+
-          '<div style="text-align:right;color:var(--text)">'+fmtE(r[1])+'</div>'+
-          '<div style="text-align:right">'+(isDed?'<span style="font-size:8px;color:var(--green3);padding:1px 4px;border:1px solid var(--green3);border-radius:1px">DED.</span>':'<span style="font-size:8px;color:var(--muted3)">—</span>')+'</div>'+
-        '</div>';
-      }).join(''):'<div style="color:var(--muted3);padding:8px 0;font-size:10px">No expenses for '+year+'.</div>')+
-    '</div>';
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
+        '<div style="font-size:8px;color:var(--muted);letter-spacing:.1em">QUEM FATURA O PR\u00d3XIMO / Who invoices next \u2014 '+year+'</div>'+
+        '<button onclick="openTaxProfiles()" style="background:transparent;border:1px solid var(--border2);color:var(--blue2);font-size:8px;padding:3px 8px;cursor:pointer;font-family:var(--mono)">\u270e Editar perfis fiscais</button>'+
+      '</div>'+
+      recLine +
+      '<div style="display:grid;grid-template-columns:110px 130px 1fr 90px;gap:8px;padding:4px 8px;font-size:7px;color:var(--muted3);letter-spacing:.08em;text-transform:uppercase">'+
+        '<div>Membro</div><div>Perfil</div><div>Base</div><div style="text-align:right">Custo fiscal</div>'+
+      '</div>'+
+      rows +
+      '<div style="font-size:8px;color:var(--muted3);margin-top:10px;line-height:1.6;border-top:1px solid var(--border1);padding-top:8px">'+
+        'Estimate on a sample gig of \u20ac'+sampleGig.toFixed(0)+' (avg invoiced this year). Tax is a <strong>band cost</strong>, '+
+        'reimbursed from the band fund \u2014 so this picks the cheapest legal route, not who \u201cpays.\u201d '+
+        'Ato isolado (0,75 \u00d7 marginal rate) is usually cheapest; a freelancer has no once-a-year limit but may sit in a higher bracket. '+
+        '<em>Orienta\u00e7\u00e3o \u2014 confirme com contabilista.</em>'+
+      '</div></div>';
   }
 }
 
@@ -7215,6 +7370,59 @@ function budgetSetTargets() {
 
 function closeBudgetTargets() { document.getElementById('budget-targets-modal').classList.remove('open'); }
 
+// ── MEMBER TAX PROFILE MODAL ─────────────────────────────────────────────────
+function openTaxProfiles() {
+  var MK = ['fabio','pedro','manuel','tiago'];
+  var NAMES = { fabio:'Fábio', pedro:'Pedro', manuel:'Manuel', tiago:'Tiago' };
+  var rows = document.getElementById('tax-profiles-rows');
+  if (!rows) return;
+  rows.innerHTML = MK.map(function(mk){
+    var p = Object.assign({ profile:'none', marginalRate:28.5, atoUsed:false }, (MEMBER_TAX_PROFILES && MEMBER_TAX_PROFILES[mk]) || {});
+    return '<div style="border:1px solid var(--border2);border-radius:2px;padding:10px 12px">'+
+      '<div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px">'+NAMES[mk]+'</div>'+
+      '<div style="display:grid;grid-template-columns:1.4fr 1fr auto;gap:10px;align-items:end">'+
+        '<div><div style="font-size:8px;color:var(--muted3);margin-bottom:3px">PERFIL / Profile</div>'+
+          '<select id="tp-'+mk+'-profile" class="form-select" style="width:100%" onchange="_tpToggleAto(\''+mk+'\')">'+
+            '<option value="none"'+(p.profile==='none'?' selected':'')+'>Sem atividade (1 ato isolado/ano)</option>'+
+            '<option value="employed"'+(p.profile==='employed'?' selected':'')+'>Empregado noutra entidade (Cat. A)</option>'+
+            '<option value="freelancer"'+(p.profile==='freelancer'?' selected':'')+'>Freelancer (atividade aberta)</option>'+
+          '</select></div>'+
+        '<div><div style="font-size:8px;color:var(--muted3);margin-bottom:3px">TAXA MARGINAL % / Marg. rate</div>'+
+          '<input id="tp-'+mk+'-rate" class="form-input" type="number" step="0.5" value="'+p.marginalRate+'" style="width:100%"></div>'+
+        '<div><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:9px;color:var(--muted2);white-space:nowrap" id="tp-'+mk+'-ato-wrap">'+
+          '<input type="checkbox" id="tp-'+mk+'-ato" '+(p.atoUsed?'checked':'')+' style="width:auto;margin:0"> ato isolado usado</label></div>'+
+      '</div></div>';
+  }).join('');
+  MK.forEach(_tpToggleAto);
+  document.getElementById('tax-profiles-modal').classList.add('open');
+}
+function _tpToggleAto(mk){
+  var prof = document.getElementById('tp-'+mk+'-profile');
+  var wrap = document.getElementById('tp-'+mk+'-ato-wrap');
+  if (prof && wrap) wrap.style.opacity = (prof.value === 'freelancer') ? '0.35' : '1';
+}
+function closeTaxProfiles(){ var m=document.getElementById('tax-profiles-modal'); if(m) m.classList.remove('open'); }
+async function saveTaxProfiles() {
+  var MK = ['fabio','pedro','manuel','tiago'];
+  var out = {};
+  MK.forEach(function(mk){
+    out[mk] = {
+      profile: (document.getElementById('tp-'+mk+'-profile')||{}).value || 'none',
+      marginalRate: parseFloat((document.getElementById('tp-'+mk+'-rate')||{}).value) || 28.5,
+      atoUsed: !!(document.getElementById('tp-'+mk+'-ato')||{}).checked,
+    };
+  });
+  MEMBER_TAX_PROFILES = out;
+  try { localStorage.setItem(STORAGE_TAXPROF, JSON.stringify(out)); } catch(e) {}
+  if (API_BASE && SESSION && SESSION.token) {
+    try { await _apiFetch('PUT', '/members/settings/member_tax_profiles', { value: out }); }
+    catch(e) { showToast && showToast('Saved locally (sync failed)','warn'); }
+  }
+  closeTaxProfiles();
+  irsRender();
+  showToast && showToast('Perfis fiscais guardados','ok');
+}
+
 async function saveBudgetTargets() {
   var year = document.getElementById('budget-year')?.value || '2025';
   var get = function(id){ var e=document.getElementById(id); return parseFloat(e&&e.value)||0; };
@@ -7246,18 +7454,19 @@ function budgetRender() {
   var actualRev = entries.filter(function(e){return e.amount>0;}).reduce(function(s,e){return s+e.amount;},0);
   var actualExp = entries.filter(function(e){return e.amount<0;}).reduce(function(s,e){return s+Math.abs(e.amount);},0);
   var actualNet = actualRev - actualExp;
-  var actualGigs = (SPLITS_DATA||[]).filter(function(s){ return !s.gig_date||new Date(s.gig_date).getFullYear()===year; }).length;
+  // Gig count = income entries in the ledger this year (real data, not dead splits).
+  var incomeCount = entries.filter(function(e){ return e.amount > 0; }).length;
+  var actualGigs = incomeCount;
   var actualAvgFee = actualGigs > 0 ? actualRev / actualGigs : 0;
-  var actualFund = (SPLITS_DATA||[]).filter(function(s){ return !s.gig_date||new Date(s.gig_date).getFullYear()===year; }).reduce(function(s,sp){ return s+parseFloat(sp.band_fund_eur||0); },0);
 
   // Annual summary cards
   var annualEl = document.getElementById('budget-annual-summary');
   if (annualEl) {
     var items = [
+      { label:'Net Margin', budget:t.net||0, actual:actualNet, col:(actualNet>=0?'var(--green3)':'var(--red3)') },
       { label:'Revenue', budget:t.revenue||0, actual:actualRev, col:'var(--green3)' },
       { label:'Expenses', budget:t.expenses||0, actual:actualExp, col:'var(--red3)', invert:true },
-      { label:'Net Income', budget:t.net||0, actual:actualNet, col:'var(--text)' },
-      { label:'Gig Count', budget:t.gigs||0, actual:actualGigs, col:'var(--blue2)', money:false },
+      { label:'Income Entries', budget:t.gigs||0, actual:actualGigs, col:'var(--blue2)', money:false },
     ];
     annualEl.innerHTML = items.map(function(item) {
       var bud = item.budget || 0;
@@ -7275,37 +7484,35 @@ function budgetRender() {
     }).join('');
   }
 
-  // Show-by-show table
+  // Gig income & net margin — from the REAL ledger (not the dead splits table).
+  // "A gig" = an income transaction (categorized Espetáculo/show, or any income).
   var tbody = document.getElementById('budget-tbody');
   if (tbody) {
-    var showSplits = (SPLITS_DATA||[]).filter(function(s){ return !s.gig_date||new Date(s.gig_date).getFullYear()===year; });
-    if (!showSplits.length) {
-      tbody.innerHTML = '<tr><td colspan="9" style="padding:16px;text-align:center;color:var(--muted3)">No shows found for '+year+'. Save gig splits to see data here.</td></tr>';
+    var incomeEntries = entries.filter(function(e){ return e.amount > 0; })
+      .sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+    // Year expense total, so each gig can show its share of the year's net.
+    var yearExp = entries.filter(function(e){return e.amount<0;}).reduce(function(s,e){return s+Math.abs(e.amount);},0);
+    if (!incomeEntries.length) {
+      tbody.innerHTML = '<tr><td colspan="9" style="padding:16px;text-align:center;color:var(--muted3)">No income recorded for '+year+' yet. Log gig revenue in the Ledger or Treasury.</td></tr>';
     } else {
-      var avgBudgetFee = t.avgFee || 0;
-      var avgBudgetExp = t.expenses && t.gigs ? (t.expenses/t.gigs) : 0;
-      tbody.innerHTML = showSplits.map(function(s) {
-        var aFee = parseFloat(s.gross_eur||0);
-        var aExp = parseFloat(s.total_expenses_eur||0);
-        var aNet = aFee - aExp;
-        var bFee = avgBudgetFee;
-        var bExp = avgBudgetExp;
-        var bNet = bFee - bExp;
-        var feeVar = aFee - bFee;
-        var margin = aFee > 0 ? (aNet/aFee*100).toFixed(0) : 0;
-        var feeColor = feeVar >= 0 ? 'var(--green3)' : 'var(--red3)';
+      tbody.innerHTML = incomeEntries.map(function(e) {
+        var fee = e.amount;
+        var cat = e.cat || '—';
+        var d = e.date ? String(e.date).slice(0,10) : '';
+        var isShow = /espet|show|gig|cach/i.test(cat) || /espet|cach|centro de artes|festival|concert/i.test(e.desc||'');
         return '<tr style="border-bottom:1px solid var(--border1);font-size:10px" onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'\'">'+
-          '<td style="padding:7px 10px"><div style="font-weight:700;color:var(--text)">'+(s.gig_name||'—')+'</div><div style="font-size:8px;color:var(--muted3)">'+(s.gig_date||'')+'</div></td>'+
-          '<td style="padding:7px 10px;text-align:right;color:var(--muted3)">'+(bFee>0?fmtE(bFee):'—')+'</td>'+
-          '<td style="padding:7px 10px;text-align:right;color:var(--green3)">'+fmtE(aFee)+'</td>'+
-          '<td style="padding:7px 10px;text-align:right;color:'+feeColor+'">'+(bFee>0?(feeVar>=0?'+':'')+fmtE(feeVar):'—')+'</td>'+
-          '<td style="padding:7px 10px;text-align:right;color:var(--muted3)">'+(bExp>0?fmtE(bExp):'—')+'</td>'+
-          '<td style="padding:7px 10px;text-align:right;color:var(--red3)">'+(aExp>0?'-'+fmtE(aExp):'—')+'</td>'+
-          '<td style="padding:7px 10px;text-align:right;color:var(--muted3)">'+(bNet>0?fmtE(bNet):'—')+'</td>'+
-          '<td style="padding:7px 10px;text-align:right;color:var(--text)">'+fmtE(aNet)+'</td>'+
-          '<td style="padding:7px 10px;text-align:right;color:'+(margin>=50?'var(--green3)':margin>=30?'var(--amber2)':'var(--red3)')+'">'+margin+'%</td>'+
+          '<td style="padding:7px 10px"><div style="font-weight:700;color:var(--text)">'+(e.desc||'—')+'</div><div style="font-size:8px;color:var(--muted3)">'+d+(isShow?' · <span style="color:var(--accent)">show</span>':'')+'</div></td>'+
+          '<td style="padding:7px 10px;text-align:right;color:var(--muted3)">'+cat+'</td>'+
+          '<td style="padding:7px 10px;text-align:right;color:var(--green3);font-weight:700">'+fmtE(fee)+'</td>'+
+          '<td colspan="6" style="padding:7px 10px;text-align:right;color:var(--muted3);font-size:9px">income entry</td>'+
         '</tr>';
-      }).join('');
+      }).join('') +
+      '<tr style="border-top:2px solid var(--border2);font-size:10px;background:var(--bg4)">'+
+        '<td style="padding:9px 10px;font-weight:700;color:var(--text)">TOTAL '+year+'</td>'+
+        '<td style="padding:9px 10px;text-align:right;color:var(--muted3)">'+incomeEntries.length+' entries</td>'+
+        '<td style="padding:9px 10px;text-align:right;color:var(--green3);font-weight:700">'+fmtE(actualRev)+'</td>'+
+        '<td colspan="6" style="padding:9px 10px;text-align:right;color:var(--muted2)">\u2212 exp '+fmtE(yearExp)+' &nbsp;=&nbsp; <strong style="color:'+(actualNet>=0?'var(--green3)':'var(--red3)')+'">net '+fmtE(actualNet)+'</strong></td>'+
+      '</tr>';
     }
   }
 
