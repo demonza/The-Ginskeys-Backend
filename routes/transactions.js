@@ -9,8 +9,58 @@ const pool    = require('../db/pool');
 const { requireAuth, requirePerm } = require('../middleware/auth');
 const { writeAudit } = require('../middleware/audit');
 const { toEur } = require('./fx');
+const { appendEvent } = require('../lib/ledger');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
+
+// ── TRUST ENGINE HELPERS ────────────────────────────────────────────
+// transactions.js is the main door money moves through, so every write
+// path here (create, edit, delete, bulk import) has to mirror into the
+// append-only fin_events store — same pattern as treasury.js/splits.js.
+// History is never rewritten: an edit or delete cancels the transaction's
+// last recorded effect with a 'reversal' event, then (for edits) records
+// a fresh event for the new values.
+
+// Most recent fin_event for this transaction row, with its ledger lines.
+async function findLatestEvent(client, txnId) {
+  const { rows: [ev] } = await client.query(
+    `SELECT seq, amount_eur, occurred_on FROM fin_events
+     WHERE source_table = 'transactions' AND source_id = $1
+     ORDER BY seq DESC LIMIT 1`, [txnId]
+  );
+  if (!ev) return null;
+  const { rows: lines } = await client.query(
+    `SELECT account, amount_eur FROM fin_ledger WHERE event_seq = $1 ORDER BY id`, [ev.seq]
+  );
+  return { seq: ev.seq, amount_eur: ev.amount_eur, lines };
+}
+
+// Cancel a transaction's last recorded effect (used on edit + delete).
+async function reverseEvent(client, prevEvent, txnId, userId, note) {
+  if (!prevEvent) return null;
+  return appendEvent(client, {
+    event_type: 'reversal',
+    amount_eur: prevEvent.amount_eur,
+    occurred_on: new Date().toISOString().slice(0, 10),
+    description: note,
+    source_table: 'transactions',
+    source_id: txnId,
+    reverses_seq: prevEvent.seq,
+    metadata: { lines: prevEvent.lines },
+  }, userId);
+}
+
+// Record a transaction's current financial effect as a fresh event.
+async function recordEvent(client, txn, userId) {
+  return appendEvent(client, {
+    event_type: txn.type === 'income' ? 'revenue_received' : 'expense_paid',
+    amount_eur: txn.amount_eur,
+    occurred_on: txn.date,
+    description: txn.description,
+    source_table: 'transactions',
+    source_id: txn.id,
+  }, userId);
+}
 
 // FIX: whitelist sort columns to prevent SQL injection through sortBy
 const ALLOWED_SORT = {
@@ -174,14 +224,33 @@ router.post('/bulk-import', requireAuth, requirePerm('addTxn'), upload.single('f
         }
 
         const id = uuid();
-        await pool.query(
-          `INSERT INTO transactions (id,date,type,category_id,amount,currency,amount_eur,description,tags,notes,created_by)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
-          [id, date, type.toLowerCase(), catId, amt, currency.toUpperCase(), amtEur,
-           description.trim(),
-           tags ? tags.split(',').map(t=>t.trim()) : [],
-           notes || null, req.user.id]
-        );
+        const txnType = type.toLowerCase();
+
+        // Each row gets its own DB transaction so one bad row can't take
+        // down the rest of the batch, while still keeping the insert and
+        // its TRUST ENGINE mirror atomic with each other.
+        const rowClient = await pool.connect();
+        try {
+          await rowClient.query('BEGIN');
+          await rowClient.query(
+            `INSERT INTO transactions (id,date,type,category_id,amount,currency,amount_eur,description,tags,notes,created_by)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+            [id, date, txnType, catId, amt, currency.toUpperCase(), amtEur,
+             description.trim(),
+             tags ? tags.split(',').map(t=>t.trim()) : [],
+             notes || null, req.user.id]
+          );
+          await recordEvent(rowClient, {
+            id, type: txnType, amount_eur: amtEur, date, description: description.trim(),
+          }, req.user.id);
+          await rowClient.query('COMMIT');
+        } catch (rowErr) {
+          await rowClient.query('ROLLBACK');
+          throw rowErr;
+        } finally {
+          rowClient.release();
+        }
+
         imported.push(id);
       } catch (e) {
         errors.push({ row: i + 2, error: e.message });
@@ -236,16 +305,32 @@ router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
     const amountEur = await toEur(amt, currency);
 
     const id = uuid();
-    const { rows } = await pool.query(
-      `INSERT INTO transactions
-         (id, date, type, category_id, amount, currency, amount_eur, description, source_dest, tour_id, tags, notes, reconciled, created_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
-       RETURNING *`,
-      [id, date, type, categoryId || null, amt, currency, amountEur,
-       description.trim(), source_dest || null, tourId || null,
-       Array.isArray(tags) ? tags : [tags], notes || null,
-       reconciled !== undefined ? !!reconciled : true, req.user.id]
-    );
+    const client = await pool.connect();
+    let rows;
+    try {
+      await client.query('BEGIN');
+      const ins = await client.query(
+        `INSERT INTO transactions
+           (id, date, type, category_id, amount, currency, amount_eur, description, source_dest, tour_id, tags, notes, reconciled, created_by)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+         RETURNING *`,
+        [id, date, type, categoryId || null, amt, currency, amountEur,
+         description.trim(), source_dest || null, tourId || null,
+         Array.isArray(tags) ? tags : [tags], notes || null,
+         reconciled !== undefined ? !!reconciled : true, req.user.id]
+      );
+      rows = ins.rows;
+
+      // TRUST ENGINE: mirror this movement into the append-only event store.
+      await recordEvent(client, rows[0], req.user.id);
+
+      await client.query('COMMIT');
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
 
     await writeAudit(req, 'TXN_CREATE', {
       entityType: 'transaction', entityId: id,
@@ -257,17 +342,24 @@ router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
 
 // ─── PUT /api/transactions/:id ─────────────────────
 router.put('/:id', requireAuth, requirePerm('editTxn'), async (req, res, next) => {
+  const client = await pool.connect();
   try {
-    const { rows: existing } = await pool.query('SELECT * FROM transactions WHERE id = $1', [req.params.id]);
-    if (!existing[0]) return res.status(404).json({ error: 'Transaction not found' });
+    await client.query('BEGIN');
+    const { rows: existing } = await client.query('SELECT * FROM transactions WHERE id = $1 FOR UPDATE', [req.params.id]);
+    if (!existing[0]) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
 
     const old = existing[0];
     const { date, type, amount, currency, description, source_dest, tourId, tags, notes, reconciled, category } = req.body;
     let { categoryId } = req.body;
 
     // FIX: validate type if provided
-    if (type && !['income','expense'].includes(type))
+    if (type && !['income','expense'].includes(type)) {
+      await client.query('ROLLBACK');
       return res.status(400).json({ error: 'type must be income or expense' });
+    }
 
     // FIX: allow updating category by NAME (the console UI only knows names).
     // A blank string ('') explicitly CLEARS the category; omitting the key leaves it.
@@ -279,7 +371,7 @@ router.put('/:id', requireAuth, requirePerm('editTxn'), async (req, res, next) =
       if (category === null || category === '') {
         categoryId = null;
       } else {
-        const { rows: cats } = await pool.query(
+        const { rows: cats } = await client.query(
           'SELECT id FROM categories WHERE name ILIKE $1 LIMIT 1', [category]
         );
         categoryId = cats[0]?.id || null;
@@ -308,39 +400,88 @@ router.put('/:id', requireAuth, requirePerm('editTxn'), async (req, res, next) =
     if (amount !== undefined || currency !== undefined) {
       const newAmt = amount   !== undefined ? parseFloat(amount) : parseFloat(old.amount);
       const newCcy = currency !== undefined ? currency           : old.currency;
-      if (!isFinite(newAmt) || newAmt <= 0)
+      if (!isFinite(newAmt) || newAmt <= 0) {
+        await client.query('ROLLBACK');
         return res.status(400).json({ error: 'amount must be a positive number' });
+      }
       const amountEur = await toEur(newAmt, newCcy);
       push('amount', newAmt);
       push('currency', newCcy);
       push('amount_eur', amountEur);
     }
 
-    if (!sets.length) return res.json(old); // nothing to change
+    if (!sets.length) {
+      await client.query('ROLLBACK');
+      return res.json(old); // nothing to change
+    }
 
     sets.push('updated_at = now()');
     vals.push(req.params.id);
-    const { rows } = await pool.query(
+    const { rows } = await client.query(
       `UPDATE transactions SET ${sets.join(', ')} WHERE id = $${vals.length} RETURNING *`,
       vals
     );
+    const updated = rows[0];
+
+    // TRUST ENGINE: if the financial shape of the transaction actually
+    // changed (type, amount, or date — the fields expandLines()/the event
+    // depend on), cancel the old recorded effect and record the new one.
+    // History is never rewritten in place — the correction is itself a
+    // new, hash-chained event.
+    const financialFieldsChanged =
+      old.type !== updated.type ||
+      Number(old.amount_eur).toFixed(2) !== Number(updated.amount_eur).toFixed(2) ||
+      String(old.date) !== String(updated.date);
+
+    if (financialFieldsChanged) {
+      const prevEvent = await findLatestEvent(client, updated.id);
+      await reverseEvent(client, prevEvent, updated.id, req.user.id,
+        `Correction: "${old.description}" edited`);
+      await recordEvent(client, updated, req.user.id);
+    }
+
+    await client.query('COMMIT');
 
     await writeAudit(req, 'TXN_UPDATE', {
       entityType: 'transaction', entityId: req.params.id,
-      oldValue: old, newValue: rows[0],
+      oldValue: old, newValue: updated,
     });
-    res.json(rows[0]);
-  } catch (err) { next(err); }
+    res.json(updated);
+  } catch (err) {
+    await client.query('ROLLBACK');
+    next(err);
+  } finally {
+    client.release();
+  }
 });
 
 // ─── DELETE /api/transactions/:id ──────────────────
 router.delete('/:id', requireAuth, requirePerm('deleteTxn'), async (req, res, next) => {
+  const client = await pool.connect();
   try {
-    const { rows } = await pool.query('DELETE FROM transactions WHERE id = $1 RETURNING *', [req.params.id]);
-    if (!rows[0]) return res.status(404).json({ error: 'Transaction not found' });
+    await client.query('BEGIN');
+    const { rows } = await client.query('DELETE FROM transactions WHERE id = $1 RETURNING *', [req.params.id]);
+    if (!rows[0]) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
+
+    // TRUST ENGINE: cancel this transaction's recorded effect. The event
+    // store is append-only — deleting the transaction row must never
+    // delete or silently orphan its history in fin_events/fin_ledger.
+    const prevEvent = await findLatestEvent(client, rows[0].id);
+    await reverseEvent(client, prevEvent, rows[0].id, req.user.id,
+      `Deleted: "${rows[0].description}"`);
+
+    await client.query('COMMIT');
     await writeAudit(req, 'TXN_DELETE', { entityType: 'transaction', entityId: req.params.id, oldValue: rows[0] });
     res.status(204).end();
-  } catch (err) { next(err); }
+  } catch (err) {
+    await client.query('ROLLBACK');
+    next(err);
+  } finally {
+    client.release();
+  }
 });
 
 module.exports = router;
