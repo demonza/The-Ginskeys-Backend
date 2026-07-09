@@ -35,8 +35,10 @@ const membersRoutes     = require('./routes/members');
 const treasuryRoutes    = require('./routes/treasury');
 const chatRoutes        = require('./routes/chat');
 const trustRoutes       = require('./routes/trust');
+const forecastRoutes    = require('./routes/forecast');
 const { CHAT_DDL }      = require('./db/migrate_v9');
 const { TRUST_DDL }     = require('./db/migrate_v10');
+const { FORECAST_DDL }  = require('./db/migrate_v11');
 
 const app = express();
 
@@ -123,6 +125,7 @@ app.use('/api/members',     membersRoutes);
 app.use('/api/treasury',    treasuryRoutes);
 app.use('/api/chat',        chatRoutes);
 app.use('/api/trust',       trustRoutes);
+app.use('/api/forecast',    forecastRoutes);
 
 // ─── HEALTH ───────────────────────────────────────────
 app.get('/api/health', async (_req, res) => {
@@ -225,11 +228,22 @@ async function start() {
     console.warn('⚠ trust tables auto-create skipped:', err.message);
   }
 
+  // Auto-create Forecast Engine tables (booking stage-transition history) if missing
+  try {
+    await pool.query(FORECAST_DDL);
+    console.log('  ✔ Forecast Engine tables ready (booking_stage_events)');
+  } catch (err) {
+    console.warn('⚠ forecast tables auto-create skipped:', err.message);
+  }
+
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`🎸 Ginskeys API listening on :${PORT}`);
     console.log(`   Health:  http://localhost:${PORT}/api/health`);
     console.log(`   Console: http://localhost:${PORT}/`);
   });
+
+  // Weekly PDF synthesis report — scheduled, non-fatal if misconfigured.
+  require('./lib/weeklyScheduler').start();
 }
 
 start();

@@ -589,4 +589,57 @@ router.get('/financial', requireAuth, requirePerm('viewLedger'), async (req, res
   } catch (err) { next(err); }
 });
 
+// ── GET /api/reports/weekly ─────────────────────────
+// Preview/download the weekly synthesis PDF on demand, without emailing it.
+router.get('/weekly', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
+  try {
+    const { generateWeeklySynthesisPDF } = require('../lib/weeklyReport');
+    const pdfBuffer = await generateWeeklySynthesisPDF();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition',
+      `attachment; filename="ginskeys-weekly-${new Date().toISOString().slice(0, 10)}.pdf"`);
+    res.send(pdfBuffer);
+  } catch (err) { next(err); }
+});
+
+// ── POST /api/reports/weekly/send ───────────────────
+// Generate the weekly synthesis PDF and email it to BAND_OFFICIAL_EMAIL
+// (or an explicit `to` in the request body, for testing) right now.
+router.post('/weekly/send', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
+  try {
+    const { generateWeeklySynthesisPDF } = require('../lib/weeklyReport');
+    const { sendMail, isConfigured } = require('../lib/mailer');
+
+    if (!isConfigured()) {
+      return res.status(400).json({
+        error: 'Email is not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASS in Railway Variables.',
+      });
+    }
+
+    const to = req.body?.to || process.env.BAND_OFFICIAL_EMAIL;
+    if (!to) {
+      return res.status(400).json({ error: 'No recipient — set BAND_OFFICIAL_EMAIL in Railway Variables, or pass "to" in the request body.' });
+    }
+
+    const pdfBuffer = await generateWeeklySynthesisPDF();
+    const dateLabel = new Date().toISOString().slice(0, 10);
+
+    await sendMail({
+      to,
+      subject: `The Ginskeys — Weekly Synthesis (${dateLabel})`,
+      html: `<p>This week's synthesis report is attached.</p>
+             <p style="color:#888;font-size:12px">Generated automatically by the Ginskeys Console. Figures are verified against the Trust Engine hash-chained ledger.</p>`,
+      attachments: [{
+        filename: `ginskeys-weekly-${dateLabel}.pdf`,
+        content: pdfBuffer,
+        contentType: 'application/pdf',
+      }],
+    });
+
+    await writeAudit(req, 'WEEKLY_REPORT_SENT', { details: `Sent to ${to}` });
+    res.json({ ok: true, sent_to: to });
+  } catch (err) { next(err); }
+});
+
 module.exports = router;
+module.exports.helpers = { fmtEur, fmtDate, fmtPct, C, drawHeader, drawSubheader, drawKpiRow, drawTable, drawTextBlock, drawSignalRow, checkPageBreak };

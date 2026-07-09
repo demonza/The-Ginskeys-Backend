@@ -56,14 +56,37 @@ router.post('/', requireAuth, requirePerm('addTxn'), async (req, res, next) => {
     if (!STAGES.includes(stage)) return res.status(400).json({ error: 'invalid stage' });
     if (!VALID_TYPES.includes(type)) return res.status(400).json({ error: 'invalid type. Valid: ' + VALID_TYPES.join(', ') });
 
-    const { rows } = await pool.query(
-      `INSERT INTO booking_contacts
-         (id,name,type,location,contact_email,contact_name,stage,fee_eur,date,notes,follow_up_date,created_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
-      [uuid(),name,type,location||null,contact_email||null,contact_name||null,
-       stage,fee_eur?parseFloat(fee_eur):null,date||null,notes||null,
-       follow_up_date||null,req.user.id]
-    );
+    const id = uuid();
+    const client = await pool.connect();
+    let rows;
+    try {
+      await client.query('BEGIN');
+      const ins = await client.query(
+        `INSERT INTO booking_contacts
+           (id,name,type,location,contact_email,contact_name,stage,fee_eur,date,notes,follow_up_date,created_by)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
+        [id,name,type,location||null,contact_email||null,contact_name||null,
+         stage,fee_eur?parseFloat(fee_eur):null,date||null,notes||null,
+         follow_up_date||null,req.user.id]
+      );
+      rows = ins.rows;
+
+      // FORECAST ENGINE: record the booking's entry stage so conversion
+      // rates can eventually be computed from real history.
+      await client.query(
+        `INSERT INTO booking_stage_events (booking_id, from_stage, to_stage, fee_eur, created_by)
+         VALUES ($1, NULL, $2, $3, $4)`,
+        [id, stage, fee_eur ? parseFloat(fee_eur) : null, req.user.id]
+      );
+
+      await client.query('COMMIT');
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
+
     await writeAudit(req,'BOOKING_ADD',{entityType:'booking',entityId:rows[0].id,details:name});
     res.status(201).json(rows[0]);
   } catch (err) { next(err); }
@@ -108,6 +131,15 @@ router.put('/:id', requireAuth, requirePerm('addTxn'), async (req, res, next) =>
        follow_up_date||null, contacted_at||null, req.params.id]
     );
     const booking = rows[0];
+
+    // FORECAST ENGINE: log the transition if the stage actually changed.
+    if (stage && stage !== prev.stage) {
+      await client.query(
+        `INSERT INTO booking_stage_events (booking_id, from_stage, to_stage, fee_eur, created_by)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [booking.id, prev.stage, stage, booking.fee_eur || null, req.user.id]
+      );
+    }
 
     // ── Keep the linked Tour record in sync with the booking lifecycle ──
     //
