@@ -607,12 +607,12 @@ router.get('/weekly', requireAuth, requirePerm('viewLedger'), async (req, res, n
 // (or an explicit `to` in the request body, for testing) right now.
 router.post('/weekly/send', requireAuth, requirePerm('viewLedger'), async (req, res, next) => {
   try {
-    const { generateWeeklySynthesisPDF } = require('../lib/weeklyReport');
+    const { generateWeeklySynthesisPDF, gatherWeekData, buildEmailHtml } = require('../lib/weeklyReport');
     const { sendMail, isConfigured } = require('../lib/mailer');
 
     if (!isConfigured()) {
       return res.status(400).json({
-        error: 'Email is not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASS in Railway Variables.',
+        error: 'Email is not configured. Set RESEND_API_KEY in Railway Variables (free at resend.com/api-keys).',
       });
     }
 
@@ -621,14 +621,14 @@ router.post('/weekly/send', requireAuth, requirePerm('viewLedger'), async (req, 
       return res.status(400).json({ error: 'No recipient — set BAND_OFFICIAL_EMAIL in Railway Variables, or pass "to" in the request body.' });
     }
 
-    const pdfBuffer = await generateWeeklySynthesisPDF();
+    const weekData = await gatherWeekData();
+    const pdfBuffer = await generateWeeklySynthesisPDF(weekData);
     const dateLabel = new Date().toISOString().slice(0, 10);
 
     await sendMail({
       to,
-      subject: `The Ginskeys — Weekly Synthesis (${dateLabel})`,
-      html: `<p>This week's synthesis report is attached.</p>
-             <p style="color:#888;font-size:12px">Generated automatically by the Ginskeys Console. Figures are verified against the Trust Engine hash-chained ledger.</p>`,
+      subject: `The Ginskeys — Síntese Semanal (${dateLabel})`,
+      html: buildEmailHtml(weekData),
       attachments: [{
         filename: `ginskeys-weekly-${dateLabel}.pdf`,
         content: pdfBuffer,
