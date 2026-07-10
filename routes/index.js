@@ -40,7 +40,7 @@ const EXTRA_ORIGINS = (process.env.FRONTEND_URL || '')
 
 const ALLOWED_ORIGINS = new Set([
   ...EXTRA_ORIGINS,
-  'https://the-ginskeys-backend-production.up.railway.app',
+  'https://the-ginskeys-backend-production.up.railway.app','https://console.theginskeys.com'
   // FIX: removed 'null' — allows file:// and data: origins, security risk
   'http://localhost:3000',
   'http://localhost:5173',
